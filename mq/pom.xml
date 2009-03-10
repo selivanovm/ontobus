@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ru.magnetosoft.magnet</groupId>
+  <artifactId>mq</artifactId>
+  <packaging>pom</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <modules>
+  	<module>mq-api</module>
+  	<module>mq-impl</module>
+  	<module>mq-test</module>
+  	<module>mq-server</module>
+  </modules>
+  
+  
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>ru.magnetosoft</groupId>
+  			<artifactId>jtoolbox</artifactId>
+  			<version>0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>4.4</version>
+  		</dependency>
+  		
+  		<dependency>
+  			<groupId>ru.magnetosoft.magnet</groupId>
+  			<artifactId>mq-api</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>ru.magnetosoft.magnet</groupId>
+  			<artifactId>mq-impl</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>		
+  	</dependencies>
+  </dependencyManagement>
+  
+  
+    <build>
+	<plugins>
+	    <plugin>
+    		<groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <configuration>
+		    <source>1.5</source>
+	    	    <target>1.5</target>
+		</configuration>
+	    </plugin>
+	    <plugin>
+    		<groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-resources-plugin</artifactId>
+		<version>2.3</version>
+	    </plugin>
+	</plugins>
+    </build>
+																	      
+  
+</project>

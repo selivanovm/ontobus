@@ -1,0 +1,10 @@
+Список команд:
+
+info
+
+create channel [id] <host:port> -> <host:port>
+create queue <name> <size>
+create listener <name> <channel-id>
+	
+remove queue <name>
+remove listener <name>
