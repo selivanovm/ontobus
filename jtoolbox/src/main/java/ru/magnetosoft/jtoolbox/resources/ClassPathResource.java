@@ -9,7 +9,11 @@ public class ClassPathResource implements Resource
 	public URL url;
 
 	public ClassPathResource(String classpath){
-		this.url = getClass().getResource(classpath);
+		this.url = ClassPathResource.class.getClassLoader().getResource(classpath);		
+	}
+
+	public ClassPathResource(URL url){
+		this.url = url;		
 	}
 	
 	public boolean exists() {

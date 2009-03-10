@@ -18,7 +18,7 @@ public class XPathNodeTest
 	@Test
 	public void testParseXml() throws Exception{
 		
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new ClassPathResource("/sample.xml").openStream() );
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( new ClassPathResource("sample.xml").openStream() );
 		
 		XPathNode root = XPathNode.wrap(doc);
 		assertTrue(root != null);

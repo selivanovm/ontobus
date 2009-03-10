@@ -15,17 +15,17 @@ public class ClassPathResourceTest
 	@Test
 	public void testResourceExistance() throws Exception{
 		
-		Resource rc = new ClassPathResource("/somefile.txt");
+		Resource rc = new ClassPathResource("somefile.txt");
 		assertTrue(rc.exists());
 		
-		rc = new ClassPathResource("/notexistingfile.txt");
+		rc = new ClassPathResource("notexistingfile.txt");
 		assertFalse(rc.exists());
 	}
 	
 	@Test
 	public void testInputStream() throws Exception{
 		
-		Resource rc = new ClassPathResource("/somefile.txt");
+		Resource rc = new ClassPathResource("somefile.txt");
 		InputStream is = rc.openStream();
 		
 		byte[] bytes = new byte[is.available()];

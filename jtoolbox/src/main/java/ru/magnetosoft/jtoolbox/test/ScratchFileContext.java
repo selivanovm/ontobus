@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 import ru.magnetosoft.jtoolbox.common.FileUtils;
 import ru.magnetosoft.jtoolbox.resources.ClassPathResource;
@@ -24,6 +25,11 @@ public abstract class ScratchFileContext
 		public ScratchDir dir(String name){
 			return new ScratchDir( this.dir + FileUtils.f_sep + name );
 		}
+		
+		public ScratchDir back(){
+			return new ScratchDir( new File(dir).getParent() );
+		}
+
 		
 		public ScratchDir copy_from_classpath(String file){
 			InputStream is = null;
