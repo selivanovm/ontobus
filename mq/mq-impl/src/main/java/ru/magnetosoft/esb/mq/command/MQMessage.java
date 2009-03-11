@@ -32,7 +32,7 @@ public class MQMessage extends Command
 		super.beforeMarshall();
 		
 		
-		set("message-type", messageType.ordinal());
+		set("message-type", messageType.name());
 		set("message-id", messageID);
 		set("correlation-id", correlationID);
 		set("destination-type", (destination != null) ? destination.type().ordinal() : null);
@@ -42,29 +42,13 @@ public class MQMessage extends Command
 		set("path", path);
 		set("payload", payload);
 		
-		
-//		prepared.add( prepareInt(messageType.ordinal()) );
-//		prepared.add( prepareString(messageID) );
-//		prepared.add( prepareString(correlationID) );
-//		prepare_destination(destination);
-//		prepare_destination(replyTo);
-//		prepared.add( prepareList(path) );
-
-//		prepared.add( messageType.ordinal() );
-//		prepared.add( messageID );
-//		prepared.add( correlationID );
-//		prepare_destination(destination);
-//		prepare_destination(replyTo);
-//		prepared.add( path );
-//		prepared.add( payload );
-		
 	}
 	
 	@Override
 	public void afterUnmarshall() {
 		super.afterUnmarshall();
 		
-		messageType = MessageType.values()[ (Integer)parameters.get("message-type") ];
+		messageType = MessageType.valueOf( (String)parameters.get("message-type") );
 		messageID = get("message-id");
 		correlationID = get("correlation-id");
 		if(get("destination-type") != null){
@@ -80,21 +64,6 @@ public class MQMessage extends Command
 		path = get("path");
 		payload = get("payload");
 		
-		
-//		messageType = MessageType.values()[ (Integer)prepared.pop().restore() ];
-//		messageID = prepared.pop().restore();
-//		correlationID = prepared.pop().restore();
-//		destination = restore_destination();
-//		replyTo = restore_destination();
-//		path = prepared.pop().restore();
-		
-//		messageType = MessageType.values()[ (Integer)prepared.get(0) ];
-//		messageID = (String)prepared.get(0);//.restore();
-//		correlationID = (String)prepared.get(0);//.restore();
-//		destination = restore_destination();
-//		replyTo = restore_destination();
-//		path = (List<String>)prepared.get(0);//.restore();
-//		payload = (Payload)prepared.get(0);
 		
 	}
 }
