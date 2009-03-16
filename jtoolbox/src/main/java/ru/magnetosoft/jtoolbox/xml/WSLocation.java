@@ -5,7 +5,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
-public class WsdlLocation
+public class WSLocation
 {
 	protected QName serviceName;
 	protected URL wsdlUrl;
@@ -21,8 +21,8 @@ public class WsdlLocation
 	}
 	
 	
-	public static WsdlLocation create(String url, String ns, String svcname) throws MalformedURLException{
-		WsdlLocation wsloc = new WsdlLocation();
+	public static WSLocation create(String url, String ns, String svcname) throws MalformedURLException{
+		WSLocation wsloc = new WSLocation();
 		wsloc.serviceName = new QName(ns, svcname);
 		wsloc.wsdlUrl = new URL(url);
 		return wsloc;
