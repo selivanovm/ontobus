@@ -42,7 +42,7 @@ public class PropertiesHelper
 		return this.props;
 	}
 	
-	public static PropertiesHelper newInstance(Properties props){
+	public static PropertiesHelper wrap(Properties props){
 		return new PropertiesHelper(props);
 	}
 }

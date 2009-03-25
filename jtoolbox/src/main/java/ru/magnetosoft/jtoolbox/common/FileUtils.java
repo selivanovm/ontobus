@@ -8,37 +8,6 @@ import java.nio.channels.FileChannel;
 
 public class FileUtils
 {
-/*	
-	public static class PathBuilder
-	{
-		protected StringBuilder path = new StringBuilder();
-		protected boolean stopped = false;
-		
-		protected PathBuilder(){
-		}
-		protected PathBuilder(String startPath){
-			this.path = new StringBuilder(startPath);
-		}
-		
-		public PathBuilder dir(String dirName){
-			if(path.length() > 0) path.append(FileUtils.f_sep);
-			path.append(dirName);
-			return this;
-		}
-		
-		public PathBuilder file(String fileName){
-			if(path.length() > 0) path.append(FileUtils.f_sep);
-			path.append(fileName);
-			stopped = true;
-			return this;
-		}		
-		
-		@Override
-		public String toString() {
-			return this.path.toString();
-		}
-	}
-*/	
 	
 	public static String f_sep = System.getProperty("file.separator");
 	public static String native_path_delim = "/";
@@ -97,22 +66,15 @@ public class FileUtils
     fis.close();
   }
 	
-	public static File curdir(){
-		return new File(System.getProperty("user.dir"));
+	public static String curdir(){
+		return System.getProperty("user.dir");
 	}
 	
-	public static File tempdir(){
-		return new File(System.getProperty("java.io.tmpdir"));
+	public static String tempdir(){
+		return System.getProperty("java.io.tmpdir");
 	}
 	
-//	public static PathBuilder newPath(){
-//		return new PathBuilder();
-//	}
-//	public static PathBuilder newPath(String initialPath){
-//		return new PathBuilder(initialPath);
-//	}
-	
-	public static String nativePath(String... items){
+	public static String buildPath(String... items){
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < items.length; i++){
 			if(sb.length() > 0) sb.append(FileUtils.f_sep);
