@@ -11,8 +11,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import ru.magnetosoft.esb.mq.MQBroker;
+import ru.magnetosoft.esb.mq.MQSession;
 import ru.magnetosoft.esb.mq.MessageHandler;
-import ru.magnetosoft.esb.mq.MQBroker.MQSession;
 import ru.magnetosoft.esb.mq.command.MQMessage;
 import ru.magnetosoft.esb.mq.context.Context;
 import ru.magnetosoft.esb.mq.context.XmlMQContextFactory;
@@ -25,6 +25,7 @@ import ru.magnetosoft.esb.mq.payload.Payload;
 import ru.magnetosoft.esb.mq.transport.tcp.TcpTransportFactory;
 import ru.magnetosoft.esb.mq.utils.IRI;
 import ru.magnetosoft.esb.mq.utils.NetworkUtils;
+import ru.magnetosoft.esb.mq.utils.Parameters;
 import ru.magnetosoft.jtoolbox.common.FileUtils;
 import ru.magnetosoft.jtoolbox.common.StringUtils;
 import ru.magnetosoft.jtoolbox.resources.FileResource;
@@ -117,7 +118,11 @@ public class Main
 		MQSession session = mq.createSession();
 //		PropertiesHelper ph = PropertiesHelper.newInstance(new Properties());
 //		ph.setInt(MQProxy.THREAD_POOL_SIZE, 1);
-		MQProxy mql = session.createProxyCustomer("aaa", messageHandler, 1, 30);
+		MQProxy mql = session.createProxyCustomer(
+				"aaa", 
+				messageHandler, 
+				Parameters.newInstance().set(MQProxy.PNames.THREAD_POOL_SIZE, 1).set(MQProxy.PNames.MAX_QUEUE_SIZE, 50)
+				);
 		
 		BufferedReader con = new BufferedReader(new InputStreamReader(System.in));
 		
