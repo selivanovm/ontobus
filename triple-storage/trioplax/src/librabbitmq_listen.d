@@ -7,23 +7,21 @@ class librabbitmq
 {
 	char[] hostname;
 	int port;
-
-	this(char[] _hostname, int _port)
+	void function(byte* txt, ulong size) message_acceptor;
+	
+	this(char[] _hostname, int _port, void function(byte* txt, ulong size) _message_acceptor)
 	{
 		hostname = _hostname;
 		port = _port;
+		message_acceptor = _message_acceptor;
 	}
 
 	void listener()
 	{
-		//	uint max_count_elements = 300000;
 		amqp_connection_state_t_ conn;
 
 		conn = amqp_new_connection();
 		Stdout.format("conn={:X4} ", &conn).newline;
-
-		//	char[] hostname = "services.magnetosoft.ru\u0000";
-		//	int port = 5672;
 
 		int sockfd;
 		sockfd = amqp_open_socket(cast(char*) hostname, port);
@@ -197,14 +195,18 @@ class librabbitmq
 					}
 
 					body_received += *ptr_frame_payload_body_fragment_len;
-					Stdout.format(
-							"body_received={} *ptr_frame_payload_body_fragment_bytes={} *ptr_frame_payload_body_fragment_len={}",
-							body_received, *ptr_frame_payload_body_fragment_bytes, *ptr_frame_payload_body_fragment_len).newline;
+//					Stdout.format(
+//							"body_received={} *ptr_frame_payload_body_fragment_bytes={} *ptr_frame_payload_body_fragment_len={}",
+//							body_received, *ptr_frame_payload_body_fragment_bytes, *ptr_frame_payload_body_fragment_len).newline;
 					assert(body_received <= body_target);
 
-					amqp_dump(cast(void*) *ptr_frame_payload_body_fragment_bytes, *ptr_frame_payload_body_fragment_len);
-					printf("data: %.*s\n", *ptr_frame_payload_body_fragment_len,
-							cast(void*) *ptr_frame_payload_body_fragment_bytes);
+//					amqp_dump(cast(void*) *ptr_frame_payload_body_fragment_bytes, *ptr_frame_payload_body_fragment_len);
+//					printf("data: %.*s\n", *ptr_frame_payload_body_fragment_len,
+//							cast(void*) *ptr_frame_payload_body_fragment_bytes);
+					
+					byte* message = cast(byte*) *ptr_frame_payload_body_fragment_bytes; 
+					
+					message_acceptor(message, *ptr_frame_payload_body_fragment_len);
 				}
 
 			//			if(body_received != body_target)
