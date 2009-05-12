@@ -29,11 +29,16 @@ void main()
 	Thread.sleep(0.250);
 }
 	
-void get_message (byte* txt, ulong size)
+void get_message (char *from,  byte* txt, ulong size)
 {
+// найдем факты содержащие одну из команд агента (store<put, get, subscription, subscription, freez, unfreez, get_agent_ontology)
+// далее поочередно их выполним
+// если результатов много, то следует разбить их на несколько сообщений
+
 //	printf("DATA: %.*s\n", size, cast(void*)txt);
 	
 	Stdout.format("!!!! txt={}, size={}", str_2_char_array(cast(char *)txt, size), size).newline;	
+
 }
 
 private char[] str_2_char_array(char* str, ulong len)
