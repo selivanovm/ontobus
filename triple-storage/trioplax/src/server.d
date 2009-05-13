@@ -29,7 +29,7 @@ void main()
 	Thread.sleep(0.250);
 }
 	
-void get_message (char *from,  byte* txt, ulong size)
+void get_message (byte* txt, ulong size)
 {
 // найдем факты содержащие одну из команд агента (store<put, get, subscription, subscription, freez, unfreez, get_agent_ontology)
 // далее поочередно их выполним

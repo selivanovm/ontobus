@@ -7,9 +7,9 @@ class librabbitmq
 {
 	char[] hostname;
 	int port;
-	void function(char* from, byte* txt, ulong size) message_acceptor;
+	void function(byte* txt, ulong size) message_acceptor;
 	
-	this(char[] _hostname, int _port, void function(char *from, byte* txt, ulong size) _message_acceptor)
+	this(char[] _hostname, int _port, void function(byte* txt, ulong size) _message_acceptor)
 	{
 		hostname = _hostname;
 		port = _port;

@@ -1,1 +1,1 @@
-./tripleStorageRelease.test data/directives.n3 data/org.n3
+./tripleStorageRelease.test data/authorization.n3 data/directives.n3 data/org.n3

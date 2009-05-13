@@ -15,19 +15,19 @@ class TripleStorage
 	private HashMap idx_so;
 	private HashMap idx_spo;
 	char* idx;
-	uint max_count_element = 100_000;
+	uint max_count_element = 450_000;
 	uint max_length_order = 8;
 
 
 	this()
 	{
-		idx_s = new HashMap(max_count_element, 1024*1024*40, max_length_order);
-		idx_p = new HashMap(1000, 1024*1024*40, 3);
-		idx_o = new HashMap(max_count_element, 1024*1024*40, max_length_order);
-		idx_sp = new HashMap(max_count_element, 1024*1024*40, max_length_order);
-		idx_po = new HashMap(max_count_element, 1024*1024*40, max_length_order);
-		idx_so = new HashMap(max_count_element, 1024*1024*40, max_length_order);
-		idx_spo = new HashMap(max_count_element, 1024*1024*40, max_length_order); // является особенным индексом, хранящим экземпляры триплетов
+		idx_s = new HashMap(max_count_element, 1024*1024*50, max_length_order);
+		idx_p = new HashMap(1000, 1024*1024*50, 3);
+		idx_o = new HashMap(max_count_element, 1024*1024*50, max_length_order);
+		idx_sp = new HashMap(max_count_element, 1024*1024*50, max_length_order);
+		idx_po = new HashMap(max_count_element, 1024*1024*50, max_length_order);
+		idx_so = new HashMap(max_count_element, 1024*1024*50, max_length_order);
+		idx_spo = new HashMap(max_count_element, 1024*1024*50, max_length_order); // является особенным индексом, хранящим экземпляры триплетов
 	}
 
 	public uint* getTriples(char* s, char* p, char* o)

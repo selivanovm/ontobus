@@ -44,7 +44,7 @@ class HashMap
 	{
 		max_size_short_order = _max_size_short_order;
 		max_count_elements = _max_count_elements;
-		Stdout.format("*** create object HashMap... start").newline;
+		Stdout.format("*** create object HashMap[max_count_elements={}... start", _max_count_elements).newline;
 
 		// область маппинга ключей, 
 		// содержит короткую очередь из [max_size_short_order] элементов в формате [ссылка на ключ 4b][ссылка на список триплетов ключа 4b] 
