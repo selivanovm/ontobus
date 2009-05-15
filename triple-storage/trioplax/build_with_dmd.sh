@@ -7,6 +7,8 @@ rm *.test
 #dmd src/testHashMap.d src/Log.d src/HashMap.d src/Hash.d -O -release -ofhashMapRelease.test
 dmd src/Triple.d src/test_triple_storage.d src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d src/librabbitmq_headers.d src/librabbitmq_listen.d lib/librabbitmq.a -O -release -oftripleStorageRelease.test
 dmd src/Triple.d src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d src/librabbitmq_headers.d src/librabbitmq_listen.d src/server.d lib/librabbitmq.a -O -release -ofTrioplaxServer
+dmd src/TripleStorage.d src/Triple.d src/Log.d src/HashMap.d src/Hash.d -O -Hdexport -release -lib
+
 #dmd Triple.d socketserver.d ListStrings.d TripleStorage.d Log.d HashMap.d Hash.d -O -release -ofFRTSServer
 rm hashMap.log
 rm *.o

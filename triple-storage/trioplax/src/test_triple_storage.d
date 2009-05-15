@@ -63,7 +63,11 @@ int main(char[][] args)
 
 				if(idx == 3)
 				{
-					o = element;
+				        if (element.length > 2)
+				        {
+					o = element[1..(element.length-1)];					
+					o[o.length] = 0;
+					}					
 				}
 			//					Stdout.format("element={} ", element).newline;
 
@@ -85,13 +89,13 @@ int main(char[][] args)
 				continue;
 			}
 
-			//				Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+							Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
 			ts.addTriple(s, p, o);
 
 			count_add_triple++;
 
-		//		if(count_add_triple > 100)
-		//			break;
+//				if(count_add_triple > 100)
+//					break;
 		}
 
 		//	
@@ -106,7 +110,7 @@ int main(char[][] args)
 		uint count_read = 0;
 		// считываем все контакты
 		//		uint* iterator0 = ts.getTriples(null, "Contact", null);
-		uint* iterator0 = ts.getTriples(null, "ID", null);
+		uint* iterator0 = ts.getTriples(null, "http://magnetosoft.ru/ontology/id", null, false);
 		//		uint* iterator0 = ts.getTriples(null, "http://magnetosoft.ru/ontology/id", null);
 
 		if(iterator0 is null)
@@ -135,16 +139,16 @@ int main(char[][] args)
 				//				uint key3_length = (*(triple0 + 4) << 8) + *(triple0 + 5);
 
 				char* triple0_s = cast(char*) triple0 + 6;
-				//				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-				//				char* triple0_o = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+								char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
+								char* triple0_o = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
 
-				//				Stdout.format("#3 считаем поля субьекта iterator0={:X4} triple0={:X} <{}><{}><{}>", iterator0, triple0, str_2_char_array(triple0_s), str_2_char_array(triple0_p), str_2_char_array(triple0_o)).newline;
+								Stdout.format("#3 считаем поля субьекта iterator0={:X4} triple0={:X} <{}><{}><{}>", iterator0, triple0, str_2_char_array(triple0_s), str_2_char_array(triple0_p), str_2_char_array(triple0_o)).newline;
 
 				uint* iterator1;
 				//		uint i = 0;
 
 				// 1. считываем все поля контакта
-				iterator1 = ts.getTriples(triple0_s, null, null);
+				iterator1 = ts.getTriples(triple0_s, null, null, false);
 
 				if(iterator1 is null)
 				{

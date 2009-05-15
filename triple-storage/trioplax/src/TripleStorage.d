@@ -18,7 +18,6 @@ class TripleStorage
 	uint max_count_element = 450_000;
 	uint max_length_order = 8;
 
-
 	this()
 	{
 		idx_s = new HashMap(max_count_element, 1024*1024*50, max_length_order);
@@ -30,7 +29,7 @@ class TripleStorage
 		idx_spo = new HashMap(max_count_element, 1024*1024*50, max_length_order); // является особенным индексом, хранящим экземпляры триплетов
 	}
 
-	public uint* getTriples(char* s, char* p, char* o)
+	public uint* getTriples(char* s, char* p, char* o, bool debug_info)
 	{
 		uint* list;
 		
@@ -41,34 +40,31 @@ class TripleStorage
 			{
 				if(o != null)
 				{
-					Stdout.format("@get from SPO").newline;
+//					Stdout.format("@get from index SPO").newline;
 					// spo
 					HashMap idx_xxx = idx_spo;
-					list = idx_xxx.get(s, p, o);
+					list = idx_xxx.get(s, p, o, debug_info);
 				} else
 				{
-					Stdout.format("@get from SP").newline;
+//					Stdout.format("@get from index SP").newline;
 					// sp
-					//idx = s ~ p;
 					HashMap idx_xxx = idx_sp;
-					list = idx_xxx.get(s, p, null);
+					list = idx_xxx.get(s, p, null, debug_info);
 				}
 			} else
 			{
 				if(o != null)
 				{
-					Stdout.format("@get from SO").newline;
+//					Stdout.format("@get from index SO").newline;
 					// so
-					//idx = s ~ o;
 					HashMap idx_xxx = idx_so;
-					list = idx_xxx.get(s, o, null);
+					list = idx_xxx.get(s, o, null,  debug_info);
 				} else
 				{
-//					Stdout.format("@get from S").newline;
+//					Stdout.format("@get from index S").newline;
 					// s
-					idx = s;
 					HashMap idx_xxx = idx_s;
-					list = idx_xxx.get(idx, null, null);
+					list = idx_xxx.get(s, null, null, debug_info);
 				}
 
 			}
@@ -80,29 +76,27 @@ class TripleStorage
 				//				Stdout.format("#p != null").newline;
 				if(o != null)
 				{
-					Stdout.format("@get from PO").newline;
+//					Stdout.format("@get from index PO").newline;
 					// po
-					//idx = p ~ o;
 					HashMap idx_xxx = idx_po;
-					list = idx_xxx.get(p, o, null);
+					list = idx_xxx.get(p, o, null, debug_info);
 				} else
 				{
-//					Stdout.format("@get from P").newline;
+//					Stdout.format("@get from index P").newline;
 					//				Stdout.format("#o == null").newline;
 					// p
 					idx = p;
 					HashMap idx_xxx = idx_p;
-					list = idx_xxx.get(idx, null, null);
+					list = idx_xxx.get(p, null, null, debug_info);
 				}
 			} else
 			{
 				if(o != null)
 				{
-					Stdout.format("@get from O").newline;
+//					Stdout.format("@get from index O").newline;
 					// o
-					idx = o;
 					HashMap idx_xxx = idx_o;
-					list = idx_xxx.get(idx, null, null);
+					list = idx_xxx.get(o, null, null, debug_info);
 				} else
 				{
 					// ?
@@ -113,27 +107,27 @@ class TripleStorage
 		return list;
 	}
 
-	public void addTriple(char[] s, char[] p, char[] o)
+	public bool addTriple(char[] s, char[] p, char[] o)
 	{
 //		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
 		void* triple;
 
 		if (s.length == 0 && p.length == 0 && o.length == 0)
-			return;
+			return false;
 			
 		
-		uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o);
+		uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
 		if (list !is null)
 		{
-			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
+//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
 //		        throw new Exception ("addTriple: triple already exist");
-			return;
+			return false;
 		}
 		
 //		log.trace("addTriple:add index spo");
 		idx_spo.put(s, p, o, null);
 //		log.trace("addTriple:get this index as triple");
-		list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o);
+		list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
 //		log.trace("addTriple:ok, list={:X4}", list);
 		
 		if (list is null)
@@ -151,9 +145,11 @@ class TripleStorage
 		idx_sp.put(s, p, null, triple);
 		idx_po.put(p, o, null, triple);
 		idx_so.put(s, o, null, triple);
-
+		
+		return true;
 	}
 }
+
 	private char[] str_2_char_array(char* str)
 	{
 		uint str_length = 0;
@@ -175,5 +171,3 @@ class TripleStorage
 
 		return res;
 	}
-
-

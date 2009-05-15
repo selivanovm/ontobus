@@ -119,16 +119,17 @@ class HashMap
 //				cast(void*) this, key1, key2, key3, triple);
 
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
-//		 log.trace("put:[{:X}] 0 hash= {:X}", cast(void*) this, hash);
 
-		//		dump_mem(key_2_list_triples_area);
+//		 log.trace("put:[{:X}] 0 hash= {:X}", cast(void*) this, hash);
 
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
+//		dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
+
+
 		if(short_order_conflict_keys > reducer_area_right)
 		{
-			log.trace(
-					"put:1 ######################### short_order_conflict_keys > reducer_area_right");
+			log.trace("put:1 ######################### short_order_conflict_keys > reducer_area_right");
 			throw new Exception("short_order_conflict_keys > reducer_area_right");
 		}
 
@@ -402,20 +403,26 @@ class HashMap
 	//		dump_mem(key_2_list_triples_area);
 	}
 
-	public uint* get(char* key1, char* key2, char* key3)
+	public uint* get(char* key1, char* key2, char* key3, bool debug_info)
 	{
 		uint* res = null;
 
-//		log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*)this, str_2_char_array(key1), str_2_char_array(key2), str_2_char_array(key3));
-		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
-//		 log.trace("get:1 hash= {:X}", hash);
+	if (debug_info)
+		log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*)this, str_2_char_array(key1), str_2_char_array(key2), str_2_char_array(key3));
 
-//		dump_mem(key_2_list_triples_area);
+		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
+
+	if ( debug_info)
+		 log.trace("get:1 hash= {:X}", hash);
 
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
+	if ( debug_info)
+		dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
+
 		// хэш нас привел к очереди конфликтующих ключей
-//		log.trace("get:2 short_order_conflict_key={:X}", short_order_conflict_keys);
+	if ( debug_info)
+		log.trace("get:2 short_order_conflict_key={:X}", short_order_conflict_keys);
 
 // log.trace("get:4 *short_order_conflict_keys={:X}",
 //				reducer_area_ptr[short_order_conflict_keys]);
@@ -440,13 +447,16 @@ class HashMap
 			uint keys_of_hash_in_reducer;
 			uint list_elements = 0;
 
-//			log.trace("get:7 начинаем сравнение нашего ключа среди короткой очереди ключей ");
+	if ( debug_info)
+			log.trace("get:7 начинаем сравнение нашего ключа среди короткой очереди ключей ");
 			for(byte i = max_size_short_order; i > 0; i--)
 			{
-//				log.trace("get:6 i={}", i);
+	if ( debug_info)
+				log.trace("get:6 i={}", i);
 				keys_of_hash_in_reducer = reducer_area_ptr[next_short_order_conflict_keys];
 
-//				log.trace("get:9 keys_of_hash_in_reducer={:X}", keys_of_hash_in_reducer);
+	if ( debug_info)
+				log.trace("get:9 keys_of_hash_in_reducer={:X}", keys_of_hash_in_reducer);
 				if(keys_of_hash_in_reducer != 0)
 				{
 					// в этой позиции есть уже ссылка на ключ, сравним с нашим ключем
@@ -462,16 +472,19 @@ class HashMap
 					uint
 							key3_length = (key_2_list_triples_area[keys_and_triplets_list + 8] << 8) + key_2_list_triples_area[keys_and_triplets_list + 9];
 
-//					 log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length, key2_length, key3_length, key_ptr);
+	if ( debug_info)
+					 log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length, key2_length, key3_length, key_ptr);
 
 					char[] keys = cast(char[]) key_2_list_triples_area;
 					if(key1 !is null)
 					{
-//						 log.trace("get:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
+	if ( debug_info)
+						 log.trace("get:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
 
 						if(_strcmp(keys, key_ptr, key1) == true)
 						{
-//							 log.trace("get:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
+	if ( debug_info)
+							 log.trace("get:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
 							isKeyExist = true;
 							
 //							 log.trace("get:11 key_ptr={:X4}", key_ptr);
@@ -492,11 +505,13 @@ class HashMap
 					if(key2 !is null && (key1 is null || key1 !is null && isKeyExist == true))
 					{
 						isKeyExist = false;
-//						log.trace("get:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
+	if ( debug_info)
+						log.trace("get:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
 
 						if(_strcmp(keys, key_ptr, key2) == true)
 						{
-//							 log.trace("get:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
+	if ( debug_info)
+							 log.trace("get:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
 
 							isKeyExist = true;
 
@@ -517,11 +532,13 @@ class HashMap
 					// 
 					if(key3 !is null && ((key1 is null || key1 !is null && isKeyExist == true) || (key2 is null || key2 !is null && isKeyExist == true)))
 					{
-//						 log.trace("get:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
+	if ( debug_info)
+						 log.trace("get:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
 						isKeyExist = false;
 						if(_strcmp(keys, key_ptr, key3) == true)
 						{
-//							 log.trace("get:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
+	if ( debug_info)
+							 log.trace("get:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
 							isKeyExist = true;
 							key_ptr += key3_length + 1;
 							list_elements = key_ptr;
@@ -557,25 +574,25 @@ class HashMap
 		return res;
 	}
 
-	private void dump_mem(ubyte[] mem)
+	private void dump_mem(ubyte[] mem, uint ptr)
 	{
 		log.trace("dump {:X4}", cast(void*) this);
 		for(int row = 0; row < 20; row++)
 		{
 			log.trace(
 					"{:X8}  {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2}  {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2}   {:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}",
-					row * 16, mem[row * 16 + 0], mem[row * 16 + 1], mem[row * 16 + 2],
-					mem[row * 16 + 3], mem[row * 16 + 4], mem[row * 16 + 5], mem[row * 16 + 6],
-					mem[row * 16 + 7], mem[row * 16 + 8], mem[row * 16 + 9], mem[row * 16 + 10],
-					mem[row * 16 + 11], mem[row * 16 + 12], mem[row * 16 + 13], mem[row * 16 + 14],
-					mem[row * 16 + 15], cast(char) mem[row * 16 + 0], cast(char) mem[row * 16 + 1],
-					cast(char) mem[row * 16 + 2], cast(char) mem[row * 16 + 3],
-					cast(char) mem[row * 16 + 4], cast(char) mem[row * 16 + 5],
-					cast(char) mem[row * 16 + 6], cast(char) mem[row * 16 + 7],
-					cast(char) mem[row * 16 + 8], cast(char) mem[row * 16 + 9],
-					cast(char) mem[row * 16 + 10], cast(char) mem[row * 16 + 11],
-					cast(char) mem[row * 16 + 12], cast(char) mem[row * 16 + 13],
-					cast(char) mem[row * 16 + 14], cast(char) mem[row * 16 + 15]);
+					row * 16, mem[ptr + row * 16 + 0], mem[ptr + row * 16 + 1], mem[ptr + row * 16 + 2],
+					mem[ptr + row * 16 + 3], mem[ptr + row * 16 + 4], mem[ptr + row * 16 + 5], mem[ptr + row * 16 + 6],
+					mem[ptr + row * 16 + 7], mem[ptr + row * 16 + 8], mem[ptr + row * 16 + 9], mem[ptr + row * 16 + 10],
+					mem[ptr + row * 16 + 11], mem[ptr + row * 16 + 12], mem[ptr + row * 16 + 13], mem[ptr + row * 16 + 14],
+					mem[ptr + row * 16 + 15], cast(char) mem[ptr + row * 16 + 0], cast(char) mem[ptr + row * 16 + 1],
+					cast(char) mem[ptr + row * 16 + 2], cast(char) mem[ptr + row * 16 + 3],
+					cast(char) mem[ptr + row * 16 + 4], cast(char) mem[ptr + row * 16 + 5],
+					cast(char) mem[ptr + row * 16 + 6], cast(char) mem[ptr + row * 16 + 7],
+					cast(char) mem[ptr + row * 16 + 8], cast(char) mem[ptr + row * 16 + 9],
+					cast(char) mem[ptr + row * 16 + 10], cast(char) mem[ptr + row * 16 + 11],
+					cast(char) mem[ptr + row * 16 + 12], cast(char) mem[ptr + row * 16 + 13],
+					cast(char) mem[ptr + row * 16 + 14], cast(char) mem[ptr + row * 16 + 15]);
 		}
 	}
 
