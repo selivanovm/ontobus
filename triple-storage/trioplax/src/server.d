@@ -14,16 +14,17 @@ import HashMap;
 import TripleStorage;
 //import ListStrings;
 
-import librabbitmq_listen;
+import librabbitmq_client;
 
 void main()
 {	
-	TripleStorage ts = new TripleStorage ();
+//	TripleStorage ts = new TripleStorage ();
 
-	char[] hostname = "services.magnetosoft.ru\u0000";
+	char[] hostname = "192.168.150.196\0";
+//	char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
 	
-	librabbitmq client = new librabbitmq (hostname, port, &get_message);
+	librabbitmq_client client = new librabbitmq_client (hostname, port, &get_message);
 	
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);

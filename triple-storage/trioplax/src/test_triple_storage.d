@@ -23,7 +23,7 @@ int main(char[][] args)
 
 	uint count_add_triple = 0;
 
-	TripleStorage ts = new TripleStorage();
+	TripleStorage ts = new TripleStorage(0xff, 100_000, 8);
 	Triple triple;
 	//		
 	auto elapsed = new StopWatch();

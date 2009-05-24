@@ -75,6 +75,7 @@ extern(C)
 		amqp_bytes_t reply_to;
 		amqp_bytes_t expiration;
 		amqp_bytes_t message_id;
+
 		uint64_t timestamp;
 		amqp_bytes_t type;
 		amqp_bytes_t user_id;
@@ -148,6 +149,7 @@ extern(C)
 
 enum amqp_def
 {
+	AMQP_REPLY_SUCCESS = 200,
 	AMQP_FRAME_BODY = 3,
 	AMQP_BASIC_CONTENT_TYPE_FLAG = (1 << 15),
 	AMQP_FRAME_HEADER = 2,
@@ -272,3 +274,16 @@ extern(C)
 		char* alloc_block;
 		size_t alloc_used;
 	};
+
+extern(C)
+	int amqp_basic_publish(amqp_connection_state_t_* state, amqp_bytes_t exchange, amqp_bytes_t routing_key,
+			amqp_boolean_t mandatory, amqp_boolean_t immediate, amqp_basic_properties_t_* properties,
+			amqp_bytes_t message_body);
+
+extern(C) amqp_rpc_reply_t_ amqp_channel_close(amqp_connection_state_t_* state, int code);
+extern(C) amqp_rpc_reply_t_ amqp_connection_close(amqp_connection_state_t_* state, int code);
+extern(C) void amqp_destroy_connection(amqp_connection_state_t_* state);
+
+//extern() int shutdown (int __fd, int __how);
+extern(C) int close (int __fd);
+
