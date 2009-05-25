@@ -1,0 +1,153 @@
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/TestRuner.scala,84
+object TestRunner {TestRunner5,111
+    def main(args: Array[String]) {main7,132
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/Store.scala,675
+object Store {Store18,392
+    val c = ConnectionManager.getConnection()c20,408
+    private var rdfsManager: IRDFSManager = nullrdfsManager21,454
+    def getManager(): IRDFSManager = {getManager23,504
+        var br: BufferedReader = nullbr43,1207
+            val st: Statement = c.createStatement()st46,1260
+            val schema: String  = StoreConfiguration.getProperties.getProperty("database_schema")schema47,1312
+            val is: InputStream = getClass().getResourceAsStream("/" + schema)is50,1481
+            val br: BufferedReader = new BufferedReader(new InputStreamReader(is))br51,1560
+            var line: String = br.readLine()line53,1644
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/RDFSManagerFactory.scala,131
+object RDFSManagerFactory {RDFSManagerFactory13,284
+    def getManager(managerClass: String): IRDFSManager = {getManager15,313
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/StoreConfiguration.scala,619
+object StoreConfiguration {StoreConfiguration14,271
+    private val PROPERTIES_FILE_PATH:String  = "rdfstore.properties"PROPERTIES_FILE_PATH16,300
+    private var properties:Properties = nullproperties17,369
+    var isCustomProperties:Boolean = falseisCustomProperties18,414
+    def getProperties(): Properties = {getProperties22,484
+    protected def getDefaults():Properties = {getDefaults27,604
+        var result:Properties = new Properties();result28,651
+        var fis:FileInputStream = nullfis43,1315
+    protected def save() = {save69,2007
+        var fos:FileOutputStream = nullfos71,2037
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/ConnectionManager.scala,476
+object ConnectionManager {ConnectionManager14,265
+    private var c: Connection = nullc16,293
+    def getConnection(): Connection = {getConnection18,331
+            val url:String = StoreConfiguration.getProperties.getProperty("database_url");url22,511
+            val user:String = StoreConfiguration.getProperties.getProperty("database_user");user23,602
+            val pwds:String  = StoreConfiguration.getProperties.getProperty("database_password");pwds24,695
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/Triplet.scala,467
+class Triplet {Triplet10,165
+    var id: Int = 0id12,182
+    var subj: String = nullsubj13,202
+    var obj: String = nullobj14,230
+    var pred: String = nullpred15,257
+    var mod: String = nullmod16,285
+    def this(id: Int, subj: String, obj: String, pred: String, mod: String) {this18,313
+    override def equals(other: Any): Boolean = {equals27,535
+		var result = trueresult28,584
+            val rdft = other.asInstanceOf[Triplet]rdft32,669
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/tests/TestTools.scala,184
+object TestTools {TestTools10,168
+    def getPaddedString(in: String, padString: String, paddingLength: int): String = {getPaddedString12,188
+        var result = inresult13,275
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/tests/InsertReadDeleteTest.scala,1043
+object InsertReadDeleteTest {InsertReadDeleteTest14,326
+    private val subjPrefix: String = getPaddedString("subject", "-", 230)subjPrefix16,357
+    private val objPrefix: String = getPaddedString("object", "-", 230)objPrefix17,431
+    private val predPrefix: String = getPaddedString("predicate", "-", 230)predPrefix18,503
+    private val modPrefix: String = getPaddedString("type", "-", 230)modPrefix19,579
+    def test(tripletsCount: Int, testCount: Int): MeasureResult = {test21,650
+        var measureResult: MeasureResult = new MeasureResult()measureResult23,724
+        val triplet: Triplet = new Triplet(0, subjPrefix, objPrefix, predPrefix, modPrefix)triplet28,934
+            val keys = new Array[Int](tripletsCount)keys32,1080
+            var startTime: Long = System.nanoTime()startTime34,1134
+            val put: Long = System.nanoTime() - startTimeput39,1343
+            val get: Long = System.nanoTime() - startTimeget45,1563
+            val remove: Long = System.nanoTime() - startTimeremove51,1782
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/tests/MeasureResult.scala,695
+class MeasureResult {MeasureResult10,172
+	private var write: Set[Long] = Set[Long]()write12,199
+	private var read: Set[Long] = Set[Long]()read13,243
+	private var delete: Set[Long] = Set[Long]()delete14,286
+	def putResults(writeTime: Long, readTime: Long, deleteTime: Long) {putResults16,332
+	def getAverageWritingTime(): Long = getAverage(write)getAverageWritingTime22,468
+	def getAverageReadingTime(): Long = getAverage(read)getAverageReadingTime24,524
+	def getAverageDeleteTime(): Long = getAverage(delete)getAverageDeleteTime26,579
+	def getAverage(set: Set[Long]): Long = {getAverage28,635
+		var sum: Long = 0sum29,677
+	override def toString(): String = {toString41,843
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/server/AMQPServer.scala,966
+object AMQPServer {AMQPServer14,373
+    def main(args: Array[String]) {main16,394
+            val username = args(0)username20,463
+            val password = args(1)password21,498
+            val vhost = args(2)vhost22,533
+            val host = args(3)host23,565
+            val port = args(4).toIntport24,596
+            val exchange = args(5)exchange25,633
+            val queue = args(6)queue26,668
+            val routingKey = args(7)routingKey27,700
+            val params = new ConnectionParameters()params29,738
+            val factory = new ConnectionFactory(params)factory35,915
+            val conn = factory.newConnection(host , port)conn36,971
+            val channel = conn.createChannel()channel38,1030
+            var consumer = new QueueingConsumer(channel)consumer43,1234
+                var delivery: QueueingConsumer.Delivery = nulldelivery47,1376
+    class MessageReciever extends Actor {MessageReciever70,2046
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/interfaces/IRDFSManager.scala,620
+trait IRDFSManager {IRDFSManager14,283
+    def setConnection(c: Connection)setConnection16,305
+    def putTriplet(triplet: Triplet): IntputTriplet18,343
+    def removeTriplet(id: Int)removeTriplet20,386
+    def getTripletById(id: Int): TripletgetTripletById24,439
+    def getTripletsByObject(obj: String): Set[Triplet]getTripletsByObject26,481
+    def getTripletsBySubject(subject: String): Set[Triplet]getTripletsBySubject28,537
+    def getTripletsByPredicate(predicate: String): Set[Triplet]getTripletsByPredicate30,598
+    def getTripletsByQuery(query: String): Set[Triplet]getTripletsByQuery32,663
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/impl/SimpleRDFSManager.scala,2039
+class SimpleRDFSManager extends IRDFSManager {SimpleRDFSManager21,458
+    private var conn: Connection = nullconn23,506
+    private var insertStatement: PreparedStatement = nullinsertStatement24,546
+    private var getByObjectStatement: PreparedStatement = nullgetByObjectStatement25,604
+    private var getByPredicateStatement: PreparedStatement = nullgetByPredicateStatement26,667
+    private var getBySubjectStatement: PreparedStatement = nullgetBySubjectStatement27,733
+    private var getByIdStatement: PreparedStatement = nullgetByIdStatement28,797
+    private var removeTripletStatement: PreparedStatement = nullremoveTripletStatement29,856
+    private var removeAllStatement: PreparedStatement = nullremoveAllStatement30,921
+    def setConnection(conn: Connection) {setConnection32,983
+    def putTriplet(triplet: Triplet): Int = {putTriplet47,1850
+    def removeTriplet(id: Int) {removeTriplet62,2370
+    def getTripletById(id: Int): Triplet = {getTripletById79,2793
+            val rs: ResultSet = getByIdStatement.executeQuery()rs82,2896
+    override def getTripletsBySubject(subject: String): Set[Triplet] = {getTripletsBySubject92,3239
+        val result = Set[Triplet]()result93,3312
+            val rs: ResultSet = getBySubjectStatement.executeQuery()rs96,3418
+    def getTripletsByObject(obj: String): Set[Triplet] = {getTripletsByObject105,3770
+        val result = Set[Triplet]()result106,3829
+            val rs: ResultSet = getByObjectStatement.executeQuery()rs109,3930
+    def getTripletsByPredicate(predicate: String): Set[Triplet] = {getTripletsByPredicate119,4286
+        val result = Set[Triplet]()result120,4354
+            val rs: ResultSet = getByPredicateStatement.executeQuery()rs123,4464
+    def getTripletsByQuery(query: String): Set[Triplet] = {getTripletsByQuery133,4819
+        val result = Set[Triplet]()result134,4879
+            val st: Statement = conn.createStatement()st136,4929
+            val rs: ResultSet = st.executeQuery(query)rs137,4984
+
+/home/mike/work/magnet3/rastore/src/main/scala/simple_schema.sql,847
+CREATE TABLE TRIPLETS (ID BIGINT PRIMARY KEY, SUBJ VARCHAR(255), OBJ TEXT, PRED VARCHAR(255), MOD VARCHAR(255));TRIPLETS2,31
+CREATE TABLE TRIPLETS (ID BIGINT PRIMARY KEY, SUBJ VARCHAR(255), OBJ TEXT, PRED VARCHAR(255), MOD VARCHAR(255));TRIPLETS.ID2,31
+CREATE TABLE TRIPLETS (ID BIGINT PRIMARY KEY, SUBJ VARCHAR(255), OBJ TEXT, PRED VARCHAR(255), MOD VARCHAR(255));TRIPLETS.SUBJ2,31
+CREATE TABLE TRIPLETS (ID BIGINT PRIMARY KEY, SUBJ VARCHAR(255), OBJ TEXT, PRED VARCHAR(255), MOD VARCHAR(255));TRIPLETS.OBJ2,31
+CREATE TABLE TRIPLETS (ID BIGINT PRIMARY KEY, SUBJ VARCHAR(255), OBJ TEXT, PRED VARCHAR(255), MOD VARCHAR(255));TRIPLETS.PRED2,31
+CREATE TABLE TRIPLETS (ID BIGINT PRIMARY KEY, SUBJ VARCHAR(255), OBJ TEXT, PRED VARCHAR(255), MOD VARCHAR(255));TRIPLETS.MOD2,31
+CREATE INDEX PRED_IDX ON TRIPLETS(PRED)TRIPLETS.PRED_IDX3,144

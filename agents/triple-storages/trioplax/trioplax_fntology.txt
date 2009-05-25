@@ -1,0 +1,134 @@
+'''размышления об онтология функционала (FNtology), структуры и примеры'''
+
+корневые определения:
+
+function - экземпляр вызова функции
+{
+triple/list_triple_UID:argument - аргументы
+triple/list_triple_UID:result - результаты
+long:argument_count - количество аргументов несущих в себе факты, применяется если все аргументы не входят в одно сообщение
+long:result_count - количество результатов содержащих факты, применяется если все результаты не входят в одно сообщение
+string:agent - кому следует отправить ответ
+}
+
+эти определения понадобятся для целей логгирования, мониторинга, маршрутизации:
+
+text:info<result - информация о выполнении функции
+time:start_time<result - время начала выполнения функции
+time:end_time<result - время окончания выполнения функции
+[ok][fail] enum:state<result - состояние ok/fail
+
+уточняем онтологию function, здесь представлены общие команды и команды агента trioplax
+
+command<function - общие функции
+put<command - функция - положить данные
+	store<put - функция сохранения данных
+get<command - функция получения данных
+
+это входящий аргумент trioplax
+
+text:query<argument
+triple list:triples<argument
+
+triple_flow_managment_function<function - функции управления потоками триплетов
+subscribe<triple_flow_managment_function - функция подписки на изменения
+unsubscribe<triple_flow_managment_function - функция снятия подписки на изменения
+
+agent_state_function<function - функции управления состоянием агентов
+freez<agent_state_function - функция останавливающая работу агента, ни какие команды кроме команды unfreez не принимаются
+unfreez<agent_state_function - функция восстанавливающая работу агента
+
+agent_ontology<function - функции управления онтологиями агента
+get_agent_ontology<agent_ontology - функция выдающая онтологии которыми владеет агент
+
+--пример: агент trioplax (быстродействующее хранилище триплетов в памяти), предоставляемый и потребляемый функционал --------------------------------
+
+trioplax
+[
+i can: предоставляемый функционал
+    store
+    get
+    subscribe
+    unsubscribe
+    freez
+    unfreez
+
+i need: потребляемый функционал
+    put    
+]
+
+--- входящие/исходящие потоки агентов
+потоки формируются из пакетов разнообразных фактов, 
+таким образом в одном входящем пакете могут быть несколько запросов к агенту или несколько ответов.
+
+
+
+--- пример структуры пакетов вариант 1 --------------------------------------------------------
+
+здесь факты(аргументы и результаты) обертываются и помещаются в object триплета argument/result
+
+пример входящего пакета:
+
+	<subject><function> "[fn-uid-1]" .
+	<[fn-uid-1]><argument> "[<arg-triple-1-s><arg-triple-1-p><arg-triple-1-o>]" .
+	<[fn-uid-1]><argument> "[<arg-triple-2-s><arg-triple-2-p><arg-triple-2-o>]" .
+	...
+	<[fn-uid-1]><argument> "[<arg-triple-n-s><arg-triple-n-p><arg-triple-n-o>]" .
+
+пример выходящего пакета:
+
+	<[fn-uid-1]><result:state> "ok" .
+	<[fn-uid-1]><result:start_time> "2009-05-01 00:00:00.3333" .
+	<[fn-uid-1]><result:end_time> "2009-05-01 00:00:01.1234" .
+	<[fn-uid-1]><result> "[<res-triple-3-s><res-triple-3-p><res-triple-3-o>]" .
+	<[fn-uid-1]><result> "[<res-triple-4-s><res-triple-4-p><res-triple-4-o>]" .
+	...
+	<[fn-uid-1]><result> "[<res-triple-n-s><res-triple-n-p><res-triple-n-o>]" .
+
+--- пример структуры пакетов вариант 2 -------------------------------------------------------
+
+в данном случае для каждого из фактов можно сгенерировать !почти уникальный UID с помощью 8 разнонаправленных функций хеша 
+и дальнейшее обобщение выполняется с помощью списка триплетов
+
+пример входящего пакета:
+
+	<subject><function> "[fn-uid-1]" .
+	<[fn-uid-1]><argument> "[triple-uid-1], [triple-uid-2], ... [triple-uid-n]" .
+	[triple-uid-1] <arg1-s><arg1-p> "arg1-o" .
+	[triple-uid-2] <arg2-s><arg2-p> "arg2-o" .
+	...
+	[triple-uid-n] <argn-s><argn-p> "argn-o" .
+
+пример выходящего пакета:
+
+	<[fn-uid-1]><result> "[triple-uid-4], ... [triple-uid-m]" .
+	<[fn-uid-1]><state> "ok" .
+	<[fn-uid-1]><start_time> "2009-05-01 00:00:00.3333" .
+	<[fn-uid-1]><end_time> "2009-05-01 00:00:01.1234" .
+	[triple-uid-4] <res1-s><res1-p> "res1-o" .
+	[triple-uid-5] <res2-s><res2-p> "res2-o" .
+	...
+	[triple-uid-n]<resn-s><resn-p> "resn-o" .
+
+
+--- пример 1: запрос к агенту trioplax - выдать факты имеющие прямое отношение к Петровым Иванам, а так-же факты относящиеся к подразделению где они работают
+
+входящий пакет:
+
+	<subject><get> "[fn-uid-1]" .
+	<[fn-uid-1]><query> "[*[s4=o3][s3=s2, p3='department'][s2=s1, p2=FirstName, o2 = 'Иван'@ru][p1=LastName, o1='Петров'@ru]" .
+
+
+
+
+--- пример 2: запрос к агенту trioplax - добавить в хранилище пакет фактов, факты можно упаковывать в списки, либо каждый отдельно, 
+	небольшие пакеты удобнее в виде списка 
+
+входящий пакет:
+
+	<subject><store> "[fn-uid-1]" .
+	<[fn-uid-1]><agent> "agent1" .
+	<[fn-uid-1]><triples> "fact-1. fact-2." .
+	...
+	<[fn-uid-1]><triples> "fact-m. fact-n." .
+

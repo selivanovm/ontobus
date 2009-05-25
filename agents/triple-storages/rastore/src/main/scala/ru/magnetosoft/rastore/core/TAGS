@@ -1,0 +1,48 @@
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/Store.scala,675
+object Store {Store18,392
+    val c = ConnectionManager.getConnection()c20,408
+    private var rdfsManager: IRDFSManager = nullrdfsManager21,454
+    def getManager(): IRDFSManager = {getManager23,504
+        var br: BufferedReader = nullbr43,1207
+            val st: Statement = c.createStatement()st46,1260
+            val schema: String  = StoreConfiguration.getProperties.getProperty("database_schema")schema47,1312
+            val is: InputStream = getClass().getResourceAsStream("/" + schema)is50,1481
+            val br: BufferedReader = new BufferedReader(new InputStreamReader(is))br51,1560
+            var line: String = br.readLine()line53,1644
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/RDFSManagerFactory.scala,131
+object RDFSManagerFactory {RDFSManagerFactory13,284
+    def getManager(managerClass: String): IRDFSManager = {getManager15,313
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/StoreConfiguration.scala,619
+object StoreConfiguration {StoreConfiguration14,271
+    private val PROPERTIES_FILE_PATH:String  = "rdfstore.properties"PROPERTIES_FILE_PATH16,300
+    private var properties:Properties = nullproperties17,369
+    var isCustomProperties:Boolean = falseisCustomProperties18,414
+    def getProperties(): Properties = {getProperties22,484
+    protected def getDefaults():Properties = {getDefaults27,604
+        var result:Properties = new Properties();result28,651
+        var fis:FileInputStream = nullfis43,1315
+    protected def save() = {save69,2007
+        var fos:FileOutputStream = nullfos71,2037
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/ConnectionManager.scala,476
+object ConnectionManager {ConnectionManager14,265
+    private var c: Connection = nullc16,293
+    def getConnection(): Connection = {getConnection18,331
+            val url:String = StoreConfiguration.getProperties.getProperty("database_url");url22,511
+            val user:String = StoreConfiguration.getProperties.getProperty("database_user");user23,602
+            val pwds:String  = StoreConfiguration.getProperties.getProperty("database_password");pwds24,695
+
+/home/mike/work/magnet3/rastore/src/main/scala/ru/magnetosoft/rastore/core/Triplet.scala,467
+class Triplet {Triplet10,165
+    var id: Int = 0id12,182
+    var subj: String = nullsubj13,202
+    var obj: String = nullobj14,230
+    var pred: String = nullpred15,257
+    var mod: String = nullmod16,285
+    def this(id: Int, subj: String, obj: String, pred: String, mod: String) {this18,313
+    override def equals(other: Any): Boolean = {equals27,535
+		var result = trueresult28,584
+            val rdft = other.asInstanceOf[Triplet]rdft32,669

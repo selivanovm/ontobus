@@ -1,0 +1,12 @@
+Installation Instructions
+*************************
+
+compiling on ubuntu
+
+download dmd+tango+tangobos
+
+http://download.palos.ro/Debian%20D%20Packages/
+
+dmd_1.035-1_i386.deb
+tango-dmd_0.99.7-1_i386.deb
+tangobos-dmd_59-1_i386.deb
