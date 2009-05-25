@@ -5,64 +5,46 @@ import scala.collection.mutable.Set
 import ru.magnetosoft.rastore.core.Store
 import ru.magnetosoft.rastore.core.StoreConfiguration
 import ru.magnetosoft.rastore.core.Triplet
+import ru.magnetosoft.rastore.core.FileStore
+import ru.magnetosoft.rastore.core.AMQPConnectionManager
 
 import com.rabbitmq.client._
 
 object Server {
 
   def main(args: Array[String]) {
-    
-    val hostName = StoreConfiguration.getProperties.getProperty("amqp_host")
-    val portNumber = StoreConfiguration.getProperties.getProperty("amqp_port")
-    val userName = StoreConfiguration.getProperties.getProperty("amqp_username")
-    val password = StoreConfiguration.getProperties.getProperty("amqp_password")
-    val virtualHost = StoreConfiguration.getProperties.getProperty("amqp_vhost")
-    val heartBeat = StoreConfiguration.getProperties.getProperty("amqp_heartbeat")
-    val queue = StoreConfiguration.getProperties.getProperty("amqp_queue")
-    val exchange = StoreConfiguration.getProperties.getProperty("amqp_exchange")
-    val routingKey = StoreConfiguration.getProperties.getProperty("amqp_routing_key")
-    val exchangeType = StoreConfiguration.getProperties.getProperty("amqp_exchange_type")
 
-    var params = new ConnectionParameters()
-    params.setUsername(userName)
-    params.setPassword(password)
-    params.setVirtualHost(virtualHost)
-    params.setRequestedHeartbeat(heartBeat.toInt)
-
-    val factory = new ConnectionFactory(params)
-    val conn = factory.newConnection(hostName, portNumber.toInt)
-    
-    val channel = conn.createChannel()
-    
-    channel.exchangeDeclare(exchange, exchangeType)
-    channel.queueDeclare(queue)
-    channel.queueBind(queue, exchange, routingKey)
-
-    val consumer = new QueueingConsumer(channel)
-    channel.basicConsume(queue, true, consumer)
-
-    println ("Listening queue '" + userName + ":" + password + "@" + hostName + ":" + portNumber + "'")
+    val saveTriplets = if (StoreConfiguration.getProperties.getProperty("server_mode") == "file")
+      (triplets: Array[String]) => {
+        var set = Set[String]()
+        for(i <- 0 until ((triplets.size - 1) / 3)) {
+          set += (triplets(i * 3 + 1) + " " + triplets(i * 3 + 2) + " " + triplets(i * 3 + 3))
+        }
+        FileStore.putTriplets(set)
+      }
+    else
+      (triplets: Array[String]) => {
+        var set = Set[Triplet]()
+        for(i <- 0 until ((triplets.size - 1) / 3)) {
+          set += new Triplet(0, triplets(i * 3 + 1), triplets(i * 3 + 2), triplets(i * 3 + 3))
+        }
+        Store.getManager.putTriplets(set)        
+      }   
 
     while(true) {
       
       try {
 
-        val delivery = consumer.nextDelivery()
+        val delivery = AMQPConnectionManager.getNextMessage
         val body = new String(delivery.getBody())
+
         val tokens = body.split("-:-")
         val cmd = tokens(0)
 
-        println ("Got message " + body)
+        println ("Got message !")
 
         if (cmd == "store") {
-          
-          var triplets = Set[Triplet]()
-          for(i <- 1 until (tokens.size / 3)) {
-            triplets += new Triplet(0, tokens(i * 3), tokens(i * 3 + 1), tokens(i * 3 + 2))
-          }
-
-          Store.getManager.putTriplets(triplets)
-
+          saveTriplets(tokens)
         }
 
       } catch {
@@ -71,9 +53,7 @@ object Server {
 
     }
 
-    channel.close();
-    conn.close()
-
+    AMQPConnectionManager.close
     
   }  
 

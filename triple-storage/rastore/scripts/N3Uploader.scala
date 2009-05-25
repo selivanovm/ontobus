@@ -41,12 +41,13 @@ object N3Uploader {
       Source.fromFile(args(0)).getLines.foreach { line =>
         if (i < 10) {
 
-          val tokens = line.split("[>]")
+/*          val tokens = line.split("[>]")
+
           val subj = escapeString(tokens(0).trim.substring(1))
           val pred = escapeString(tokens(1).trim.substring(1))
-          val obj = escapeString(tokens(2).substring(0, tokens(2).length - 2).substring(2, tokens(2).length - 4))
+          val obj = escapeString(tokens(2).substring(0, tokens(2).length - 2).substring(2, tokens(2).length - 4)) */
 
-          msg += "-:-" + subj + "-:-" + pred + "-:-" + obj
+          msg += "-:-" + line 
           
           i = i + 1
         } else {

@@ -43,6 +43,10 @@ object StoreConfiguration {
         result.setProperty("amqp_exchange", "rsexchange")
         result.setProperty("amqp_exchange_type", "direct")
         result.setProperty("amqp_routing_key", "rskey")
+
+        result.setProperty("server_mode", "file")
+
+
         return result;
     }
 
