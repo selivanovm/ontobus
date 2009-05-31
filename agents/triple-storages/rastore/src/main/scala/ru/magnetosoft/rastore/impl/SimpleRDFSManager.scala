@@ -139,7 +139,7 @@ class SimpleRDFSManager extends IRDFSManager {
         getByI.setLong(1, id);
         val rs: ResultSet = getByI.executeQuery()
         while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
         }
       } else if (subj != "" && obj != "" && pred != "") {
         getBySOP.setString(1, subj)
@@ -147,46 +147,46 @@ class SimpleRDFSManager extends IRDFSManager {
         getBySOP.setString(3, pred)
         val rs: ResultSet = getBySOP.executeQuery()
         while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
         }
       } else if (subj != "" && obj  != "") {
         getBySO.setString(1, subj)
         getBySO.setString(2, obj)
         val rs: ResultSet = getBySO.executeQuery()
         while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
         }
       } else if (subj != "" && pred != "") {
           getBySP.setString(1, subj)
           getBySP.setString(2, pred)
           val rs: ResultSet = getBySP.executeQuery()
           while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
           }
         } else if (obj != "" && pred != "") {
           getByOP.setString(1, obj)
           getByOP.setString(2, pred)
           val rs: ResultSet = getByOP.executeQuery()
           while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
           }
         } else if (subj != "") {
           getByS.setString(1, subj)
           val rs: ResultSet = getByS.executeQuery()
           while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
           }
         } else if (obj != "") {
           getByS.setString(1, obj)
           val rs: ResultSet = getByO.executeQuery()
           while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
           }
         } else if (pred != "") {
           getByP.setString(1, pred)
           val rs: ResultSet = getByP.executeQuery()
           while (rs.next()) {
-          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4))
+          result += new Triplet(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5))
           }
         } 
       } catch {

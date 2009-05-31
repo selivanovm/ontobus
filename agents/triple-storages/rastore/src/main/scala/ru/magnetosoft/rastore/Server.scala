@@ -18,7 +18,7 @@ object Server {
       (triplets: Array[String]) => {
         var set = Set[String]()
         for(i <- 0 until ((triplets.size - 1) / 3)) {
-          set += (triplets(i * 3 + 1) + " " + triplets(i * 3 + 2) + " " + triplets(i * 3 + 3))
+          //set += (triplets(i * 3 + 1) + " " + triplets(i * 3 + 2) + " " + triplets(i * 3 + 3))
         }
         FileStore.putTriplets(set)
       }
@@ -26,7 +26,7 @@ object Server {
       (triplets: Array[String]) => {
         var set = Set[Triplet]()
         for(i <- 0 until ((triplets.size - 1) / 3)) {
-          set += new Triplet(0, triplets(i * 3 + 1), triplets(i * 3 + 2), triplets(i * 3 + 3))
+          //set += new Triplet(0, triplets(i * 3 + 1), triplets(i * 3 + 2), triplets(i * 3 + 3))
         }
         Store.getManager.putTriplets(set)        
       }   

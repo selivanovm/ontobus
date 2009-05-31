@@ -2,7 +2,7 @@ package ru.magnetosoft.rastore
 
 import scala.io.Source
 import scala.collection.mutable.Set
-
+import ru.magnetosoft.rastore.util._
 import ru.magnetosoft.rastore.tests._
 import ru.magnetosoft.rastore.core.Store
 import ru.magnetosoft.rastore.core.Triplet
@@ -38,7 +38,7 @@ object TestRunner {
           var a = Set[Triplet]()
           Source.fromFile(args(0)).getLines.foreach { line =>
             if (i < 1000) {
-              a += tripletFromLine(line)
+              a += Common.tripletFromLine(line)
               i = i + 1
             } else {
               i = 0
@@ -107,39 +107,8 @@ object TestRunner {
 
       }
 
-
     } else {
       System.out.println("Usage: ")
     }
   }
-
-  def tripletFromLine(line: String): Triplet = {
-    val tokens: Array[String] = line.split("[>]")
-    val subj = escapeString(tokens(0).trim.substring(1))
-    val pred = escapeString(tokens(1).trim.substring(1))
-    val obj = escapeString(tokens(2).substring(0, tokens(2).length - 2).substring(2, tokens(2).length - 4))
-    return new Triplet(0, subj, obj, pred)
-  }
-
-  def escapeString(line: String): String = {
-    
-    var sb = new StringBuilder()
-
-    for (i <- 0 until line.length) {
-      val c = line.charAt(i)
-      sb.append(
-        c match {
-          case '\t' => "\\t"
-          case '\n' => "\\n"
-          case '\r' => "\\r"
-          case '\\' => "\\\\"
-          case '\"' => "\\\""
-          case _ => c
-        }
-      )
-    }
-
-    return sb.toString
-  }
-
 }
