@@ -1,6 +1,5 @@
 package ru.magnetosoft.rastore.core
 
-import ru.magnetosoft.rastore.core.Triplet
 import scala.collection.mutable.Set
 
 import java.io.BufferedWriter

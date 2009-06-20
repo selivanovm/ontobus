@@ -40,7 +40,7 @@ object AMQPConnectionManager {
       consumer = new QueueingConsumer(channel)
       channel.basicConsume(queue, true, consumer)
 
-      println ("Listening queue '" + userName + ":" + password + "@" + hostName + ":" + portNumber + "'")
+      LogManager.info ("Listening queue '" + userName + ":" + password + "@" + hostName + ":" + portNumber + "'")
 
     }
 
@@ -52,8 +52,13 @@ object AMQPConnectionManager {
   }
 
   def close() {
-    channel.close();
-    conn.close()
+    try {
+      channel.close();
+      conn.close()
+    } catch {
+      case e: Exception => 
+        LogManager.error("Unable to close amqp connection, may be it was already closed.")
+    }
   }
 
 }

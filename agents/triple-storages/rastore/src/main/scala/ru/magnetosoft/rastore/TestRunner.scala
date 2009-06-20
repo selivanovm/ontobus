@@ -6,6 +6,7 @@ import ru.magnetosoft.rastore.util._
 import ru.magnetosoft.rastore.tests._
 import ru.magnetosoft.rastore.core.Store
 import ru.magnetosoft.rastore.core.Triplet
+import ru.magnetosoft.rastore.core.LogManager
 
 object TestRunner {
 
@@ -50,7 +51,7 @@ object TestRunner {
           
           val write = System.nanoTime() - startWrite
 
-          println("done.")
+          LogManager.info("done.")
 
           print("Reading started...")
 
@@ -64,7 +65,7 @@ object TestRunner {
 
           val read = System.nanoTime() - startRead
 
-          println("done.")
+          LogManager.info("done.")
 
           print("Deleting started...")
 
@@ -78,7 +79,7 @@ object TestRunner {
 
           val delete = System.nanoTime() - startDelete
 
-          println("done.")
+          LogManager.info("done.")
 
           mrWrite.putResult(write / 1000000000.0)
           mrWriteSpeed.putResult(tripletsIds.size / (write / 1000000000.0))
@@ -89,17 +90,17 @@ object TestRunner {
           mrDelete.putResult(delete / 1000000000.0)
           mrDeleteSpeed.putResult(tripletsIds.size / (delete / 1000000000.0))
 
-          println(new java.util.Date() + " : " + iterations + " iterations left.")
+          LogManager.info(new java.util.Date() + " : " + iterations + " iterations left.")
 
         }        
 
-        println("=====================================================")
-        println("Avg. writing  time  " + mrWrite.getAverage + " sec.")
-        println("Avg. reading  time  " + mrRead.getAverage + " sec.")
-        println("Avg. removing time  " + mrDelete.getAverage + " sec.")
-        println("Avg. writing  speed " + mrWriteSpeed.getAverage + " docs/sec.")
-        println("Avg. reading  speed " + mrReadSpeed.getAverage + " docs/sec.")
-        println("Avg. removing speed " + mrDeleteSpeed.getAverage + " docs/sec.")
+        LogManager.info("=====================================================")
+        LogManager.info("Avg. writing  time  " + mrWrite.getAverage + " sec.")
+        LogManager.info("Avg. reading  time  " + mrRead.getAverage + " sec.")
+        LogManager.info("Avg. removing time  " + mrDelete.getAverage + " sec.")
+        LogManager.info("Avg. writing  speed " + mrWriteSpeed.getAverage + " docs/sec.")
+        LogManager.info("Avg. reading  speed " + mrReadSpeed.getAverage + " docs/sec.")
+        LogManager.info("Avg. removing speed " + mrDeleteSpeed.getAverage + " docs/sec.")
 
       } catch {
 

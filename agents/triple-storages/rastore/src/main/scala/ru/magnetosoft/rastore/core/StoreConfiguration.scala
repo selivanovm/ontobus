@@ -13,7 +13,7 @@ import java.util.Properties;
 
 object StoreConfiguration {
 
-    private val PROPERTIES_FILE_PATH:String  = "rdfstore.properties"
+    private val PROPERTIES_FILE_PATH:String  = "rastore.properties"
     private var properties:Properties = null
     var isCustomProperties:Boolean = false
 
@@ -45,7 +45,11 @@ object StoreConfiguration {
         result.setProperty("amqp_routing_key", "rskey")
 
         result.setProperty("server_mode", "file")
+        result.setProperty("thread_for_message_parser", "false")
 
+        result.setProperty("log_level", "debug")
+        result.setProperty("log_mode", "sysout")
+        result.setProperty("log_file_path", "./server.log")
 
         return result;
     }
@@ -75,7 +79,7 @@ object StoreConfiguration {
         if (!isCustomProperties) {
             properties = getDefaults()
             save
-            System.out.println("Turn to default properties.")
+            LogManager.info("Turn to default properties.")
         }
             
     }

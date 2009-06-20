@@ -48,7 +48,7 @@ object N3Uploader {
                                MessageProperties.PERSISTENT_TEXT_PLAIN,
                                (msg + "}.").getBytes)
           total += i
-          println("Uploaded " + total + " messages")
+          println("Uploaded " + total + " triplets")
           i = 0
           msg = "<subject><put>{"
         }
@@ -56,6 +56,7 @@ object N3Uploader {
     } else
       println ("Usage : <inputFile> <host> <port> <vhost> <exchange> <targetQueue> <user> <password> <heartbeat> <routingKey> <exchangeType>")
     println ("Done.")
+    System.exit(0)
   }
 
   def escapeString(line: String): String = {

@@ -39,13 +39,13 @@ object Store {
             val st: Statement = c.createStatement()
             val schema: String  = StoreConfiguration.getProperties.getProperty("database_schema")
 
-            System.out.println("Try to get DB Schema from " + schema)
+            LogManager.info("Try to get DB Schema from " + schema)
             val is: InputStream = getClass().getResourceAsStream("/" + schema)
             val br: BufferedReader = new BufferedReader(new InputStreamReader(is))
 
             var line: String = br.readLine()
             while (line != null) {
-                System.out.println("Schema Update : " + line)
+                LogManager.info("Schema Update : " + line)
                 st.executeUpdate(line)
                 line = br.readLine()
             }
