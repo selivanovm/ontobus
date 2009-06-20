@@ -3,12 +3,13 @@ import scala.collection.mutable.Set
 
 import com.rabbitmq.client._
 
-object N3Uploader {
+object Client {
 
   def main(args: Array[String]) {
     
-    if (args.size == 11) {
+    if (args.size == 12) {
 
+      val message = args(0)
       val hostName = args(1)
       val portNumber = args(2)
       val virtualHost = args(3)
@@ -19,6 +20,7 @@ object N3Uploader {
       val heartBeat = args(8)
       val routingKey = args(9)
       val exchangeType = args(10)
+      val listenAfterSending = args(11)
 
       var params = new ConnectionParameters()
       params.setUsername(userName)
@@ -35,26 +37,24 @@ object N3Uploader {
       channel.queueDeclare(queue)
       channel.queueBind(queue, exchange, routingKey)
 
-      var msg = "<subject><store>{"
-      var i = 0
-      var total = 0
+      channel.basicPublish("", "rsinbox",
+                           MessageProperties.PERSISTENT_TEXT_PLAIN,
+                           message.getBytes)
 
-      Source.fromFile(args(0)).getLines.foreach { line =>
-        if (i < 100) {
-          msg += line.substring(0, line.length - 1)
-          i = i + 1
-        } else {
-          channel.basicPublish(exchange, routingKey,
-                               MessageProperties.PERSISTENT_TEXT_PLAIN,
-                               (msg + "}.").getBytes)
-          total += i
-          println("Uploaded " + total + " triplets")
-          i = 0
-          msg = "<subject><store>{"
+      if (listenAfterSending == "true") {
+        val consumer = new QueueingConsumer(channel)
+        channel.basicConsume(queue, true, consumer)
+
+        while(true) {
+          val delivery = consumer.nextDelivery
+          val body = new String(delivery.getBody)
+          println("Got answer : " + body)
         }
+
       }
+
     } else
-      println ("Usage : <inputFile> <host> <port> <vhost> <exchange> <targetQueue> <user> <password> <heartbeat> <routingKey> <exchangeType>")
+      println ("Usage : <message> <host> <port> <vhost> <exchange> <targetQueue> <user> <password> <heartbeat> <routingKey> <exchangeType> <listen_flag>")
     println ("Done.")
     System.exit(0)
   }

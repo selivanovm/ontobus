@@ -26,7 +26,7 @@ class OntoFunction () {
       else false
     }
 
-  override def toString(): String = "OntoFunction: command = " + command + ", arguments = \n" + arguments.mkString("\n\t")
+  override def toString(): String = "OntoFunction: command = " + command + ", arguments = [ \n" + arguments.mkString("\n") + " ]"
 
   override def hashCode(): Int = { 
     var result = 17

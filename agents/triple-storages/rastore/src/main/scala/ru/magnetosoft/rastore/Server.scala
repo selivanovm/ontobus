@@ -10,6 +10,7 @@ import ru.magnetosoft.rastore.core.FileStore
 import ru.magnetosoft.rastore.core.AMQPConnectionManager
 import ru.magnetosoft.rastore.server.MessageParser
 import ru.magnetosoft.rastore.server.OntoFunction
+import ru.magnetosoft.rastore.core.TripletModifier
 import com.rabbitmq.client._
 import ru.magnetosoft.rastore.core.LogManager
 
@@ -30,10 +31,37 @@ object Server {
       loop {
         react {
           case msg: Set[OntoFunction] => {
-            LogManager.debug("Got message [ " + msg + " ]")
+            LogManager.debug("Got message with function requests [ " + msg + " ]")
 
             for(fn <- msg) {
-              
+              val fn_start = System.nanoTime
+              fn.command.pred match {
+                case "store" => {
+                  val stringsToStore = Set[String]()
+                  for(arg <- fn.arguments) {
+                    val strings = if (TripletModifier.TripletSet.id == arg.mod) MessageParser.split(arg.obj) else Set[String](arg.obj)
+                    stringsToStore ++ strings
+                  }
+                  FileStore.putTriplets(stringsToStore)
+                }
+                case "get" => {
+                  
+                  val lines = FileStore.lineIterator
+                  val array = Set[String]()
+                  for(line <- lines) {
+                    if (array.size == 1000 || !lines.hasNext) {
+                      AMQPConnectionManager.sendMessage(fn.command.obj, array.mkString(""))
+                      array.clear
+                    } else array += line
+                  }
+
+                }
+/*                case "get_triplets_count" => 
+                  AMQPConnectionManager.sendMessage(fn.command.obj, FileStore.tripletsCount.toString) */
+                case _ => LogManager.debug("Unknown command : " + fn.command.pred)
+              }
+              val fn_finish = System.nanoTime
+              LogManager.debug("Function [ " + fn.command.pred + " ] finished in " + ((fn_finish - fn_start) / NANOSECONDS_IN_SECOND) + "/sec.")
             }
 
             count = count + msg.size
@@ -79,10 +107,11 @@ object Server {
         try {
 
           val delivery = AMQPConnectionManager.getNextMessage
-          val body = new String(delivery.getBody())
-
-          messageParser ! body
-
+          if (delivery != null) {
+            val body = new String(delivery.getBody())
+            messageParser ! body
+          }
+//          Thread.sleep(1)
         } catch {
           case ex: Exception => { ex.printStackTrace() }
         }

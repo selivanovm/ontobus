@@ -25,7 +25,7 @@ object LogManager {
   def log(msg: String, level: Int) = {
     val currentLogLevel = logLevel(StoreConfiguration.getProperties.getProperty("log_level"))
     if (level <= currentLogLevel) {
-      val logLine = getDate(new Date()) + " | " + LogLevel(level) + " | " + msg
+      val logLine = getDate(new Date()) + " | " + LogLevel(level) + " " * (5 - LogLevel(level).toString.length) + " | " + msg
       val logMode = StoreConfiguration.getProperties.getProperty("log_mode", "sysout")
       if (logMode == "file")
         writeToFile(logLine)

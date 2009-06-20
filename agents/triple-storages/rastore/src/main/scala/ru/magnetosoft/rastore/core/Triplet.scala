@@ -28,7 +28,6 @@ class Triplet {
     if (!other.isInstanceOf[Triplet]) return false
     else {
       val rdft = other.asInstanceOf[Triplet]
-
       if (this.subj != rdft.subj) false
       else if (this.obj != rdft.obj) false
       else if (this.pred != rdft.pred) false

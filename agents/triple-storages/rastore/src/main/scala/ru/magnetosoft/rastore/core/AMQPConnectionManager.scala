@@ -46,9 +46,22 @@ object AMQPConnectionManager {
 
   }
 
+  def sendMessage(queue: String, message: String) = {
+    checkConnection
+    val exchange = StoreConfiguration.getProperties.getProperty("amqp_exchange")
+    val routingKey = StoreConfiguration.getProperties.getProperty("amqp_routing_key")
+    channel.basicPublish(exchange, routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes)
+    LogManager.debug("Message sent to [ " + queue + " ] : " + message)
+  }
+
   def getNextMessage(): QueueingConsumer.Delivery = {
     checkConnection()
     return consumer.nextDelivery()
+  }
+
+  def getNextMessage(ms: Int): QueueingConsumer.Delivery = {
+    checkConnection()
+    return consumer.nextDelivery(ms)
   }
 
   def close() {

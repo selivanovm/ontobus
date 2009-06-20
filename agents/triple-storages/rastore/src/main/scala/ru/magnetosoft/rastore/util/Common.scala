@@ -7,18 +7,20 @@ import scala.collection.mutable.Set
 
 object Common {
 
-  def tripletFromLine(line: String): Triplet = {
+  def tripletFromLine(triplet: String): Triplet = {
+    val line = triplet.trim
     val i1 = line.indexOf(">")
     if (i1 > -1) {
-      val subj = escapeString(line.substring(1, i1))
+      val subj = line.substring(1, i1)
       val i2 = line.indexOf(">", i1 + 1)
       if (i2 > -1) { 
         val i3 = line.indexOf("<", i1)
-        val pred = escapeString(line.substring(i3 + 1, i2))       
+        val pred = line.substring(i3 + 1, i2)
         val obj_token = line.substring(i2 + 1, line.length).trim
-        val obj = untripledString(obj_token)
-        val mod = if (obj_token.startsWith("<")) TripletModifier.Subject.id else TripletModifier.Literal.id
-        new Triplet(0, subj, pred, obj, mod)
+        val obj = obj_token.substring(0, obj_token.length - 1).trim
+        val mod = if (obj_token.startsWith("<")) TripletModifier.Subject.id 
+                  else if (obj_token.startsWith("{")) TripletModifier.TripletSet.id else TripletModifier.Literal.id
+        new Triplet(0, subj, pred, obj.substring(1, obj.length - 1), mod)
       } else return null
     } else return null
   }
@@ -41,9 +43,9 @@ object Common {
     return sb.toString
   }
 
-  def untripledString(string: String): String =
-    if (string.startsWith("\"") || string.startsWith("<")) {
-      if (string.endsWith(">"))
+  def untripledString(string: String): String = 
+    if (string.startsWith("\"") || string.startsWith("<") || string.startsWith("{")) {
+      if (string.endsWith(">") || string.endsWith("}") )
         string.substring(1, string.length - 1)
       else
         string.substring(1, string.length - 3)
@@ -52,8 +54,8 @@ object Common {
   def setEqualityCheck[T](s1: Set[T], s2: Set[T]): Boolean =
     if (s1.size != s2.size) return false
     else if (!leftSetContainsAllRight(s1, s2)) return false
-      else if (!leftSetContainsAllRight(s2, s1)) return false
-        else return true
+    else if (!leftSetContainsAllRight(s2, s1)) return false
+    else return true
 
   def leftSetContainsAllRight[T](s1: Set[T], s2: Set[T]): Boolean = {
     s2.foreach(el => {

@@ -20,12 +20,17 @@ class CommonTest {
   @Test
   def tripletFromLineTest() = {
 
-    val line = "<uid1><argument> \"<i> <have> <beautiful wife#1> .\" ."
-    val expected = new Triplet(0, "uid1", "argument", "<i> <have> <beautiful wife#1> .", TripletModifier.Literal.id)
-    val result = Common.tripletFromLine(line)
+    val line1 = "<uid1> <argument>\"<i> <have> <beautiful wife#1> .\"."
+    val expected1 = new Triplet(0, "uid1", "argument", "<i> <have> <beautiful wife#1> .", TripletModifier.Literal.id)
+    val result1 = Common.tripletFromLine(line1)
 
-    assertEquals(expected, result)
+    assertEquals(expected1, result1)
 
+    val line2 = "<uid1>   <argument>{<s1><p1><o1>.<s2><p2><o2>.}  ."
+    val expected2 = new Triplet(0, "uid1", "argument", "<s1><p1><o1>.<s2><p2><o2>.", TripletModifier.TripletSet.id)
+    val result2 = Common.tripletFromLine(line2)
+
+    assertEquals(expected2, result2)
   }
 
   @Test 
