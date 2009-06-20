@@ -35,32 +35,27 @@ object N3Uploader {
       channel.queueDeclare(queue)
       channel.queueBind(queue, exchange, routingKey)
 
-      var msg = "store"
+      var msg = "<subject><put>{"
       var i = 0
+      var total = 0
 
       Source.fromFile(args(0)).getLines.foreach { line =>
         if (i < 10) {
-
-/*          val tokens = line.split("[>]")
-
-          val subj = escapeString(tokens(0).trim.substring(1))
-          val pred = escapeString(tokens(1).trim.substring(1))
-          val obj = escapeString(tokens(2).substring(0, tokens(2).length - 2).substring(2, tokens(2).length - 4)) */
-
-          msg += "-:-" + line 
-          
+          msg += line.substring(0, line.length - 1)
           i = i + 1
         } else {
           channel.basicPublish(exchange, routingKey,
                                MessageProperties.PERSISTENT_TEXT_PLAIN,
-                               msg.getBytes)
+                               (msg + "}.").getBytes)
+          total += i
+          println("Uploaded " + total + " messages")
           i = 0
-          msg = "store"
+          msg = "<subject><put>{"
         }
       }
     } else
       println ("Usage : <inputFile> <host> <port> <vhost> <exchange> <targetQueue> <user> <password> <heartbeat> <routingKey> <exchangeType>")
-
+    println ("Done.")
   }
 
   def escapeString(line: String): String = {
