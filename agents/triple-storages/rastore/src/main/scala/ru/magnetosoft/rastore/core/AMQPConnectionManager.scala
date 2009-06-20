@@ -4,6 +4,7 @@ import com.rabbitmq.client._
 
 object AMQPConnectionManager {
 
+  val logger = new Logger(AMQPConnectionManager)
   var conn: Connection = null
   var channel: Channel = null
   var consumer: QueueingConsumer = null
@@ -40,7 +41,7 @@ object AMQPConnectionManager {
       consumer = new QueueingConsumer(channel)
       channel.basicConsume(queue, true, consumer)
 
-      LogManager.info ("Listening queue '" + userName + ":" + password + "@" + hostName + ":" + portNumber + "'")
+      logger.info ("Listening queue '" + userName + ":" + password + "@" + hostName + ":" + portNumber + "'")
 
     }
 
@@ -51,7 +52,7 @@ object AMQPConnectionManager {
     val exchange = StoreConfiguration.getProperties.getProperty("amqp_exchange")
     val routingKey = StoreConfiguration.getProperties.getProperty("amqp_routing_key")
     channel.basicPublish(exchange, routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes)
-    LogManager.debug("Message sent to [ " + queue + " ] : " + message)
+    logger.debug("Message sent to [ " + queue + " ] : " + message)
   }
 
   def getNextMessage(): QueueingConsumer.Delivery = {
@@ -70,7 +71,7 @@ object AMQPConnectionManager {
       conn.close()
     } catch {
       case e: Exception => 
-        LogManager.error("Unable to close amqp connection, may be it was already closed.")
+        logger.error("Unable to close amqp connection, may be it was already closed.")
     }
   }
 

@@ -6,15 +6,17 @@ import scala.collection.mutable.HashMap
 import ru.magnetosoft.rastore.util.Common
 import ru.magnetosoft.rastore.core.Triplet
 import ru.magnetosoft.rastore.core.TripletModifier
-import ru.magnetosoft.rastore.core.LogManager
+import ru.magnetosoft.rastore.core.Logger
 
 import scala.collection.jcl.ArrayList
 
 object MessageParser {
 
+  val logger = new Logger(MessageParser)
+
   def functionsFromMessage(message: String): Set[OntoFunction] = {
 
-    LogManager.debug("Got message for parsing [ " + message + " ]")
+    logger.debug("Got message for parsing [ " + message + " ]")
 
     val functions = HashMap[String, OntoFunction]()
     val argumentsMap = HashMap[String, Set[Triplet]]()
@@ -54,7 +56,7 @@ object MessageParser {
       result += functions(key)
     }
 
-    LogManager.debug("OntoFunctions created [ " + result + " ]")
+    logger.debug("OntoFunctions created [ " + result + " ]")
     return result
   }
 

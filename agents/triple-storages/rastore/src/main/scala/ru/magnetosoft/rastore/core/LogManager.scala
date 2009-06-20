@@ -22,28 +22,37 @@ object LogManager {
     dataWriter.close
   }
 
-  def log(msg: String, level: Int) = {
-    val currentLogLevel = logLevel(StoreConfiguration.getProperties.getProperty("log_level"))
+  def log(msg: String, obj: AnyRef, level: Int) = {
+    val currentLogLevel = logLevel(StoreConfiguration.getProperties.getProperty("log_level", "debug"))
     if (level <= currentLogLevel) {
-      val logLine = getDate(new Date()) + " | " + LogLevel(level) + " " * (5 - LogLevel(level).toString.length) + " | " + msg
-      val logMode = StoreConfiguration.getProperties.getProperty("log_mode", "sysout")
-      if (logMode == "file")
-        writeToFile(logLine)
-      else if (logMode == "sysout")
-        println(logLine)
+      val logFilter = StoreConfiguration.getProperties.getProperty("log_filter", "")
+
+      val isFilterMathes = 
+        if (logFilter == "") true
+        else if (logFilter.split(";").filter((el: String) => obj.getClass.getName.endsWith(el)).size == 0) false
+        else true
+      
+      if (isFilterMathes) {
+        val logLine = getDate(new Date()) + " | " + LogLevel(level) + " " * (5 - LogLevel(level).toString.length) + " | " + obj.getClass.getName + " | " + msg
+        val logMode = StoreConfiguration.getProperties.getProperty("log_mode", "sysout")
+        if (logMode == "file")
+          writeToFile(logLine)
+        else if (logMode == "sysout")
+          println(logLine)
+      }
     }
   }
 
-  def error(msg: String) = {
-    log(msg, LogLevel.ERROR.id)
+  def error(msg: String, obj: AnyRef) = {
+    log(msg, obj, LogLevel.ERROR.id)
   }
 
-  def info(msg: String) = {
-    log(msg, LogLevel.INFO.id)
+  def info(msg: String, obj: AnyRef) = {
+    log(msg, obj, LogLevel.INFO.id)
   }
 
-  def debug(msg: String) = {
-    log(msg, LogLevel.DEBUG.id)
+  def debug(msg: String, obj: AnyRef) = {
+    log(msg, obj, LogLevel.DEBUG.id)
   }
 
   def getDate(date: Date): String = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss").format(date)
