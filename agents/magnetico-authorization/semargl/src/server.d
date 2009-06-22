@@ -22,6 +22,20 @@ librabbitmq_client client = null;
 
 Authorization az = null;
 
+struct Triple
+{
+char *s;
+char *p;
+char *o;
+uint is_fact_in_object;
+}
+
+struct Counts
+{
+byte facts;
+byte open_brakets;
+}
+
 void main(char[][] args)
 {
 	az = new Authorization();
@@ -38,33 +52,35 @@ void main(char[][] args)
 	Thread.sleep(0.250);
 }
 
-private void prepare_message(char* message, ulong message_size)
+private Counts calculate_count_facts (char* message, ulong message_size)
 {
-	byte count_open_brakets = 0;
-	byte count_fact_fragment = 0;
-	byte count_facts = 0;
+ Counts res;
 
 	for(int i = message_size; i > 0; i--)
 	{
 		char* cur_char = cast(char*) (message + i);
 
 		if(*cur_char == '.')
-			count_facts++;
+			res.facts++;
 
 		if(*cur_char == '{')
-			count_open_brakets++;
+			res.open_brakets++;
 	}
 
-	char* facts_s[] = new char*[count_facts];
-	char* facts_p[] = new char*[count_facts];
-	char* facts_o[] = new char*[count_facts];
-	uint is_fact_in_object[] = new uint[count_facts];
-	uint stack_brackets[] = new uint[count_open_brakets];
+  return  res;
+}
 
-	count_facts = 0;
+private uint prepare_message(char* message, ulong message_size, Counts counts)
+{
+	byte count_open_brakets = 0;
+	byte count_facts = 0;
+	byte count_fact_fragment = 0;
+
+	Triple* facts[] = new Triple*[counts.facts];	
+
+	uint stack_brackets[] = new uint[counts.open_brakets];
 
 	bool is_open_quotes = false;
-	count_open_brakets = 0;
 
 	for(int i = 0; i < message_size; i++)
 	{
@@ -92,16 +108,16 @@ private void prepare_message(char* message, ulong message_size)
 		{
 			if(count_fact_fragment == 0)
 			{
-				is_fact_in_object[count_facts] = stack_brackets[count_open_brakets];
-				facts_s[count_facts] = cur_char_ptr + 1;
+				facts[count_facts].is_fact_in_object = stack_brackets[count_open_brakets];
+				facts[count_facts].s = cur_char_ptr + 1;
 			}
 			if(count_fact_fragment == 1)
 			{
-				facts_p[count_facts] = cur_char_ptr + 1;
+				facts[count_facts].s = cur_char_ptr + 1;
 			}
 			if(count_fact_fragment == 2)
 			{
-				facts_o[count_facts] = cur_char_ptr + 1;
+				facts[count_facts].o = cur_char_ptr + 1;
 			}
 
 			count_fact_fragment++;
@@ -128,6 +144,7 @@ private void prepare_message(char* message, ulong message_size)
 	//			}
 	}
 
+return count_facts;
 }
 
 void get_message(byte* message, ulong message_size)
@@ -166,7 +183,7 @@ void get_message(byte* message, ulong message_size)
 	{
 		Stdout.format("this is facts on update").newline;
 
-		prepare_message ();		
+		uint count_facts = prepare_message (cast(char*)message, message_size);		
 		
 		// это команда put?
 		int put_id = -1;
