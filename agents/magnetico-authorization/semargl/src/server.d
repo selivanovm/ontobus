@@ -22,18 +22,20 @@ librabbitmq_client client = null;
 
 Authorization az = null;
 
+/*
 struct Triple
 {
-char *s;
-char *p;
-char *o;
-uint is_fact_in_object;
+	char* s;
+	char* p;
+	char* o;
+	uint is_fact_in_object;
 }
+*/
 
 struct Counts
 {
-byte facts;
-byte open_brakets;
+	byte facts;
+	byte open_brakets;
 }
 
 void main(char[][] args)
@@ -52,9 +54,9 @@ void main(char[][] args)
 	Thread.sleep(0.250);
 }
 
-private Counts calculate_count_facts (char* message, ulong message_size)
+private Counts calculate_count_facts(char* message, ulong message_size)
 {
- Counts res;
+	Counts res;
 
 	for(int i = message_size; i > 0; i--)
 	{
@@ -67,24 +69,24 @@ private Counts calculate_count_facts (char* message, ulong message_size)
 			res.open_brakets++;
 	}
 
-  return  res;
+	return res;
 }
 
-private uint prepare_message(char* message, ulong message_size, Counts counts)
+private uint extract_facts_from_message(char* message, ulong message_size, Counts counts, char* fact_s[], char* fact_p[], char* fact_o[], uint is_fact_in_object[])
 {
+	Stdout.format("extract_facts_from_message ... facts.size={}", counts.facts).newline;
+	
 	byte count_open_brakets = 0;
 	byte count_facts = 0;
 	byte count_fact_fragment = 0;
 
-	Triple* facts[] = new Triple*[counts.facts];	
-
 	uint stack_brackets[] = new uint[counts.open_brakets];
-
+	
 	bool is_open_quotes = false;
 
 	for(int i = 0; i < message_size; i++)
-	{
-		char* cur_char_ptr = cast(char*) (message + i);
+	{		
+		char* cur_char_ptr = message + i;
 		char cur_char = *cur_char_ptr;
 
 		if(cur_char == '"')
@@ -97,29 +99,31 @@ private uint prepare_message(char* message, ulong message_size, Counts counts)
 				*cur_char_ptr = 0;
 			}
 		}
-
+		
 		if(cur_char == '{')
 		{
 			count_open_brakets++;
 			stack_brackets[count_open_brakets] = count_facts;
 		}
-
+		
 		if(cur_char == '<' || cur_char == '{' || (cur_char == '"' && is_open_quotes == true))
 		{
 			if(count_fact_fragment == 0)
 			{
-				facts[count_facts].is_fact_in_object = stack_brackets[count_open_brakets];
-				facts[count_facts].s = cur_char_ptr + 1;
+				if (count_open_brakets > 0)
+				  is_fact_in_object[count_facts] = stack_brackets[count_open_brakets];
+				
+				fact_s[count_facts] = cur_char_ptr + 1;
 			}
 			if(count_fact_fragment == 1)
 			{
-				facts[count_facts].s = cur_char_ptr + 1;
+				fact_p[count_facts] = cur_char_ptr + 1;
 			}
 			if(count_fact_fragment == 2)
 			{
-				facts[count_facts].o = cur_char_ptr + 1;
+				fact_o[count_facts] = cur_char_ptr + 1;
 			}
-
+			
 			count_fact_fragment++;
 			if(count_fact_fragment > 2)
 			{
@@ -130,8 +134,11 @@ private uint prepare_message(char* message, ulong message_size, Counts counts)
 		}
 
 		if(cur_char == '>')
-			*cur_char_ptr = 0;
-
+		{
+			*cur_char_ptr = 0;			
+		}
+		
+		
 	//			if(*cur_char == '}')
 	//				count_open_brakets--;
 
@@ -143,8 +150,18 @@ private uint prepare_message(char* message, ulong message_size, Counts counts)
 	//				count_facts++;
 	//			}
 	}
+	
+	Stdout.format("extract_facts_from_message ... ok").newline;
+	
+	for (int i = 0; i < count_facts; i++)
+	{
+		printf ("\nfound s=%s\n", fact_s[i]);
+		printf ("found p=%s\n", fact_p[i]);
+		printf ("found o=%s\n\n", fact_o[i]);
+	}
 
-return count_facts;
+
+	return count_facts;
 }
 
 void get_message(byte* message, ulong message_size)
@@ -166,31 +183,32 @@ void get_message(byte* message, ulong message_size)
 
 	uint param_count = 0;
 
-	/*
-		<subject><authorize><uid1>.
-		<uid1><from>"hsearch--594463104-1245681854398098000".
-		<uid1><right>"r".
-		<uid1><category>"DOCUMENT".
-		<uid1><targetId>"61b807a9-e350-45a1-a0ed-10afa8f987a4".
-		<uid1><elements>"a8df72cae40b43deb5dfbb7d8af1bb34,da08671d0c50416481f32705a908f1ab,4107206856ea4a7b8d8b4b80444f7f85".	  
-	 */
-	
 	elapsed.start;
-
+	
+	char* fact_s[];
+	char* fact_p[];
+	char* fact_o[];
+	uint is_fact_in_object[];
+	
 	// разберемся что за команда пришла
 	// если первый символ = [<], значит пришли факты
 	if(*(message + 0) == '<' && *(message + 10) == 'p')
 	{
 		Stdout.format("this is facts on update").newline;
 
-		uint count_facts = prepare_message (cast(char*)message, message_size);		
-		
+		Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
+		fact_s = new char* [count_elements.facts];
+		fact_p = new char* [count_elements.facts];
+		fact_o = new char* [count_elements.facts];
+		is_fact_in_object = new uint [count_elements.facts];		
+		uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o, is_fact_in_object);
+
 		// это команда put?
 		int put_id = -1;
 		uint arg_id = 0;
-		for(int i = 0; i < count_facts; i++)
+		for(int i = 0; i < count_elements.facts; i++)
 		{
-			if(strcmp(facts_p[i], "put") == 0 && strcmp(facts_s[i], "subject") == 0)
+			if(strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
 			{
 				put_id = i;
 				//				Stdout.format("found comand put, id ={} ", i).newline;	
@@ -202,7 +220,7 @@ void get_message(byte* message, ulong message_size)
 		{
 			for(int i = 0; i < count_facts; i++)
 			{
-				if(strcmp(facts_p[i], "argument") == 0/* && strcmp(facts_s[i], facts_o[put_id]) == 0*/)
+				if(strcmp(fact_p[i], "argument") == 0/* && strcmp(facts_s[i], facts_o[put_id]) == 0*/)
 				{
 					//					Stdout.format("found argument put, factid={}", i).newline;
 					arg_id = i;
@@ -218,8 +236,8 @@ void get_message(byte* message, ulong message_size)
 				if(is_fact_in_object[i] == arg_id)
 				{
 					//					Stdout.format("add triple <{}><{}><{}>", str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i])).newline;
-					az.addAuthorizeData(str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(
-							facts_o[i]));
+					az.addAuthorizeData(str_2_char_array(fact_s[i]), str_2_char_array(fact_p[i]), str_2_char_array(
+							fact_o[i]));
 				//					TripleStorage ts = az.getTripleStorage();
 				//					ts.addTriple (str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i]));
 				}
@@ -231,9 +249,9 @@ void get_message(byte* message, ulong message_size)
 
 		for(int i = 0; i < count_facts; i++)
 		{
-			Stdout.format("s = {:X2} {:X4} {}", i, facts_s[i], str_2_char_array(cast(char*) facts_s[i])).newline;
-			Stdout.format("p = {:X2} {:X4} {}", i, facts_p[i], str_2_char_array(cast(char*) facts_p[i])).newline;
-			Stdout.format("o = {:X2} {:X4} {}", i, facts_o[i], str_2_char_array(cast(char*) facts_o[i])).newline;
+			Stdout.format("s = {:X2} {:X4} {}", i, fact_s[i], str_2_char_array(cast(char*) fact_s[i])).newline;
+			Stdout.format("p = {:X2} {:X4} {}", i, fact_p[i], str_2_char_array(cast(char*) fact_p[i])).newline;
+			Stdout.format("o = {:X2} {:X4} {}", i, fact_o[i], str_2_char_array(cast(char*) fact_o[i])).newline;
 			Stdout.format("is_fact_in_object = {:X2} {}\n", i, is_fact_in_object[i]).newline;
 		}
 
@@ -241,7 +259,83 @@ void get_message(byte* message, ulong message_size)
 	}
 	else if(*(message + 0) == '<' && *(message + 13) == 'h')
 	{
+		/*
+		 <subject><authorize><uid1>.
+		 <uid1><from>"hsearch--594463104-1245681854398098000".
+		 <uid1><right>"r".
+		 <uid1><category>"DOCUMENT".
+		 <uid1><targetId>"61b807a9-e350-45a1-a0ed-10afa8f987a4".
+		 <uid1><elements>"a8df72cae40b43deb5dfbb7d8af1bb34,da08671d0c50416481f32705a908f1ab,4107206856ea4a7b8d8b4b80444f7f85".	  
+		 */
+
 		Stdout.format("this request on authorization").newline;
+
+		Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
+		fact_s = new char* [count_elements.facts];
+		fact_p = new char* [count_elements.facts];
+		fact_o = new char* [count_elements.facts];
+		is_fact_in_object = new uint [count_elements.facts];		
+		uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o, is_fact_in_object);
+
+		// это команда put?
+		int authorize_id = -1;
+		int from_id = 0;
+		int right_id = 0;
+		int category_id = 0;
+		int targetId_id = 0;
+		int elements_id = 0;
+
+		Stdout.format("this request on authorization #1").newline;
+
+		for(int i = 0; i < count_facts; i++)
+		{
+			Stdout.format("this request on authorization #1.1").newline;
+			printf("fact s=%s\n", fact_s[i]);
+			printf("fact p=%s\n", fact_p[i]);
+			printf("fact p=%s\n", fact_o[i]);
+			if(strcmp(fact_p[i], "authorize") == 0 && strcmp(fact_s[i], "subject") == 0)
+			{
+				authorize_id = i;
+				Stdout.format("found comand authorize, id ={} ", i).newline;
+				break;
+			}
+		}
+		
+		Stdout.format("this request on authorization #2").newline;
+
+		if(authorize_id >= 0)
+		{
+			for(int i = 0; i < count_facts; i++)
+			{
+				if(strcmp(fact_p[i], "from") == 0)
+				{
+					from_id = i;
+				}
+				if(strcmp(fact_p[i], "right") == 0)
+				{
+					right_id = i;
+				}
+				if(strcmp(fact_p[i], "category") == 0)
+				{
+					category_id = i;
+				}
+				if(strcmp(fact_p[i], "targetId") == 0)
+				{
+					targetId_id = i;
+				}
+				if(strcmp(fact_p[i], "elements") == 0)
+				{
+					elements_id = i;
+				}
+			}
+		}
+
+		if(elements_id != 0)
+		{
+//			Stdout.format("elements_id ={} ", facts[elements_id].o).newline;
+
+		}
+
 		// иначе считаем это списком ID документов на авторизацию
 
 		//	uint prev_pos = 0;
