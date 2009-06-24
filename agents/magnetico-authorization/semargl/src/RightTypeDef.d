@@ -2,9 +2,9 @@ module RightTypeDef;
 
 enum RightType
 {
-	CREATE,
-	READ,
-	WRITE,
-	UPDATE,
-	DELETE
+	CREATE=0,
+	READ=1,
+	WRITE=2,
+	UPDATE=3,
+	DELETE=4
 }

@@ -148,7 +148,7 @@ class Authorization
 
 				if(element[4] == '-' && element[7] == '-' && element[10] == ' ' && element[13] == ':' && element[16] == ':' && element[19] == ',')
 					element = Text.delimit(element, "<")[1];
-				
+
 				element[element.length] = 0;
 
 				idx++;
@@ -199,7 +199,7 @@ class Authorization
 
 			if(i_know_predicat)
 			{
-									//						Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+				//						Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
 				if(ts.addTriple(s, p, o))
 					count_add_triple++;
 				else
@@ -297,6 +297,11 @@ class Authorization
 
 		printf("authorize:docId=%s\n", docId);
 
+		calculatedRight = S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
+		if (calculatedRight == true)
+			return calculatedRight;
+		
+
 		uint* iterator_facts_of_document = ts.getTriples(subject_document, null, null, false);
 
 		if(iterator_facts_of_document is null)
@@ -311,9 +316,6 @@ class Authorization
 
 		if(calculatedRight == false)
 			calculatedRight = S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-
-		if(calculatedRight == false)
-			calculatedRight = S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
 
 		if(calculatedRight == false)
 			calculatedRight = S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
