@@ -54,7 +54,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 				if(strcmp(triple0_o, user) == 0)
 				{
-					Stdout.format("да! я автор документа {}", str_2_chararray(elementId)).newline;
+//					Stdout.format("да! я автор документа {}", str_2_chararray(elementId)).newline;
 					return true;
 
 				}

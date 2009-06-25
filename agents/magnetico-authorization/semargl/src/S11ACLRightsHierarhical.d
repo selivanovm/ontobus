@@ -12,7 +12,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
 	bool result = false;
 
-	Stdout.format("S11ACLRightsHierarhical document = {:X4}", elementId).newline;
+	//	Stdout.format("S11ACLRightsHierarhical document = {:X4}", elementId).newline;
 
 	// если документ в документообороте и мы хотим модифицировать
 	if((RightType.WRITE == rightType) || (RightType.DELETE == rightType))
@@ -37,8 +37,8 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 		uint*[] iterator_on_targets_of_hierarhical_departments)
 {
-	Stdout.format("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}",
-			iterator_on_targets_of_hierarhical_departments.length).newline;
+	//	Stdout.format("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}",
+	//			iterator_on_targets_of_hierarhical_departments.length).newline;
 
 	uint* iterator1 = ts.getTriples(null, "magnet-ontology#elementId", elementId, false);
 
@@ -54,7 +54,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 			byte* triple1 = cast(byte*) *iterator1;
 			char* acl_subject = cast(char*) triple1 + 6;
 
-//			bool this_user_in_ACL = false;
+			//			bool this_user_in_ACL = false;
 			// возьмем факты этой записи ACL
 			uint* iterator2 = ts.getTriples(acl_subject, null, null, false);
 

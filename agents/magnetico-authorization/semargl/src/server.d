@@ -57,7 +57,7 @@ void get_message(byte* message, ulong message_size)
 //	char check_right = 0;
 
 	char* user_id;
-	char* queue_name;
+//	char* queue_name;
 	char* list_docid;
 	char* docId;
 	uint targetRightType = RightType.READ;
@@ -66,6 +66,7 @@ void get_message(byte* message, ulong message_size)
 
 	elapsed.start;
 	
+	char* queue_name = cast(char*)(new char [40]); 
 	char* fact_s[];
 	char* fact_p[];
 	char* fact_o[];
@@ -154,8 +155,10 @@ void get_message(byte* message, ulong message_size)
 			 <uid1><elements>"a8df72cae40b43deb5dfbb7d8af1bb34,da08671d0c50416481f32705a908f1ab,4107206856ea4a7b8d8b4b80444f7f85".	  
 			 */
 
-			Stdout.format("this request on authorization").newline;
+//			Stdout.format("this request on authorization").newline;
 
+			char* command_uid = null;
+			
 			// это команда authorize?
 			int authorize_id = -1;
 			int from_id = 0;
@@ -163,20 +166,21 @@ void get_message(byte* message, ulong message_size)
 			int category_id = 0;
 			int targetId_id = 0;
 			int elements_id = 0;
-
-			Stdout.format("this request on authorization #1").newline;
+		
+//			Stdout.format("this request on authorization #1").newline;
 
 			for(int i = 0; i < count_facts; i++)
 			{
 				if(strcmp(fact_p[i], "authorize") == 0 && strcmp(fact_s[i], "subject") == 0)
 				{
+					command_uid = fact_o[i];
 					authorize_id = i;
-					Stdout.format("found comand authorize, id ={} ", i).newline;
+//					Stdout.format("found comand authorize, id ={} ", i).newline;
 					break;
 				}
 			}
 
-			Stdout.format("this request on authorization #2").newline;
+//			Stdout.format("this request on authorization #2").newline;
 
 			if(authorize_id >= 0)
 			{
@@ -212,15 +216,20 @@ void get_message(byte* message, ulong message_size)
 				autz_elements = fact_o[elements_id];
 			}
 
-			queue_name = fact_o[from_id];
+//			queue_name = fact_o[from_id];
+			strcpy (queue_name, fact_o[from_id]);
 			user_id = fact_o[targetId_id];
 			char* check_right = fact_o[right_id];
+			
+			// результат поместим в то же сообщение
+			char* result = cast (char*)message;
+			char* result_ptr = result;
 
-			printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
+//			printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
 
 			uint*[] hierarhical_departments = null;
 			hierarhical_departments = getDepartmentTreePath(user_id, az.getTripleStorage());
-			Stdout.format("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length).newline;
+//			Stdout.format("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length).newline;
 
 			for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 			{
@@ -236,7 +245,7 @@ void get_message(byte* message, ulong message_size)
 					targetRightType = RightType.DELETE;
 			}
 
-			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
+//			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
 
 			bool calculatedRight_isAdmin;
 			calculatedRight_isAdmin = S01UserIsAdmin.calculate(user_id, null, targetRightType, az.getTripleStorage());
@@ -246,34 +255,43 @@ void get_message(byte* message, ulong message_size)
 			uint doc_pos = 0;
 			uint prev_doc_pos = 0;
 
+			*result_ptr = '<';
+			strcpy (result_ptr+1, command_uid);
+			result_ptr += strlen (command_uid) + 1;
+			strcpy (result_ptr, "><result:data>\"");
+			result_ptr += 15;
+				
 			for(uint i = 0; true; i++)
 			{
 				char prev_state_byte = *(autz_elements + i);
 
-				Stdout.format("this request on authorization #1.2, {}{}", i, *(autz_elements + i)).newline;
+//				Stdout.format("this request on authorization #1.2, {}{}", i, *(autz_elements + i)).newline;
 				if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 				{
 					*(autz_elements + i) = 0;
 
 					docId = cast(char*) (autz_elements + doc_pos);
+//					printf("docId:%s\n", docId);
 
 					count_prepared_doc++;
-					printf("!!+! docId=%s\n", docId);
 					bool calculatedRight = az.authorize(docId, user_id, targetRightType, hierarhical_departments);
 					//			Stdout.format("prev_doc_pos={}, doc_pos={}, right = {}", prev_doc_pos, doc_pos, calculatedRight).newline;
 
-					if(calculatedRight == false)
+//					if(calculatedRight == false)
+//					{
+//						for(uint j = doc_pos; *(autz_elements + j) != 0; j++)
+//						{
+//							*(autz_elements + j) = ' ';
+//						}
+//						*(autz_elements + i) = ' ';
+//					}
+//					else
+					if(calculatedRight == true)
 					{
-						for(uint j = doc_pos; *(autz_elements + j) != 0; j++)
-						{
-							*(autz_elements + j) = ' ';
-						}
-						*(autz_elements + i) = ' ';
-					}
-					else
-					{
-						Stdout.format("this request on authorization #1.4 true").newline;
-						*(autz_elements + i) = ',';
+						strcpy (result_ptr, docId);
+						result_ptr += strlen (docId);						
+//						Stdout.format("this request on authorization #1.4 true").newline;
+//						*(autz_elements + i) = ',';
 						count_authorized_doc++;
 					}
 
@@ -286,22 +304,25 @@ void get_message(byte* message, ulong message_size)
 					break;
 				}
 			}
+			
+			strcpy (result_ptr, "\".");
 
 			time = elapsed.stop;
 
 			Stdout.format(
-					"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.)",
-					count_prepared_doc, count_authorized_doc, time * 1000, time).newline;
+					"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
+					count_prepared_doc, count_authorized_doc, time * 1000, time, count_authorized_doc/time).newline;
+			
+			printf("result:%s\n", result);
+			printf("queue_name:%s\n", queue_name);
 
 			elapsed.start;
-
-			client.send(queue_name, autz_elements);
+			
+			client.send(queue_name, result);
 
 			time = elapsed.stop;
 
 			Stdout.format("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time).newline;
-
-			printf("!!+! docId=%s\n", autz_elements);
 
 			az.getTripleStorage().print_stat();
 		}
@@ -358,7 +379,7 @@ private Counts calculate_count_facts(char* message, ulong message_size)
 
 private uint extract_facts_from_message(char* message, ulong message_size, Counts counts, char* fact_s[], char* fact_p[], char* fact_o[], uint is_fact_in_object[])
 {
-	Stdout.format("extract_facts_from_message ... facts.size={}", counts.facts).newline;
+//	Stdout.format("extract_facts_from_message ... facts.size={}", counts.facts).newline;
 	
 	byte count_open_brakets = 0;
 	byte count_facts = 0;
@@ -435,15 +456,15 @@ private uint extract_facts_from_message(char* message, ulong message_size, Count
 	//			}
 	}
 	
-	Stdout.format("extract_facts_from_message ... ok").newline;
-	
+//	Stdout.format("extract_facts_from_message ... ok").newline;
+/*	
 	for (int i = 0; i < count_facts; i++)
 	{
 		printf ("\nfound s=%s\n", fact_s[i]);
 		printf ("found p=%s\n", fact_p[i]);
 		printf ("found o=%s\n\n", fact_o[i]);
 	}
-
+*/
 
 	return count_facts;
 }

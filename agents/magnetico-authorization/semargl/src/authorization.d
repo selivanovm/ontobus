@@ -295,7 +295,7 @@ class Authorization
 		//			char* subject_document = cast(char*) triple0 + 6;
 		char* subject_document = docId;
 
-		printf("authorize:docId=%s\n", docId);
+//		printf("authorize:docId=%s\n", docId);
 
 		calculatedRight = S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
 		if (calculatedRight == true)
