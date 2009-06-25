@@ -1,0 +1,5 @@
+<magnet-ontology#RightsRecord1> <magnet-ontology#author> "eb413e31-da1d-451f-acfa-d15c1dc69377" .
+<magnet-ontology#RightsRecord1> <magnet-ontology#target> "d8a2e376-047f-4a7a-9094-b3c4d664a51c" .
+<magnet-ontology#RightsRecord1> <magnet-ontology#elementId> "c0464d8c00694e3e901fe6e98b648ace" .
+<magnet-ontology#RightsRecord1> <magnet-ontology#rigths> "r" .
+<eb413e31-da1d-451f-acfa-d15c1dc69377> <magnet-ontology#group> "DOCFLOW" .

@@ -1,0 +1,6 @@
+*~
+*.o
+*.def
+*.log
+.gitignore
+rodzilla
