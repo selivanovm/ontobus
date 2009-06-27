@@ -1,1 +1,0 @@
-enum TripleTypes { URI_TYPE, LITERAL_TYPE, TRIPLE_SET_TYPE }
