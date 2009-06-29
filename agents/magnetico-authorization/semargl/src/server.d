@@ -33,8 +33,8 @@ void main(char[][] args)
 	az = new Authorization();
 
 	//char[] hostname = "192.168.150.197\0";
-	char[] hostname = "192.168.150.44\0";
-	//	char[] hostname = "services.magnetosoft.ru\0";
+	//char[] hostname = "192.168.150.44\0";
+		char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
 
 	Stdout.format("connect to AMQP server ({}:{})", hostname, port).newline;
@@ -289,7 +289,9 @@ void get_message(byte* message, ulong message_size)
 					if(calculatedRight == true)
 					{
 						strcpy (result_ptr, docId);
-						result_ptr += strlen (docId);						
+						result_ptr += strlen (docId);
+						*result_ptr = ',';
+						result_ptr++;						
 //						Stdout.format("this request on authorization #1.4 true").newline;
 //						*(autz_elements + i) = ',';
 						count_authorized_doc++;
