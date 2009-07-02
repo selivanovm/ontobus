@@ -56,7 +56,7 @@ void get_message(byte* message, ulong message_size)
 
 //	char check_right = 0;
 
-	char* user_id;
+//	char* user_id;
 //	char* queue_name;
 	char* list_docid;
 	char* docId;
@@ -67,6 +67,7 @@ void get_message(byte* message, ulong message_size)
 	elapsed.start;
 	
 	char* queue_name = cast(char*)(new char [40]); 
+	char* user = cast(char*)(new char [40]); 
 	char* fact_s[];
 	char* fact_p[];
 	char* fact_o[];
@@ -218,7 +219,8 @@ void get_message(byte* message, ulong message_size)
 
 //			queue_name = fact_o[from_id];
 			strcpy (queue_name, fact_o[from_id]);
-			user_id = fact_o[targetId_id];
+			strcpy (user, fact_o[targetId_id]);
+			
 			char* check_right = fact_o[right_id];
 			
 			// результат поместим в то же сообщение
@@ -228,7 +230,7 @@ void get_message(byte* message, ulong message_size)
 //			printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
 
 			uint*[] hierarhical_departments = null;
-			hierarhical_departments = getDepartmentTreePath(user_id, az.getTripleStorage());
+			hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
 //			Stdout.format("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length).newline;
 
 			for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
@@ -248,7 +250,7 @@ void get_message(byte* message, ulong message_size)
 //			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
 
 			bool calculatedRight_isAdmin;
-			calculatedRight_isAdmin = S01UserIsAdmin.calculate(user_id, null, targetRightType, az.getTripleStorage());
+			calculatedRight_isAdmin = S01UserIsAdmin.calculate(user, null, targetRightType, az.getTripleStorage());
 
 			uint count_prepared_doc = 0;
 			uint count_authorized_doc = 0;
@@ -274,8 +276,8 @@ void get_message(byte* message, ulong message_size)
 //					printf("docId:%s\n", docId);
 
 					count_prepared_doc++;
-					bool calculatedRight = az.authorize(docId, user_id, targetRightType, hierarhical_departments);
-					//			Stdout.format("prev_doc_pos={}, doc_pos={}, right = {}", prev_doc_pos, doc_pos, calculatedRight).newline;
+					bool calculatedRight = az.authorize(docId, user, targetRightType, hierarhical_departments);
+//					Stdout.format("right = {}", calculatedRight).newline;
 
 //					if(calculatedRight == false)
 //					{
