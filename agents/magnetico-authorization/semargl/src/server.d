@@ -315,7 +315,7 @@ void get_message(byte* message, ulong message_size)
 
 			Stdout.format(
 					"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
-					count_prepared_doc, count_authorized_doc, time * 1000, time, count_authorized_doc/time).newline;
+					count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc/time).newline;
 			
 			printf("result:%s\n", result);
 			printf("queue_name:%s\n", queue_name);
