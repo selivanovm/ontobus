@@ -7,11 +7,11 @@ class librabbitmq_client
 {
 	amqp_connection_state_t_ conn;
 	char* vhost = "auth\0";
-	char* exchange = "rsexchange";
+	char* exchange = "";
 	char* login = "rastore\0";
 	char* passw = "rspass\0";
-	char* bindingkey = cast(char*) "rskey\0";
-	char* queue = "rsinbox";
+	char* bindingkey = cast(char*) "\0";
+	char* queue = "auth";
 
 	char[] hostname;
 	int port;

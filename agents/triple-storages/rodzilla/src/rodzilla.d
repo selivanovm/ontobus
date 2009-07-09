@@ -1,12 +1,15 @@
 module rodzilla;
 
+import tango.text.stream.LineIterator;
 private import tango.core.Thread;
 private import tango.io.Console;
 private import std.c.string;
+import std.c.stdio;
 import tango.time.StopWatch;
 import tango.io.stream.DataFileStream;
 private import tango.io.FileConduit;
-
+import tango.text.locale.Locale;
+import tango.text.convert.Layout;
 import Integer = tango.text.convert.Integer;
 
 private import tango.io.Stdout;
@@ -16,11 +19,21 @@ import tango.io.File;
 
 import librabbitmq_client;
 import tango.time.WallClock;
+import tango.text.convert.Format;
+
+import tango.io.FileScan;
+
+const time_mark_size = 15;
+const TRIPLES_IN_PACKET = 500;
 
 //File file;
 DataFileOutput file;
 FileConduit conduit;
 FilePath path;
+Locale locale;
+char[] now;
+
+librabbitmq_client client;
 
 class Triple
 {
@@ -40,11 +53,12 @@ void main()
 
   //  file = new File ("rodzilla.data");
 
+  Cout(Format("{:d15} ", WallClock.now.span.millis));
 
-  char[] hostname = "192.168.150.197\0";
+  char[] hostname = "192.168.150.196\0";
 
-
-  path = new FilePath("triples.data");
+  auto locale = new Locale();
+  path = new FilePath(locale ("./data/{:yyyy-MM-dd}.triples", WallClock.now));
 
   if (path.exists)
     conduit = new FileConduit(path.toString(), FileConduit.WriteAppending);
@@ -56,7 +70,7 @@ void main()
   //	char[] hostname = "services.magnetosoft.ru\0";
   int port = 5672;
 	
-  librabbitmq_client client = new librabbitmq_client (hostname, port, &get_message);
+  client = new librabbitmq_client (hostname, port, &get_message);
 	
   (new Thread(&client.listener)).start;
   Thread.sleep(0.250);
@@ -66,9 +80,108 @@ void main()
 void store_triplet(char* start, int l, char* s, int s_l, char* p, 
 		   int p_l, char* o, int o_l, uint  m)
 {
-  //  for(int i = 0; i < l; i++)
+  file.write(now);
   file.buffer.append(start, l);
   file.write("\n");
+}
+
+void get_triplet(char* destination)
+{
+
+  //  TimeOfDay tod = WallClock.now.time;
+  //  Stdout.format("{}:{:d02}:{:d02}:{:d002}", tod.hours, tod.minutes, tod.seconds, tod.millis).newline;
+
+  char[] buffer = new char[ TRIPLES_IN_PACKET * 5000 ];
+  char* buf_ptr = &buffer[0];
+
+  int msg_length = 0;
+  int triples_count = 0;
+  char[] header = "<subject><put>{\0";
+  char[] footer = "}.\0";
+  char[] root = "./data/";
+  auto scan = (new FileScan)(root, ".triples");
+
+  int total_chars_sent = 0;
+  int total_triples_sent = 0;
+
+  //  tod = WallClock.now.time;
+  //  Stdout.format("{}:{:d02}:{:d02}:{:d002}", tod.hours, tod.minutes, tod.seconds, tod.millis).newline;
+
+  char[] line = new char[5000];
+  char* line_ptr = &(line[0]);
+  char* t;
+  foreach (file; scan.files)
+    {
+      memcpy(buf_ptr, cast(char*)header, header.length - 1);
+      msg_length = header.length - 1;
+
+      FILE *data_file = fopen ( &(file.toString[0]), "r" );
+
+      if (data_file != null)
+	{
+ 
+	  while ( fgets ( line_ptr, 5000, data_file ) != null )
+	    {
+	      
+	      if (line.length > time_mark_size)
+		{
+		  triples_count++;
+
+		  uint line_length = time_mark_size;
+		  for(; line_length < 5000; line_length++)
+		    {
+		      if (*(line_ptr + line_length) == '\n' || *(line_ptr + line_length) == '0')
+			  break;
+		      *(buf_ptr + msg_length++) = *(line_ptr + line_length);
+		    }
+
+		  //		  char* triple_ptr = line_ptr + time_mark_size;
+		  //		  *(line_ptr + line_length) = 0;
+
+		  //		  		  printf("! %s ! \n", triple_ptr);
+
+		  //		  memcpy(buf_ptr + msg_length, triple_ptr, line_length - time_mark_size);
+
+		  //		  msg_length += line_length - time_mark_size;
+
+		  if (triples_count == TRIPLES_IN_PACKET)
+		    {
+		      memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
+		      msg_length += footer.length - 1;
+		      *(buf_ptr + msg_length) = 0;
+
+		      //		      		      printf("\n %s \n", buf_ptr);
+		      client.send(destination, buf_ptr);
+
+		      total_chars_sent += msg_length;
+		      total_triples_sent += triples_count;
+
+		      memcpy(buf_ptr, cast(char*)header, header.length - 1);
+		      msg_length = header.length - 1;
+		      triples_count = 0;
+		    } 
+		}
+  	      
+	    }
+	  fclose(data_file);
+	}
+
+      if (triples_count > 0)
+	{
+
+	  memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
+	  msg_length += footer.length - 1;
+
+	  *(buf_ptr + msg_length) = 0;
+	  //	  printf("%s\n", buf_ptr);
+	  client.send(destination, buf_ptr);
+	  total_chars_sent += msg_length;
+	  total_triples_sent += triples_count;
+	}
+    }
+
+    Stdout.format("Total sent: {} chars, {} triples", total_chars_sent, total_triples_sent).newline;
+
 }
 
 void parse_functions(char* start, int l, char* s, int s_l, char* p, 
@@ -84,7 +197,14 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p,
 	  split_triples_line(o, o_l, &store_triplet);
 	} else if (*p == 'g' && *(p + 1) == 'e' && *(p + 2) == 't')
 	{
+	  *(o + o_l) = 0;
+	  //	    str_2_char_array(o, o_l);
 	  
+	  //	  Cout(str_2_char_array(o, o_l)).newline;
+
+
+
+	  get_triplet(o);
 	}
     }
 }
@@ -93,10 +213,12 @@ void get_message (byte* message, ulong message_size)
 {
 
   auto elapsed = new StopWatch();  
+  now = Format("{:d15}", WallClock.now.span.millis); // field has size of time_mark_size characters
   elapsed.start;
 	
   *(message + message_size) = 0;
-  //  char* msg = ;
+
+  //  Cout(str_2_char_array(cast(char*)message, message_size));
 
   split_triples_line(cast(char*) message, message_size, &parse_functions);
 
