@@ -1,32 +1,27 @@
 module rodzilla;
 
-import tango.text.stream.LineIterator;
-private import tango.core.Thread;
-private import tango.io.Console;
-private import std.c.string;
-import std.c.stdio;
-import tango.time.StopWatch;
-import tango.io.stream.DataFileStream;
-private import tango.io.FileConduit;
-import tango.text.locale.Locale;
-import tango.text.convert.Layout;
-import Integer = tango.text.convert.Integer;
+import tango.io.stream.MapStream;
 
-private import tango.io.Stdout;
-import Text = tango.text.Util;
+import tango.core.Thread;
+import tango.io.Console;
+import tango.text.convert.Format;
+import tango.io.FileScan;
+import tango.io.stream.DataFileStream;
+import tango.io.FileConduit;
+
+import std.c.string;
+import std.c.stdio;
+import std.string;
+import tango.io.Stdout;
+import tango.text.locale.Locale;
 import tango.time.StopWatch;
-import tango.io.File;
+import tango.time.WallClock;
 
 import librabbitmq_client;
-import tango.time.WallClock;
-import tango.text.convert.Format;
-
-import tango.io.FileScan;
 
 const time_mark_size = 15;
 const TRIPLES_IN_PACKET = 500;
 
-//File file;
 DataFileOutput file;
 FileConduit conduit;
 FilePath path;
@@ -35,27 +30,27 @@ char[] now;
 
 librabbitmq_client client;
 
-class Triple
-{
-}
-
-struct Functions
-{
-  Triple* cmd;
-  Triple* facts[];
-}
-
 private enum TripleType { URI, LITERAL, SET }
 
 void main()
 {	
-  //	TripleStorage ts = new TripleStorage ();
 
-  //  file = new File ("rodzilla.data");
+  char[][char[]] props = load_props;
 
   Cout(Format("{:d15} ", WallClock.now.span.millis));
 
-  char[] hostname = "192.168.150.196\0";
+  char[] hostname = make_null_string(props["amqp_server_address"]);
+  int port = atoi(props["amqp_server_port"]);
+
+  /*      result["amqp_server_address"] = "localhost";
+      result["amqp_server_port"] = "5762";
+      result["amqp_server_exchange"] = "";
+      result["amqp_server_login"] = "rodzilla";
+      result["amqp_server_password"] = "rodzilla_password";
+      result["amqp_server_routingkey"] = "";
+      result["amqp_server_queue"] = "store";*/
+
+
 
   auto locale = new Locale();
   path = new FilePath(locale ("./data/{:yyyy-MM-dd}.triples", WallClock.now));
@@ -66,9 +61,6 @@ void main()
     conduit = new FileConduit(path.toString(), FileConduit.WriteCreate);
 
   file = new DataFileOutput(conduit, 1000, false);
-
-  //	char[] hostname = "services.magnetosoft.ru\0";
-  int port = 5672;
 	
   client = new librabbitmq_client (hostname, port, &get_message);
 	
@@ -88,9 +80,6 @@ void store_triplet(char* start, int l, char* s, int s_l, char* p,
 void get_triplet(char* destination)
 {
 
-  //  TimeOfDay tod = WallClock.now.time;
-  //  Stdout.format("{}:{:d02}:{:d02}:{:d002}", tod.hours, tod.minutes, tod.seconds, tod.millis).newline;
-
   char[] buffer = new char[ TRIPLES_IN_PACKET * 5000 ];
   char* buf_ptr = &buffer[0];
 
@@ -103,9 +92,6 @@ void get_triplet(char* destination)
 
   int total_chars_sent = 0;
   int total_triples_sent = 0;
-
-  //  tod = WallClock.now.time;
-  //  Stdout.format("{}:{:d02}:{:d02}:{:d002}", tod.hours, tod.minutes, tod.seconds, tod.millis).newline;
 
   char[] line = new char[5000];
   char* line_ptr = &(line[0]);
@@ -135,22 +121,12 @@ void get_triplet(char* destination)
 		      *(buf_ptr + msg_length++) = *(line_ptr + line_length);
 		    }
 
-		  //		  char* triple_ptr = line_ptr + time_mark_size;
-		  //		  *(line_ptr + line_length) = 0;
-
-		  //		  		  printf("! %s ! \n", triple_ptr);
-
-		  //		  memcpy(buf_ptr + msg_length, triple_ptr, line_length - time_mark_size);
-
-		  //		  msg_length += line_length - time_mark_size;
-
 		  if (triples_count == TRIPLES_IN_PACKET)
 		    {
 		      memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
 		      msg_length += footer.length - 1;
 		      *(buf_ptr + msg_length) = 0;
 
-		      //		      		      printf("\n %s \n", buf_ptr);
 		      client.send(destination, buf_ptr);
 
 		      total_chars_sent += msg_length;
@@ -198,12 +174,6 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p,
 	} else if (*p == 'g' && *(p + 1) == 'e' && *(p + 2) == 't')
 	{
 	  *(o + o_l) = 0;
-	  //	    str_2_char_array(o, o_l);
-	  
-	  //	  Cout(str_2_char_array(o, o_l)).newline;
-
-
-
 	  get_triplet(o);
 	}
     }
@@ -236,17 +206,11 @@ private void split_triples_line(char* line, ulong line_size, void function(char*
 {
 
   int idx_count = 0;
-
   bool is_beetween_tokens = false;
-
   int delim_num = 0;
-
   char sp = ' ';
-
   char* prev_delim = &sp;
-  
   int facts_cnt = 0;
-
   int tk_start = 0;
   int fact_start = 0;
 
@@ -330,12 +294,7 @@ private void split_triples_line(char* line, ulong line_size, void function(char*
       
     char* c_ptr = line + i;
 
-    //    char c = *c_ptr;
-
     bool is_process_needed = false;
-
-    //    Stdout.format("{} : {} : {} : {} : {} ||| ", i, c, str_2_char_array(line, i), delim_num, is_beetween_tokens).newline;
-    
 
     if (*c_ptr != ' ') {
 
@@ -390,34 +349,25 @@ private void split_triples_line(char* line, ulong line_size, void function(char*
 	      triple_handler(start, l, s, s_l, p, p_l, o, o_l, m);
 	    }
 	  
-	  //	  get_scan_param(c_ptr, delim_num, i);
-	  //	  	  Cout("3").newline;
 	} else if (is_beetween_tokens) 
 	{
 	  if (delim_num == 0 && idx_count > 0) 
 	    {
-	      //	      Cout("1").newline;
 	      --idx_count;
 	      get_scan_param(prev_delim, 6, i);
 	    } else 
 	    {
-	      //	      Cout("2 ").newline;
-	      //	      get_scan_param(c_ptr, 
 	      is_beetween_tokens = false;
 	      if (delim_num > 0) {--delim_num; }
-			       //, i
-			     //);
-
 	    }
 	}
     }
-  }
 
-  //  return facts_cnt;
+  }
 
 }
 
-private char[] str_2_char_array(char* str, ulong len)
+private char[] str_2_char_array(char* str, uint len)
 {
   if (str is null)
     return "null";
@@ -432,64 +382,51 @@ private char[] str_2_char_array(char* str, ulong len)
   return res;
 }
 
-void fn(char* c_ptr, uint c_length)
+// Loads server properties
+private char[][char[]] load_props()
 {
-  Cout(str_2_char_array(c_ptr, c_length)).newline;
-}
+  char[][char[]] result;
+  FileConduit props_conduit;
 
-unittest
-{
-  // split_triples_line
-  char[] tripletsLine = "<s1><p1>{<ss><pp><oo>.<ss1><pp1><oo1>.}.<s2><p2>\"uid1\".<s3><p3>\"o3\\\"\".";
-  char* tripletsLine_ptr = &tripletsLine[0];
+  path = new FilePath("./rodzilla.properties");
 
-
-  //  split_triples_line(tripletsLine_ptr, tripletsLine.length, &fn);
-
-  /*Triple[] facts = new Triple[ tripletsLine.length / 7 ];
-  int fns = split_triples_line(tripletsLine_ptr, tripletsLine.length, facts);
-
-  for(int i = 0; i < fns; i++)
+  if (!path.exists)
     {
-      Cout(str_2_char_array(facts[i].s, facts[i].s_l)).newline;
-      //      Cout(str_2_char_array(facts[i].p, facts[i].p_l)).newline;
-      //      Cout(str_2_char_array(facts[i].o, facts[i].o_l)).newline;
-      //      Stdout.format("{}",facts[i].m).newline;
-      //      Cout("").newline;
+
+      result["amqp_server_address"] = "localhost";
+      result["amqp_server_port"] = "5762";
+      result["amqp_server_exchange"] = "";
+      result["amqp_server_login"] = "rodzilla";
+      result["amqp_server_password"] = "rodzilla_password";
+      result["amqp_server_routingkey"] = "";
+      result["amqp_server_queue"] = "store";
+
+      props_conduit = new FileConduit(path.toString(), FileConduit.ReadWriteCreate);
+      auto output = new MapOutput!(char)(props_conduit.output);
+
+      output.append(result);
+      output.flush;
+      props_conduit.close;
+
+      return result;
+
     }
 
-  assert(fns == 3);
+  props_conduit = new FileConduit(path.toString(), FileConduit.ReadExisting);
+  auto input = new MapInput!(char)(props_conduit.input);
+  result = result.init;
+  input.load(result);
+  props_conduit.close;
+  return result;
+}
 
-  assert(str_2_char_array(facts[0].s, facts[0].s_l) == "s1");
-  assert(str_2_char_array(facts[0].p, facts[0].p_l) == "p1");
-  assert(str_2_char_array(facts[0].o, facts[0].o_l) == "<ss><pp><oo>.<ss1><pp1><oo1>.");
-  assert(facts[0].m == TripleType.SET);
-  Cout(str_2_char_array(facts[0].start, facts[0].l)).newline;
-  assert(str_2_char_array(facts[0].start, facts[0].l) == "<s1><p1>{<ss><pp><oo>.<ss1><pp1><oo1>.}.");
-
-  assert(str_2_char_array(facts[1].s, facts[1].s_l) == "s2");
-  assert(str_2_char_array(facts[1].p, facts[1].p_l) == "p2");
-  assert(str_2_char_array(facts[1].o, facts[1].o_l) == "uid1");
-  assert(facts[1].m == TripleType.LITERAL);
-
-  assert(str_2_char_array(facts[2].s, facts[2].s_l) == "s3");
-  assert(str_2_char_array(facts[2].p, facts[2].p_l) == "p3");
-  assert(str_2_char_array(facts[2].o, facts[2].o_l) == "o3\\\"");
-  assert(facts[1].m == TripleType.LITERAL); 
-
-  /*  char[] large_triple_set = "
-<_:Directive0> <http://magnetosoft.ru/ontology/isPrivate> \"true\" .<_:Directive0> <http://magnetosoft.ru/ontology/documentType> \"1791\" .<_:Directive0> <http://purl.org/dc/elements/1.1/title> \"О списании затрат по объекту \\\" Главный корпус №2. ЦОГП. Расширение помещения склада готовой продукции\\\"\" .<_:Directive0> <http://magnetosoft.ru/ontology/fileAttachment> \"c294f2f9-828f-4878-af11-eda188039b3f\" .<_:Directive1> <http://magnetosoft.ru/ontology/id> \"b8602efe38bd4c5c85d519e8db0e5130\" .";
-
-  Triple[] large_facts = new Triple[ large_triple_set.length / 7 ];
-  int large_fns = split_triples_line(&large_triple_set[0], large_triple_set.length, large_facts); 
-
-  for(int i = 0; i < large_fns; i++)
-    {
-      Cout(str_2_char_array(large_facts[i].s, large_facts[i].s_l)).newline;
-      Cout(str_2_char_array(large_facts[i].p, large_facts[i].p_l)).newline;
-      Cout(str_2_char_array(large_facts[i].o, large_facts[i].o_l)).newline;
-      Stdout.format("{}",large_facts[i].m).newline;
-      Cout("").newline;
-      }*/
-
+// make null string form common string
+char[] make_null_string(char[] str)
+{
+  char[] result = new char[str.length + 1];
+  char* result_ptr = &result[0];
+  char* str_ptr = &str[0];
+  memcpy(result_ptr, str_ptr, str.length);
+  result[str.length] = '\0';
+  return result;
 }
