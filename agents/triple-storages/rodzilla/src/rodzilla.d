@@ -85,7 +85,7 @@ void get_triplet(char* destination)
 
   int msg_length = 0;
   int triples_count = 0;
-  char[] header = "<subject><put>{\0";
+  char[] header = "<subject><result>{\0";
   char[] footer = "}.\0";
   char[] root = "./data/";
   auto scan = (new FileScan)(root, ".triples");
@@ -160,8 +160,7 @@ void get_triplet(char* destination)
 
 }
 
-void parse_functions(char* start, int l, char* s, int s_l, char* p, 
-		     int p_l, char* o, int o_l, uint  m)
+void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
 {
   if (*s == 's' && *(s + 1) == 'u' && *(s + 2) == 'b' && 
       *(s + 3) == 'j' && *(s + 4) == 'e' && *(s + 5) == 'c' && 
@@ -201,8 +200,8 @@ void get_message (byte* message, ulong message_size)
 
 }
 
-private void split_triples_line(char* line, ulong line_size, void function(char* start, int l, char* s, int s_l, char* p, 
-									   int p_l, char* o, int o_l, uint  m) triple_handler)
+private void split_triples_line(char* line, ulong line_size, void function(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, 
+									   int o_l, uint  m) triple_handler)
 {
 
   int idx_count = 0;
@@ -362,9 +361,7 @@ private void split_triples_line(char* line, ulong line_size, void function(char*
 	    }
 	}
     }
-
   }
-
 }
 
 private char[] str_2_char_array(char* str, uint len)
@@ -375,9 +372,7 @@ private char[] str_2_char_array(char* str, uint len)
   char[] res = new char[len];
 
   for(uint i = 0; i < len; i++)
-    {
-      res[i] = *(str + i);
-    }
+    res[i] = *(str + i);
 
   return res;
 }
@@ -388,11 +383,10 @@ private char[][char[]] load_props()
   char[][char[]] result;
   FileConduit props_conduit;
 
-  path = new FilePath("./rodzilla.properties");
+  auto props_path = new FilePath("./rodzilla.properties");
 
-  if (!path.exists)
+  if (!props_path.exists) // props file doesn't exists, so create new one with defaults
     {
-
       result["amqp_server_address"] = "localhost";
       result["amqp_server_port"] = "5762";
       result["amqp_server_exchange"] = "";
@@ -401,22 +395,22 @@ private char[][char[]] load_props()
       result["amqp_server_routingkey"] = "";
       result["amqp_server_queue"] = "store";
 
-      props_conduit = new FileConduit(path.toString(), FileConduit.ReadWriteCreate);
+      props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
       auto output = new MapOutput!(char)(props_conduit.output);
 
       output.append(result);
       output.flush;
       props_conduit.close;
-
-      return result;
-
+    }
+  else
+    {
+      props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadExisting);
+      auto input = new MapInput!(char)(props_conduit.input);
+      result = result.init;
+      input.load(result);
+      props_conduit.close;
     }
 
-  props_conduit = new FileConduit(path.toString(), FileConduit.ReadExisting);
-  auto input = new MapInput!(char)(props_conduit.input);
-  result = result.init;
-  input.load(result);
-  props_conduit.close;
   return result;
 }
 
