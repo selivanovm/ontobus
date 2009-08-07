@@ -280,10 +280,15 @@ extern(C)
 			amqp_boolean_t mandatory, amqp_boolean_t immediate, amqp_basic_properties_t_* properties,
 			amqp_bytes_t message_body);
 
-extern(C) amqp_rpc_reply_t_ amqp_channel_close(amqp_connection_state_t_* state, int code);
-extern(C) amqp_rpc_reply_t_ amqp_connection_close(amqp_connection_state_t_* state, int code);
-extern(C) void amqp_destroy_connection(amqp_connection_state_t_* state);
+extern(C)
+	amqp_rpc_reply_t_ amqp_channel_close(amqp_connection_state_t_* state, int code);
+
+extern(C)
+	amqp_rpc_reply_t_ amqp_connection_close(amqp_connection_state_t_* state, int code);
+
+extern(C)
+	void amqp_destroy_connection(amqp_connection_state_t_* state);
 
 //extern() int shutdown (int __fd, int __how);
-extern(C) int close (int __fd);
-
+extern(C)
+	int close(int __fd);
