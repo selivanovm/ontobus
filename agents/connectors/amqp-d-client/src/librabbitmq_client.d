@@ -2,29 +2,35 @@ private import tango.io.Stdout;
 private import std.c.string;
 
 import librabbitmq_headers;
+import mom_client;
 
-class librabbitmq_client
+class librabbitmq_client : mom_client
 {
 	amqp_connection_state_t_ conn;
 	char* vhost = "auth\0";
-	char* exchange = "";
 	char* login = "search-client\0";
 	char* passw = "123\0";
-	char* bindingkey = cast(char*) "\0";
 	char* queue = "auth";
+	char* bindingkey = cast(char*) "\0";
+	char* exchange = "";
 
 	char[] hostname;
 	int port;
 	void function(byte* txt, ulong size) message_acceptor;
 
-	this(char[] _hostname, int _port, void function(byte* txt, ulong size) _message_acceptor)
+	this(char[] _hostname, int _port)
 	{
 		hostname = _hostname;
 		port = _port;
-		message_acceptor = _message_acceptor;
 	}
+	
+	void set_callback (void function(byte* txt, ulong size) _message_acceptor)
+	{
+		message_acceptor = _message_acceptor;	
+	}
+	
 
-	void send(char* routingkey, char* messagebody)
+	int send(char* routingkey, char* messagebody)
 	{
 		//		Stdout.format("@@@ send").newline;
 
@@ -76,6 +82,7 @@ class librabbitmq_client
 	//		shutdown(sockfd, 0);
 	//		Stdout.format("@@@ Closingqueue socket").newline;
 	//		close(sockfd);
+	return 0;
 	}
 
 	void listener()
