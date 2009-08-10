@@ -14,6 +14,7 @@ import HashMap;
 import TripleStorage;
 import authorization;
 
+import mom_client;
 import librabbitmq_client;
 import script_util;
 import RightTypeDef;
@@ -38,7 +39,8 @@ void main(char[][] args)
 	int port = 5672;
 
 	Stdout.format("connect to AMQP server ({}:{})", hostname, port).newline;
-	client = new librabbitmq_client(hostname, port, &get_message);
+	client = new librabbitmq_client(hostname, port);
+	client.set_callback (&get_message);
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
