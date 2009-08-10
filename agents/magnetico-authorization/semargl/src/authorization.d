@@ -313,41 +313,41 @@ class Authorization
 		{
 			calculatedRight = S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
 					hierarhical_departments);
-//			printf("authorize:S11ACLRightsHierarhical res=%d\n", calculatedRight);
+		//			printf("authorize:S11ACLRightsHierarhical res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-//			printf("authorize:S05InDocFlow res=%d\n", calculatedRight);
+		//			printf("authorize:S05InDocFlow res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			printf("authorize:S10UserIsAuthorOfDocument res=%d\n", calculatedRight);
+		//			printf("authorize:S10UserIsAuthorOfDocument res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			printf("authorize:S20UserIsInOUP res=%d\n", calculatedRight);
+		//			printf("authorize:S20UserIsInOUP res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			printf("authorize:S30UsersOfDocumentum res=%d\n", calculatedRight);
+		//			printf("authorize:S30UsersOfDocumentum res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			printf("authorize:S40UsersOfTAImport res=%d\n", calculatedRight);
+		//			printf("authorize:S40UsersOfTAImport res=%d\n", calculatedRight);
 		}
 
 		//		next_element = *(iterator0 + 1);

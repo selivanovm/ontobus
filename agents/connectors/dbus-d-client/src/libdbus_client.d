@@ -5,7 +5,7 @@ private import std.c.stdio;
 import libdbus_headers;
 import mom_client;
 
-class libdbus_client : mom_client
+class libdbus_client: mom_client
 {
 	DBusConnection* conn = null;
 	DBusError err;

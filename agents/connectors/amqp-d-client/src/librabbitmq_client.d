@@ -4,7 +4,7 @@ private import std.c.string;
 import librabbitmq_headers;
 import mom_client;
 
-class librabbitmq_client : mom_client
+class librabbitmq_client: mom_client
 {
 	amqp_connection_state_t_ conn;
 	char* vhost = "auth\0";
@@ -23,12 +23,11 @@ class librabbitmq_client : mom_client
 		hostname = _hostname;
 		port = _port;
 	}
-	
-	void set_callback (void function(byte* txt, ulong size) _message_acceptor)
+
+	void set_callback(void function(byte* txt, ulong size) _message_acceptor)
 	{
-		message_acceptor = _message_acceptor;	
+		message_acceptor = _message_acceptor;
 	}
-	
 
 	int send(char* routingkey, char* messagebody)
 	{
@@ -66,23 +65,23 @@ class librabbitmq_client : mom_client
 		//		Stdout.format("@@@ send:publish").newline;
 		int result_publish = amqp_basic_publish(&conn, amqp_cstring_bytes(exchange), amqp_cstring_bytes(routingkey), 0,
 				0, &props, amqp_cstring_bytes(messagebody));
-	//		Stdout.format("@@@ send:publish:{}", result_publish).newline;
+		//		Stdout.format("@@@ send:publish:{}", result_publish).newline;
 
-	//		Stdout.format("@@@ Closing channel").newline;
-	//	"Closing channel"
-	//		amqp_channel_close(&conn, amqp_def.AMQP_REPLY_SUCCESS);
+		//		Stdout.format("@@@ Closing channel").newline;
+		//	"Closing channel"
+		//		amqp_channel_close(&conn, amqp_def.AMQP_REPLY_SUCCESS);
 
-	//		Stdout.format("@@@ Closing connection").newline;
-	//"Closing connection"
-	//		amqp_connection_close(&conn, amqp_def.AMQP_REPLY_SUCCESS);
+		//		Stdout.format("@@@ Closing connection").newline;
+		//"Closing connection"
+		//		amqp_connection_close(&conn, amqp_def.AMQP_REPLY_SUCCESS);
 
-	//		Stdout.format("@@@ amqp_destroy_connection").newline;
-	//		amqp_destroy_connection(&conn);
-	// "Closingqueue socket"
-	//		shutdown(sockfd, 0);
-	//		Stdout.format("@@@ Closingqueue socket").newline;
-	//		close(sockfd);
-	return 0;
+		//		Stdout.format("@@@ amqp_destroy_connection").newline;
+		//		amqp_destroy_connection(&conn);
+		// "Closingqueue socket"
+		//		shutdown(sockfd, 0);
+		//		Stdout.format("@@@ Closingqueue socket").newline;
+		//		close(sockfd);
+		return 0;
 	}
 
 	void listener()

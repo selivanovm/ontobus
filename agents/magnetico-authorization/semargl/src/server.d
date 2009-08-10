@@ -18,16 +18,12 @@ import mom_client;
 import librabbitmq_client;
 import script_util;
 import RightTypeDef;
+import fact_tools;
+import str_tool;
 
 librabbitmq_client client = null;
 
 Authorization az = null;
-
-struct Counts
-{
-	byte facts;
-	byte open_brakets;
-}
 
 void main(char[][] args)
 {
@@ -35,7 +31,7 @@ void main(char[][] args)
 
 	//char[] hostname = "192.168.150.197\0";
 	//char[] hostname = "192.168.150.44\0";
-		char[] hostname = "services.magnetosoft.ru\0";
+	char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
 
 	Stdout.format("connect to AMQP server ({}:{})", hostname, port).newline;
@@ -125,7 +121,7 @@ void get_message(byte* message, ulong message_size)
 				if(is_fact_in_object[i] == arg_id)
 				{
 				//	Stdout.format("add triple <{}><{}><{}>", str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i])).newline;
-					az.addAuthorizeData(str_2_char_array(fact_s[i]), str_2_char_array(fact_p[i]), str_2_char_array(fact_o[i]));
+					az.addAuthorizeData(str_2_chararray(fact_s[i]), str_2_chararray(fact_p[i]), str_2_chararray(fact_o[i]));
 				//	TripleStorage ts = az.getTripleStorage();
 					//	ts.addTriple (str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i]));
 				}
@@ -137,9 +133,9 @@ void get_message(byte* message, ulong message_size)
 
 		for(int i = 0; i < count_facts; i++)
 		{
-			Stdout.format("s = {:X2} {:X4} {}", i, fact_s[i], str_2_char_array(cast(char*) fact_s[i])).newline;
-			Stdout.format("p = {:X2} {:X4} {}", i, fact_p[i], str_2_char_array(cast(char*) fact_p[i])).newline;
-			Stdout.format("o = {:X2} {:X4} {}", i, fact_o[i], str_2_char_array(cast(char*) fact_o[i])).newline;
+			Stdout.format("s = {:X2} {:X4} {}", i, fact_s[i], str_2_chararray(cast(char*) fact_s[i])).newline;
+			Stdout.format("p = {:X2} {:X4} {}", i, fact_p[i], str_2_chararray(cast(char*) fact_p[i])).newline;
+			Stdout.format("o = {:X2} {:X4} {}", i, fact_o[i], str_2_chararray(cast(char*) fact_o[i])).newline;
 			Stdout.format("is_fact_in_object = {:X2} {}\n", i, is_fact_in_object[i]).newline;
 		}
 
@@ -341,136 +337,4 @@ void get_message(byte* message, ulong message_size)
 //	Stdout.format("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length)).newline;
 }
 
-private char[] str_2_char_array(char* str)
-{
-	uint str_length = 0;
-	char* tmp_ptr = str;
-	while(*tmp_ptr != 0)
-	{
-		//			Stdout.format("@={}", *tmp_ptr).newline;
-		tmp_ptr++;
-	}
 
-	str_length = tmp_ptr - str;
-
-	char[] res = new char[str_length];
-
-	uint i;
-	for(i = 0; i < str_length; i++)
-	{
-		res[i] = *(str + i);
-	}
-	res[i] = 0;
-
-	return res;
-}
-
-private Counts calculate_count_facts(char* message, ulong message_size)
-{
-	Counts res;
-
-	for(int i = message_size; i > 0; i--)
-	{
-		char* cur_char = cast(char*) (message + i);
-
-		if(*cur_char == '.')
-			res.facts++;
-
-		if(*cur_char == '{')
-			res.open_brakets++;
-	}
-
-	return res;
-}
-
-private uint extract_facts_from_message(char* message, ulong message_size, Counts counts, char* fact_s[], char* fact_p[], char* fact_o[], uint is_fact_in_object[])
-{
-//	Stdout.format("extract_facts_from_message ... facts.size={}", counts.facts).newline;
-	
-	byte count_open_brakets = 0;
-	byte count_facts = 0;
-	byte count_fact_fragment = 0;
-
-	uint stack_brackets[] = new uint[counts.open_brakets];
-	
-	bool is_open_quotes = false;
-
-	for(int i = 0; i < message_size; i++)
-	{		
-		char* cur_char_ptr = message + i;
-		char cur_char = *cur_char_ptr;
-
-		if(cur_char == '"')
-		{
-			if(is_open_quotes == false)
-				is_open_quotes = true;
-			else
-			{
-				is_open_quotes = false;
-				*cur_char_ptr = 0;
-			}
-		}
-		
-		if(cur_char == '{')
-		{
-			count_open_brakets++;
-			stack_brackets[count_open_brakets] = count_facts;
-		}
-		
-		if(cur_char == '<' || cur_char == '{' || (cur_char == '"' && is_open_quotes == true))
-		{
-			if(count_fact_fragment == 0)
-			{
-				if (count_open_brakets > 0)
-				  is_fact_in_object[count_facts] = stack_brackets[count_open_brakets];
-				
-				fact_s[count_facts] = cur_char_ptr + 1;
-			}
-			if(count_fact_fragment == 1)
-			{
-				fact_p[count_facts] = cur_char_ptr + 1;
-			}
-			if(count_fact_fragment == 2)
-			{
-				fact_o[count_facts] = cur_char_ptr + 1;
-			}
-			
-			count_fact_fragment++;
-			if(count_fact_fragment > 2)
-			{
-				count_fact_fragment = 0;
-				count_facts++;
-			}
-
-		}
-
-		if(cur_char == '>')
-		{
-			*cur_char_ptr = 0;			
-		}
-		
-		
-	//			if(*cur_char == '}')
-	//				count_open_brakets--;
-
-	//			if(*cur_char == '.' && count_open_brakets == 0)
-	//			if(*cur_char == '.')
-	//			{
-	//				*cur_char = 0;
-	//				count_fact_fragment = 0;
-	//				count_facts++;
-	//			}
-	}
-	
-//	Stdout.format("extract_facts_from_message ... ok").newline;
-/*	
-	for (int i = 0; i < count_facts; i++)
-	{
-		printf ("\nfound s=%s\n", fact_s[i]);
-		printf ("found p=%s\n", fact_p[i]);
-		printf ("found o=%s\n\n", fact_o[i]);
-	}
-*/
-
-	return count_facts;
-}

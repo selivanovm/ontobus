@@ -44,20 +44,20 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 }
 
 /*
- * возвращяет массив итераторов на списки субьектов 
+ * возвращает массив итераторов на списки субьектов 
  * имеющих факты magnet-ontology#target = подразделение по иерархии  
  */
 public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 {
 	// получаем путь до корня в дереве подразделений начиная от заданного подразделения
 
-	uint*[] result = new uint* [16];
+	uint*[] result = new uint*[16];
 	ubyte count_result = 0;
 
 	uint* iterator0;
 	byte* triple0;
 
-//	Stdout.format("getDepartmentTreePath #1 user={}", str_2_chararray(user)).newline;
+	//	Stdout.format("getDepartmentTreePath #1 user={}", str_2_chararray(user)).newline;
 
 	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null, false);
 	if(iterator0 !is null)
@@ -65,8 +65,8 @@ public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 		triple0 = cast(byte*) *iterator0;
 		char*
 				next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
-//		if(next_branch !is null)
-//			Stdout.format("getDepartmentTreePath #1 next_branch  {}", str_2_chararray(next_branch)).newline;
+		//		if(next_branch !is null)
+		//			Stdout.format("getDepartmentTreePath #1 next_branch  {}", str_2_chararray(next_branch)).newline;
 
 		while(next_branch !is null)
 		{
@@ -75,7 +75,7 @@ public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 			if(iterator1 !is null)
 			{
 
-//				Stdout.format("iterator1 next_element1={:X4}", iterator1).newline;
+				//				Stdout.format("iterator1 next_element1={:X4}", iterator1).newline;
 
 				result[count_result] = iterator1;
 				count_result++;
@@ -90,17 +90,19 @@ public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 				if(triple0 !is null)
 				{
 					next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
-//					if(next_branch !is null)
-//						Stdout.format("getDepartmentTreePath #2 next_branch  {}", str_2_chararray(next_branch)).newline;
-				} else
+				//					if(next_branch !is null)
+				//						Stdout.format("getDepartmentTreePath #2 next_branch  {}", str_2_chararray(next_branch)).newline;
+				}
+				else
 					next_branch = null;
 
-			} else
+			}
+			else
 				next_branch = null;
 		}
 	}
 
-//	Stdout.format("getDepartmentTreePath #5 ok").newline;
+	//	Stdout.format("getDepartmentTreePath #5 ok").newline;
 
 	result.length = count_result;
 
