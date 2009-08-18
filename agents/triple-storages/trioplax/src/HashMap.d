@@ -1,5 +1,5 @@
 private import tango.stdc.stdlib: alloca;
-private import std.c.string;
+private import tango.stdc.string;
 private import tango.io.Stdout;
 import Integer = tango.text.convert.Integer;
 

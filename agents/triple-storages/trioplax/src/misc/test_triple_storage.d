@@ -1,6 +1,6 @@
 // import TripleStorageInvoker;
 private import tango.io.Stdout;
-private import std.c.string;
+private import tango.stdc.string;
 //import Integer = tango.text.convert.Integer;
 import tango.io.File;
 import Text = tango.text.Util;

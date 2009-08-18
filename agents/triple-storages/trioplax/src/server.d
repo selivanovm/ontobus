@@ -2,7 +2,7 @@ module server;
 
 private import tango.core.Thread;
 private import tango.io.Console;
-private import std.c.string;
+private import tango.stdc.string;
 
 import Integer = tango.text.convert.Integer;
 
