@@ -1,5 +1,5 @@
 private import tango.io.Stdout;
-private import std.c.string;
+private import tango.stdc.string;
 
 import librabbitmq_headers;
 import mom_client;
