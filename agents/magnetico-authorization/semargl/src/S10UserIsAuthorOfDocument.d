@@ -1,6 +1,6 @@
 module S10UserIsAuthorOfDocument;
 
-private import std.c.string;
+private import tango.stdc.string;
 import TripleStorage;
 private import tango.io.Stdout;
 import str_tool;

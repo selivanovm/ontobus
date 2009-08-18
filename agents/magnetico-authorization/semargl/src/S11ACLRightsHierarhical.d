@@ -5,7 +5,7 @@ import TripleStorage;
 private import tango.io.Stdout;
 import str_tool;
 import script_util;
-private import std.c.string;
+private import tango.stdc.string;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts,
 		uint*[] iterator_on_targets_of_hierarhical_departments)

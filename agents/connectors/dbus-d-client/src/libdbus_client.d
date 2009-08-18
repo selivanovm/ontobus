@@ -1,6 +1,6 @@
 private import tango.io.Stdout;
-private import std.c.string;
-private import std.c.stdio;
+private import tango.stdc.string;
+private import tango.stdc.stdio;
 
 import libdbus_headers;
 import mom_client;
