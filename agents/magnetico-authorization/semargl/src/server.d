@@ -3,6 +3,7 @@ module server;
 private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
+private import tango.stdc.posix.stdio;
 
 import Integer = tango.text.convert.Integer;
 

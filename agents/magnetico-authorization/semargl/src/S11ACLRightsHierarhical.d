@@ -6,6 +6,7 @@ private import tango.io.Stdout;
 import str_tool;
 import script_util;
 private import tango.stdc.string;
+private import tango.stdc.posix.stdio;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts,
 		uint*[] iterator_on_targets_of_hierarhical_departments)
