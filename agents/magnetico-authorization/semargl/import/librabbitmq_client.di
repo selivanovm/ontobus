@@ -5,7 +5,7 @@ private
 }
 private
 {
-    import std.c.string;
+    import tango.stdc.string;
 }
 import librabbitmq_headers;
 import mom_client;
