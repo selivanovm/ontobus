@@ -26,14 +26,14 @@ import script_util;
 
 import persistent_triple_storage;
 
-import S05InDocFlow;
-import S01AllLoggedUsersCanCreateDocuments;
-import S01UserIsAdmin;
-import S10UserIsAuthorOfDocument;
-import S11ACLRightsHierarhical;
-import S20UserIsInOUP;
-import S30UsersOfDocumentum;
-import S40UsersOfTAImport;
+import scripts.S05InDocFlow;
+import scripts.S01AllLoggedUsersCanCreateDocuments;
+import scripts.S01UserIsAdmin;
+import scripts.S10UserIsAuthorOfDocument;
+import scripts.S11ACLRightsHierarhical;
+import scripts.S20UserIsInOUP;
+import scripts.S30UsersOfDocumentum;
+import scripts.S40UsersOfTAImport;
 
 class Authorization
 {
@@ -199,7 +199,7 @@ class Authorization
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
 
-		calculatedRight = S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
+		calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
 		if(calculatedRight == true)
 			return calculatedRight;
 
@@ -213,41 +213,41 @@ class Authorization
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
+			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
 					hierarhical_departments);
 		//			printf("authorize:S11ACLRightsHierarhical res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
+			calculatedRight = scripts.S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
 		//			printf("authorize:S05InDocFlow res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
+			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
 		//			printf("authorize:S10UserIsAuthorOfDocument res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
+			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
 		//			printf("authorize:S20UserIsInOUP res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
+			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
 		//			printf("authorize:S30UsersOfDocumentum res=%d\n", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
+			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
 		//			printf("authorize:S40UsersOfTAImport res=%d\n", calculatedRight);
 		}

@@ -249,7 +249,7 @@ void get_message(byte* message, ulong message_size)
 //			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
 
 			bool calculatedRight_isAdmin;
-			calculatedRight_isAdmin = S01UserIsAdmin.calculate(user, null, targetRightType, az.getTripleStorage());
+			calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType, az.getTripleStorage());
 
 			uint count_prepared_doc = 0;
 			uint count_authorized_doc = 0;

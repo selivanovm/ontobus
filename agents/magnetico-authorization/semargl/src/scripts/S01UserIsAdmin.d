@@ -1,4 +1,4 @@
-module S01UserIsAdmin;
+module scripts.S01UserIsAdmin;
 
 import TripleStorage;
 private import tango.io.Stdout;

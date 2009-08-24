@@ -1,4 +1,4 @@
-module S10UserIsAuthorOfDocument;
+module scripts.S10UserIsAuthorOfDocument;
 
 private import tango.stdc.string;
 import TripleStorage;

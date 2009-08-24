@@ -1,15 +1,14 @@
-module S30UsersOfDocumentum;
+module scripts.S20UserIsInOUP;
 
 import TripleStorage;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts,
                       uint* iterator_facts_of_document)
 {
-	/*
-		def oupDepId = "c7750205-e7bd-47a8-b0e0-f13953a22d9c";
-		def documentTypeNames = ["Входящий документ (Documentum)","Приказ (Documentum)"];
-		
-		if(rightType != RightType.READ) return false
+	
+/*	
+		def oupDepId = "f8c51331-b1d8-48ac-ae69-91af741f6320";
+		def documentTypeNames = ["Инвестиционная заявка","Инвестиционный проект", "Запрос на изменение Инвестиционного проекта"];
 		
 	    //Необрабатываемые параметры        	  
 	    if ((null==elementId)||('*'==elementId)) {
@@ -54,5 +53,5 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		//пересечем результат
 		return inSet
 */		
-		return false;
+	return false;
 }

@@ -1,4 +1,4 @@
-module S11ACLRightsHierarhical;
+module scripts.S11ACLRightsHierarhical;
 
 import RightTypeDef;
 import TripleStorage;

@@ -1,4 +1,4 @@
-module S05InDocFlow;
+module scripts.S05InDocFlow;
 
 import RightTypeDef;
 import TripleStorage;

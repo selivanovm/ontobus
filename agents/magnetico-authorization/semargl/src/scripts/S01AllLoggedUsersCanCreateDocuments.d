@@ -1,4 +1,4 @@
-module S01AllLoggedUsersCanCreateDocuments;
+module scripts.S01AllLoggedUsersCanCreateDocuments;
 
 import RightTypeDef;
 import TripleStorage;

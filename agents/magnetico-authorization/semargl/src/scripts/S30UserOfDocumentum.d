@@ -1,48 +1,31 @@
-module S40UsersOfTAImport;
+module scripts.S30UsersOfDocumentum;
 
 import TripleStorage;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts,
                       uint* iterator_facts_of_document)
 {
-/*	
-		def mondiDepId = '92e57b6d-83e3-485f-8885-0bade363f759';
-		def documentTypeNames = ['Чертеж-IMPORT', 'Конструкторский проект-IMPORT'];
+	/*
+		def oupDepId = "c7750205-e7bd-47a8-b0e0-f13953a22d9c";
+		def documentTypeNames = ["Входящий документ (Documentum)","Приказ (Documentum)"];
 		
-		if(rightType != RightType.READ) {
-			return false
-		}
+		if(rightType != RightType.READ) return false
 		
 	    //Необрабатываемые параметры        	  
-	    if ((null == elementId) || ('*' == elementId)) {
+	    if ((null==elementId)||('*'==elementId)) {
 	    	log.debug('Не поддерживаемый идентификатор :'+elementId)
 	        return false
 	    }
 	    // получаем идентификатор подразделения пользователя
-        if (null == processFlow.store['getDepartmentUidByUserUid:'+ticket.userId]) {
-        	processFlow.store['getDepartmentUidByUserUid:'+ticket.userId] = iSystem.userManagementComponent.getDepartmentUidByUserUid(ticket.userId)
-        }
+        if (null == processFlow.store['getDepartmentUidByUserUid:'+ticket.userId]) { processFlow.store['getDepartmentUidByUserUid:'+ticket.userId]=iSystem.userManagementComponent.getDepartmentUidByUserUid(ticket.userId) }
         def userDepId = processFlow.store['getDepartmentUidByUserUid:'+ticket.userId]
-        if (userDepId == null) {
-        	return false
-        }
+        if ((userDepId==null)&&(oupDepId != ticket.userId)) return false
 
    	    log.debug('Подразделение пользователя | :'+userDepId)
-   	    //если пользователь не в Монди (или в нижележащем подразделении), выходим
-   	    //if (null == processFlow.store['getDepartmentTreePathUids:'+userDepId]) {
-   	    //	processFlow.store['getDepartmentTreePathUids:'+userDepId] = iSystem.userManagementComponent.getDepartmentTreePathUids(userDepId)
-   	    //}
-   	    if (null == processFlow.store['getDepartmentTreePath:'+userDepId]) {
-   	    	processFlow.store['getDepartmentTreePath:'+userDepId] = iSystem.userManagementComponent.getDepartmentTreePath(userDepId, 'ru')
-   	    }
-   	    //def treePath = processFlow.store['getDepartmentTreePathUids:'+userDepId]
-   	    def treePathIds = processFlow.store['getDepartmentTreePath:'+userDepId].collect {
-   	    	it.getId()
-   	    }
-   	    if(!treePathIds.contains(mondiDepId)) {
+   	    //если пользователь не в ОУП, выходим
+   	    if(!userDepId.equals(oupDepId)){
             return false
    	    }
-   	    
 	    //Если документа с заданным идентификатором нет (он только что созданный черновик) 
         def document = null;
         try {
@@ -65,11 +48,11 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	    //получаем имя типа документа
 	    def documentTypeName = documentType.name
 	    //проверим есть ли это имя в нашем множестве имен типов документов
-	    boolean inSet = documentTypeNames.contains(documentTypeName)
+	    def inSet = documentTypeNames.contains(documentTypeName)
+	    //узнаем, находится ли объект в документообороте
 	    
 		//пересечем результат
 		return inSet
-	}
-*/
-	return false;
+*/		
+		return false;
 }
