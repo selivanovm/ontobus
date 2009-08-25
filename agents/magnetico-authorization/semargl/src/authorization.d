@@ -123,7 +123,6 @@ class Authorization
 		Stdout.format("authorization init ... ok").newline;
 	}
 
-
 	public void addAuthorizeData(char[] s, char[] p, char[] o)
 	{
 		auto layout = new Locale;
@@ -199,7 +198,8 @@ class Authorization
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
 
-		calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
+		calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
+				targetRightType, ts);
 		if(calculatedRight == true)
 			return calculatedRight;
 

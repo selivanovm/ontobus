@@ -32,7 +32,8 @@ void main(char[][] args)
 
 	//char[] hostname = "192.168.150.197\0";
 	//char[] hostname = "192.168.150.44\0";
-	char[] hostname = "services.magnetosoft.ru\0";
+	char[] hostname = "192.168.150.196\0";
+	//char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
 
 	Stdout.format("connect to AMQP server ({}:{})", hostname, port).newline;

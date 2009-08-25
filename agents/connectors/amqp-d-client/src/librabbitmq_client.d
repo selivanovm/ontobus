@@ -1,5 +1,6 @@
 private import tango.io.Stdout;
 private import tango.stdc.string;
+private import tango.stdc.posix.stdio;
 
 import librabbitmq_headers;
 import mom_client;
@@ -7,10 +8,10 @@ import mom_client;
 class librabbitmq_client: mom_client
 {
 	amqp_connection_state_t_ conn;
-	char* vhost = "auth\0";
-	char* login = "search-client\0";
-	char* passw = "123\0";
-	char* queue = "auth";
+	char* vhost = "magnetico\0";
+	char* login = "eks\0";
+	char* passw = "123456\0";
+	char* queue = "test";
 	char* bindingkey = cast(char*) "\0";
 	char* exchange = "";
 
@@ -117,6 +118,7 @@ class librabbitmq_client: mom_client
 			amqp_rpc_reply_t_ result;
 			amqp_bytes_t_ queuename;
 
+			try
 			{
 				amqp_queue_declare_t s;
 
@@ -136,6 +138,11 @@ class librabbitmq_client: mom_client
 
 				amqp_queue_declare_ok_t* r = cast(amqp_queue_declare_ok_t*) result.reply.decoded;
 
+				if(r is null)
+				{
+					throw new Exception("queue declare fail");
+				}
+
 				queuename = amqp_bytes_malloc_dup(r.queue);
 
 				if(queuename.bytes is null)
@@ -145,7 +152,14 @@ class librabbitmq_client: mom_client
 				}
 
 			}
+			catch(Exception ex)
+			{
+				printf("queue=[%s] \n", queue);
+				Stdout.format("Exception:{} \n", ex);
+				throw ex;
+			}
 
+			try
 			{
 
 				amqp_queue_bind_t s;
@@ -158,7 +172,13 @@ class librabbitmq_client: mom_client
 				Stdout.format("result bind={:X4}, queuename={}", &result, cast(char*) queuename.bytes).newline;
 			//			printf("%s", queuename.bytes);
 			}
+			catch(Exception ex)
+			{
+				Stdout.format("Exception in: connect 2 block");
+				throw ex;
+			}
 
+			try
 			{
 				amqp_bytes_t_ consumer_tag;
 				consumer_tag.len = 0;
@@ -178,6 +198,11 @@ class librabbitmq_client: mom_client
 						amqp_def.AMQP_BASIC_CONSUME_OK_METHOD, &s);
 				Stdout.format("result consume={:X4}", &result).newline;
 			}
+			catch(Exception ex)
+			{
+				Stdout.format("Exception in: connect 3 block");
+				throw ex;
+			}
 
 			{
 				amqp_frame_t_ frame;
@@ -193,7 +218,7 @@ class librabbitmq_client: mom_client
 					amqp_maybe_release_buffers(&conn);
 					result_listen = amqp_simple_wait_frame(&conn, &frame);
 
-					//      printf("Result %d\n", result);
+					printf("Result %d\n", result);
 					if(result_listen <= 0)
 					{
 						Stdout.format("result_listen1 <= 0 -> break").newline;
