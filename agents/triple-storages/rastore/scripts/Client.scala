@@ -22,6 +22,10 @@ object Client {
       val exchangeType = args(10)
       val listenAfterSending = args(11)
 
+      println(String.format("host = %s, port = %s, virtualHost = %s, exchange = %s, queue = %s, userName = %s, password = %s, heartBeat = %s, " +
+                            "routingKey = %s, exchangeType = %s, listenAfterSending = %s, message = %s", hostName, portNumber, virtualHost,
+                          exchange, queue, userName, password, heartBeat, routingKey, exchangeType, listenAfterSending, message))
+
       var params = new ConnectionParameters()
       params.setUsername(userName)
       params.setPassword(password)
@@ -33,11 +37,11 @@ object Client {
       
       val channel = conn.createChannel()
       
-      channel.exchangeDeclare(exchange, exchangeType)
+//      channel.exchangeDeclare(exchange, exchangeType)
       channel.queueDeclare(queue)
-      channel.queueBind(queue, exchange, routingKey)
+//      channel.queueBind(queue, exchange, routingKey)
 
-      channel.basicPublish("", "rsinbox",
+      channel.basicPublish(routingKey, exchange,
                            MessageProperties.PERSISTENT_TEXT_PLAIN,
                            message.getBytes)
 
