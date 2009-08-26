@@ -1,55 +1,140 @@
-ответы с ожидаются с result:data, по феншую
+онтология authorization
 
+magnet-ontology#RightRecord
+
+magnet-ontology#authorSystem - система выдающая право, "BA"/"DOCFLOW"
+magnet-ontology#authorSubsystem - "user"/routeName
+magnet-ontology#authorSubsystemElement - id user or id route.
+
+magnet-ontology#category категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
+
+magnet-ontology#targetSystem - система, для которой выдали права, "BA"/"DOCFLOW".
+magnet-ontology#targetSubsystem - "user"/"department".
+magnet-ontology#targetSubsystemElement - user id or department id.
+
+magnet-ontology#elementId - идентификатор элемента, на который выдаются права.
+
+magnet-ontology#dateTo период действия прав (до (с возможностью указания открытых интервалов значение null)).
+magnet-ontology#dateFrom - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
+magnet-ontology#rigths> "c|r|u|d"
+
+
+
+ответы с ожидаются с result:data
 
 1. get_authorization_rights_records
 
+Используется для получения записей прав соответствующих определенному шаблону. Шаблон - набор триплетов, которые входят в состав записи права.
+Если запись права содержит заданные в шаблоне триплеты, значит она должна быть включена в результат. Если какие-то из триплетов шаблона содержат
+пустые значения объектов, либо отсутствуют в запросе, значит их нужно проигнорировать при сравнении. 
+
 отправляю:
-	<subject><get_authorization_rights_records>\"uid1\".
-	<uid1><element_id>\"elementId\".<uid1><category>\"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION\".
-	<uid1><target_id>\"targetId\"."
+
+	<subject><get_authorization_rights_records>"uid1".
+		<uid1><argument>{
+			<recId><magnet-ontology#authorSystem>"".
+			<recId><magnet-ontology#authorSubsystem>"".
+			<recId><magnet-ontology#authorSubsystemElement>"".
+			<recId><magnet-ontology#targetSystem>"".
+			<recId><magnet-ontology#targetSubsystem>"".
+			<recId><magnet-ontology#targetSubsystemElement>"".
+			<recId><magnet-ontology#category>"".
+			<recId><magnet-ontology#elementId>"".
+		}.
+
 
 ожидаю:
 триплеты записей прав
-	<magnet-ontology#RightsRecord5> <magnet-ontology#author> "54566bf5-7dc7-432c-b6a5-27e560c4ec0e" .                                                           
-	<magnet-ontology#RightsRecord5> <magnet-ontology#target> "c60246bc-5b95-4cbd-b6e4-13288884045f" .                                                           
-	<magnet-ontology#RightsRecord5> <magnet-ontology#elementId> "aa8d1a71a2e34303954ced25d1037cdf" .                                                            
-	<magnet-ontology#RightsRecord5> <magnet-ontology#rigths> "r" ........"
 
-2. is_banned
+	<magnet-ontology#RightsRecord5><magnet-ontology#authorSystem>"BA".                                                           
+	<magnet-ontology#RightsRecord5><magnet-ontology#authorSubsystem>"user".                                                           
+	<magnet-ontology#RightsRecord5><magnet-ontology#authorSubsystemElement>"aa8d1a71a2e34303954ced25d1037cdf".
+	...
+
+2. обновление, создание, удаление записей прав
+
+Используется для создания/обновления/удаления записей прав доступа. В качестве параметров передается список триплетов, первый из которых содержит
+имя запрашиваемой операции(create|update|delete), остальные служат параметрами для операции. В случае, если операция == create создается новая запись
+с триплетами переданными в аргументе, идентификатор записи создается на стороне semargl и возвращается в качестве результата. В случае, если 
+операция == update обновляется запись триплетами, переданными в аргументе. В случае, если операция == delete удаляются записи соответствующие шаблону
+переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении.
 
 отправляю:
-	<subject><is_banned><uid1>.<uid1><argument>\"%s\".", ticketId
 
-ожидаю:
-	"true" или "false"
-
-3. обновление, создание, удаление записей прав
-
-отправляю:
-	<subject><put><uid1>.<uid1><argument>{<operation><name>\"create|update|delete\".<recId><magnet-ontology#author>\"authorId\".
-	<recId><magnet-ontology#target>\"targetId\".<recId><magnet-ontology#elementId>\"elementId\".
-	<recId><magnet-ontology#rights>\"c|r|u|d\" .<recId><magnet-ontology#group>\"BA\".}.
+	<subject><put><uid1>.
+		<uid1><argument>{
+			<operation><name>"create|update|delete".
+			<recId><magnet-ontology#authorSystem>"".
+			<recId><magnet-ontology#authorSubsystem>"".
+			<recId><magnet-ontology#authorSubsystemElement>"".
+			<recId><magnet-ontology#targetSystem>"".
+			<recId><magnet-ontology#targetSubsystem>"".
+			<recId><magnet-ontology#targetSubsystemElement>"".
+			<recId><magnet-ontology#category>"".<recId><magnet-ontology#elementId>"".<recId><magnet-ontology#rights>"".
+		}.
 
 ожидаю: 
+
 	идентификатор созданной/обновленной записи
 
 
-4. authorize
+3. authorize
+
+Используется для проверки доступа пользователя к объектам системы. 
 
 отправляю: 
-	<subject><authorize><uid1>.<uid1><right>\"c|r|u|d\".
-	<uid1><category>\"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION\".
-	<uid1><elements>\"elementId\".<uid1><targetId>\"targetId\"."
+	<subject><authorize><uid1>.<uid1><right>"c|r|u|d".
+	<uid1><category>"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION".
+	<uid1><elements>"elementId".<uid1><targetId>"targetId"."
 
 ожидаю:
 список id элементов, к которым разрешен доступ, разделенных запятой:
 	id1, id3
 
-5. remove_records_for_element
+
+4. add_delegate
+
+Добавляет делегата для пользователя, если установлен флаг withTree, значит делегат так же принимает делегированные owner'у права.
+Возвращает идентификатор записи делегирования.
 
 отправляю:
-	<subject><remove_records_for_element><uid1>.<uid1><argument>\"elementId\"."
+	<subject><add_delegates><uid1>.
+		<uid1><argument>{
+			<delegateRecord1><owner>"userId1".
+			<delegateRecord1><delegate>"userId2".
+			<delegateRecord1><withTree>"true".
+		}.
+
+ожидаю: 
+	delegateRecord1Id
 
 
+5. remove_delegate
 
+Удаляет запись делегирования соответствующую шаблону без учета идентификатора записи(от кого - кому).
+
+отправляю:
+	<subject><remove_delegate><uid1>.<uid1><argument>"<delegateRecord1><owner>"userId1".".
+
+	
+6. get_delegate_assigners
+
+Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором.
+
+отправляю:
+	<subject><get_delegate_assigners><uid1>.<uid1><argument>"userId1".
+
+ожидаю:
+	список идентификаторов делегировавших без учета дерева делегирования(через запятую)
+
+	
+7. get_delegate_assigners_tree
+
+Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором с учетом дерева делегатов.
+
+отправляю:
+	<subject><get_delegate_assigners><uid1>.<uid1><argument>"userId1".
+
+ожидаю:
+	список идентификаторов делегатов c учетом дерева делегирования(через запятую)
 

@@ -1,3 +1,4 @@
+private import tango.io.Stdout;
 
 public char[] str_2_chararray(char* str)
 {
@@ -5,12 +6,14 @@ public char[] str_2_chararray(char* str)
 	char* tmp_ptr = str;
 	while(*tmp_ptr != 0)
 	{
-		//			Stdout.format("@={}", *tmp_ptr).newline;
+//					Stdout.format("@={}", *tmp_ptr).newline;
 		tmp_ptr++;
 	}
+	
+//					Stdout.format("str_length={}", str_length).newline;
 
 	str_length = tmp_ptr - str;
-
+	
 	char[] res = new char[str_length];
 
 	uint i;
@@ -18,7 +21,8 @@ public char[] str_2_chararray(char* str)
 	{
 		res[i] = *(str + i);
 	}
-	res[i] = 0;
+	if (i > 0)
+	    res[i] = 0;
 
 	return res;
 }

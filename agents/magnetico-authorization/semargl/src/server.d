@@ -86,12 +86,42 @@ void get_message(byte* message, ulong message_size)
 		fact_o = new char* [count_elements.facts];
 		is_fact_in_object = new uint [count_elements.facts];		
 		uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o, is_fact_in_object);
+		// 				
+		// замапим предикаты фактов на конкретные переменные put_id, fact_id, arg_id
+		for(int i = 0; i < count_elements.facts; i++)
+		{
+			if(put_id < 0 && strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
+			{
+				put_id = i;
+				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
+    			}
+    			else 
+    			{
+			if(arg_id < 0 && strcmp(fact_p[i], "argument") == 0)
+			{
+				arg_id = i;
+				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
+    			}
+    			else
+			if(subject_id < 0 &&  strcmp(fact_p[i], "subject") == 0)
+			{
+				subject_id = i;
+				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
+    			}
+    			else 
+    			{
+			if(command_id < 0 && strcmp(fact_p[i], "name") == 0 && strcmp(fact_s[i], "command") == 0)
+			{
+				command_id = i;
+				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
+    			}
+    			}
+		}
+		
 		
 		
 		if(*(message + 0) == '<' && *(message + 10) == 'p')
 		{
-			Stdout.format("this is facts on update").newline;
-
 		// это команда put?
 		int put_id = -1;
 		uint arg_id = 0;
@@ -100,23 +130,24 @@ void get_message(byte* message, ulong message_size)
 			if(strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
 			{
 				put_id = i;
-				//				Stdout.format("found comand put, id ={} ", i).newline;	
+				Stdout.format("found comand put, id ={} ", i).newline;	
 				break;
 			}
 		}
-
+		
 		if(put_id >= 0)
 		{
 			for(int i = 0; i < count_facts; i++)
 			{
 				if(strcmp(fact_p[i], "argument") == 0/* && strcmp(facts_s[i], facts_o[put_id]) == 0*/)
 				{
-					//					Stdout.format("found argument put, factid={}", i).newline;
+					Stdout.format("found argument put, factid={}", i).newline;
 					arg_id = i;
 					break;
 				}
 			}
 		}
+		
 
 		if(arg_id != 0)
 		{
@@ -124,7 +155,8 @@ void get_message(byte* message, ulong message_size)
 			{
 				if(is_fact_in_object[i] == arg_id)
 				{
-				//	Stdout.format("add triple <{}><{}><{}>", str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i])).newline;
+					
+					Stdout.format("add triple <{}><{}><{}>", str_2_chararray(cast(char*)fact_s[i]), str_2_chararray(cast(char*)fact_p[i]), str_2_chararray(cast(char*)fact_o[i])).newline;
 					az.addAuthorizeData(str_2_chararray(fact_s[i]), str_2_chararray(fact_p[i]), str_2_chararray(fact_o[i]));
 				//	TripleStorage ts = az.getTripleStorage();
 					//	ts.addTriple (str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i]));
@@ -132,7 +164,7 @@ void get_message(byte* message, ulong message_size)
 			}
 
 		}
-
+		
 		time = elapsed.stop;
 
 		for(int i = 0; i < count_facts; i++)
