@@ -88,6 +88,11 @@ void get_message(byte* message, ulong message_size)
 		uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o, is_fact_in_object);
 		// 				
 		// замапим предикаты фактов на конкретные переменные put_id, fact_id, arg_id
+		int put_id = -1;
+		int arg_id = -1;
+                int subject_id = -1;
+                int command_id = -1;
+
 		for(int i = 0; i < count_elements.facts; i++)
 		{
 			if(put_id < 0 && strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
@@ -103,6 +108,7 @@ void get_message(byte* message, ulong message_size)
 				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
     			}
     			else
+    			{
 			if(subject_id < 0 &&  strcmp(fact_p[i], "subject") == 0)
 			{
 				subject_id = i;
@@ -116,44 +122,17 @@ void get_message(byte* message, ulong message_size)
 				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
     			}
     			}
+    			}
+                     }
 		}
 		
-		
-		
-		if(*(message + 0) == '<' && *(message + 10) == 'p')
-		{
-		// это команда put?
-		int put_id = -1;
-		uint arg_id = 0;
-		for(int i = 0; i < count_elements.facts; i++)
-		{
-			if(strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
-			{
-				put_id = i;
-				Stdout.format("found comand put, id ={} ", i).newline;	
-				break;
-			}
-		}
-		
-		if(put_id >= 0)
-		{
-			for(int i = 0; i < count_facts; i++)
-			{
-				if(strcmp(fact_p[i], "argument") == 0/* && strcmp(facts_s[i], facts_o[put_id]) == 0*/)
-				{
-					Stdout.format("found argument put, factid={}", i).newline;
-					arg_id = i;
-					break;
-				}
-			}
-		}
-		
+						
 
-		if(arg_id != 0)
+		if(put_id >= 0 && arg_id > 0 && command_id > 0)
 		{
 			for(int i = 0; i < count_facts; i++)
 			{
-				if(is_fact_in_object[i] == arg_id)
+				if(is_fact_in_object[i] == arg_id) // отфильтруем все факты-аргументя
 				{
 					
 					Stdout.format("add triple <{}><{}><{}>", str_2_chararray(cast(char*)fact_s[i]), str_2_chararray(cast(char*)fact_p[i]), str_2_chararray(cast(char*)fact_o[i])).newline;
@@ -163,7 +142,7 @@ void get_message(byte* message, ulong message_size)
 				}
 			}
 
-		}
+		
 		
 		time = elapsed.stop;
 
@@ -372,5 +351,3 @@ void get_message(byte* message, ulong message_size)
 
 //	Stdout.format("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length)).newline;
 }
-
-
