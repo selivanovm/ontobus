@@ -78,6 +78,8 @@ void get_message(byte* message, ulong message_size)
 	
 	if(*(message + 0) == '<' && *(message + (message_size-1)) == '.')
 	{
+		Stdout.format("this is facts...").newline;
+		
 		Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
 		fact_s = new char* [count_elements.facts];
 		fact_p = new char* [count_elements.facts];

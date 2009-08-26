@@ -1,0 +1,55 @@
+ответы с ожидаются с result:data, по феншую
+
+
+1. get_authorization_rights_records
+
+отправляю:
+	<subject><get_authorization_rights_records>\"uid1\".
+	<uid1><element_id>\"elementId\".<uid1><category>\"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION\".
+	<uid1><target_id>\"targetId\"."
+
+ожидаю:
+триплеты записей прав
+	<magnet-ontology#RightsRecord5> <magnet-ontology#author> "54566bf5-7dc7-432c-b6a5-27e560c4ec0e" .                                                           
+	<magnet-ontology#RightsRecord5> <magnet-ontology#target> "c60246bc-5b95-4cbd-b6e4-13288884045f" .                                                           
+	<magnet-ontology#RightsRecord5> <magnet-ontology#elementId> "aa8d1a71a2e34303954ced25d1037cdf" .                                                            
+	<magnet-ontology#RightsRecord5> <magnet-ontology#rigths> "r" ........"
+
+2. is_banned
+
+отправляю:
+	<subject><is_banned><uid1>.<uid1><argument>\"%s\".", ticketId
+
+ожидаю:
+	"true" или "false"
+
+3. обновление, создание, удаление записей прав
+
+отправляю:
+	<subject><put><uid1>.<uid1><argument>{<operation><name>\"create|update|delete\".<recId><magnet-ontology#author>\"authorId\".
+	<recId><magnet-ontology#target>\"targetId\".<recId><magnet-ontology#elementId>\"elementId\".
+	<recId><magnet-ontology#rights>\"c|r|u|d\" .<recId><magnet-ontology#group>\"BA\".}.
+
+ожидаю: 
+	идентификатор созданной/обновленной записи
+
+
+4. authorize
+
+отправляю: 
+	<subject><authorize><uid1>.<uid1><right>\"c|r|u|d\".
+	<uid1><category>\"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION\".
+	<uid1><elements>\"elementId\".<uid1><targetId>\"targetId\"."
+
+ожидаю:
+список id элементов, к которым разрешен доступ, разделенных запятой:
+	id1, id3
+
+5. remove_records_for_element
+
+отправляю:
+	<subject><remove_records_for_element><uid1>.<uid1><argument>\"elementId\"."
+
+
+
+

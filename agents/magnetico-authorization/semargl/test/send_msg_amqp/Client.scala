@@ -58,9 +58,17 @@ object Client {
       }
 
     } else
+    {
+      println (String.format("found %s params", args.size + ""))
+	for (i <- 0 until args.size) 
+	{
+    	    println (String.format("param %s=%s", i + "", args(i) ))	
+	}
       println ("Usage : <message> <host> <port> <vhost> <exchange> <targetQueue> <user> <password> <heartbeat> <routingKey> <exchangeType> <listen_flag>")
+    }
     println ("Done.")
     System.exit(0)
+    
   }
 
   def escapeString(line: String): String = {
