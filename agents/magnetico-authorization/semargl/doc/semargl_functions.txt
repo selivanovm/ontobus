@@ -22,7 +22,34 @@ magnet-ontology#rigths> "c|r|u|d"
 
 ответы с ожидаются с result:data
 
-1. get_authorization_rights_records
+1. обновление, создание, удаление записей прав
+
+Используется для создания/обновления/удаления записей прав доступа. В качестве параметров передается список триплетов, первый из которых содержит
+имя запрашиваемой операции(create|update|delete), остальные служат параметрами для операции. В случае, если операция == create создается новая запись
+с триплетами переданными в аргументе, идентификатор записи создается на стороне semargl и возвращается в качестве результата. В случае, если 
+операция == update обновляется запись триплетами, переданными в аргументе. В случае, если операция == delete удаляются записи соответствующие шаблону
+переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении.
+
+отправляю:
+
+	<subject><put><uid1>.
+		<uid1><argument>{
+			<operation><name>"create|update|delete".
+			<recId><magnet-ontology#authorSystem>"".
+			<recId><magnet-ontology#authorSubsystem>"".
+			<recId><magnet-ontology#authorSubsystemElement>"".
+			<recId><magnet-ontology#targetSystem>"".
+			<recId><magnet-ontology#targetSubsystem>"".
+			<recId><magnet-ontology#targetSubsystemElement>"".
+			<recId><magnet-ontology#category>"".<recId><magnet-ontology#elementId>"".<recId><magnet-ontology#rights>"".
+		}.
+
+ожидаю: 
+
+	идентификатор созданной/обновленной записи
+
+
+2. get_authorization_rights_records
 
 Используется для получения записей прав соответствующих определенному шаблону. Шаблон - набор триплетов, которые входят в состав записи права.
 Если запись права содержит заданные в шаблоне триплеты, значит она должна быть включена в результат. Если какие-то из триплетов шаблона содержат

@@ -3,7 +3,7 @@ module scripts.S05InDocFlow;
 import RightTypeDef;
 import TripleStorage;
 private import tango.io.Stdout;
-import str_tool;
+//import str_tool;
 import script_util;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)

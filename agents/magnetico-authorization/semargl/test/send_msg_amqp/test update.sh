@@ -1,0 +1,3 @@
+message='<subject><put><uid1>.<uid1><argument>{<operation><name>"update".<><magnet-ontology#authorSystem>"".<0000000000000000><magnet-ontology#authorSubsystem>"".<0000000000000000><magnet-ontology#authorSubsystemElement>"".<0000000000000000><magnet-ontology#targetSystem>"".<0000000000000000><magnet-ontology#targetSubsystem>"".<0000000000000000><magnet-ontology#targetSubsystemElement>"".<0000000000000000><magnet-ontology#category>"".<0000000000000000><magnet-ontology#elementId>"".<0000000000000000><magnet-ontology#rights>"".}.'
+
+java -cp ./:lib/commons-io-1.2.jar:lib/commons-cli-1.1.jar:lib/rabbitmq-client.jar:lib/scala-library.jar Client $message 192.168.150.196 5672 magnetico test test eks 123456 0 "" direct true

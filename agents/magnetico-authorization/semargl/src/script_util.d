@@ -3,7 +3,7 @@ module script_util;
 import RightTypeDef;
 import TripleStorage;
 private import tango.io.Stdout;
-import str_tool;
+import std.string;
 
 public bool isInDocFlow(char* elementId, TripleStorage ts)
 {
@@ -34,7 +34,7 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 
 			if(iterator0 !is null)
 			{
-				Stdout.format("да, документ в документообороте {}", str_2_chararray(elementId)).newline;
+				Stdout.format("да, документ в документообороте {}", toString(elementId)).newline;
 				return true;
 			}
 		}

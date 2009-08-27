@@ -3,6 +3,7 @@ module server;
 private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
+private import std.string;
 private import tango.stdc.posix.stdio;
 
 import Integer = tango.text.convert.Integer;
@@ -20,7 +21,8 @@ import librabbitmq_client;
 import script_util;
 import RightTypeDef;
 import fact_tools;
-import str_tool;
+
+//import str_tool;
 
 librabbitmq_client client = null;
 
@@ -38,12 +40,11 @@ void main(char[][] args)
 
 	Stdout.format("connect to AMQP server ({}:{})", hostname, port).newline;
 	client = new librabbitmq_client(hostname, port);
-	client.set_callback (&get_message);
+	client.set_callback(&get_message);
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
 }
-
 
 void get_message(byte* message, ulong message_size)
 {
@@ -54,10 +55,10 @@ void get_message(byte* message, ulong message_size)
 
 	double time;
 
-//	char check_right = 0;
+	//	char check_right = 0;
 
-//	char* user_id;
-//	char* queue_name;
+	//	char* user_id;
+	//	char* queue_name;
 	char* list_docid;
 	char* docId;
 	uint targetRightType = RightType.READ;
@@ -65,99 +66,119 @@ void get_message(byte* message, ulong message_size)
 	uint param_count = 0;
 
 	elapsed.start;
-	
-	char* queue_name = cast(char*)(new char [40]); 
-	char* user = cast(char*)(new char [40]); 
+
+	char* queue_name = cast(char*) (new char[40]);
+	char* user = cast(char*) (new char[40]);
 	char* fact_s[];
 	char* fact_p[];
 	char* fact_o[];
 	uint is_fact_in_object[];
-	
+
 	// разберемся что за команда пришла
 	// если первый символ = [<], значит пришли факты
-	
-	if(*(message + 0) == '<' && *(message + (message_size-1)) == '.')
+
+	if(*(message + 0) == '<' && *(message + (message_size - 1)) == '.')
 	{
-		Stdout.format("this is facts...").newline;
-		
+		//		Stdout.format("this is facts...").newline;
+
 		Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
-		fact_s = new char* [count_elements.facts];
-		fact_p = new char* [count_elements.facts];
-		fact_o = new char* [count_elements.facts];
-		is_fact_in_object = new uint [count_elements.facts];		
-		uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o, is_fact_in_object);
+		fact_s = new char*[count_elements.facts];
+		fact_p = new char*[count_elements.facts];
+		fact_o = new char*[count_elements.facts];
+		is_fact_in_object = new uint[count_elements.facts];
+		uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s,
+				fact_p, fact_o, is_fact_in_object);
 		// 				
 		// замапим предикаты фактов на конкретные переменные put_id, fact_id, arg_id
 		int put_id = -1;
 		int arg_id = -1;
-                int subject_id = -1;
-                int command_id = -1;
+		int operation_id = -1;
 
 		for(int i = 0; i < count_elements.facts; i++)
 		{
 			if(put_id < 0 && strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
 			{
 				put_id = i;
-				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
-    			}
-    			else 
-    			{
-			if(arg_id < 0 && strcmp(fact_p[i], "argument") == 0)
+			//				Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
+			}
+			else
 			{
-				arg_id = i;
-				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
-    			}
-    			else
-    			{
-			if(subject_id < 0 &&  strcmp(fact_p[i], "subject") == 0)
-			{
-				subject_id = i;
-				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
-    			}
-    			else 
-    			{
-			if(command_id < 0 && strcmp(fact_p[i], "name") == 0 && strcmp(fact_s[i], "command") == 0)
-			{
-				command_id = i;
-				Stdout.format("found comand {}, id ={} ", fact_p[i], i).newline;	
-    			}
-    			}
-    			}
-                     }
-		}
-		
-						
-
-		if(put_id >= 0 && arg_id > 0 && command_id > 0)
-		{
-			for(int i = 0; i < count_facts; i++)
-			{
-				if(is_fact_in_object[i] == arg_id) // отфильтруем все факты-аргументя
+				if(arg_id < 0 && strcmp(fact_p[i], "argument") == 0)
 				{
-					
-					Stdout.format("add triple <{}><{}><{}>", str_2_chararray(cast(char*)fact_s[i]), str_2_chararray(cast(char*)fact_p[i]), str_2_chararray(cast(char*)fact_o[i])).newline;
-					az.addAuthorizeData(str_2_chararray(fact_s[i]), str_2_chararray(fact_p[i]), str_2_chararray(fact_o[i]));
-				//	TripleStorage ts = az.getTripleStorage();
-					//	ts.addTriple (str_2_char_array(facts_s[i]), str_2_char_array(facts_p[i]), str_2_char_array(facts_o[i]));
+					arg_id = i;
+				//					Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
+				}
+				else
+				{
+
+					if(operation_id < 0 && strcmp(fact_p[i], "name") == 0 && strcmp(fact_s[i], "operation") == 0)
+					{
+						operation_id = i;
+					//						Stdout.format("found operation {}, id ={} ", toString(fact_p[i]), i).newline;
+					}
+
 				}
 			}
-
-		
-		
-		time = elapsed.stop;
-
-		for(int i = 0; i < count_facts; i++)
-		{
-			Stdout.format("s = {:X2} {:X4} {}", i, fact_s[i], str_2_chararray(cast(char*) fact_s[i])).newline;
-			Stdout.format("p = {:X2} {:X4} {}", i, fact_p[i], str_2_chararray(cast(char*) fact_p[i])).newline;
-			Stdout.format("o = {:X2} {:X4} {}", i, fact_o[i], str_2_chararray(cast(char*) fact_o[i])).newline;
-			Stdout.format("is_fact_in_object = {:X2} {}\n", i, is_fact_in_object[i]).newline;
 		}
 
-		Stdout.format("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time).newline;
-	}
-	
-	
+		if(put_id >= 0 && arg_id > 0 && operation_id > 0)
+		{
+			if(strcmp(fact_o[operation_id], "create") == 0)
+			{
+				//			Stdout.format("команда на добавление").newline;
+
+				ulong uuid = getUUID();
+
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(is_fact_in_object[i] == arg_id && i != operation_id)
+					{
+						// отфильтруем все факты-аргументы					
+						if(strcmp(fact_s[i], "0000000000000000") == 0)
+							longToHex(uuid, fact_s[i]);
+						else
+						{
+							if(strlen(fact_s[i]) == 0)
+							{
+								fact_s[i] = cast(char*) new char[16];
+								longToHex(uuid, fact_s[i]);
+							}
+						}
+
+						//					Stdout.format("add triple <{}><{}><{}>", toString(cast(char*) fact_s[i]), toString(
+						//							cast(char*) fact_p[i]), toString(cast(char*) fact_o[i])).newline;
+						az.addAuthorizeData(toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
+					}
+				}
+			}
+			else
+			{
+				if(strcmp(fact_o[operation_id], "update") == 0)
+				{
+				}
+
+				else
+				{
+					if(strcmp(fact_o[operation_id], "delete") == 0)
+					{
+					}
+				}
+
+			}
+
+			time = elapsed.stop;
+			/*
+			 for(int i = 0; i < count_facts; i++)
+			 {
+			 Stdout.format("s = {:X2} {:X4} {}", i, fact_s[i], toString(cast(char*) fact_s[i])).newline;
+			 Stdout.format("p = {:X2} {:X4} {}", i, fact_p[i], toString(cast(char*) fact_p[i])).newline;
+			 Stdout.format("o = {:X2} {:X4} {}", i, fact_o[i], toString(cast(char*) fact_o[i])).newline;
+			 Stdout.format("is_fact_in_object = {:X2} {}\n", i, is_fact_in_object[i]).newline;
+			 }
+			 */
+			Stdout.format("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time).newline;
+		}
+
 		if(*(message + 0) == '<' && *(message + 13) == 'h')
 		{
 			/*
@@ -169,10 +190,9 @@ void get_message(byte* message, ulong message_size)
 			 <uid1><elements>"a8df72cae40b43deb5dfbb7d8af1bb34,da08671d0c50416481f32705a908f1ab,4107206856ea4a7b8d8b4b80444f7f85".	  
 			 */
 
-//			Stdout.format("this request on authorization").newline;
-
+			//			Stdout.format("this request on authorization").newline;
 			char* command_uid = null;
-			
+
 			// это команда authorize?
 			int authorize_id = -1;
 			int from_id = 0;
@@ -180,8 +200,8 @@ void get_message(byte* message, ulong message_size)
 			int category_id = 0;
 			int targetId_id = 0;
 			int elements_id = 0;
-		
-//			Stdout.format("this request on authorization #1").newline;
+
+			//			Stdout.format("this request on authorization #1").newline;
 
 			for(int i = 0; i < count_facts; i++)
 			{
@@ -189,12 +209,12 @@ void get_message(byte* message, ulong message_size)
 				{
 					command_uid = fact_o[i];
 					authorize_id = i;
-//					Stdout.format("found comand authorize, id ={} ", i).newline;
+					//					Stdout.format("found comand authorize, id ={} ", i).newline;
 					break;
 				}
 			}
 
-//			Stdout.format("this request on authorization #2").newline;
+			//			Stdout.format("this request on authorization #2").newline;
 
 			if(authorize_id >= 0)
 			{
@@ -230,21 +250,21 @@ void get_message(byte* message, ulong message_size)
 				autz_elements = fact_o[elements_id];
 			}
 
-//			queue_name = fact_o[from_id];
-			strcpy (queue_name, fact_o[from_id]);
-			strcpy (user, fact_o[targetId_id]);
-			
+			//			queue_name = fact_o[from_id];
+			strcpy(queue_name, fact_o[from_id]);
+			strcpy(user, fact_o[targetId_id]);
+
 			char* check_right = fact_o[right_id];
-			
+
 			// результат поместим в то же сообщение
-			char* result = cast (char*)message;
+			char* result = cast(char*) message;
 			char* result_ptr = result;
 
-//			printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
+			//			printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
 
 			uint*[] hierarhical_departments = null;
 			hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
-//			Stdout.format("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length).newline;
+			//			Stdout.format("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length).newline;
 
 			for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 			{
@@ -260,10 +280,11 @@ void get_message(byte* message, ulong message_size)
 					targetRightType = RightType.DELETE;
 			}
 
-//			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
+			//			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
 
 			bool calculatedRight_isAdmin;
-			calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType, az.getTripleStorage());
+			calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType,
+					az.getTripleStorage());
 
 			uint count_prepared_doc = 0;
 			uint count_authorized_doc = 0;
@@ -271,44 +292,44 @@ void get_message(byte* message, ulong message_size)
 			uint prev_doc_pos = 0;
 
 			*result_ptr = '<';
-			strcpy (result_ptr+1, command_uid);
-			result_ptr += strlen (command_uid) + 1;
-			strcpy (result_ptr, "><result:data>\"");
+			strcpy(result_ptr + 1, command_uid);
+			result_ptr += strlen(command_uid) + 1;
+			strcpy(result_ptr, "><result:data>\"");
 			result_ptr += 15;
-				
+
 			for(uint i = 0; true; i++)
 			{
 				char prev_state_byte = *(autz_elements + i);
 
-//				Stdout.format("this request on authorization #1.2, {}{}", i, *(autz_elements + i)).newline;
+				//				Stdout.format("this request on authorization #1.2, {}{}", i, *(autz_elements + i)).newline;
 				if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 				{
 					*(autz_elements + i) = 0;
 
 					docId = cast(char*) (autz_elements + doc_pos);
-//					printf("docId:%s\n", docId);
+					//					printf("docId:%s\n", docId);
 
 					count_prepared_doc++;
 					bool calculatedRight = az.authorize(docId, user, targetRightType, hierarhical_departments);
-//					Stdout.format("right = {}", calculatedRight).newline;
+					//					Stdout.format("right = {}", calculatedRight).newline;
 
-//					if(calculatedRight == false)
-//					{
-//						for(uint j = doc_pos; *(autz_elements + j) != 0; j++)
-//						{
-//							*(autz_elements + j) = ' ';
-//						}
-//						*(autz_elements + i) = ' ';
-//					}
-//					else
+					//					if(calculatedRight == false)
+					//					{
+					//						for(uint j = doc_pos; *(autz_elements + j) != 0; j++)
+					//						{
+					//							*(autz_elements + j) = ' ';
+					//						}
+					//						*(autz_elements + i) = ' ';
+					//					}
+					//					else
 					if(calculatedRight == true)
 					{
-						strcpy (result_ptr, docId);
-						result_ptr += strlen (docId);
+						strcpy(result_ptr, docId);
+						result_ptr += strlen(docId);
 						*result_ptr = ',';
-						result_ptr++;						
-//						Stdout.format("this request on authorization #1.4 true").newline;
-//						*(autz_elements + i) = ',';
+						result_ptr++;
+						//						Stdout.format("this request on authorization #1.4 true").newline;
+						//						*(autz_elements + i) = ',';
 						count_authorized_doc++;
 					}
 
@@ -321,20 +342,20 @@ void get_message(byte* message, ulong message_size)
 					break;
 				}
 			}
-			
-			strcpy (result_ptr, "\".");
+
+			strcpy(result_ptr, "\".");
 
 			time = elapsed.stop;
 
 			Stdout.format(
 					"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
-					count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc/time).newline;
-			
+					count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc / time).newline;
+
 			printf("result:%s\n", result);
 			printf("queue_name:%s\n", queue_name);
 
 			elapsed.start;
-			
+
 			client.send(queue_name, result);
 
 			time = elapsed.stop;
@@ -344,7 +365,7 @@ void get_message(byte* message, ulong message_size)
 			az.getTripleStorage().print_stat();
 		}
 	}
-	
+
 //	printf("!!!! queue_name=%s\n", queue_name);
 //	Stdout.format("!!!! check_right={}", check_right).newline;
 //	printf("!!!! list_docid=%s\n", list_docid);

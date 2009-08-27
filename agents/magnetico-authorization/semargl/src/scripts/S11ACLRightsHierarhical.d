@@ -3,7 +3,7 @@ module scripts.S11ACLRightsHierarhical;
 import RightTypeDef;
 import TripleStorage;
 private import tango.io.Stdout;
-import str_tool;
+//import str_tool;
 import script_util;
 private import tango.stdc.string;
 private import tango.stdc.posix.stdio;

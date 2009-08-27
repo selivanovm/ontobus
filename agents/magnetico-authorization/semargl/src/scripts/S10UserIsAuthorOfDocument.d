@@ -3,7 +3,7 @@ module scripts.S10UserIsAuthorOfDocument;
 private import tango.stdc.string;
 import TripleStorage;
 private import tango.io.Stdout;
-import str_tool;
+//import str_tool;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, uint* iterator_facts_of_document)
 {
