@@ -28,7 +28,7 @@ magnet-ontology#rigths> "c|r|u|d"
 Если запись права содержит заданные в шаблоне триплеты, значит она должна быть включена в результат. Если какие-то из триплетов шаблона содержат
 пустые значения объектов, либо отсутствуют в запросе, значит их нужно проигнорировать при сравнении. 
 
-отправляю:
+запрос:
 
 	<subject><get_authorization_rights_records>"uid1".
 		<uid1><argument>{
@@ -43,7 +43,7 @@ magnet-ontology#rigths> "c|r|u|d"
 		}.
 
 
-ожидаю:
+ответ:
 триплеты записей прав
 
 	<magnet-ontology#RightsRecord5><magnet-ontology#authorSystem>"BA".                                                           
@@ -59,7 +59,7 @@ magnet-ontology#rigths> "c|r|u|d"
 операция == update обновляется запись триплетами, переданными в аргументе. В случае, если операция == delete удаляются записи соответствующие шаблону
 переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении.
 
-отправляю:
+запрос:
 
 	<subject><put><uid1>.
 		<uid1><argument>{
@@ -73,7 +73,7 @@ magnet-ontology#rigths> "c|r|u|d"
 			<recId><magnet-ontology#category>"".<recId><magnet-ontology#elementId>"".<recId><magnet-ontology#rights>"".
 		}.
 
-ожидаю: 
+ответ: 
 
 	идентификатор созданной/обновленной записи
 
@@ -82,12 +82,12 @@ magnet-ontology#rigths> "c|r|u|d"
 
 Используется для проверки доступа пользователя к объектам системы. 
 
-отправляю: 
+запрос: 
 	<subject><authorize><uid1>.<uid1><right>"c|r|u|d".
 	<uid1><category>"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION".
 	<uid1><elements>"elementId".<uid1><targetId>"targetId"."
 
-ожидаю:
+ответ:
 список id элементов, к которым разрешен доступ, разделенных запятой:
 	id1, id3
 
@@ -97,7 +97,7 @@ magnet-ontology#rigths> "c|r|u|d"
 Добавляет делегата для пользователя, если установлен флаг withTree, значит делегат так же принимает делегированные owner'у права.
 Возвращает идентификатор записи делегирования.
 
-отправляю:
+запрос:
 	<subject><add_delegates><uid1>.
 		<uid1><argument>{
 			<delegateRecord1><owner>"userId1".
@@ -105,7 +105,7 @@ magnet-ontology#rigths> "c|r|u|d"
 			<delegateRecord1><withTree>"true".
 		}.
 
-ожидаю: 
+ответ: 
 	delegateRecord1Id
 
 
@@ -113,7 +113,7 @@ magnet-ontology#rigths> "c|r|u|d"
 
 Удаляет запись делегирования соответствующую шаблону без учета идентификатора записи(от кого - кому).
 
-отправляю:
+запрос:
 	<subject><remove_delegate><uid1>.<uid1><argument>"<delegateRecord1><owner>"userId1".".
 
 	
@@ -121,10 +121,10 @@ magnet-ontology#rigths> "c|r|u|d"
 
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором.
 
-отправляю:
+запрос:
 	<subject><get_delegate_assigners><uid1>.<uid1><argument>"userId1".
 
-ожидаю:
+ответ:
 	список идентификаторов делегировавших без учета дерева делегирования(через запятую)
 
 	
@@ -132,9 +132,25 @@ magnet-ontology#rigths> "c|r|u|d"
 
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором с учетом дерева делегатов.
 
-отправляю:
+запрос:
 	<subject><get_delegate_assigners><uid1>.<uid1><argument>"userId1".
 
-ожидаю:
+ответ:
 	список идентификаторов делегатов c учетом дерева делегирования(через запятую)
 
+8. is_in_docflow
+
+Используется для того, чтобы выяснить, находится документ в документообороте(идет ли по какому-либо маршруту) или нет. 
+Документ находится в документообороте, если существуют записи прав соответствующие шаблону: 
+
+			<magnet-ontology#authorSystem> = "DOCFLOW"
+			<magnet-ontology#category> = "DOCUMENT"
+			<magnet-ontology#elementId> = идентификатору документа для которого выполняется метод
+
+запрос:
+
+	<subject><is_in_docflow><uid1>.<uid1><argument>"docId1".
+
+ответ:
+
+	true | false
