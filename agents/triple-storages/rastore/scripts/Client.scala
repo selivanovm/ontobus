@@ -38,6 +38,9 @@ object Client {
       val channel = conn.createChannel()
       
 //      channel.exchangeDeclare(exchange, exchangeType)
+      if (routingKey.length == 0) {
+        channel.queueDeclare(exchange)
+      }
       channel.queueDeclare(queue)
 //      channel.queueBind(queue, exchange, routingKey)
 
