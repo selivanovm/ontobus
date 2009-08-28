@@ -1,10 +1,6 @@
 // D import file generated from 'src/HashMap.d'
 private
 {
-    import tango.stdc.stdlib;
-}
-private
-{
     import tango.stdc.string;
 }
 private
@@ -64,5 +60,11 @@ private
 }
 private
 {
-    char[] str_2_char_array(char* str);
+    static
+{
+    char[] _toString(char* s)
+{
+return s ? s[0..strlen(s)] : cast(char[])null;
+}
+}
 }

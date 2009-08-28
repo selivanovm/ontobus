@@ -61,7 +61,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 		}
 
-		//			Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+					Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
 
 		if(s.length == 0 && p.length == 0 && o.length == 0)
 			continue;

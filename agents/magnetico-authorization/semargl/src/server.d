@@ -22,7 +22,6 @@ import script_util;
 import RightTypeDef;
 import fact_tools;
 
-//import str_tool;
 
 librabbitmq_client client = null;
 

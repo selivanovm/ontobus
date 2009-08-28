@@ -35,6 +35,8 @@ import scripts.S20UserIsInOUP;
 import scripts.S30UsersOfDocumentum;
 import scripts.S40UsersOfTAImport;
 
+import fact_tools;
+
 class Authorization
 {
 	private char[][] i_know_predicates;
@@ -53,6 +55,9 @@ class Authorization
 
 		// ACL
 		i_know_predicates[d++] = "magnet-ontology#author";
+		i_know_predicates[d++] = "magnet-ontology#authorSystem";	
+		i_know_predicates[d++] = "magnet-ontology#authorSubsystem";
+		
 		i_know_predicates[d++] = "magnet-ontology#rigths";
 		i_know_predicates[d++] = "magnet-ontology#target";
 		i_know_predicates[d++] = "magnet-ontology#fromUserId";
@@ -119,7 +124,22 @@ class Authorization
 		Stdout.formatln("\n{} Errors", scan.errors.length);
 		foreach(error; scan.errors)
 			Stdout(error).newline;
-
+		
+		byte* triple;
+		uint* list_iterator = ts.getTriples("6fabc9222d44f980", null, null, true);
+		Stdout.format("list_iterator {:X4}", list_iterator).newline;
+		if(list_iterator !is null)
+		{
+			uint next_element0 = 0xFF;
+			while(next_element0 > 0)
+			{
+				triple = cast(byte*)*list_iterator;				
+				print_triple (triple);
+				
+				next_element0 = *(list_iterator + 1);
+				list_iterator = cast(uint*) next_element0;
+			}
+		}
 		Stdout.format("authorization init ... ok").newline;
 	}
 
@@ -268,25 +288,4 @@ class Authorization
 		return calculatedRight;
 	}
 
-	public char[] str_2_char_array(char* str)
-	{
-		uint str_length = 0;
-		char* tmp_ptr = str;
-		while(*tmp_ptr != 0)
-		{
-			//		Stdout.format("@={}", *tmp_ptr).newline;
-			tmp_ptr++;
-		}
-
-		str_length = tmp_ptr - str;
-
-		char[] res = new char[str_length];
-
-		for(uint i = 0; i < str_length; i++)
-		{
-			res[i] = *(str + i);
-		}
-
-		return res;
-	}
 }

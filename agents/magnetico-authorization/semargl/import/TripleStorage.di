@@ -1,13 +1,12 @@
 // D import file generated from 'src/TripleStorage.d'
 import HashMap;
-import Triple;
-private
-{
-    import tango.stdc.stdlib;
-}
 private
 {
     import tango.io.Stdout;
+}
+private
+{
+    import tango.stdc.string;
 }
 import dee0xd.Log;
 enum idx_name 
@@ -91,6 +90,10 @@ class TripleStorage
 }
     public
 {
+    bool removeTriple(char[] s, char[] p, char[] o);
+}
+    public
+{
     bool addTriple(char[] s, char[] p, char[] o);
 }
     public
@@ -110,5 +113,11 @@ Stdout.format("index spo={} reads",stat__idx_spo__reads).newline;
 }
 private
 {
-    char[] str_2_char_array(char* str);
+    static
+{
+    char[] _toString(char* s)
+{
+return s ? s[0..strlen(s)] : cast(char[])null;
+}
+}
 }
