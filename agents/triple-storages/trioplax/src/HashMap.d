@@ -1,3 +1,4 @@
+module HashMap;
 //private import tango.stdc.stdlib: alloca;
 //private import tango.stdc.stdlib: malloc;
 private import tango.stdc.string;
@@ -7,7 +8,7 @@ import Integer = tango.text.convert.Integer;
 import Hash;
 //import ListTriple;
 
-import dee0xd.Log;
+//import dee0xd.Log;
 
 class HashMap
 {
@@ -129,7 +130,7 @@ class HashMap
 
 		if(short_order_conflict_keys > reducer_area_right)
 		{
-			log.trace("put:1 ######################### short_order_conflict_keys > reducer_area_right");
+//!			log.trace("put:1 ######################### short_order_conflict_keys > reducer_area_right");
 			throw new Exception("short_order_conflict_keys > reducer_area_right");
 		}
 
@@ -407,14 +408,14 @@ class HashMap
 	{
 		uint* res = null;
 
-		if(debug_info)
-			log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*) this, _toString(key1),
-					_toString(key2), _toString(key3));
+//!		if(debug_info)
+//!			log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*) this, _toString(key1),
+//!					_toString(key2), _toString(key3));
 
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 
-		if(debug_info)
-			log.trace("get:1 hash= {:X}", hash);
+//!		if(debug_info)
+//!			log.trace("get:1 hash= {:X}", hash);
 
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
@@ -422,8 +423,8 @@ class HashMap
 			dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
 
 		// хэш нас привел к очереди конфликтующих ключей
-		if(debug_info)
-			log.trace("get:2 short_order_conflict_key={:X}", short_order_conflict_keys);
+//!		if(debug_info)
+//!			log.trace("get:2 short_order_conflict_key={:X}", short_order_conflict_keys);
 
 		// log.trace("get:4 *short_order_conflict_keys={:X}",
 		//				reducer_area_ptr[short_order_conflict_keys]);
@@ -449,18 +450,18 @@ class HashMap
 			uint keys_of_hash_in_reducer;
 			uint list_elements = 0;
 
-			if(debug_info)
-				log.trace("get:7 начинаем сравнение нашего ключа среди короткой очереди ключей, next_short_order_conflict_keys={:X4}", next_short_order_conflict_keys);
+//!			if(debug_info)
+//!				log.trace("get:7 начинаем сравнение нашего ключа среди короткой очереди ключей, next_short_order_conflict_keys={:X4}", next_short_order_conflict_keys);
 
 			for(byte i = max_size_short_order; i > 0; i--)
 			{
-				if(debug_info)
-					log.trace("get:6 i={}", i);
+//!				if(debug_info)
+//!					log.trace("get:6 i={}", i);
 				
 				keys_of_hash_in_reducer = reducer_area_ptr[next_short_order_conflict_keys];
 
-				if(debug_info)
-					log.trace("get:9 keys_of_hash_in_reducer={:X}", keys_of_hash_in_reducer);
+//!				if(debug_info)
+//!					log.trace("get:9 keys_of_hash_in_reducer={:X}", keys_of_hash_in_reducer);
 				
 				if(keys_of_hash_in_reducer != 0)
 				{
@@ -477,20 +478,20 @@ class HashMap
 					uint
 							key3_length = (key_2_list_triples_area[keys_and_triplets_list + 8] << 8) + key_2_list_triples_area[keys_and_triplets_list + 9];
 
-					if(debug_info)
-						log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length,
-								key2_length, key3_length, key_ptr);
+//!					if(debug_info)
+//!						log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length,
+//!								key2_length, key3_length, key_ptr);
 
 					char[] keys = cast(char[]) key_2_list_triples_area;
 					if(key1 !is null)
 					{
-						if(debug_info)
-							log.trace("get:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
+//!						if(debug_info)
+//!							log.trace("get:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
 
 						if(_strcmp(keys, key_ptr, key1) == true)
 						{
-							if(debug_info)
-								log.trace("get:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
+//!							if(debug_info)
+//!								log.trace("get:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
 							isKeyExist = true;
 
 							//							 log.trace("get:11 key_ptr={:X4}", key_ptr);
@@ -510,13 +511,13 @@ class HashMap
 					if(key2 !is null && (key1 is null || key1 !is null && isKeyExist == true))
 					{
 						isKeyExist = false;
-						if(debug_info)
-							log.trace("get:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
+//!						if(debug_info)
+//!							log.trace("get:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
 
 						if(_strcmp(keys, key_ptr, key2) == true)
 						{
-							if(debug_info)
-								log.trace("get:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
+//!							if(debug_info)
+//!								log.trace("get:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
 
 							isKeyExist = true;
 
@@ -537,13 +538,13 @@ class HashMap
 					// 
 					if(key3 !is null && ((key1 is null || key1 !is null && isKeyExist == true) || (key2 is null || key2 !is null && isKeyExist == true)))
 					{
-						if(debug_info)
-							log.trace("get:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
+//!						if(debug_info)
+//!							log.trace("get:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
 						isKeyExist = false;
 						if(_strcmp(keys, key_ptr, key3) == true)
 						{
-							if(debug_info)
-								log.trace("get:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
+//!							if(debug_info)
+//!								log.trace("get:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
 							isKeyExist = true;
 							key_ptr += key3_length + 1;
 							list_elements = key_ptr;
@@ -582,10 +583,11 @@ class HashMap
 
 	private void dump_mem(ubyte[] mem, uint ptr)
 	{
-		log.trace("dump {:X4}", cast(void*) this);
+//!		log.trace("dump {:X4}", cast(void*) this);
 		for(int row = 0; row < 40; row++)
 		{
-			log.trace(
+//!			log.trace(
+			Stdout.format(
 					"{:X8}  {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2}  {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2}   {:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}",
 					row * 16, mem[ptr + row * 16 + 0], mem[ptr + row * 16 + 1], mem[ptr + row * 16 + 2],
 					mem[ptr + row * 16 + 3], mem[ptr + row * 16 + 4], mem[ptr + row * 16 + 5], mem[ptr + row * 16 + 6],
