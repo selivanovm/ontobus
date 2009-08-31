@@ -6,7 +6,7 @@
         Description:    some logging stuff
         Date:                   09.12.2008 by Digited
 **/
-module dee0xd.Log;
+module src.dee0xd.Log;
 
 public import
         tango.util.log.Log;
