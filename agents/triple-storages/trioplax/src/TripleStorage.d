@@ -3,7 +3,7 @@ import HashMap;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 
-private import src.dee0xd.Log;
+private import Log;
 
 enum idx_name
 {

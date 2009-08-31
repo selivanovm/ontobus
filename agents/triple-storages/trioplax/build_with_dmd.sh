@@ -8,7 +8,9 @@ rm *.a
 #dmd src/testHashMap.d src/Log.d src/HashMap.d src/Hash.d -debug -ofhashMapDebug.test
 #dmd src/testHashMap.d src/Log.d src/HashMap.d src/Hash.d -O -release -ofhashMapRelease.test
 dmd -Iimport src/*.d lib/librabbitmq_client.a lib/librabbitmq.a -oftripleStorageRelease.test
+date
 dmd -Iimport src/*.d lib/librabbitmq_client.a lib/librabbitmq.a -O -release -ofTrioplaxServer.run
+date
 dmd src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d -O -Hdexport -release -lib
 
 #dmd Triple.d socketserver.d ListStrings.d TripleStorage.d Log.d HashMap.d Hash.d -O -release -ofFRTSServer
