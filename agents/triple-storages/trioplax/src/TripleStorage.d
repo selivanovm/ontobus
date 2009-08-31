@@ -1,3 +1,5 @@
+module TripleStorage;
+
 import HashMap;
 //import Triple;
 private import tango.io.Stdout;
