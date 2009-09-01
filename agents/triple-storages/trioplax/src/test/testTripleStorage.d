@@ -5,121 +5,58 @@ private import tango.io.Stdout;
 private import tango.stdc.string;
 //import Integer = tango.text.convert.Integer;
 import tango.io.device.File;
+//import tango.io.File;
 import Text = tango.text.Util;
 import tango.time.StopWatch;
 import Log;
 
 import HashMap;
 import TripleStorage;
-//import ListTriple;
-//import Triple;
+import tango.io.FileScan;
+
+import tango.io.FileScan;
 
 int main(char[][] args)
 {
-	if(args.length < 2)
-	{
-		Stdout.format("Usage: file name").newline;
-
-		return -1;
-	}
-
 	uint count_add_triple = 0;
 
-	TripleStorage ts = new TripleStorage(0xff, 100_000, 8);
-//	Triple triple;
+	TripleStorage ts = new TripleStorage(0xff, 100, 5);
+	//	Triple triple;
 	//		
 	auto elapsed = new StopWatch();
 	double time;
 
-	for(int i = 1; i < args.length; i++)
+	elapsed.start;
+
+	char[] root = ".";
+	Stdout.formatln("Scanning '{}'", root);
+	auto scan = (new FileScan)(root, ".tn3");
+	Stdout.format("\n{} Folders\n", scan.folders.length);
+	foreach(folder; scan.folders)
+		Stdout.format("{}\n", folder);
+	Stdout.format("\n{0} Files\n", scan.files.length);
+
+	foreach(file; scan.files)
 	{
-		Stdout.format("load triples in file {}", args[i]).newline;
-
-		auto file = new File(args[i]);
-		
-//        auto file = new File("file.d");
-        auto content = cast(char[]) file.load (file);
-        Stdout (content).newline;
-//        char[10] ff;
-//        int f = file.read(ff);
-        
-//		auto content = cast(char[]) file.read (void[]);
-
-		elapsed.start;
-
-		foreach(line; Text.lines(content))
-		{
-			char[] s, p, o;
-			int idx = 0;
-			foreach(element; Text.delimit(line, ">"))
-			{
-				element = Text.chopl(element, "<");
-				element = Text.chopl(element, " <");
-				element = Text.chopr(element, " .");
-				element = Text.trim(element);
-				element[element.length] = 0;
-
-				idx++;
-				if(idx == 1)
-				{
-					s = element;
-				}
-
-				if(idx == 2)
-				{
-					p = element;
-				}
-
-				if(idx == 3)
-				{
-				        if (element.length > 2)
-				        {
-					o = element[1..(element.length-1)];					
-					o[o.length] = 0;
-					}					
-				}
-			//					Stdout.format("element={} ", element).newline;
-
-			}
-
-			//		void* q = cast(void *)triple;
-			//		Stdout.format("addr triple={:X4}", q).newline;
-			//		byte* triple = cast (byte*) alloca(1 + s.length + 1 + 1 + p.length + 1 + 1 + o.length);
-
-			//		if (_0triple is null)
-			//			_0triple = triple;
-
-			if(s.length == 0 && p.length == 0 && o.length == 0)
-				continue;
-
-			if(o.length == 2)
-			{
-				//				Stdout.format("main: skip this triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
-				continue;
-			}
-
-							Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
-			ts.addTriple(s, p, o);
-
-			count_add_triple++;
-
-//				if(count_add_triple > 100)
-//					break;
-		}
-
-		//	
-
-		time = elapsed.stop;
-
-		Stdout.format("create TripleStorage time = {}, all count triples = {}", time, count_add_triple).newline;
+		Stdout.format("{}\n", file);
+		load_from_file(file, ts);
 	}
+	Stdout.formatln("\n{} Errors", scan.errors.length);
+	foreach(error; scan.errors)
+		Stdout(error).newline;
+
+	time = elapsed.stop;
+
+	Stdout.format("create TripleStorage time = {}, all count triples = {}",
+			time, count_add_triple).newline;
 
 	for(uint i = 0; i < 100; i++)
 	{
 		uint count_read = 0;
 		// считываем все контакты
 		//		uint* iterator0 = ts.getTriples(null, "Contact", null);
-		uint* iterator0 = ts.getTriples(null, "http://magnetosoft.ru/ontology/id", null, false);
+		uint* iterator0 = ts.getTriples(null,
+				"http://magnetosoft.ru/ontology/id", null, false);
 		//		uint* iterator0 = ts.getTriples(null, "http://magnetosoft.ru/ontology/id", null);
 
 		if(iterator0 is null)
@@ -148,10 +85,16 @@ int main(char[][] args)
 				//				uint key3_length = (*(triple0 + 4) << 8) + *(triple0 + 5);
 
 				char* triple0_s = cast(char*) triple0 + 6;
-								char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-								char* triple0_o = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+				char*
+						triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
+				char*
+						triple0_o = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
 
-								Stdout.format("#3 считаем поля субьекта iterator0={:X4} triple0={:X} <{}><{}><{}>", iterator0, triple0, str_2_char_array(triple0_s), str_2_char_array(triple0_p), str_2_char_array(triple0_o)).newline;
+				Stdout.format(
+						"#3 считаем поля субьекта iterator0={:X4} triple0={:X} <{}><{}><{}>",
+						iterator0, triple0, str_2_char_array(triple0_s),
+						str_2_char_array(triple0_p),
+						str_2_char_array(triple0_o)).newline;
 
 				uint* iterator1;
 				//		uint i = 0;
@@ -199,44 +142,116 @@ int main(char[][] args)
 
 					}
 
-				//				
-				//				Stdout.format("triple:s={}, p={}, o={}",
-				//					triple.s, triple.p, triple.o).newline;
+					//				
+					//				Stdout.format("triple:s={}, p={}, o={}",
+					//					triple.s, triple.p, triple.o).newline;
 
 				}
 				next_element = *(iterator0 + 1);
 				iterator0 = cast(uint*) next_element;
 				count_read++;
-			//				log.trace ("next_element={:X}, iterator0={:X}", next_element, iterator0);
+				//				log.trace ("next_element={:X}, iterator0={:X}", next_element, iterator0);
 			}
 
 		}
 
 		time = elapsed.stop;
 
-		Stdout.format("read TripleStorage, read={}, time ={}, cps={}", count_read, time, count_read / time).newline;
+		Stdout.format("read TripleStorage, read={}, time ={}, cps={}",
+				count_read, time, count_read / time).newline;
 	}
 	return 0;
 }
 
-public char[] str_2_char_array(char* str)
+public char[] str_2_char_array(char* s)
 {
-	uint str_length = 0;
-	char* tmp_ptr = str;
-	while(*tmp_ptr != 0)
+	return s ? s[0 .. strlen(s)] : cast(char[]) null;
+}
+
+public void load_from_file(FilePath file_path, TripleStorage ts)
+{
+	uint count_add_triple = 0;
+	uint count_ignored_triple = 0;
+
+	auto elapsed = new StopWatch();
+	double time;
+	Stdout.format("load triples from file {}", file_path).newline;
+
+	auto file = new File(file_path.path ~ file_path.name ~ file_path.suffix);
+
+	auto content = cast(char[]) file.load;
+	//	auto content = cast(char[]) file.read;
+
+	elapsed.start;
+
+	foreach(line; Text.lines(content))
 	{
-		//		Stdout.format("@={}", *tmp_ptr).newline;
-		tmp_ptr++;
+		char[] s, p, o;
+		char[] element;
+		int idx = 0;
+
+		uint b_pos = 0;
+		uint e_pos = 0;
+		for(uint i = 0; i < line.length; i++)
+		{
+			if(line[i] == '<' || line[i] == '"' && b_pos < e_pos)
+			{
+				b_pos = i;
+			} else
+			{
+				if(line[i] == '>' || line[i] == '"')
+				{
+					e_pos = i;
+					element = line[b_pos + 1 .. (e_pos+1)];
+					element[element.length - 1] = 0;
+					element.length = element.length - 1;
+
+					idx++;
+					if(idx == 1)
+					{
+						s = element;
+					}
+					
+					if(idx == 2)
+					{
+						p = element;
+					}
+
+					if(idx == 3)
+					{
+						o = element;						
+					}
+
+				}
+			}
+
+		}
+
+		Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple,
+				s, p, o).newline;
+
+		if(s.length == 0 && p.length == 0 && o.length == 0)
+			continue;
+
+		if(o.length == 2)
+		{
+			// Stdout.format("main: skip this triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+			continue;
+		}
+
+		//						Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+		if(ts.addTriple(s, p, o))
+			count_add_triple++;
+
+		//				if(count_add_triple > 5)
+		//					break;
 	}
 
-	str_length = tmp_ptr - str;
+	//	
 
-	char[] res = new char[str_length];
+	time = elapsed.stop;
 
-	for(uint i = 0; i < str_length; i++)
-	{
-		res[i] = *(str + i);
-	}
-
-	return res;
+	Stdout.format(
+			"create TripleStorage time = {}, count add triples = {}, ignored = {}",
+			time, count_add_triple, count_ignored_triple).newline;
 }
