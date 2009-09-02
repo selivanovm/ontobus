@@ -7,15 +7,19 @@ private
 {
     import tango.stdc.string;
 }
+private
+{
+    import tango.stdc.posix.stdio;
+}
 import librabbitmq_headers;
 import mom_client;
 class librabbitmq_client : mom_client
 {
     amqp_connection_state_t_ conn;
-    char* vhost = "auth\x00";
-    char* login = "search-client\x00";
-    char* passw = "123\x00";
-    char* queue = "auth";
+    char* vhost = "magnetico\x00";
+    char* login = "eks\x00";
+    char* passw = "123456\x00";
+    char* queue = "test";
     char* bindingkey = cast(char*)"\x00";
     char* exchange = "";
     char[] hostname;

@@ -1,4 +1,5 @@
 // D import file generated from 'src/TripleStorage.d'
+module TripleStorage;
 import HashMap;
 private
 {
@@ -8,7 +9,10 @@ private
 {
     import tango.stdc.string;
 }
-import dee0xd.Log;
+private
+{
+    import Log;
+}
 enum idx_name 
 {
 S = 1 << 0,

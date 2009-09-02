@@ -1,4 +1,5 @@
 // D import file generated from 'src/HashMap.d'
+module HashMap;
 private
 {
     import tango.stdc.string;
@@ -9,7 +10,6 @@ private
 }
 import Integer = tango.text.convert.Integer;
 import Hash;
-import dee0xd.Log;
 class HashMap
 {
     private

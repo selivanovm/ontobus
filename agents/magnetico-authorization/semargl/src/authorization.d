@@ -4,15 +4,13 @@ module authorization;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 //import Integer = tango.text.convert.Integer;
-import tango.io.File;
+import tango.io.device.File;
 import Text = tango.text.Util;
 import tango.time.StopWatch;
 import dee0xd.Log;
 
 import HashMap;
 import TripleStorage;
-//import ListTriple;
-//import Triple;
 import tango.time.WallClock;
 import tango.time.Clock;
 import tango.io.FileScan;
@@ -160,7 +158,7 @@ class Authorization
 						dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
 				convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
-		file.append(now);
+//		file.append(now);
 	}
 
 	private char[] convert(char[] tmp, long i)
