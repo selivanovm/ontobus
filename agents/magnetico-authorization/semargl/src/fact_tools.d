@@ -13,12 +13,10 @@ struct Counts
 
 public void print_triple (byte* triple)
 {
-	Stdout.format("triple={:X4}", triple).newline;
-	char* triple_s = cast(char*) triple + 6;
-	char* triple_p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-	char* triple_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-	Stdout.format("s={:X4}", triple_s).newline;
-    printf ("triple: <%s><><>\n", triple_s);
+	char* s = cast(char*) triple + 6;
+	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+    printf ("triple: <%s><%s><%s>\n", s, p, o);
 }
 
 public Counts calculate_count_facts(char* message, ulong message_size)

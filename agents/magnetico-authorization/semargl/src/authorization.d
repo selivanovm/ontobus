@@ -131,7 +131,7 @@ class Authorization
 			Stdout(error).newline;
 		
 		byte* triple;
-		uint* list_iterator = ts.getTriples("6fabc9222d44f980", null, null, true);
+		uint* list_iterator = ts.getTriples("record", null, null, false);
 		Stdout.format("list_iterator {:X4}", list_iterator).newline;
 		if(list_iterator !is null)
 		{
