@@ -3,9 +3,19 @@ module testTripleStorage;
 // import TripleStorageInvoker;
 private import tango.io.Stdout;
 private import tango.stdc.string;
+
 //import Integer = tango.text.convert.Integer;
-import tango.io.device.File;
-//import tango.io.File;
+
+version (tango_99_8)
+{
+ import tango.io.device.File;
+}
+
+version (tango_99_7)
+{
+ import tango.io.File;
+}
+
 import Text = tango.text.Util;
 import tango.time.StopWatch;
 import Log;
@@ -179,8 +189,14 @@ public void load_from_file(FilePath file_path, TripleStorage ts)
 
 	auto file = new File(file_path.path ~ file_path.name ~ file_path.suffix);
 
+version (tango_99_8)
+{
 	auto content = cast(char[]) file.load;
-	//	auto content = cast(char[]) file.read;
+}	
+version (tango_99_7)
+{
+	auto content = cast(char[]) file.read;
+}	
 
 	elapsed.start;
 
