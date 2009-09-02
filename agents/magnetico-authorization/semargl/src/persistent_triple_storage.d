@@ -1,7 +1,16 @@
 module persistent_triple_storage;
 
 //import tango.io.File;
+version (tango_99_8)
+{
 import tango.io.device.File;
+}
+
+version (tango_99_7)
+{
+import tango.io.File;
+}
+
 import tango.io.FileScan;
 import tango.time.StopWatch;
 private import tango.io.Stdout;
@@ -18,8 +27,16 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 	Stdout.format("load triples from file {}", file_path).newline;
 
 	auto file = new File(file_path.path ~ file_path.name ~ file_path.suffix);
-//	auto content = cast(char[]) file.read;
+	
+	version (tango_99_7)
+	{
+	auto content = cast(char[]) file.read;
+	}
+	
+	version (tango_99_8)
+	{
 	auto content = file.load;
+	}
 
 	elapsed.start;
 

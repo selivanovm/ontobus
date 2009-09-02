@@ -4,10 +4,17 @@ module authorization;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 //import Integer = tango.text.convert.Integer;
+version (tango_99_8)
+{
 import tango.io.device.File;
+}
+version (tango_99_7)
+{
+import tango.io.File;
+}
 import Text = tango.text.Util;
 import tango.time.StopWatch;
-import dee0xd.Log;
+import Log;
 
 import HashMap;
 import TripleStorage;
