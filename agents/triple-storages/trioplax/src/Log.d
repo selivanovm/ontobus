@@ -73,7 +73,27 @@ private
 
 
                         void format (LogEvent event, size_t delegate(void[]) dg)
-//                        void format( LogEvent event, void delegate( void[] ) dg )
+                        {
+                                char[] level = event.levelName;
+
+                                char[13] tmp = void;
+                                char[256] tmp2 = void;
+
+                                // convert time to field values
+                                auto tm = event.time;
+                                auto dt = (localTime) ? WallClock.toDate(tm) : Clock.toDate(tm);
+
+                                dg( _layout( "{}.{} {}:{}:{},{} ---> {}",
+                                        convert( tmp[0..2], dt.date.day ),
+                                        convert( tmp[2..4], dt.date.month ),
+                                        convert( tmp[4..6], dt.time.hours ),
+                                        convert( tmp[6..8], dt.time.minutes ),
+                                        convert( tmp[8..10], dt.time.seconds ),
+                                        convert( tmp[10..13], dt.time.millis ),
+                                        event.toString ));
+                        }
+                        
+                        void format( LogEvent event, void delegate( void[] ) dg )
                         {
                                 char[] level = event.levelName;
 
