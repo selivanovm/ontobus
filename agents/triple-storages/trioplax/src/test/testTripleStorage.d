@@ -1,10 +1,10 @@
 module testTripleStorage;
 
-// import TripleStorageInvoker;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 
 //import Integer = tango.text.convert.Integer;
+import fact_tools;
 
 version (tango_99_8)
 {
@@ -60,6 +60,9 @@ int main(char[][] args)
 	Stdout.format("create TripleStorage time = {}, all count triples = {}",
 			time, count_add_triple).newline;
 
+	print_list_triple (ts.getTriples("c36494f3956c4ad98eb504ec73dba831", null, null, false));
+
+	
 	for(uint i = 0; i < 100; i++)
 	{
 		uint count_read = 0;
