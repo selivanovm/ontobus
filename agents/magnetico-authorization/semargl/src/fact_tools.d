@@ -11,12 +11,37 @@ struct Counts
 	byte open_brakets;
 }
 
-public void print_triple (byte* triple)
+public void print_list_triple (uint* list_iterator)
 {
+	byte *triple;
+	Stdout.format("list_iterator {:X4}", list_iterator).newline;
+	if(list_iterator !is null)
+	{
+		uint next_element0 = 0xFF;
+		while(next_element0 > 0)
+		{
+			triple = cast(byte*) *list_iterator;
+			Stdout.format("triple {:X4}", triple).newline;
+			print_triple(triple);
+
+			next_element0 = *(list_iterator + 1);
+			list_iterator = cast(uint*) next_element0;
+		}
+	}
+	
+}
+
+public void print_triple(byte* triple)
+{
+	if (triple is null) return;
+	
 	char* s = cast(char*) triple + 6;
+	
 	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+	
 	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-    printf ("triple: <%s><%s><%s>\n", s, p, o);
+
+	printf("triple: <%s><%s><%s>\n", s, p, o);
 }
 
 public Counts calculate_count_facts(char* message, ulong message_size)
@@ -136,7 +161,7 @@ public static final ulong getUUID()
 {
 	return Clock.now.span().nanos();
 }
-	
+
 public static final void longToHex(ulong dl, char* buff)
 {
 	buff[15] = HEX_CHARS[cast(ubyte) (dl & 0x0F)];

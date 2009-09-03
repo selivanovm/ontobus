@@ -3,15 +3,18 @@ module authorization;
 // import TripleStorageInvoker;
 private import tango.io.Stdout;
 private import tango.stdc.string;
+
 //import Integer = tango.text.convert.Integer;
-version (tango_99_8)
+version(tango_99_8)
 {
-import tango.io.device.File;
+	import tango.io.device.File;
 }
-version (tango_99_7)
+
+version(tango_99_7)
 {
-import tango.io.File;
+	import tango.io.File;
 }
+
 import Text = tango.text.Util;
 import tango.time.StopWatch;
 import Log;
@@ -49,7 +52,7 @@ class Authorization
 
 	this()
 	{
-		i_know_predicates = new char[][17];
+		i_know_predicates = new char[][24];
 
 		uint d = 0;
 
@@ -60,11 +63,18 @@ class Authorization
 
 		// ACL
 		i_know_predicates[d++] = "magnet-ontology#author";
-		i_know_predicates[d++] = "magnet-ontology#authorSystem";	
+		i_know_predicates[d++] = "magnet-ontology#authorSystem";
 		i_know_predicates[d++] = "magnet-ontology#authorSubsystem";
-		
-		i_know_predicates[d++] = "magnet-ontology#rigths";
+		i_know_predicates[d++] = "magnet-ontology#authorSubsystemElement";
+
+		i_know_predicates[d++] = "magnet-ontology#category";
+
 		i_know_predicates[d++] = "magnet-ontology#target";
+		i_know_predicates[d++] = "magnet-ontology#targetSystem";
+		i_know_predicates[d++] = "magnet-ontology#targetSubsystem";
+		i_know_predicates[d++] = "magnet-ontology#targetSubsystemElement";
+
+		i_know_predicates[d++] = "magnet-ontology#rigths";
 		i_know_predicates[d++] = "magnet-ontology#fromUserId";
 		i_know_predicates[d++] = "magnet-ontology#toUserId";
 		i_know_predicates[d++] = "magnet-ontology#withDelegatesTree";
@@ -130,21 +140,10 @@ class Authorization
 		foreach(error; scan.errors)
 			Stdout(error).newline;
 		
-		byte* triple;
-		uint* list_iterator = ts.getTriples("record", null, null, false);
-		Stdout.format("list_iterator {:X4}", list_iterator).newline;
-		if(list_iterator !is null)
-		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
-			{
-				triple = cast(byte*)*list_iterator;				
-				print_triple (triple);
-				
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-			}
-		}
+  	    print_list_triple (ts.getTriples("6fade5fe62cac8f0", null, null, false));
+  	    print_list_triple (ts.getTriples("6fade578b4571790", null, null, false));
+  	    
+		
 		Stdout.format("authorization init ... ok").newline;
 	}
 
@@ -165,7 +164,7 @@ class Authorization
 						dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
 				convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
-//		file.append(now);
+		file.append(now);
 	}
 
 	private char[] convert(char[] tmp, long i)
