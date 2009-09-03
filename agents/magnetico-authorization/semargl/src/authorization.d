@@ -74,7 +74,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology#targetSubsystem";
 		i_know_predicates[d++] = "magnet-ontology#targetSubsystemElement";
 
-		i_know_predicates[d++] = "magnet-ontology#rigths";
+		i_know_predicates[d++] = "magnet-ontology#rights";
 		i_know_predicates[d++] = "magnet-ontology#fromUserId";
 		i_know_predicates[d++] = "magnet-ontology#toUserId";
 		i_know_predicates[d++] = "magnet-ontology#withDelegatesTree";
