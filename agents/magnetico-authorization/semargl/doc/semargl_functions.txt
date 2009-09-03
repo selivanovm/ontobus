@@ -29,7 +29,8 @@ magnet-ontology#rigths> "c|r|u|d"
 имя запрашиваемой операции(create|update|delete), остальные служат параметрами для операции. В случае, если операция == create создается новая запись
 с триплетами переданными в аргументе, идентификатор записи создается на стороне semargl и возвращается в качестве результата. В случае, если 
 операция == update обновляется запись триплетами, переданными в аргументе. В случае, если операция == delete удаляются записи соответствующие шаблону
-переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении.
+переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении. При удалении в сравнении не учавствует
+поле права на доступ.
 
 отправляю:
 
@@ -42,7 +43,11 @@ magnet-ontology#rigths> "c|r|u|d"
 			<recId><magnet-ontology#targetSystem>"".
 			<recId><magnet-ontology#targetSubsystem>"".
 			<recId><magnet-ontology#targetSubsystemElement>"".
-			<recId><magnet-ontology#category>"".<recId><magnet-ontology#elementId>"".<recId><magnet-ontology#rights>"".
+			<recId><magnet-ontology#category>"".
+			<recId><magnet-ontology#elementId>"".
+			<recId><magnet-ontology#dateFrom>"".
+			<recId><magnet-ontology#dateTo>"".
+			<recId><magnet-ontology#rights>"".
 		}.
 
 ожидаю: 
@@ -79,35 +84,7 @@ magnet-ontology#rigths> "c|r|u|d"
 	<magnet-ontology#RightsRecord5><magnet-ontology#authorSubsystemElement>"aa8d1a71a2e34303954ced25d1037cdf".
 	...
 
-2. обновление, создание, удаление записей прав
-
-Используется для создания/обновления/удаления записей прав доступа. В качестве параметров передается список триплетов, первый из которых содержит
-имя запрашиваемой операции(create|update|delete), остальные служат параметрами для операции. В случае, если операция == create создается новая запись
-с триплетами переданными в аргументе, идентификатор записи создается на стороне semargl и возвращается в качестве результата. В случае, если 
-операция == update обновляется запись триплетами, переданными в аргументе. В случае, если операция == delete удаляются записи соответствующие шаблону
-переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении. При удалении в сравнении не учавствует
-поле права на доступ.
-
-запрос:
-
-	<subject><put><uid1>.
-		<uid1><argument>{
-			<operation><name>"create|update|delete".
-			<recId><magnet-ontology#authorSystem>"".
-			<recId><magnet-ontology#authorSubsystem>"".
-			<recId><magnet-ontology#authorSubsystemElement>"".
-			<recId><magnet-ontology#targetSystem>"".
-			<recId><magnet-ontology#targetSubsystem>"".
-			<recId><magnet-ontology#targetSubsystemElement>"".
-			<recId><magnet-ontology#category>"".<recId><magnet-ontology#elementId>"".<recId><magnet-ontology#rights>"".
-		}.
-
-ответ: 
-
-	идентификатор созданной/обновленной записи
-
-
-3. authorize
+2. authorize
 
 Используется для проверки доступа пользователя к объектам системы. 
 
@@ -121,7 +98,7 @@ magnet-ontology#rigths> "c|r|u|d"
 	id1, id3
 
 
-4. add_delegate
+3. add_delegate
 
 Добавляет делегата для пользователя, если установлен флаг withTree, значит делегат так же принимает делегированные owner'у права.
 Возвращает идентификатор записи делегирования.
@@ -138,7 +115,7 @@ magnet-ontology#rigths> "c|r|u|d"
 	delegateRecord1Id
 
 
-5. remove_delegate
+4. remove_delegate
 
 Удаляет запись делегирования соответствующую шаблону без учета идентификатора записи(от кого - кому).
 
@@ -146,7 +123,7 @@ magnet-ontology#rigths> "c|r|u|d"
 	<subject><remove_delegate><uid1>.<uid1><argument>"<delegateRecord1><owner>"userId1".".
 
 	
-6. get_delegate_assigners
+5. get_delegate_assigners
 
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором.
 
@@ -157,7 +134,7 @@ magnet-ontology#rigths> "c|r|u|d"
 	список идентификаторов делегировавших без учета дерева делегирования(через запятую)
 
 	
-7. get_delegate_assigners_tree
+6. get_delegate_assigners_tree
 
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором с учетом дерева делегатов.
 
@@ -167,7 +144,7 @@ magnet-ontology#rigths> "c|r|u|d"
 ответ:
 	список идентификаторов делегатов c учетом дерева делегирования(через запятую)
 
-8. is_in_docflow
+7. is_in_docflow
 
 Используется для того, чтобы выяснить, находится документ в документообороте(идет ли по какому-либо маршруту) или нет. 
 Документ находится в документообороте, если существуют записи прав соответствующие шаблону: 
