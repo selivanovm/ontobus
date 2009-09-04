@@ -8,10 +8,10 @@ import mom_client;
 class librabbitmq_client: mom_client
 {
 	amqp_connection_state_t_ conn;
-	char* vhost = "magnetico\0";
-	char* login = "eks\0";
-	char* passw = "123456\0";
-	char* queue = "test";
+	char[] vhost;// = "magnetico\0";
+	char[] login;// = "ba\0";
+	char[] passw;// = "123456\0";
+	char[] queue;// = "semargl";
 	char* bindingkey = cast(char*) "\0";
 	char* exchange = "";
 
@@ -19,10 +19,14 @@ class librabbitmq_client: mom_client
 	int port;
 	void function(byte* txt, ulong size) message_acceptor;
 
-	this(char[] _hostname, int _port)
+	this(char[] _hostname, int _port, char[] _login, char[] _passw, char[] _queue, char[] _vhost)
 	{
 		hostname = _hostname;
 		port = _port;
+		login = _login;
+		passw = _passw;
+		queue = _queue; 
+		vhost = _vhost; 
 	}
 
 	void set_callback(void function(byte* txt, ulong size) _message_acceptor)
@@ -107,7 +111,7 @@ class librabbitmq_client: mom_client
 			amqp_set_sockfd(&conn, sockfd);
 
 			amqp_rpc_reply_t_ res_login;
-			res_login = amqp_login(&conn, vhost, 131072, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, login, passw);
+			res_login = amqp_login(&conn, cast(char*)vhost, 131072, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, cast(char*)login, cast(char*)passw);
 
 			Stdout.format("login state={}", res_login.reply_type).newline;
 
@@ -123,7 +127,7 @@ class librabbitmq_client: mom_client
 				amqp_queue_declare_t s;
 
 				s.ticket = 0;
-				s.queue = amqp_cstring_bytes(queue);
+				s.queue = amqp_cstring_bytes(cast(char*)queue);
 				s.passive = 0;
 				s.durable = 0;
 				s.exclusive = 0;

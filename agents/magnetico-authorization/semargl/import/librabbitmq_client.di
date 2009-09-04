@@ -16,19 +16,23 @@ import mom_client;
 class librabbitmq_client : mom_client
 {
     amqp_connection_state_t_ conn;
-    char* vhost = "magnetico\x00";
-    char* login = "eks\x00";
-    char* passw = "123456\x00";
-    char* queue = "test";
+    char[] vhost;
+    char[] login;
+    char[] passw;
+    char[] queue;
     char* bindingkey = cast(char*)"\x00";
     char* exchange = "";
     char[] hostname;
     int port;
     void function(byte* txt, ulong size) message_acceptor;
-    this(char[] _hostname, int _port)
+    this(char[] _hostname, int _port, char[] _login, char[] _passw, char[] _queue, char[] _vhost)
 {
 hostname = _hostname;
 port = _port;
+login = _login;
+passw = _passw;
+queue = _queue;
+vhost = _vhost;
 }
     void set_callback(void function(byte* txt, ulong size) _message_acceptor)
 {

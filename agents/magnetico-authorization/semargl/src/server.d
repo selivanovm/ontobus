@@ -22,7 +22,6 @@ import script_util;
 import RightTypeDef;
 import fact_tools;
 
-
 librabbitmq_client client = null;
 
 Authorization az = null;
@@ -32,13 +31,18 @@ void main(char[][] args)
 	az = new Authorization();
 
 	//char[] hostname = "192.168.150.197\0";
-	//char[] hostname = "192.168.150.44\0";
-	char[] hostname = "192.168.150.196\0";
-	//char[] hostname = "services.magnetosoft.ru\0";
+//	char[] hostname = "192.168.150.44\0";
+	//	char[] hostname = "192.168.150.196\0";
+	char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
+	char[] vhost = "magnetico\0";
+	char[] login = "ba\0";
+	char[] passw = "123456\0";
+	char[] queue = "semargl";
 
-	Stdout.format("connect to AMQP server ({}:{})", hostname, port).newline;
-	client = new librabbitmq_client(hostname, port);
+	
+	Stdout.format("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, queue, vhost).newline;
+	client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
 	client.set_callback(&get_message);
 
 	(new Thread(&client.listener)).start;
@@ -199,6 +203,7 @@ void get_message(byte* message, ulong message_size)
 			int category_id = 0;
 			int targetId_id = 0;
 			int elements_id = 0;
+			int set_from_id = 0;
 
 			//			Stdout.format("this request on authorization #1").newline;
 
@@ -223,21 +228,25 @@ void get_message(byte* message, ulong message_size)
 					{
 						from_id = i;
 					}
-					if(strcmp(fact_p[i], "right") == 0)
+					else if(strcmp(fact_p[i], "right") == 0)
 					{
 						right_id = i;
 					}
-					if(strcmp(fact_p[i], "category") == 0)
+					else if(strcmp(fact_p[i], "category") == 0)
 					{
 						category_id = i;
 					}
-					if(strcmp(fact_p[i], "targetId") == 0)
+					else if(strcmp(fact_p[i], "targetId") == 0)
 					{
 						targetId_id = i;
 					}
-					if(strcmp(fact_p[i], "elements") == 0)
+					else if(strcmp(fact_p[i], "elements") == 0)
 					{
 						elements_id = i;
+					}
+					else if(strcmp(fact_p[i], "set_from") == 0)
+					{
+						set_from_id = i;
 					}
 				}
 			}
@@ -250,7 +259,7 @@ void get_message(byte* message, ulong message_size)
 			}
 
 			//			queue_name = fact_o[from_id];
-			strcpy(queue_name, fact_o[from_id]);
+			strcpy(queue_name, fact_o[set_from_id]);
 			strcpy(user, fact_o[targetId_id]);
 
 			char* check_right = fact_o[right_id];

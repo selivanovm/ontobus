@@ -1,49 +1,48 @@
 module authorization;
 
-// import TripleStorageInvoker;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 
 //import Integer = tango.text.convert.Integer;
 version(tango_99_8)
 {
-	import tango.io.device.File;
+	private import tango.io.device.File;
 }
 
 version(tango_99_7)
 {
-	import tango.io.File;
+	private import tango.io.File;
 }
 
-import Text = tango.text.Util;
-import tango.time.StopWatch;
-import Log;
+private import Text = tango.text.Util;
+private import tango.time.StopWatch;
+private import tango.time.WallClock;
+private import tango.time.Clock;
+private import tango.io.FileScan;
 
-import HashMap;
-import TripleStorage;
-import tango.time.WallClock;
-import tango.time.Clock;
-import tango.io.FileScan;
+private import tango.text.locale.Locale;
+private import tango.text.convert.TimeStamp;
+private import tango.text.convert.Layout;
 
-import tango.text.locale.Locale;
-import tango.text.convert.TimeStamp;
-import tango.text.convert.Layout;
+private import scripts.S05InDocFlow;
+private import scripts.S01AllLoggedUsersCanCreateDocuments;
+private import scripts.S01UserIsAdmin;
+private import scripts.S10UserIsAuthorOfDocument;
+private import scripts.S11ACLRightsHierarhical;
+private import scripts.S20UserIsInOUP;
+private import scripts.S30UsersOfDocumentum;
+private import scripts.S40UsersOfTAImport;
 
-import RightTypeDef;
-import script_util;
+private import RightTypeDef;
+private import script_util;
 
-import persistent_triple_storage;
+private import persistent_triple_storage;
 
-import scripts.S05InDocFlow;
-import scripts.S01AllLoggedUsersCanCreateDocuments;
-import scripts.S01UserIsAdmin;
-import scripts.S10UserIsAuthorOfDocument;
-import scripts.S11ACLRightsHierarhical;
-import scripts.S20UserIsInOUP;
-import scripts.S30UsersOfDocumentum;
-import scripts.S40UsersOfTAImport;
+private import fact_tools;
+private import Log;
 
-import fact_tools;
+private import HashMap;
+private import TripleStorage;
 
 class Authorization
 {
