@@ -1,9 +1,10 @@
 module fact_tools;
 
-import tango.time.Clock;
-import tango.time.Time;
+private import tango.time.Clock;
+private import tango.time.Time;
 private import tango.stdc.posix.stdio;
 private import tango.io.Stdout;
+private import tango.stdc.string;
 
 struct Counts
 {
@@ -183,4 +184,10 @@ public static final void longToHex(ulong dl, char* buff)
 //	buff[16] = 0;
 
 //	printf("time=%s\n", buff);
+}
+
+
+public static char[] getString(char* s)
+{
+	return s ? s[0 .. strlen(s)] : cast(char[]) null;
 }

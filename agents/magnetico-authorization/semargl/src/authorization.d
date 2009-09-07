@@ -138,10 +138,9 @@ class Authorization
 		Stdout.formatln("\n{} Errors", scan.errors.length);
 		foreach(error; scan.errors)
 			Stdout(error).newline;
-		
-  	    print_list_triple (ts.getTriples(null, "magnet-ontology#authorSystem", null, false));
-  	    
-		
+
+		print_list_triple(ts.getTriples(null, "magnet-ontology#authorSystem", null, false));
+
 		Stdout.format("authorization init ... ok").newline;
 	}
 
@@ -174,7 +173,7 @@ class Authorization
 
 	public bool authorize(char* docId, char* User, uint targetRightType, uint*[] hierarhical_departments)
 	{
-		//		Stdout.format("autorize start").newline;
+		log.trace("autorize start");
 		//		elapsed.start;
 
 		//		char* User = "671d8e10-d7ca-48ae-b027-76a97172f304";
@@ -222,14 +221,19 @@ class Authorization
 
 		calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
 				targetRightType, ts);
+
 		if(calculatedRight == true)
+		{
+			log.trace("autorize end, return:[{}]", calculatedRight);
 			return calculatedRight;
+		}
 
 		uint* iterator_facts_of_document = ts.getTriples(subject_document, null, null, false);
 
 		if(iterator_facts_of_document is null)
 		{
 			Stdout.format("iterator_facts_of_document is null").newline;
+			log.trace("autorize end, return:[false]");
 			return false;
 		}
 
@@ -287,6 +291,7 @@ class Authorization
 		//		Stdout.format("calculate rules for documents, count={}, time ={}, cps={}", count_auth_doc, time,
 		//				count_auth_doc / time).newline;
 
+		log.trace("autorize end, return:[{}]", calculatedRight);
 		return calculatedRight;
 	}
 

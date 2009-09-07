@@ -5,6 +5,7 @@ private import tango.io.Console;
 private import tango.stdc.string;
 private import std.string;
 private import tango.stdc.posix.stdio;
+private import Log;
 
 import Integer = tango.text.convert.Integer;
 
@@ -26,10 +27,14 @@ librabbitmq_client client = null;
 
 Authorization az = null;
 
+char* result_buffer = null;
+
 void main(char[][] args)
 {
 	az = new Authorization();
 
+	result_buffer = cast (char *)new char [10*1024];
+	
 	//char[] hostname = "192.168.150.197\0";
 //	char[] hostname = "192.168.150.44\0";
 	//	char[] hostname = "192.168.150.196\0";
@@ -52,7 +57,8 @@ void main(char[][] args)
 void get_message(byte* message, ulong message_size)
 {
 	*(message + message_size) = 0;
-	printf("get new message %s\n", message);
+	
+	log.trace ("\n\nget new message \n{}", getString (cast (char*)message));
 
 	auto elapsed = new StopWatch();
 
@@ -179,7 +185,7 @@ void get_message(byte* message, ulong message_size)
 			 Stdout.format("is_fact_in_object = {:X2} {}\n", i, is_fact_in_object[i]).newline;
 			 }
 			 */
-			Stdout.format("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time).newline;
+			log.trace ("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 		}
 
 		if(*(message + 0) == '<' && *(message + 13) == 'h')
@@ -205,7 +211,7 @@ void get_message(byte* message, ulong message_size)
 			int elements_id = 0;
 			int set_from_id = 0;
 
-			//			Stdout.format("this request on authorization #1").newline;
+			log.trace("this request on authorization #1");
 
 			for(int i = 0; i < count_facts; i++)
 			{
@@ -264,15 +270,15 @@ void get_message(byte* message, ulong message_size)
 
 			char* check_right = fact_o[right_id];
 
-			// результат поместим в то же сообщение
-			char* result = cast(char*) message;
-			char* result_ptr = result;
+//			// результат поместим в то же сообщение
+//			char* result = cast(char*) message;
+			char* result_ptr = cast(char*) result_buffer;
 
-			//			printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
+//						printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
 
 			uint*[] hierarhical_departments = null;
 			hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
-			//			Stdout.format("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length).newline;
+//						log.trace("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length);
 
 			for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 			{
@@ -288,16 +294,17 @@ void get_message(byte* message, ulong message_size)
 					targetRightType = RightType.DELETE;
 			}
 
-			//			Stdout.format("this request on authorization #1.1 {}", targetRightType).newline;
+//						Stdout.format("this request on authorization #1.1.0 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
 
 			bool calculatedRight_isAdmin;
-			calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType,
-					az.getTripleStorage());
+			calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType, az.getTripleStorage());
 
 			uint count_prepared_doc = 0;
 			uint count_authorized_doc = 0;
 			uint doc_pos = 0;
 			uint prev_doc_pos = 0;
+
+//			Stdout.format("this request on authorization #1.1.1 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
 
 			*result_ptr = '<';
 			strcpy(result_ptr + 1, command_uid);
@@ -309,7 +316,8 @@ void get_message(byte* message, ulong message_size)
 			{
 				char prev_state_byte = *(autz_elements + i);
 
-				//				Stdout.format("this request on authorization #1.2, {}{}", i, *(autz_elements + i)).newline;
+//								Stdout.format("this request on authorization #1.2, {} {}", i, *(autz_elements + i)).newline;
+								
 				if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 				{
 					*(autz_elements + i) = 0;
@@ -317,6 +325,9 @@ void get_message(byte* message, ulong message_size)
 					docId = cast(char*) (autz_elements + doc_pos);
 					//					printf("docId:%s\n", docId);
 
+//					Stdout.format("this request on authorization #1.3, {} docId={}", i, getString (autz_elements + doc_pos)).newline;
+					
+					
 					count_prepared_doc++;
 					bool calculatedRight = az.authorize(docId, user, targetRightType, hierarhical_departments);
 					//					Stdout.format("right = {}", calculatedRight).newline;
@@ -351,26 +362,28 @@ void get_message(byte* message, ulong message_size)
 				}
 			}
 
-			strcpy(result_ptr, "\".");
+			strcpy(result_ptr, "\".\0");
 
 			time = elapsed.stop;
 
-			Stdout.format(
+			log.trace(
 					"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
-					count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc / time).newline;
+					count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc / time);
 
-			printf("result:%s\n", result);
-			printf("queue_name:%s\n", queue_name);
+			log.trace("result:{}", getString (result_buffer));
+//			printf("result:%s\n", result);
+//			printf("queue_name:%s\n", queue_name);
 
 			elapsed.start;
 
-			client.send(queue_name, result);
+			client.send(queue_name, result_buffer);
 
 			time = elapsed.stop;
 
-			Stdout.format("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time).newline;
+			log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
-			az.getTripleStorage().print_stat();
+//			az.getTripleStorage().print_stat();
+			
 		}
 	}
 

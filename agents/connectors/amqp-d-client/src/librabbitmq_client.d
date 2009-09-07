@@ -222,7 +222,7 @@ class librabbitmq_client: mom_client
 					amqp_maybe_release_buffers(&conn);
 					result_listen = amqp_simple_wait_frame(&conn, &frame);
 
-					printf("Result %d\n", result);
+//					printf("Result %d\n", result);
 					if(result_listen <= 0)
 					{
 						Stdout.format("result_listen1 <= 0 -> break").newline;
@@ -283,8 +283,8 @@ class librabbitmq_client: mom_client
 					body_target = *ptr_frame_payload_properties_body_size;
 					body_received = 0;
 
-					Stdout.format("result body_target={} class_id={}", body_target,
-							*ptr_frame_payload_properties_class_id).newline;
+//					Stdout.format("result body_target={} class_id={}", body_target,
+//							*ptr_frame_payload_properties_class_id).newline;
 
 					while(body_received < body_target)
 					{
