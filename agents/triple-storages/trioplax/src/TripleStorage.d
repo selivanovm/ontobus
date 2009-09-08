@@ -44,7 +44,7 @@ class TripleStorage
 	{
 		max_count_element = _max_count_element;
 		max_length_order = _max_length_order;
-//		Stdout.format("TripleStorage:use_index={:X1}", useindex).newline;
+		//		Stdout.format("TripleStorage:use_index={:X1}", useindex).newline;
 
 		if(useindex & idx_name.S)
 		{
@@ -184,111 +184,130 @@ class TripleStorage
 		uint* list_iterator = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
 		if(list_iterator !is null)
 		{
-			removed_triple = cast(uint*)(*list_iterator);
+			removed_triple = cast(uint*) (*list_iterator);
 			*list_iterator = 0;
 		}
 		else
 			return false;
 
-		list_iterator = idx_s.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list_iterator !is null)
+		if(idx_s !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			list_iterator = idx_s.get(cast(char*) s, null, null, false);
+			if(list_iterator !is null)
 			{
-				if(list_iterator == removed_triple)
+				uint next_element0 = 0xFF;
+				while(next_element0 > 0)
 				{
-					*list_iterator = 0;
+					if(cast(uint*) (*list_iterator) == removed_triple)
+					{
+						Stdout.format("removeTriple from S, removed_triple={:X4}", removed_triple).newline;
+						*list_iterator = 0;
+					}
+
+					next_element0 = *(list_iterator + 1);
+					list_iterator = cast(uint*) next_element0;
+
 				}
-
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-
 			}
 		}
 
-		list_iterator = idx_p.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list_iterator !is null)
+		if(idx_p !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			list_iterator = idx_p.get(cast(char*) p, null, null, false);
+			if(list_iterator !is null)
 			{
-				if(list_iterator == removed_triple)
+				uint next_element0 = 0xFF;
+				while(next_element0 > 0)
 				{
-					*list_iterator = 0;
+					if(cast(uint*) (*list_iterator) == removed_triple)
+					{
+						Stdout.format("removeTriple from P, removed_triple={:X4}", removed_triple).newline;
+						*list_iterator = 0;
+					}
+
+					next_element0 = *(list_iterator + 1);
+					list_iterator = cast(uint*) next_element0;
 				}
-
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-
 			}
 		}
 
-		list_iterator = idx_o.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list_iterator !is null)
+		if(idx_o !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			list_iterator = idx_o.get(cast(char*) o, null, null, false);
+			if(list_iterator !is null)
 			{
-				if(list_iterator == removed_triple)
+				uint next_element0 = 0xFF;
+				while(next_element0 > 0)
 				{
-					*list_iterator = 0;
+					if(cast(uint*) (*list_iterator) == removed_triple)
+					{
+						Stdout.format("removeTriple from O, removed_triple={:X4}", removed_triple).newline;
+						*list_iterator = 0;
+					}
+
+					next_element0 = *(list_iterator + 1);
+					list_iterator = cast(uint*) next_element0;
 				}
-
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-
 			}
 		}
 
-		list_iterator = idx_sp.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list_iterator !is null)
+		if(idx_sp !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			list_iterator = idx_sp.get(cast(char*) s, cast(char*) p, null, false);
+			if(list_iterator !is null)
 			{
-				if(list_iterator == removed_triple)
+				uint next_element0 = 0xFF;
+				while(next_element0 > 0)
 				{
-					*list_iterator = 0;
+					if(cast(uint*) (*list_iterator) == removed_triple)
+					{
+						Stdout.format("removeTriple from SP, removed_triple={:X4}", removed_triple).newline;
+						*list_iterator = 0;
+					}
+
+					next_element0 = *(list_iterator + 1);
+					list_iterator = cast(uint*) next_element0;
 				}
-
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-
 			}
 		}
 
-		list_iterator = idx_po.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list_iterator !is null)
+		if(idx_po !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			list_iterator = idx_po.get(cast(char*) p, cast(char*) o, null, false);
+			if(list_iterator !is null)
 			{
-				if(list_iterator == removed_triple)
+				uint next_element0 = 0xFF;
+				while(next_element0 > 0)
 				{
-					*list_iterator = 0;
+					if(cast(uint*) (*list_iterator) == removed_triple)
+					{
+						Stdout.format("removeTriple from PO, removed_triple={:X4}", removed_triple).newline;
+						*list_iterator = 0;
+					}
+
+					next_element0 = *(list_iterator + 1);
+					list_iterator = cast(uint*) next_element0;
 				}
-
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-
 			}
 		}
 
-		list_iterator = idx_so.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list_iterator !is null)
+		if(idx_so !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			list_iterator = idx_so.get(cast(char*) s, cast(char*) o, null, false);
+			if(list_iterator !is null)
 			{
-				if(list_iterator == removed_triple)
+				uint next_element0 = 0xFF;
+				while(next_element0 > 0)
 				{
-					*list_iterator = 0;
+					if(cast(uint*) (*list_iterator) == removed_triple)
+					{
+						Stdout.format("removeTriple from SO, removed_triple={:X4}", removed_triple).newline;
+						*list_iterator = 0;
+					}
+
+					next_element0 = *(list_iterator + 1);
+					list_iterator = cast(uint*) next_element0;
 				}
-
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
-
 			}
 		}
 

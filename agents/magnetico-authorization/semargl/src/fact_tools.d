@@ -15,7 +15,7 @@ struct Counts
 public void print_list_triple (uint* list_iterator)
 {
 	byte *triple;
-	Stdout.format("list_iterator {:X4}", list_iterator).newline;
+	Stdout.format(\n"list_iterator {:X4}", list_iterator).newline;
 	if(list_iterator !is null)
 	{
 		uint next_element0 = 0xFF;
@@ -26,6 +26,7 @@ public void print_list_triple (uint* list_iterator)
 			print_triple(triple);
 
 			next_element0 = *(list_iterator + 1);
+			Stdout.format("next_element0 {:X4}", next_element0).newline;
 			list_iterator = cast(uint*) next_element0;
 		}
 	}

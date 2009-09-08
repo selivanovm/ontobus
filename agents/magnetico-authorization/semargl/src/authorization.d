@@ -139,7 +139,11 @@ class Authorization
 		foreach(error; scan.errors)
 			Stdout(error).newline;
 
-		print_list_triple(ts.getTriples(null, "magnet-ontology#authorSystem", null, false));
+		print_list_triple(ts.getTriples("record", null, null, false));
+		
+		 ts.removeTriple ("record", "magnet-ontology#target", "92e57b6d-83e3-485f-8885-0bade363f759");
+		 
+			print_list_triple(ts.getTriples("record", null, null, false));
 
 		Stdout.format("authorization init ... ok").newline;
 	}
