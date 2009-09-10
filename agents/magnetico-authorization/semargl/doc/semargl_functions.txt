@@ -1,41 +1,58 @@
 онтология authorization
 
-magnet-ontology#RightRecord
+magnet-ontology#argument
 
+magnet-ontology#result:data
+magnet-ontology#result:state (ok|error)
+
+magnet-ontology#set_from
+
+http://purl.org/dc/elements/1.1/creator
+
+// функции авторизации
+magnet-ontology#create
+magnet-ontology#update
+magnet-ontology#delete
+magnet-ontology#delete_by_element_id
+magnet-ontology#put
+
+magnet-ontology#remove_records_for_element
+magnet-ontology#get_authorization_rights_records
+magnet-ontology#is_in_docflow
+magnet-ontology#is_admin
+magnet-ontology#get_delegate_assigners
+magnet-ontology#get_delegate_assigners_tree
+magnet-ontology#authorize
+
+// запись о праве
 magnet-ontology#authorSystem - система выдающая право, "BA"/"DOCFLOW"
 magnet-ontology#authorSubsystem - "user"/routeName
 magnet-ontology#authorSubsystemElement - id user or id route.
-
-magnet-ontology#category категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
-
 magnet-ontology#targetSystem - система, для которой выдали права, "BA"/"DOCFLOW".
 magnet-ontology#targetSubsystem - "user"/"department".
 magnet-ontology#targetSubsystemElement - user id or department id.
-
+magnet-ontology#category - категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
+magnet-ontology#dateFrom - период действия прав (до (с возможностью указания открытых интервалов значение null)).
+magnet-ontology#dateTo - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
 magnet-ontology#elementId - идентификатор элемента, на который выдаются права.
+magnet-ontology#rights - "c|r|u|d"
 
-magnet-ontology#dateTo период действия прав (до (с возможностью указания открытых интервалов значение null)).
-magnet-ontology#dateFrom - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
-magnet-ontology#rigths> "c|r|u|d"
+// функции делегирования делегатами
+magnet-ontology#remove_delegate
+magnet-ontology#delegate
+magnet-ontology#get_delegate_assigners
+magnet-ontology#get_delegate_assigners_tree
 
-
+magnet-ontology#owner - кто делегирует
+magnet-ontology#withTree - делегировать с учетом дерева делегатов
 
 ответы с ожидаются с result:data, получатель ответа задается в запросе с помощбю триплета вида 
-<subject><set_from><очередь в которую нужно отправить ответ>.
+<subject><magnet-ontology#set_from><очередь в которую нужно отправить ответ>.
 
-1. обновление, создание, удаление записей прав
+1. create - используется для создания записи права на доступ, возвращает идентификатор(субъект) записи созданного права.
 
-Используется для создания/обновления/удаления записей прав доступа. В качестве параметров передается список триплетов, первый из которых содержит
-имя запрашиваемой операции(create|update|delete), остальные служат параметрами для операции. В случае, если операция == create создается новая запись
-с триплетами переданными в аргументе, идентификатор записи создается на стороне semargl и возвращается в качестве результата. В случае, если 
-операция == update обновляется запись триплетами, переданными в аргументе. В случае, если операция == delete удаляются записи соответствующие шаблону
-переданному в аргументе, если триплет шаблона не содержит данных в объекте, то он не участвует в сравнении.
-
-отправляю:
-
-	<subject><put><uid1>.
-		<uid1><argument>{
-			<operation><name>"create|update|delete".
+	<subject><magnet-ontology#create><uid1>.
+		<uid1><magnet-ontology#argument>{
 			<recId><magnet-ontology#authorSystem>"".
 			<recId><magnet-ontology#authorSubsystem>"".
 			<recId><magnet-ontology#authorSubsystemElement>"".
@@ -49,12 +66,35 @@ magnet-ontology#rigths> "c|r|u|d"
 			<recId><magnet-ontology#rights>"".
 		}.
 
-ожидаю: 
 
-	идентификатор созданной/обновленной записи
+2. delete - используется для удаления записей права на доступ. в качестве аргумента принимает идентификатор(субъект) записи удаляемого права.
+
+   <subject><magnet-ontology#delete><uid>.<uid><magnet-ontology#argument><recordId>.
+
+3. delete_by_element_id - используется для удаления записей права на доступ. в качестве аргумента принимает идентификатор объекта. 
+   все записи описывающие права доступа к этому объекту должны быть удалены.
+
+   <subject><magnet-ontology#delete_by_element_id><uid>.<uid><magnet-ontology#argument><elementId>.
+
+4. update - используется для обновления записей права на доступ. в качестве аргумента принимает список триплетов с обновленными атрибутами записи.
+
+	<subject><magnet-ontology#update><uid1>.
+		<uid1><magnet-ontology#argument>{
+			<recId><magnet-ontology#authorSystem>"".
+			<recId><magnet-ontology#authorSubsystem>"".
+			<recId><magnet-ontology#authorSubsystemElement>"".
+			<recId><magnet-ontology#targetSystem>"".
+			<recId><magnet-ontology#targetSubsystem>"".
+			<recId><magnet-ontology#targetSubsystemElement>"".
+			<recId><magnet-ontology#category>"".
+			<recId><magnet-ontology#elementId>"".
+			<recId><magnet-ontology#dateFrom>"".
+			<recId><magnet-ontology#dateTo>"".
+			<recId><magnet-ontology#rights>"".
+		}.
 
 
-2. get_authorization_rights_records
+5. get_authorization_rights_records
 
 Используется для получения записей прав соответствующих определенному шаблону. Шаблон - набор триплетов, которые входят в состав записи права.
 Если запись права содержит заданные в шаблоне триплеты, значит она должна быть включена в результат. Если какие-то из триплетов шаблона содержат
@@ -62,8 +102,8 @@ magnet-ontology#rigths> "c|r|u|d"
 
 запрос:
 
-	<subject><get_authorization_rights_records>"uid1".
-		<uid1><argument>{
+	<subject><magnet-ontology#get_authorization_rights_records>"uid1".
+		<uid1><magnet-ontology#argument>{
 			<recId><magnet-ontology#authorSystem>"".
 			<recId><magnet-ontology#authorSubsystem>"".
 			<recId><magnet-ontology#authorSubsystemElement>"".
@@ -83,67 +123,71 @@ magnet-ontology#rigths> "c|r|u|d"
 	<magnet-ontology#RightsRecord5><magnet-ontology#authorSubsystemElement>"aa8d1a71a2e34303954ced25d1037cdf".
 	...
 
-2. authorize
+6. authorize
 
 Используется для проверки доступа пользователя к объектам системы. 
 
 запрос: 
-	<subject><authorize><uid1>.<uid1><right>"c|r|u|d".
-	<uid1><category>"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION".
-	<uid1><elements>"elementId".<uid1><targetId>"targetId"."
+	<subject><magnet-ontology#authorize><uid1>.<uid1><magnet-ontology#argument>
+		{
+			<><magnet-ontology#rights>"c|r|u|d".
+			<><magnet-ontology#category>"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION".
+			<><magnet-ontology#elementId>"elementId1, elementId2".
+			<uid1><magnet-ontology#targetSubsystemElement>>"targetId"."
+		}.
 
 ответ:
 список id элементов, к которым разрешен доступ, разделенных запятой:
 	id1, id3
 
 
-3. add_delegate
+7. add_delegate
 
 Добавляет делегата для пользователя, если установлен флаг withTree, значит делегат так же принимает делегированные owner'у права.
 Возвращает идентификатор записи делегирования.
 
 запрос:
-	<subject><add_delegates><uid1>.
-		<uid1><argument>{
-			<delegateRecord1><owner>"userId1".
-			<delegateRecord1><delegate>"userId2".
-			<delegateRecord1><withTree>"true".
+	<subject><magnet-ontology#add_delegates><uid1>.
+		<uid1><magnet-ontology#argument>{
+			<delegateRecord1><magnet-ontology#owner>"userId1".
+			<delegateRecord1><magnet-ontology#delegate>"userId2".
+			<delegateRecord1><magnet-ontology#withTree>"true".
 		}.
 
 ответ: 
 	delegateRecord1Id
 
 
-4. remove_delegate
+8. remove_delegate
 
 Удаляет запись делегирования соответствующую шаблону без учета идентификатора записи(от кого - кому).
 
 запрос:
-	<subject><remove_delegate><uid1>.<uid1><argument>"<delegateRecord1><owner>"userId1".".
+	<subject><magnet-ontology#remove_delegate><uid1>.<uid1><magnet-ontology#argument>"<delegateRecord1><owner>\"userId1\".".
 
 	
-5. get_delegate_assigners
+9. get_delegate_assigners
 
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором.
 
 запрос:
-	<subject><get_delegate_assigners><uid1>.<uid1><argument>"userId1".
+	<subject><magnet-ontology#get_delegate_assigners><uid1>.<uid1><magnet-ontology#argument>"userId1".
 
 ответ:
 	список идентификаторов делегировавших без учета дерева делегирования(через запятую)
 
 	
-6. get_delegate_assigners_tree
+10. get_delegate_assigners_tree
 
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором с учетом дерева делегатов.
 
 запрос:
-	<subject><get_delegate_assigners_tree><uid1>.<uid1><argument>"userId1".
+	<subject><magnet-ontology#get_delegate_assigners_tree><uid1>.<uid1><magnet-ontology#argument>"userId1".
 
 ответ:
 	список идентификаторов делегатов c учетом дерева делегирования(через запятую)
 
-7. is_in_docflow
+11. is_in_docflow
 
 Используется для того, чтобы выяснить, находится документ в документообороте(идет ли по какому-либо маршруту) или нет. 
 Документ находится в документообороте, если существуют записи прав соответствующие шаблону: 
@@ -154,9 +198,8 @@ magnet-ontology#rigths> "c|r|u|d"
 
 запрос:
 
-	<subject><is_in_docflow><uid1>.<uid1><argument>"docId1".
+	<subject><magnet-ontology#is_in_docflow><uid1>.<uid1><magnet-ontology#argument>"docId1".
 
 ответ:
 
 	true | false
-
