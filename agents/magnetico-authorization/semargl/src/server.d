@@ -109,17 +109,17 @@ void get_message(byte* message, ulong message_size)
 
 			for(int i = 0; i < count_elements.facts; i++)
 			{
-				if(put_id < 0 && strcmp(fact_p[i], "put") == 0 && strcmp(fact_s[i], "subject") == 0)
+				if(put_id < 0 && strcmp(fact_p[i], "put") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
 				{
 					put_id = i;
-				//				Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
+					Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
 				}
 				else
 				{
-					if(arg_id < 0 && strcmp(fact_p[i], "argument") == 0)
+					if(arg_id < 0 && strcmp(fact_p[i], "magnet-ontology/transport#argument") == 0)
 					{
 						arg_id = i;
-					//					Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
+						Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
 					}
 					else
 					{
@@ -192,41 +192,38 @@ void get_message(byte* message, ulong message_size)
 				log.trace("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 			}
 
-			if(*(message + 0) == '<' && *(message + 13) == 'h')
+			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
+
+			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0],
+					"magnet-ontology#subject") == 0)
 			{
-				/*
-				 <subject><authorize><uid1>.
-				 <uid1><from>"hsearch--594463104-1245681854398098000".
-				 <uid1><right>"r".
-				 <uid1><category>"DOCUMENT".
-				 <uid1><targetId>"61b807a9-e350-45a1-a0ed-10afa8f987a4".
-				 <uid1><elements>"a8df72cae40b43deb5dfbb7d8af1bb34,da08671d0c50416481f32705a908f1ab,4107206856ea4a7b8d8b4b80444f7f85".	  
+				/* пример сообщения:
+				 <cd075595-0231-440d-a98b-e7a1fe47fd5a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
+				 <cd075595-0231-440d-a98b-e7a1fe47fd5a><magnet-ontology/transport#argument>
+				 {
+				 <><magnet-ontology/authorization/acl#rights>"r".
+				 <><magnet-ontology/authorization/acl#category>"DOCUMENTTYPE".
+				 <><magnet-ontology/authorization/acl#elementId>"ae57c79a80d04ccf86a717fc60d92c15".
+				 <><magnet-ontology/authorization/acl#targetSubsystemElement>"544c820e-ad22-4f3e-9eca-2e0d92ac0db9".
+				 }.
+				 <-1511315886-1252675095430804000><magnet-ontology#subject><magnet-ontology/transport#set_from>.
+				 <-1511315886-1252675095430804000><magnet-ontology/transport#argument>"client--1511315886-1252675095430804000".  
 				 */
 
 				//			Stdout.format("this request on authorization").newline;
 				char* command_uid = null;
 
 				// это команда authorize?
-				int authorize_id = -1;
+				int authorize_id = 0;
 				int from_id = 0;
 				int right_id = 0;
 				int category_id = 0;
 				int targetId_id = 0;
 				int elements_id = 0;
 				int set_from_id = 0;
+				command_uid = fact_s[0];
 
 				log.trace("this request on authorization #1");
-
-				for(int i = 0; i < count_facts; i++)
-				{
-					if(strcmp(fact_p[i], "authorize") == 0 && strcmp(fact_s[i], "subject") == 0)
-					{
-						command_uid = fact_o[i];
-						authorize_id = i;
-						//					Stdout.format("found comand authorize, id ={} ", i).newline;
-						break;
-					}
-				}
 
 				//			Stdout.format("this request on authorization #2").newline;
 
@@ -234,27 +231,27 @@ void get_message(byte* message, ulong message_size)
 				{
 					for(int i = 0; i < count_facts; i++)
 					{
-						if(strcmp(fact_p[i], "from") == 0)
+						if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
 						{
 							from_id = i;
 						}
-						else if(strcmp(fact_p[i], "right") == 0)
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#rights") == 0)
 						{
 							right_id = i;
 						}
-						else if(strcmp(fact_p[i], "category") == 0)
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0)
 						{
 							category_id = i;
 						}
-						else if(strcmp(fact_p[i], "targetId") == 0)
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
 						{
 							targetId_id = i;
 						}
-						else if(strcmp(fact_p[i], "elements") == 0)
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
 						{
 							elements_id = i;
 						}
-						else if(strcmp(fact_p[i], "set_from") == 0)
+						else if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
 						{
 							set_from_id = i;
 						}
@@ -268,14 +265,11 @@ void get_message(byte* message, ulong message_size)
 					autz_elements = fact_o[elements_id];
 				}
 
-				//			queue_name = fact_o[from_id];
 				strcpy(queue_name, fact_o[set_from_id]);
 				strcpy(user, fact_o[targetId_id]);
 
 				char* check_right = fact_o[right_id];
 
-				//			// результат поместим в то же сообщение
-				//			char* result = cast(char*) message;
 				char* result_ptr = cast(char*) result_buffer;
 
 				//						printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
@@ -300,9 +294,9 @@ void get_message(byte* message, ulong message_size)
 
 				//						Stdout.format("this request on authorization #1.1.0 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
 
-				bool calculatedRight_isAdmin;
-				calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType,
-						az.getTripleStorage());
+				//				bool calculatedRight_isAdmin;
+				//				calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType,
+				//						az.getTripleStorage());
 
 				uint count_prepared_doc = 0;
 				uint count_authorized_doc = 0;
@@ -314,8 +308,8 @@ void get_message(byte* message, ulong message_size)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><result:data>\"");
-				result_ptr += 15;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+				result_ptr += 41;
 
 				for(uint i = 0; true; i++)
 				{
@@ -347,10 +341,15 @@ void get_message(byte* message, ulong message_size)
 						//					else
 						if(calculatedRight == true)
 						{
+							if(count_prepared_doc > 1)
+							{
+								*result_ptr = ',';
+								result_ptr++;
+							}
+
 							strcpy(result_ptr, docId);
 							result_ptr += strlen(docId);
-							*result_ptr = ',';
-							result_ptr++;
+
 							//						Stdout.format("this request on authorization #1.4 true").newline;
 							//						*(autz_elements + i) = ',';
 							count_authorized_doc++;

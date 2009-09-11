@@ -12,10 +12,10 @@ struct Counts
 	byte open_brakets;
 }
 
-public void print_list_triple (uint* list_iterator)
+public void print_list_triple(uint* list_iterator)
 {
-	byte *triple;
-	Stdout.format(\n"list_iterator {:X4}", list_iterator).newline;
+	byte* triple;
+	Stdout.format(\n "list_iterator {:X4}", list_iterator).newline;
 	if(list_iterator !is null)
 	{
 		uint next_element0 = 0xFF;
@@ -30,18 +30,20 @@ public void print_list_triple (uint* list_iterator)
 			list_iterator = cast(uint*) next_element0;
 		}
 	}
-	
+
 }
 
 public void print_triple(byte* triple)
 {
-	if (triple is null) return;
-	
+	if(triple is null)
+		return;
+
 	char* s = cast(char*) triple + 6;
-	
+
 	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-	
-	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+	char*
+			o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 	printf("triple: <%s><%s><%s>\n", s, p, o);
 }
@@ -143,16 +145,16 @@ public uint extract_facts_from_message(char* message, ulong message_size, Counts
 	//			}
 	}
 
-	//	Stdout.format("extract_facts_from_message ... ok").newline;
-	/*	
-	 for (int i = 0; i < count_facts; i++)
-	 {
-	 printf ("\nfound s=%s\n", fact_s[i]);
-	 printf ("found p=%s\n", fact_p[i]);
-	 printf ("found o=%s\n\n", fact_o[i]);
-	 }
-	 */
+/*
+	Stdout.format("extract_facts_from_message ... ok").newline;
 
+	for(int i = 0; i < count_facts; i++)
+	{
+		printf("\nfound s=%s\n", fact_s[i]);
+		printf("found p=%s\n", fact_p[i]);
+		printf("found o=%s\n\n", fact_o[i]);
+	}
+*/
 	return count_facts;
 }
 
@@ -186,7 +188,6 @@ public static final void longToHex(ulong dl, char* buff)
 
 //	printf("time=%s\n", buff);
 }
-
 
 public static char[] getString(char* s)
 {

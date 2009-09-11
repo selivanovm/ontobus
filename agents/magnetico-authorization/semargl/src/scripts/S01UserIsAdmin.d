@@ -1,14 +1,14 @@
 module scripts.S01UserIsAdmin;
 
-import TripleStorage;
+private import TripleStorage;
 private import tango.io.Stdout;
+private import Log;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
 	if(isAdmin(user, ts))
 	{
-		//        	log.debug('User is admin')
-		Stdout.format("i'm admin").newline;
+		log.trace("User is admin");
 
 		return true;
 	}
@@ -17,7 +17,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 public bool isAdmin(char* user, TripleStorage ts)
 {
-	uint* iterator0 = ts.getTriples(user, "magnet-ontology#isAdmin", "true", false);
+	uint* iterator0 = ts.getTriples(user, "magnet-ontology/authorization/functions#is_admin", "true", false);
 
 	if(iterator0 != null)
 		return true;
