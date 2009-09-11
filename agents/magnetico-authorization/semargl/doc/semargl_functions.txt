@@ -1,6 +1,6 @@
 предикаты общего назначения
 
-magnet-ontology/transport#subject
+magnet-ontology#subject
 magnet-ontology/transport#argument
 magnet-ontology/transport#result:data
 magnet-ontology/transport#result:state (ok|error)
@@ -47,11 +47,11 @@ magnet-ontology/authorization/acl#owner - кто делегирует
 magnet-ontology/authorization/acl#withTree - делегировать с учетом дерева делегатов
 
 ответы с ожидаются с result:data, получатель ответа задается в запросе с помощбю триплета вида 
-<magnet-ontology/transport#subject><magnet-ontology/transport#set_from><очередь в которую нужно отправить ответ>.
+<magnet-ontology#subject><magnet-ontology/transport#set_from><очередь в которую нужно отправить ответ>.
 
 1. create - используется для создания записи права на доступ, возвращает идентификатор(субъект) записи созданного права.
 
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#create><uid1>.
+   	  <uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#create>.
 		<uid1><magnet-ontology/transport#argument>{
 			<recId><magnet-ontology/authorization/acl#authorSystem>"".
 			<recId><magnet-ontology/authorization/acl#authorSubsystem>"".
@@ -69,16 +69,16 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 
 2. delete - используется для удаления записей права на доступ. в качестве аргумента принимает идентификатор(субъект) записи удаляемого права.
 
-   <magnet-ontology/transport#subject><magnet-ontology/authorization/functions#delete><uid>.<uid><magnet-ontology/transport#argument><recordId>.
+   <magnet-ontology#subject><magnet-ontology/authorization/functions#delete><uid>.<uid><magnet-ontology/transport#argument><recordId>.
 
 3. delete_by_element_id - используется для удаления записей права на доступ. в качестве аргумента принимает идентификатор объекта. 
    все записи описывающие права доступа к этому объекту должны быть удалены.
 
-   <magnet-ontology/transport#subject><magnet-ontology/authorization/functions#delete_by_element_id><uid>.<uid><magnet-ontology/transport#argument><elementId>.
+   <magnet-ontology#subject><magnet-ontology/authorization/functions#delete_by_element_id><uid>.<uid><magnet-ontology/transport#argument><elementId>.
 
 4. update - используется для обновления записей права на доступ. в качестве аргумента принимает список триплетов с обновленными атрибутами записи.
 
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#update><uid1>.
+   	  <uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#update>.
 		<uid1><magnet-ontology/transport#argument>{
 			<recId><magnet-ontology/authorization/acl#authorSystem>"".
 			<recId><magnet-ontology/authorization/acl#authorSubsystem>"".
@@ -102,7 +102,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 
 запрос:
 
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#get_authorization_rights_records>"uid1".
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#get_authorization_rights_records>.
 		<uid1><magnet-ontology/transport#argument>{
 			<recId><magnet-ontology/authorization/acl#authorSystem>"".
 			<recId><magnet-ontology/authorization/acl#authorSubsystem>"".
@@ -128,7 +128,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 Используется для проверки доступа пользователя к объектам системы. 
 
 запрос: 
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#authorize><uid1>.<uid1><magnet-ontology/transport#argument>
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.<uid1><magnet-ontology/transport#argument>
 		{
 			<><magnet-ontology/authorization/acl#rights>"c|r|u|d".
 			<><magnet-ontology/authorization/acl#category>"DOCUMENT | DOCUMENTTYPE | USER | DICTIONARY | DRAFT | USERGROUP | DEPARTMENTASSOCIATION".
@@ -147,7 +147,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 Возвращает идентификатор записи делегирования.
 
 запрос:
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#add_delegates><uid1>.
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#add_delegates>.
 		<uid1><magnet-ontology/transport#argument>{
 			<delegateRecord1><magnet-ontology/authorization/acl#owner>"userId1".
 			<delegateRecord1><magnet-ontology/authorization/acl#delegate>"userId2".
@@ -163,7 +163,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 Удаляет запись делегирования соответствующую шаблону без учета идентификатора записи(от кого - кому).
 
 запрос:
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#remove_delegate><uid1>.<uid1><magnet-ontology/transport#argument>"<delegateRecord1><owner>\"userId1\".".
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#remove_delegate>.<uid1><magnet-ontology/transport#argument>"<delegateRecord1><owner>\"userId1\".".
 
 	
 9. get_delegate_assigners
@@ -171,7 +171,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором.
 
 запрос:
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#get_delegate_assigners><uid1>.<uid1><magnet-ontology/transport#argument>"userId1".
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#get_delegate_assigners>.<uid1><magnet-ontology/transport#argument>"userId1".
 
 ответ:
 	список идентификаторов делегировавших без учета дерева делегирования(через запятую)
@@ -182,7 +182,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 Используется для получения списка пользователей делегировавших права пользователю с переданным в аргументе идентификатором с учетом дерева делегатов.
 
 запрос:
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#get_delegate_assigners_tree><uid1>.<uid1><magnet-ontology/transport#argument>"userId1".
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#get_delegate_assigners_tree>.<uid1><magnet-ontology/transport#argument>"userId1".
 
 ответ:
 	список идентификаторов делегатов c учетом дерева делегирования(через запятую)
@@ -198,7 +198,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 
 запрос:
 
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#is_in_docflow><uid1>.<uid1><magnet-ontology/transport#argument>"docId1".
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#is_in_docflow>.<uid1><magnet-ontology/transport#argument>"docId1".
 
 ответ:
 
@@ -210,7 +210,7 @@ magnet-ontology/authorization/acl#withTree - делегировать с уче�
 
 запрос:
 
-	<magnet-ontology/transport#subject><magnet-ontology/authorization/functions#is_admin><uid1>.<uid1><magnet-ontology/transport#argument>"userId".
+	<uid1><magnet-ontology#subject><magnet-ontology/authorization/functions#is_admin>.<uid1><magnet-ontology/transport#argument>"userId".
 
 ответ:
 
