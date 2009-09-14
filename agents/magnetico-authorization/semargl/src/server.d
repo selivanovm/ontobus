@@ -220,7 +220,7 @@ void get_message(byte* message, ulong message_size)
 				int category_id = 0;
 				int targetId_id = 0;
 				int elements_id = 0;
-				int set_from_id = 0;
+				int reply_to_id = 0;
 				command_uid = fact_s[0];
 
 				log.trace("this request on authorization #1");
@@ -251,9 +251,9 @@ void get_message(byte* message, ulong message_size)
 						{
 							elements_id = i;
 						}
-						else if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
+						else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
 						{
-							set_from_id = i;
+							reply_to_id = i;
 						}
 					}
 				}
@@ -265,7 +265,7 @@ void get_message(byte* message, ulong message_size)
 					autz_elements = fact_o[elements_id];
 				}
 
-				strcpy(queue_name, fact_o[set_from_id]);
+				strcpy(queue_name, fact_o[reply_to_id]);
 				strcpy(user, fact_o[targetId_id]);
 
 				char* check_right = fact_o[right_id];
@@ -373,9 +373,8 @@ void get_message(byte* message, ulong message_size)
 						"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
 						count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc / time);
 
+				log.trace("queue_name:{}", getString(queue_name));
 				log.trace("result:{}", getString(result_buffer));
-				//			printf("result:%s\n", result);
-				//			printf("queue_name:%s\n", queue_name);
 
 				elapsed.start;
 

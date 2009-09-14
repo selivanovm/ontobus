@@ -63,6 +63,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology/state"; //
 		i_know_predicates[d++] = "magnet-ontology/data"; //
 		i_know_predicates[d++] = "magnet-ontology/transport#set_from"; //
+		i_know_predicates[d++] = "magnet-ontology/transport/message#reply_to"; // имя очереди для ответа на сообщение
 
 		// онтология authorization
 
