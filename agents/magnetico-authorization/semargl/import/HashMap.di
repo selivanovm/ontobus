@@ -10,6 +10,7 @@ private
 }
 import Integer = tango.text.convert.Integer;
 import Hash;
+import Log;
 class HashMap
 {
     private

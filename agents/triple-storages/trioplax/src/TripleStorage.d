@@ -174,14 +174,13 @@ class TripleStorage
 		return list;
 	}
 
-	public bool removeTriple(char[] s, char[] p, char[] o)
+	public bool removeTriple(char* s, char* p, char* o)
 	{
-		if(s.length == 0 && p.length == 0 && o.length == 0)
+		if(s !is null  && p !is null && o !is null)
 			return false;
-
 		uint* removed_triple;
 
-		uint* list_iterator = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+		uint* list_iterator = idx_spo.get(s, p, o, false);
 		if(list_iterator !is null)
 		{
 			removed_triple = cast(uint*) (*list_iterator);
@@ -310,8 +309,15 @@ class TripleStorage
 				}
 			}
 		}
-
-		return true;
+		
+	}
+		
+	public bool removeTriple(char[] s, char[] p, char[] o)
+	{
+		if(s.length == 0 && p.length == 0 && o.length == 0)
+			return false;
+		
+		return removeTriple(cast (char*)s, cast (char*)p, cast (char*)o);
 	}
 
 	public bool addTriple(char[] s, char[] p, char[] o)

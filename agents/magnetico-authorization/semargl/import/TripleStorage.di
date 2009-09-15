@@ -94,6 +94,10 @@ class TripleStorage
 }
     public
 {
+    bool removeTriple(char* s, char* p, char* o);
+}
+    public
+{
     bool removeTriple(char[] s, char[] p, char[] o);
 }
     public

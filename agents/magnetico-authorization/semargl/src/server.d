@@ -81,7 +81,6 @@ void get_message(byte* message, ulong message_size)
 
 		uint param_count = 0;
 
-
 		char* fact_s[];
 		char* fact_p[];
 		char* fact_o[];
@@ -144,20 +143,34 @@ void get_message(byte* message, ulong message_size)
 			{
 				log.trace("команда на удаление");
 
-				az.getTripleStorage.getTriples (fact_o[arg_id], null, null, false);
-				
-//				az.getTripleStorage.removeTriple ();
-				
-				for(int i = 0; i < count_facts; i++)
+				uint* removed_triples = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
+
+				if(removed_triples !is null)
 				{
-					if(is_fact_in_object[i] == arg_id)
+					uint next_element0 = 0xFF;
+					while(next_element0 > 0)
 					{
-						// нужно определиться что именно удаляем, документ! или отдельный факт?
-//						az.getTripleStorage (('D', toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
+						byte* triple = cast(byte*) *removed_triples;
+						
+						char* s = cast(char*) triple + 6;
+
+						char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+						char*
+								o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+						log.trace("remove triple <{}><{}><{}>", toString(s), toString(p), toString(p));
+
+						az.getTripleStorage.removeTriple(s, p, o);
+
+						next_element0 = *(removed_triples + 1);
+						removed_triples = cast(uint*) next_element0;
+
 					}
 				}
+
 				time = elapsed.stop;
-				log.trace("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+				log.trace("remove triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 			}
 
 			if(put_id >= 0 && arg_id > 0)
@@ -188,11 +201,10 @@ void get_message(byte* message, ulong message_size)
 						az.logginTriple('A', toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
 					}
 				}
-				
-				time = elapsed.stop;
-				log.trace("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-			}
 
+				time = elapsed.stop;
+				log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+			}
 
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
