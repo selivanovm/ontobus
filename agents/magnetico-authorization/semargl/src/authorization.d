@@ -147,7 +147,7 @@ class Authorization
 		foreach(error; scan.errors)
 			Stdout(error).newline;
 
-		scan = (new FileScan)(root, ".tn3");
+		scan = (new FileScan)(root, ".n3log");
 		Stdout.format("\n{} Folders\n", scan.folders.length);
 		foreach(folder; scan.folders)
 			Stdout.format("{}\n", folder);
@@ -162,33 +162,59 @@ class Authorization
 		foreach(error; scan.errors)
 			Stdout(error).newline;
 
-//		print_list_triple(ts.getTriples("record", null, null, false));
+		//		print_list_triple(ts.getTriples("record", null, null, false));
 
-//		ts.removeTriple("record", "magnet-ontology#target", "92e57b6d-83e3-485f-8885-0bade363f759");
+		//		ts.removeTriple("record", "magnet-ontology#target", "92e57b6d-83e3-485f-8885-0bade363f759");
 
-//		print_list_triple(ts.getTriples("record", null, null, false));
+		//		print_list_triple(ts.getTriples("record", null, null, false));
 
 		Stdout.format("authorization init ... ok").newline;
 	}
 
-	public void addAuthorizeData(char[] s, char[] p, char[] o)
+	public void logginTriple(char command, char[] s, char[] p, char[] o)
 	{
-		auto layout = new Locale;
-		auto nameFile = layout("data/authorize-data-{:yyyy-MM-dd}.tn3", WallClock.now);
-		auto file = new File(nameFile);
 		ts.addTriple(s, p, o);
+
+		auto layout = new Locale;
+		auto nameFile = layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now);
+		auto file = new File(nameFile);
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
-		char[] tmp1 = new char[33 + s.length + p.length + o.length];
+		char[] tmp1 = new char[35 + s.length + p.length + o.length];
 		char[18] tmp;
 
-		auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year),
-				convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10],
-						dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
-				convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
+		// так сделано из невозможности задать параметр из двух цифр в Util.layout
+		if(command == 'A')
+		{
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 A <%7><%8>\"%9\" .\n",
+					convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8],
+							dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12],
+							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
+							dt.time.millis), s, p, o);
 
-		file.append(now);
+			file.append(now);
+		}
+		else if(command == 'U')
+		{
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 U <%7><%8>\"%9\" .\n",
+					convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8],
+							dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12],
+							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
+							dt.time.millis), s, p, o);
+
+			file.append(now);
+		}
+		else if(command == 'D')
+		{
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 D <%7><%8>\"%9\" .\n",
+					convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8],
+							dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12],
+							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
+							dt.time.millis), s, p, o);
+
+			file.append(now);
+		}
 	}
 
 	private char[] convert(char[] tmp, long i)
@@ -200,7 +226,7 @@ class Authorization
 
 	public bool authorize(char* docId, char* User, uint targetRightType, uint*[] hierarhical_departments)
 	{
-		log.trace("autorize start docId={}, User={}", getString (docId), getString (User));
+		log.trace("autorize start docId={}, User={}", getString(docId), getString(User));
 		//		elapsed.start;
 
 		//		char* User = "671d8e10-d7ca-48ae-b027-76a97172f304";

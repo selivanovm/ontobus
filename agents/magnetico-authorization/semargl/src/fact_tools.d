@@ -100,13 +100,19 @@ public uint extract_facts_from_message(char* message, ulong message_size, Counts
 			count_open_brakets++;
 			stack_brackets[count_open_brakets] = count_facts;
 		}
+		if(cur_char == '}')
+		{
+			count_open_brakets--;
+		}
 
 		if(cur_char == '<' || cur_char == '{' || (cur_char == '"' && is_open_quotes == true))
 		{
 			if(count_fact_fragment == 0)
 			{
 				if(count_open_brakets > 0)
+				{
 					is_fact_in_object[count_facts] = stack_brackets[count_open_brakets];
+				}
 
 				fact_s[count_facts] = cur_char_ptr + 1;
 			}
@@ -145,16 +151,16 @@ public uint extract_facts_from_message(char* message, ulong message_size, Counts
 	//			}
 	}
 
-/*
-	Stdout.format("extract_facts_from_message ... ok").newline;
+	/*
+	 Stdout.format("extract_facts_from_message ... ok").newline;
 
-	for(int i = 0; i < count_facts; i++)
-	{
-		printf("\nfound s=%s\n", fact_s[i]);
-		printf("found p=%s\n", fact_p[i]);
-		printf("found o=%s\n\n", fact_o[i]);
-	}
-*/
+	 for(int i = 0; i < count_facts; i++)
+	 {
+	 printf("\nfound s=%s\n", fact_s[i]);
+	 printf("found p=%s\n", fact_p[i]);
+	 printf("found o=%s\n\n", fact_o[i]);
+	 }
+	 */
 	return count_facts;
 }
 

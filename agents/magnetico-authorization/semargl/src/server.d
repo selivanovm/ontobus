@@ -67,6 +67,7 @@ void get_message(byte* message, ulong message_size)
 		log.trace("\n\nget new message \n{}", getString(cast(char*) message));
 
 		auto elapsed = new StopWatch();
+		elapsed.start;
 
 		double time;
 
@@ -80,7 +81,6 @@ void get_message(byte* message, ulong message_size)
 
 		uint param_count = 0;
 
-		elapsed.start;
 
 		char* fact_s[];
 		char* fact_p[];
@@ -102,17 +102,21 @@ void get_message(byte* message, ulong message_size)
 			uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s,
 					fact_p, fact_o, is_fact_in_object);
 			// 				
-			// замапим предикаты фактов на конкретные переменные put_id, fact_id, arg_id
+			// замапим предикаты фактов на конкретные переменные put_id, arg_id
 			int put_id = -1;
+			int delete_by_element_id = -1;
 			int arg_id = -1;
-			int operation_id = -1;
 
-			for(int i = 0; i < count_elements.facts; i++)
+			for(int i = 0; i < count_facts; i++)
 			{
-				if(put_id < 0 && strcmp(fact_p[i], "put") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
+				//				log.trace("look triple <{}><{}><{}>", toString(cast(char*) fact_s[i]), toString(
+				//						cast(char*) fact_p[i]), toString(cast(char*) fact_o[i]));
+
+				if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#put") == 0 && strcmp(
+						fact_p[i], "magnet-ontology#subject") == 0)
 				{
 					put_id = i;
-					Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
+					Stdout.format("found comand {}, id ={} ", toString(fact_o[i]), i).newline;
 				}
 				else
 				{
@@ -123,91 +127,90 @@ void get_message(byte* message, ulong message_size)
 					}
 					else
 					{
-
-						if(operation_id < 0 && strcmp(fact_p[i], "name") == 0 && strcmp(fact_s[i], "operation") == 0)
+						if(delete_by_element_id < 0 && strcmp(fact_o[i],
+								"magnet-ontology/authorization/functions#delete_by_element_id") == 0 && strcmp(
+								fact_p[i], "magnet-ontology#subject") == 0)
 						{
-							operation_id = i;
-						//						Stdout.format("found operation {}, id ={} ", toString(fact_p[i]), i).newline;
+							delete_by_element_id = i;
+							Stdout.format("found comand {}, id ={} ", toString(fact_o[i]), i).newline;
 						}
-
 					}
+
 				}
+
 			}
 
-			if(put_id >= 0 && arg_id > 0 && operation_id > 0)
+			if(delete_by_element_id >= 0 && arg_id > 0)
 			{
-				if(strcmp(fact_o[operation_id], "create") == 0)
+				log.trace("команда на удаление");
+
+				az.getTripleStorage.getTriples (fact_o[arg_id], null, null, false);
+				
+//				az.getTripleStorage.removeTriple ();
+				
+				for(int i = 0; i < count_facts; i++)
 				{
-					//			Stdout.format("команда на добавление").newline;
-
-					ulong uuid = getUUID();
-
-					for(int i = 0; i < count_facts; i++)
+					if(is_fact_in_object[i] == arg_id)
 					{
-						if(is_fact_in_object[i] == arg_id && i != operation_id)
-						{
-							// отфильтруем все факты-аргументы					
-							if(strcmp(fact_s[i], "0000000000000000") == 0)
-								longToHex(uuid, fact_s[i]);
-							else
-							{
-								if(strlen(fact_s[i]) == 0)
-								{
-									fact_s[i] = cast(char*) new char[16];
-									longToHex(uuid, fact_s[i]);
-								}
-							}
-
-							//					Stdout.format("add triple <{}><{}><{}>", toString(cast(char*) fact_s[i]), toString(
-							//							cast(char*) fact_p[i]), toString(cast(char*) fact_o[i])).newline;
-							az.addAuthorizeData(toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
-						}
+						// нужно определиться что именно удаляем, документ! или отдельный факт?
+//						az.getTripleStorage (('D', toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
 					}
 				}
-				else
-				{
-					if(strcmp(fact_o[operation_id], "update") == 0)
-					{
-					}
-
-					else
-					{
-						if(strcmp(fact_o[operation_id], "delete") == 0)
-						{
-						}
-					}
-
-				}
-
 				time = elapsed.stop;
-				/*
-				 for(int i = 0; i < count_facts; i++)
-				 {
-				 Stdout.format("s = {:X2} {:X4} {}", i, fact_s[i], toString(cast(char*) fact_s[i])).newline;
-				 Stdout.format("p = {:X2} {:X4} {}", i, fact_p[i], toString(cast(char*) fact_p[i])).newline;
-				 Stdout.format("o = {:X2} {:X4} {}", i, fact_o[i], toString(cast(char*) fact_o[i])).newline;
-				 Stdout.format("is_fact_in_object = {:X2} {}\n", i, is_fact_in_object[i]).newline;
-				 }
-				 */
 				log.trace("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 			}
 
-			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
+			if(put_id >= 0 && arg_id > 0)
+			{
+				log.trace("команда на добавление");
+
+				ulong uuid = getUUID();
+
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(is_fact_in_object[i] == arg_id)
+					{
+						/*						
+						 // отфильтруем все факты-аргументы					
+						 if(strcmp(fact_s[i], "0000000000000000") == 0)
+						 longToHex(uuid, fact_s[i]);
+						 else
+						 {
+						 if(strlen(fact_s[i]) == 0)
+						 {
+						 fact_s[i] = cast(char*) new char[16];
+						 longToHex(uuid, fact_s[i]);
+						 }
+						 }
+						 */
+						log.trace("add triple <{}><{}><{}>", toString(cast(char*) fact_s[i]), toString(
+								cast(char*) fact_p[i]), toString(cast(char*) fact_o[i]));
+						az.logginTriple('A', toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
+					}
+				}
+				
+				time = elapsed.stop;
+				log.trace("time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+			}
+
+
+			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
 			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0],
 					"magnet-ontology#subject") == 0)
 			{
 				/* пример сообщения:
-				 <cd075595-0231-440d-a98b-e7a1fe47fd5a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
-				 <cd075595-0231-440d-a98b-e7a1fe47fd5a><magnet-ontology/transport#argument>
+				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
+				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport#argument>
 				 {
-				 <><magnet-ontology/authorization/acl#rights>"r".
-				 <><magnet-ontology/authorization/acl#category>"DOCUMENTTYPE".
-				 <><magnet-ontology/authorization/acl#elementId>"ae57c79a80d04ccf86a717fc60d92c15".
+				 <><magnet-ontology/authorization/acl#rights>"u".
+				 <><magnet-ontology/authorization/acl#category>"DOCUMENT".
+				 <><magnet-ontology/authorization/acl#elementId>"c49cc462c6eb4e7ca50da4075b1a44fe".
 				 <><magnet-ontology/authorization/acl#targetSubsystemElement>"544c820e-ad22-4f3e-9eca-2e0d92ac0db9".
 				 }.
-				 <-1511315886-1252675095430804000><magnet-ontology#subject><magnet-ontology/transport#set_from>.
-				 <-1511315886-1252675095430804000><magnet-ontology/transport#argument>"client--1511315886-1252675095430804000".  
+				 <c5c8ce35-8082-4169-8c76-f0f40f4a85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
+				 <c5c8ce35-8082-4169-8c76-f0f40f4a85f3><magnet-ontology/transport#argument>"client-3516df90-522a-476a-9470-8293daf2014a".
+				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport/message#reply_to>"client-3516df90-522a-476a-9470-8293daf2014a".  
 				 */
 
 				//			Stdout.format("this request on authorization").newline;
