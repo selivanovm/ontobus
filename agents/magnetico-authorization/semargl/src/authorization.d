@@ -173,8 +173,6 @@ class Authorization
 
 	public void logginTriple(char command, char[] s, char[] p, char[] o)
 	{
-		ts.addTriple(s, p, o);
-
 		auto layout = new Locale;
 		auto nameFile = layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now);
 		auto file = new File(nameFile);

@@ -46,6 +46,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 		char[] s, p, o;
 		char[] element;
 		int idx = 0;
+		char command = '-';
 
 		uint b_pos = 0;
 		uint e_pos = 0;
@@ -54,6 +55,11 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 			if(line[i] == '<' || line[i] == '"' && b_pos < e_pos)
 			{
 				b_pos = i;
+				if(b_pos - 2 > 0 && (line[b_pos - 2] == 'A' || line[b_pos - 2] == 'D' || line[b_pos - 2] == 'U'))
+				{
+					command = line[b_pos - 2];
+				}
+
 			}
 			else
 			{
@@ -85,7 +91,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 		}
 
-//		Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+		//		Stdout.format("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
 
 		if(s.length == 0 && p.length == 0 && o.length == 0)
 			continue;
@@ -103,15 +109,27 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 		if(i_know_predicat)
 		{
-			//						Stdout.format("main: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
-			if(ts.addTriple(s, p, o))
-				count_add_triple++;
-			else
-			{
-				Stdout.format("!!! triple not added").newline;
+			//						Stdout.format("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
 
-				count_ignored_triple++;
+			if(command == 'A')
+			{
+				if(ts.addTriple(s, p, o))
+				{
+					count_add_triple++;
+				}
+				else
+				{
+					Stdout.format("!!! triple not added").newline;
+
+					count_ignored_triple++;
+				}
 			}
+			if(command == 'D')
+			{
+				Stdout.format("persistent_triple_storage: remove triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+				ts.removeTriple(s, p, o);
+			}
+
 		}
 		else
 		{

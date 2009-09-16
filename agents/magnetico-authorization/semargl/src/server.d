@@ -141,7 +141,7 @@ void get_message(byte* message, ulong message_size)
 
 			if(delete_by_element_id >= 0 && arg_id > 0)
 			{
-				log.trace("команда на удаление");
+				log.trace("команда на удаление всех фактов с s={}", toString(fact_o[arg_id]));
 
 				uint* removed_triples = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
 
@@ -151,7 +151,7 @@ void get_message(byte* message, ulong message_size)
 					while(next_element0 > 0)
 					{
 						byte* triple = cast(byte*) *removed_triples;
-						
+
 						char* s = cast(char*) triple + 6;
 
 						char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
@@ -162,6 +162,7 @@ void get_message(byte* message, ulong message_size)
 						log.trace("remove triple <{}><{}><{}>", toString(s), toString(p), toString(p));
 
 						az.getTripleStorage.removeTriple(s, p, o);
+						az.logginTriple('D', toString(s), toString(p), toString(o));
 
 						next_element0 = *(removed_triples + 1);
 						removed_triples = cast(uint*) next_element0;
@@ -198,6 +199,7 @@ void get_message(byte* message, ulong message_size)
 						 */
 						log.trace("add triple <{}><{}><{}>", toString(cast(char*) fact_s[i]), toString(
 								cast(char*) fact_p[i]), toString(cast(char*) fact_o[i]));
+						az.getTripleStorage.addTriple(toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
 						az.logginTriple('A', toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));
 					}
 				}
