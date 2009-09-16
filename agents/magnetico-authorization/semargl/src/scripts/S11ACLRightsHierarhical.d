@@ -41,7 +41,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 	//	Stdout.format("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}",
 	//			iterator_on_targets_of_hierarhical_departments.length).newline;
 
-	uint* iterator1 = ts.getTriples(null, "magnet-ontology#elementId", elementId, false);
+	uint* iterator1 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId, false);
 
 	bool this_user_in_ACL = false;
 
@@ -67,9 +67,9 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 				if(triple2 !is null)
 				{
 					char* triple2_p = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-					printf("%s\n", triple2_p);
+//					printf("%s\n", triple2_p);
 
-					if(strcmp(triple2_p, "magnet-ontology#target\0") == 0)
+					if(strcmp(triple2_p, "magnet-ontology/authorization/acl#targetSubsystemElement\0") == 0)
 					{
 						// проверим, это ACL для нашего пользователя или нет
 						char*
@@ -82,9 +82,9 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 						}
 
 					}
-					else if(this_user_in_ACL == true && strcmp(triple2_p, "magnet-ontology#rigths\0") == 0)
+					else if(this_user_in_ACL == true && strcmp(triple2_p, "magnet-ontology/authorization/acl#rights\0") == 0)
 					{
-						Stdout.format("this_user_in_ACL == true && strcmp(triple2_p, 'magnet-ontology#rigths\0'").newline;
+//						Stdout.format("this_user_in_ACL == true && strcmp(triple2_p, 'magnet-ontology/authorization/acl#rights\0'").newline;
 
 						// проверим, есть ли тут требуемуе нами право
 						char*
@@ -94,7 +94,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 						{
 							if((rightType == RightType.READ) && *triple2_o == 'r')
 							{
-								Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
+//								Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
 								return true;
 							}
 							triple2_o++;

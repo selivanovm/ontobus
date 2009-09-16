@@ -46,7 +46,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 		char[] s, p, o;
 		char[] element;
 		int idx = 0;
-		char command = '-';
+		char command = 'A';
 
 		uint b_pos = 0;
 		uint e_pos = 0;

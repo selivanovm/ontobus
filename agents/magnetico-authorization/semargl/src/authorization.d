@@ -86,18 +86,19 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners"; //
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners_tree"; //
 
-		//		 запись о праве
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSystem"; // - система выдающая право, "BA"/"DOCFLOW"
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystem"; // - "user"/routeName
+		//		 запись о праве, данная часть ACL требует переработки!
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSystem"; // 			- система выдающая право, "BA"/"DOCFLOW"
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystem"; // 		- "user"/routeName
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystemElement"; // - id user or id route.
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; // - система, для которой выдали права, "BA"/"DOCFLOW".
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystem"; // - "user"/"department".
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; // 			- система, для которой выдали права, "BA"/"DOCFLOW".
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystem"; // 		- "user"/"department".
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystemElement"; // - user id or department id.
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#category"; // - категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateFrom"; // - период действия прав (до (с возможностью указания открытых интервалов значение null)).
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateTo"; // - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#elementId"; // - идентификатор элемента, на который выдаются права.
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rights"; // - "c|r|u|d"
+
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#category"; // 				- категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateFrom"; // 				- период действия прав (до (с возможностью указания открытых интервалов значение null)).
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateTo"; // 				- период действия прав (от (с возможностью указания открытых интервалов- значение null)).
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#elementId"; // 				- идентификатор элемента, на который выдаются права.
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rights"; // 				- "c|r|u|d"
 
 		//		 запись о делегировании
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#owner"; // - кто делегирует
@@ -222,9 +223,13 @@ class Authorization
 
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для всех документов 
 
-	public bool authorize(char* docId, char* User, uint targetRightType, uint*[] hierarhical_departments)
+	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
+			uint*[] hierarhical_departments)
 	{
-		log.trace("autorize start docId={}, User={}", getString(docId), getString(User));
+//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(
+//				authorizedElementCategory), getString(authorizedElementId), getString(User));
+
+		
 		//		elapsed.start;
 
 		//		char* User = "671d8e10-d7ca-48ae-b027-76a97172f304";
@@ -253,7 +258,7 @@ class Authorization
 		calculatedRight = scripts.S01UserIsAdmin.calculate(User, null, targetRightType, ts);
 		if(calculatedRight == true)
 		{
-			log.trace("autorize end, return:[{}]", calculatedRight);
+			log.trace("autorize end#0, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 
@@ -271,7 +276,7 @@ class Authorization
 		//				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
 
 		//			char* subject_document = cast(char*) triple0 + 6;
-		char* subject_document = docId;
+		char* subject_document = authorizedElementId;
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
 
@@ -280,16 +285,16 @@ class Authorization
 
 		if(calculatedRight == true)
 		{
-			log.trace("autorize end, return:[{}]", calculatedRight);
+			log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 
 		uint* iterator_facts_of_document = ts.getTriples(subject_document, null, null, false);
 
-		if(iterator_facts_of_document is null)
+		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
 			Stdout.format("iterator_facts_of_document is null").newline;
-			log.trace("autorize end, return:[false]");
+			log.trace("autorize end#2, return:[false]");
 			return false;
 		}
 
@@ -297,7 +302,7 @@ class Authorization
 		{
 			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
 					hierarhical_departments);
-		//			printf("authorize:S11ACLRightsHierarhical res=%d\n", calculatedRight);
+//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
@@ -347,7 +352,7 @@ class Authorization
 		//		Stdout.format("calculate rules for documents, count={}, time ={}, cps={}", count_auth_doc, time,
 		//				count_auth_doc / time).newline;
 
-		log.trace("autorize end, return:[{}]", calculatedRight);
+		log.trace("autorize end#3, return:[{}]", calculatedRight);
 		return calculatedRight;
 	}
 

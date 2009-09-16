@@ -115,14 +115,14 @@ void get_message(byte* message, ulong message_size)
 						fact_p[i], "magnet-ontology#subject") == 0)
 				{
 					put_id = i;
-					Stdout.format("found comand {}, id ={} ", toString(fact_o[i]), i).newline;
+//					Stdout.format("found comand {}, id ={} ", toString(fact_o[i]), i).newline;
 				}
 				else
 				{
 					if(arg_id < 0 && strcmp(fact_p[i], "magnet-ontology/transport#argument") == 0)
 					{
 						arg_id = i;
-						Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
+//						Stdout.format("found comand {}, id ={} ", toString(fact_p[i]), i).newline;
 					}
 					else
 					{
@@ -131,7 +131,7 @@ void get_message(byte* message, ulong message_size)
 								fact_p[i], "magnet-ontology#subject") == 0)
 						{
 							delete_by_element_id = i;
-							Stdout.format("found comand {}, id ={} ", toString(fact_o[i]), i).newline;
+//							Stdout.format("found comand {}, id ={} ", toString(fact_o[i]), i).newline;
 						}
 					}
 
@@ -240,7 +240,7 @@ void get_message(byte* message, ulong message_size)
 				int reply_to_id = 0;
 				command_uid = fact_s[0];
 
-				log.trace("this request on authorization #1");
+//				log.trace("this request on authorization #1");
 
 				//			Stdout.format("this request on authorization #2").newline;
 
@@ -344,7 +344,7 @@ void get_message(byte* message, ulong message_size)
 						//					Stdout.format("this request on authorization #1.3, {} docId={}", i, getString (autz_elements + doc_pos)).newline;
 
 						count_prepared_doc++;
-						bool calculatedRight = az.authorize(docId, user, targetRightType, hierarhical_departments);
+						bool calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
 						//					Stdout.format("right = {}", calculatedRight).newline;
 
 						//					if(calculatedRight == false)
