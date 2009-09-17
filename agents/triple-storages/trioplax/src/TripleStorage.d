@@ -40,7 +40,7 @@ class TripleStorage
 	uint max_count_element = 100_000;
 	uint max_length_order = 4;
 
-	this(ubyte useindex, uint _max_count_element, uint _max_length_order)
+	this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length)
 	{
 		max_count_element = _max_count_element;
 		max_length_order = _max_length_order;
@@ -48,42 +48,35 @@ class TripleStorage
 
 		if(useindex & idx_name.S)
 		{
-			Stdout.format("TripleStorage:create index S").newline;
-			idx_s = new HashMap(max_count_element, 1024 * 1024 * 50, max_length_order);
+			idx_s = new HashMap("S", max_count_element, inital_triple_area_length, max_length_order);
 		}
 
 		if(useindex & idx_name.P)
 		{
-			Stdout.format("TripleStorage:create index P").newline;
-			idx_p = new HashMap(1000, 1024 * 1024 * 50, 3);
+			idx_p = new HashMap("P", 1000, inital_triple_area_length, 3);
 		}
 
 		if(useindex & idx_name.O)
 		{
-			Stdout.format("TripleStorage:create index O").newline;
-			idx_o = new HashMap(max_count_element, 1024 * 1024 * 50, max_length_order);
+			idx_o = new HashMap("O", max_count_element, inital_triple_area_length, max_length_order);
 		}
 
 		if(useindex & idx_name.SP)
 		{
-			Stdout.format("TripleStorage:create index SP").newline;
-			idx_sp = new HashMap(max_count_element, 1024 * 1024 * 50, max_length_order);
+			idx_sp = new HashMap("SP", max_count_element, inital_triple_area_length*2, max_length_order);
 		}
 
 		if(useindex & idx_name.PO)
 		{
-			Stdout.format("TripleStorage:create index PO").newline;
-			idx_po = new HashMap(max_count_element, 1024 * 1024 * 50, max_length_order);
+			idx_po = new HashMap("PO", max_count_element, inital_triple_area_length*2, max_length_order);
 		}
 
 		if(useindex & idx_name.SO)
 		{
-			Stdout.format("TripleStorage:create index SO").newline;
-			idx_so = new HashMap(max_count_element, 1024 * 1024 * 50, max_length_order);
+			idx_so = new HashMap("SO", max_count_element, inital_triple_area_length*2, max_length_order);
 		}
 
-		Stdout.format("TripleStorage:create index SPO").newline;
-		idx_spo = new HashMap(max_count_element, 1024 * 1024 * 50, max_length_order); // является особенным индексом, хранящим экземпляры триплетов
+		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length*3, max_length_order); // является особенным индексом, хранящим экземпляры триплетов
 	}
 
 	public uint* getTriples(char* s, char* p, char* o, bool debug_info)

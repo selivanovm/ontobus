@@ -1,9 +1,9 @@
 module scripts.S10UserIsAuthorOfDocument;
 
 private import tango.stdc.string;
-import TripleStorage;
+private import TripleStorage;
 private import tango.io.Stdout;
-//import str_tool;
+private import fact_tools;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, uint* iterator_facts_of_document)
 {
@@ -28,8 +28,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	//        	  return false	  
 	//          } // иначе
 
-//	Stdout.format("UserIsAuthorOfDocument #1 document subject {}, user={}", str_2_chararray(elementId),
-//			str_2_chararray(user)).newline;
+//	Stdout.format("UserIsAuthorOfDocument #1 document subject {}, user={}", getString(elementId), getString(user)).newline;
 
 	// найдем автора документа
 	//	uint* iterator0 = ts.getTriples(elementId, "http://purl.org/dc/elements/1.1/creator", user, false);
@@ -45,7 +44,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 //			Stdout.format("UserIsAuthorOfDocument #2.1").newline;
 
 			char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-//			Stdout.format("UserIsAuthorOfDocument #3 triple0_p={}", str_2_chararray(triple0_p)).newline;
+//			Stdout.format("UserIsAuthorOfDocument #3 triple0_p={}", getString(triple0_p)).newline;
 
 			if(strcmp(triple0_p, "http://purl.org/dc/elements/1.1/creator") == 0)
 			{
@@ -54,7 +53,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 				if(strcmp(triple0_o, user) == 0)
 				{
-//					Stdout.format("да! я автор документа {}", str_2_chararray(elementId)).newline;
+//					Stdout.format("да! я автор документа {}", getString(elementId)).newline;
 					return true;
 
 				}

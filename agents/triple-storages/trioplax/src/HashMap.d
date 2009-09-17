@@ -4,11 +4,11 @@ module HashMap;
 //private import tango.stdc.stdlib: malloc;
 private import tango.stdc.string;
 private import tango.io.Stdout;
-import Integer = tango.text.convert.Integer;
+private import Integer = tango.text.convert.Integer;
 
-import Hash;
+private import Hash;
 
-import Log;
+private import Log;
 
 class HashMap
 {
@@ -26,6 +26,8 @@ class HashMap
 	ubyte[] key_2_list_triples_area;
 	uint key_2_list_triples_area__last;
 	uint key_2_list_triples_area__right;
+	
+	char[] hashName;
 
 	// область длинных списков конфликтующих ключей
 	//	uint long_list_length;
@@ -42,11 +44,12 @@ class HashMap
 	//	int* triples_area__ptr;
 	//	uint triples_area__last_used;
 
-	this(uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
+	this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 	{
+		hashName = _hashName;
 		max_size_short_order = _max_size_short_order;
 		max_count_elements = _max_count_elements;
-		log.trace("*** create object HashMap[max_count_elements={}... start", _max_count_elements);
+		log.trace("*** create HashMap[name={}, max_count_elements={}, triple_area_length={}, max_size_short_order={} ... start", hashName, _triple_area_length, _max_count_elements, max_size_short_order);
 
 		// область маппинга ключей, 
 		// содержит короткую очередь из [max_size_short_order] элементов в формате [ссылка на ключ 4b][ссылка на список триплетов ключа 4b] 
@@ -371,6 +374,7 @@ class HashMap
 			key_2_list_triples_area__last += 8;
 			if(key_2_list_triples_area__last > key_2_list_triples_area__right)
 			{
+				log.trace ("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName, key_2_list_triples_area__last, key_2_list_triples_area__right);
 				throw new Exception("key_2_list_triples_area__last > key_2_list_triples_area__right");
 			}
 			// log.trace("put:23 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);

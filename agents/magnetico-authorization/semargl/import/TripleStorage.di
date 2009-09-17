@@ -87,7 +87,7 @@ class TripleStorage
 }
     uint max_count_element = 100000;
     uint max_length_order = 4;
-    this(ubyte useindex, uint _max_count_element, uint _max_length_order);
+    this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length);
     public
 {
     uint* getTriples(char* s, char* p, char* o, bool debug_info);

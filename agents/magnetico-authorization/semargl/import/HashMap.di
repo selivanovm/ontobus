@@ -8,9 +8,18 @@ private
 {
     import tango.io.Stdout;
 }
-import Integer = tango.text.convert.Integer;
-import Hash;
-import Log;
+private
+{
+    import Integer = tango.text.convert.Integer;
+}
+private
+{
+    import Hash;
+}
+private
+{
+    import Log;
+}
 class HashMap
 {
     private
@@ -25,7 +34,8 @@ class HashMap
     ubyte[] key_2_list_triples_area;
     uint key_2_list_triples_area__last;
     uint key_2_list_triples_area__right;
-    this(uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
+    char[] hashName;
+    this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
     public
 {
     void put(char[] key1, char[] key2, char[] key3, void* triple);

@@ -126,7 +126,7 @@ class Authorization
 	{
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO, 500_000, 8);
+		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO, 1_100_000, 8, 1024 * 1024 * 55);
 
 		//		
 
@@ -293,7 +293,7 @@ class Authorization
 
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
-			Stdout.format("iterator_facts_of_document is null").newline;
+			log.trace("iterator_facts_of_document [s={}] is null", getString (subject_document));
 			log.trace("autorize end#2, return:[false]");
 			return false;
 		}
@@ -308,35 +308,35 @@ class Authorization
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-		//			printf("authorize:S05InDocFlow res=%d\n", calculatedRight);
+//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-		//			printf("authorize:S10UserIsAuthorOfDocument res=%d\n", calculatedRight);
+//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-		//			printf("authorize:S20UserIsInOUP res=%d\n", calculatedRight);
+//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-		//			printf("authorize:S30UsersOfDocumentum res=%d\n", calculatedRight);
+//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-		//			printf("authorize:S40UsersOfTAImport res=%d\n", calculatedRight);
+//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		//		next_element = *(iterator0 + 1);
@@ -352,7 +352,7 @@ class Authorization
 		//		Stdout.format("calculate rules for documents, count={}, time ={}, cps={}", count_auth_doc, time,
 		//				count_auth_doc / time).newline;
 
-		log.trace("autorize end#3, return:[{}]", calculatedRight);
+//		log.trace("autorize end#3, return:[{}]", calculatedRight);
 		return calculatedRight;
 	}
 
