@@ -90,7 +90,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSystem"; // 			- система выдающая право, "BA"/"DOCFLOW"
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystem"; // 		- "user"/routeName
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystemElement"; // - id user or id route.
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; // 			- система, для которой выдали права, "BA"/"DOCFLOW".
+//?		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; // 			- система, для которой выдали права, "BA"/"DOCFLOW".
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystem"; // 		- "user"/"department".
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystemElement"; // - user id or department id.
 
@@ -113,7 +113,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology#hasPart";
 		i_know_predicates[d++] = "magnet-ontology#memberOf";
 		i_know_predicates[d++] = "magnet-ontology#loginName";
-
+		
 		init();
 	}
 
@@ -131,37 +131,37 @@ class Authorization
 		//		
 
 		char[] root = ".";
-		Stdout.formatln("Scanning '{}'", root);
+		log.trace("Scanning '{}'", root);
 
 		auto scan = (new FileScan)(root, ".n3");
-		Stdout.format("\n{} Folders\n", scan.folders.length);
+		log.trace("\n{} Folders\n", scan.folders.length);
 		foreach(folder; scan.folders)
-			Stdout.format("{}\n", folder);
-		Stdout.format("\n{0} Files\n", scan.files.length);
+			log.trace("{}\n", folder);
+			log.trace("\n{0} Files\n", scan.files.length);
 
 		foreach(file; scan.files)
 		{
-			Stdout.format("{}\n", file);
+			log.trace("{}\n", file);
 			load_from_file(file, i_know_predicates, ts);
 		}
-		Stdout.formatln("\n{} Errors", scan.errors.length);
+		log.trace("\n{} Errors", scan.errors.length);
 		foreach(error; scan.errors)
-			Stdout(error).newline;
+			log.trace(error);
 
 		scan = (new FileScan)(root, ".n3log");
-		Stdout.format("\n{} Folders\n", scan.folders.length);
+		log.trace("\n{} Folders\n", scan.folders.length);
 		foreach(folder; scan.folders)
-			Stdout.format("{}\n", folder);
-		Stdout.format("\n{0} Files\n", scan.files.length);
+			log.trace("{}\n", folder);
+		log.trace("\n{0} Files\n", scan.files.length);
 
 		foreach(file; scan.files)
 		{
-			Stdout.format("{}\n", file);
+			log.trace("{}\n", file);
 			load_from_file(file, i_know_predicates, ts);
 		}
-		Stdout.formatln("\n{} Errors", scan.errors.length);
+		log.trace("\n{} Errors", scan.errors.length);
 		foreach(error; scan.errors)
-			Stdout(error).newline;
+			log.trace(error);
 
 		//		print_list_triple(ts.getTriples("record", null, null, false));
 
@@ -169,7 +169,7 @@ class Authorization
 
 		//		print_list_triple(ts.getTriples("record", null, null, false));
 
-		Stdout.format("authorization init ... ok").newline;
+		log.trace("authorization init ... ok");
 	}
 
 	public void logginTriple(char command, char[] s, char[] p, char[] o)
@@ -258,7 +258,7 @@ class Authorization
 		calculatedRight = scripts.S01UserIsAdmin.calculate(User, null, targetRightType, ts);
 		if(calculatedRight == true)
 		{
-			log.trace("autorize end#0, return:[{}]", calculatedRight);
+//			log.trace("autorize end#0, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 

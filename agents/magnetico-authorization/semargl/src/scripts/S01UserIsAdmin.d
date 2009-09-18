@@ -8,7 +8,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
 	if(isAdmin(user, ts))
 	{
-		log.trace("User is admin");
+//		log.trace("User is admin");
 
 		return true;
 	}

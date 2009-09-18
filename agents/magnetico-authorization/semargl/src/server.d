@@ -61,10 +61,17 @@ void get_message(byte* message, ulong message_size)
 {
 	synchronized
 	{
-
+		if (*(message + message_size -1) != '.')
+		{
+			log.trace("invalid message");			
+			return;
+		}
+			
+			
 		*(message + message_size) = 0;
-
-		log.trace("\n\nget new message \n{}", getString(cast(char*) message));
+		
+//		Stdout.format ("{}", message).newline;
+		log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
 
 		auto elapsed = new StopWatch();
 		elapsed.start;
