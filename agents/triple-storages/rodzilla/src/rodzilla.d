@@ -32,15 +32,62 @@ librabbitmq_client client;
 
 private enum TripleType { URI, LITERAL, SET }
 
+uint functions_cnt = 0;
+const uint MAX_FUNCTIONS_IN_MESSAGE = 1000;
+
+char[] PUT = "magnet-ontology/logging#put";
+char[] GET = "magnet-ontology/logging#get";
+char[] SUBJECT = "magnet-ontology#subject";
+char[] ARGUMENT = "magnet-ontology/transport#argument";
+char[] DATA = "magnet-ontology/transport#result:data";
+char[] RESULT_STATE = "magnet-ontology/transport#result:state";
+char[] REPLY_TO = "magnet-ontology/transport#reply_to";
+
+uint fn_cnt = 0;
+uint args_cnt = 0;
+
+char*[] fn_names;
+uint[] fn_names_l;
+
+char*[] fn_uids;
+uint[] fn_uids_l;
+
+char*[] args;
+uint[] args_l;
+
+char*[] args_uids;
+uint[] args_uids_l;
+
+char*[] reply_to;
+uint[] reply_to_l;
+
+char*[] reply_to_uids;
+uint[] reply_to_uids_l;
+
 void main()
 {	
+
+  fn_names = new char*[1000];
+  fn_names_l = new uint[1000];
+
+  fn_uids = new char*[1000];
+  fn_uids_l = new uint[1000];
+
+  reply_to = new char*[1000];
+  reply_to_l = new uint[1000];
+
+  args = new char*[1000];
+  args_l = new uint[1000];
+  
+  args_uids = new char*[1000];
+  args_uids_l = new uint[1000];
 
   char[][char[]] props = load_props;
 
   Cout(Format("{:d15} ", WallClock.now.span.millis));
 
   char[] hostname = make_null_string(props["amqp_server_address"]);
-  int port = atoi(props["amqp_server_port"]);
+  int portt = atoi(props["amqp_server_port"]);
 
   /*      result["amqp_server_address"] = "localhost";
       result["amqp_server_port"] = "5762";
@@ -61,8 +108,8 @@ void main()
     conduit = new FileConduit(path.toString(), FileConduit.WriteCreate);
 
   file = new DataFileOutput(conduit, 1000, false);
-	
-  client = new librabbitmq_client (hostname, port, &get_message);
+
+  client = new librabbitmq_client (hostname, portt, &get_message);
 	
   (new Thread(&client.listener)).start;
   Thread.sleep(0.250);
@@ -96,6 +143,7 @@ void get_triplet(char* destination)
   char[] line = new char[5000];
   char* line_ptr = &(line[0]);
   char* t;
+
   foreach (file; scan.files)
     {
       memcpy(buf_ptr, cast(char*)header, header.length - 1);
@@ -116,7 +164,7 @@ void get_triplet(char* destination)
 		  uint line_length = time_mark_size;
 		  for(; line_length < 5000; line_length++)
 		    {
-		      if (*(line_ptr + line_length) == '\n' || *(line_ptr + line_length) == '0')
+		      if (*(line_ptr + line_length) == '\n' || *(line_ptr + line_length) == 0)
 			  break;
 		      *(buf_ptr + msg_length++) = *(line_ptr + line_length);
 		    }
@@ -162,7 +210,32 @@ void get_triplet(char* destination)
 
 void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
 {
-  if (*s == 's' && *(s + 1) == 'u' && *(s + 2) == 'b' && 
+  if (cmp_str(p, p_l, SUBJECT)) {
+
+    // сохраняем uid
+    fn_uids[fn_cnt] = s;
+    fn_uids_l[fn_cnt] = s_l;
+
+    // сохраняем функцию
+    fn_names[fn_cnt] = o;
+    fn_names_l[fn_cnt] = o_l;
+
+    fn_cnt++;
+
+  } else if (cmp_str(p, p_l, ARGUMENT)) {
+
+    // сохраняем uid
+    args_uids[args_cnt] = s;
+    args_uids_l[args_cnt] = s_l;
+
+    // сохраняем аргумент
+    args[args_cnt] = o;
+    args_l[args_cnt] = o_l;
+
+    args_cnt++;
+  }
+
+  /*  if (*s == 's' && *(s + 1) == 'u' && *(s + 2) == 'b' && 
       *(s + 3) == 'j' && *(s + 4) == 'e' && *(s + 5) == 'c' && 
       *(s + 6) == 't')
     {
@@ -175,7 +248,10 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 	  *(o + o_l) = 0;
 	  get_triplet(o);
 	}
-    }
+	}*/
+
+
+
 }
 	
 void get_message (byte* message, ulong message_size)
@@ -188,10 +264,36 @@ void get_message (byte* message, ulong message_size)
   *(message + message_size) = 0;
 
   //  Cout(str_2_char_array(cast(char*)message, message_size));
+  fn_cnt = 0;
+  args_cnt = 0;
 
   split_triples_line(cast(char*) message, message_size, &parse_functions);
 
+  for(uint i = 0; i < fn_cnt; i++) {
+    //    print_buf(fn_uids[i], fn_uids_l[i]);
+    for(uint j = 0; j < args_cnt; j++) {
+      //      print_buf(args_uids[j], args_uids_l[j]);
+      if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
+	if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
+	  split_triples_line(args[j], args_l[j], &store_triplet);	  
+	} else if (cmp_str(fn_names[i], fn_names_l[i], GET)) {
+	  
+	}
+      }
+    }
+    /*    Stdout.format("\nFn : ");
+    for(uint j = 0; j < fn_names_l[i]; j++)
+    Stdout.format("{}", *(fn_names[i] + j));*/
+  }
+
+  /*  for(uint i = 0; i < args_cnt; i++) {
+    Stdout.format("\nArg : ");
+    for(uint j = 0; j < args_l[i]; j++)
+      Stdout.format("{}", *(args[i] + j));
+      }*/
+
   file.flush;
+
 
   double time = elapsed.stop;  
 
@@ -423,4 +525,41 @@ char[] make_null_string(char[] str)
   memcpy(result_ptr, str_ptr, str.length);
   result[str.length] = '\0';
   return result;
+}
+
+bool cmp_str(char* buf1, uint l1, char[] buf2) {
+  if (l1 != buf2.length)
+    return false;
+  if (l1 == 0)
+    return true;
+
+  char* bbuf = &buf2[0];
+  for(uint i = 0; i < l1; i++) {
+    if (*(buf1 + i) != *(bbuf + i))
+      return false;
+  }
+  return true;
+}
+
+bool cmp_str(char* buf1, uint l1, char* buf2, uint l2) {
+  if (l1 != l2)
+    return false;
+  if (l1 == 0)
+    return true;
+
+  for(uint i = 0; i < l1; i++) {
+    if (*(buf1 + i) != *(buf2 + i))
+      return false;
+  }
+  return true;
+}
+
+void print_buf(char* buf, uint l) {
+  if (buf != null && l > 0) {
+    
+    for(uint i = 0; i < l; i++) {
+      Stdout.format("{}", *(buf + i));
+    }
+    Cout("\n");
+  }
 }

@@ -11,12 +11,12 @@ import librabbitmq_headers;
 class librabbitmq_client
 {
     amqp_connection_state_t_ conn;
-    char* vhost = "auth\x00";
+    char* vhost = "store\x00";
     char* exchange = "";
-    char* login = "rastore\x00";
-    char* passw = "rspass\x00";
+    char* login = "ba\x00";
+    char* passw = "123456\x00";
     char* bindingkey = cast(char*)"\x00";
-    char* queue = "auth";
+    char* queue = "store";
     char[] hostname;
     int port;
     void function(byte* txt, ulong size) message_acceptor;
