@@ -45,6 +45,7 @@ char[] REPLY_TO = "magnet-ontology/transport#reply_to";
 
 uint fn_cnt = 0;
 uint args_cnt = 0;
+uint reply_to_cnt = 0;
 
 char*[] fn_names;
 uint[] fn_names_l;
@@ -81,6 +82,12 @@ void main()
   
   args_uids = new char*[1000];
   args_uids_l = new uint[1000];
+
+  reply_to = new char*[1000];
+  reply_to_l = new uint[1000];
+
+  reply_to_uids = new char*[1000];
+  reply_to_uids_l = new uint[1000];
 
   char[][char[]] props = load_props;
 
@@ -124,8 +131,13 @@ void store_triplet(char* start, int l, char* s, int s_l, char* p,
   file.write("\n");
 }
 
-void get_triplet(char* destination)
+void get_triplet(char* destination, uint d_l)
 {
+
+  char[] dst = new char[d_l];
+  for(int i = 0; i < d_l; i++) {
+    dst[i] = *(destination + i);
+  }
 
   char[] buffer = new char[ TRIPLES_IN_PACKET * 5000 ];
   char* buf_ptr = &buffer[0];
@@ -175,7 +187,7 @@ void get_triplet(char* destination)
 		      msg_length += footer.length - 1;
 		      *(buf_ptr + msg_length) = 0;
 
-		      client.send(destination, buf_ptr);
+		      client.send(&dst[0], buf_ptr);
 
 		      total_chars_sent += msg_length;
 		      total_triples_sent += triples_count;
@@ -198,7 +210,7 @@ void get_triplet(char* destination)
 
 	  *(buf_ptr + msg_length) = 0;
 	  //	  printf("%s\n", buf_ptr);
-	  client.send(destination, buf_ptr);
+	  client.send(&dst[0], buf_ptr);
 	  total_chars_sent += msg_length;
 	  total_triples_sent += triples_count;
 	}
@@ -233,6 +245,17 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
     args_l[args_cnt] = o_l;
 
     args_cnt++;
+
+  } else if (cmp_str(p, p_l, REPLY_TO)) {
+    
+    reply_to_uids[reply_to_cnt] = s;
+    reply_to_uids_l[reply_to_cnt] = s_l;
+
+    reply_to[reply_to_cnt] = o;
+    reply_to_l[reply_to_cnt] = o_l;
+
+    reply_to_cnt++;
+
   }
 
   /*  if (*s == 's' && *(s + 1) == 'u' && *(s + 2) == 'b' && 
@@ -245,7 +268,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 	  split_triples_line(o, o_l, &store_triplet);
 	} else if (*p == 'g' && *(p + 1) == 'e' && *(p + 2) == 't')
 	{
-	  *(o + o_l) = 0;
+ 	  *(o + o_l) = 0;
 	  get_triplet(o);
 	}
 	}*/
@@ -266,34 +289,42 @@ void get_message (byte* message, ulong message_size)
   //  Cout(str_2_char_array(cast(char*)message, message_size));
   fn_cnt = 0;
   args_cnt = 0;
+  reply_to_cnt = 0;
 
   split_triples_line(cast(char*) message, message_size, &parse_functions);
 
+  char* reply_to_ptr;
+  uint reply_to_length;
+
   for(uint i = 0; i < fn_cnt; i++) {
-    //    print_buf(fn_uids[i], fn_uids_l[i]);
-    for(uint j = 0; j < args_cnt; j++) {
-      //      print_buf(args_uids[j], args_uids_l[j]);
-      if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
-	if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
-	  split_triples_line(args[j], args_l[j], &store_triplet);	  
-	} else if (cmp_str(fn_names[i], fn_names_l[i], GET)) {
-	  
-	}
+
+    reply_to_ptr = null;
+    reply_to_length = 0;
+    
+    for(uint k = 0; k < reply_to_cnt; k++) {
+      if (cmp_str(fn_uids[i], fn_uids_l[i], reply_to_uids[k], reply_to_uids_l[k])) {
+	reply_to_ptr = reply_to[k];
+	reply_to_length = reply_to_l[k];
       }
     }
-    /*    Stdout.format("\nFn : ");
-    for(uint j = 0; j < fn_names_l[i]; j++)
-    Stdout.format("{}", *(fn_names[i] + j));*/
+
+    if (reply_to_ptr == null || reply_to_length == 0) {
+      continue;
+    }
+
+    if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
+      for(uint j = 0; j < args_cnt; j++) {
+	//      print_buf(args_uids[j], args_uids_l[j]);
+	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
+	 split_triples_line(args[j], args_l[j], &store_triplet);	  
+	}
+      }
+    } else if (cmp_str(fn_names[i], fn_names_l[i], GET)) {
+      get_triplet(reply_to_ptr, reply_to_length);
+    }
+    //    print_buf(fn_uids[i], fn_uids_l[i]);
   }
-
-  /*  for(uint i = 0; i < args_cnt; i++) {
-    Stdout.format("\nArg : ");
-    for(uint j = 0; j < args_l[i]; j++)
-      Stdout.format("{}", *(args[i] + j));
-      }*/
-
   file.flush;
-
 
   double time = elapsed.stop;  
 
