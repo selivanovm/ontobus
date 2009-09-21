@@ -191,19 +191,14 @@ void get_message(byte* message, ulong message_size)
 				{
 					if(is_fact_in_object[i] == arg_id)
 					{
-						/*						
-						 // отфильтруем все факты-аргументы					
-						 if(strcmp(fact_s[i], "0000000000000000") == 0)
-						 longToHex(uuid, fact_s[i]);
-						 else
-						 {
+
 						 if(strlen(fact_s[i]) == 0)
 						 {
 						 fact_s[i] = cast(char*) new char[16];
 						 longToHex(uuid, fact_s[i]);
 						 }
-						 }
-						 */
+
+						 
 						log.trace("add triple <{}><{}><{}>", toString(cast(char*) fact_s[i]), toString(
 								cast(char*) fact_p[i]), toString(cast(char*) fact_o[i]));
 						az.getTripleStorage.addTriple(toString(fact_s[i]), toString(fact_p[i]), toString(fact_o[i]));

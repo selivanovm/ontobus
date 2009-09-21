@@ -279,9 +279,13 @@ class Authorization
 		char* subject_document = authorizedElementId;
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
-
+		if (strcmp(authorizedElementCategory, "DOCUMENT") == 0)
+		{
 		calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
 				targetRightType, ts);
+			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			return calculatedRight;
+		}
 
 		if(calculatedRight == true)
 		{
@@ -302,41 +306,41 @@ class Authorization
 		{
 			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
 					hierarhical_departments);
-//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
+			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
+			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
+			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		//		next_element = *(iterator0 + 1);
