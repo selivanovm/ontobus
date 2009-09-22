@@ -39,12 +39,12 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 		uint*[] iterator_on_targets_of_hierarhical_departments)
 {
-		Stdout.format("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}",
-				iterator_on_targets_of_hierarhical_departments.length).newline;
+//	Stdout.format("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}",
+//			iterator_on_targets_of_hierarhical_departments.length).newline;
 
 	uint* iterator1 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId, false);
 
-	print_list_triple(iterator1);
+//	print_list_triple(iterator1);
 
 	bool this_user_in_ACL = false;
 
@@ -70,18 +70,17 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 				if(triple2 !is null)
 				{
 					char* triple2_p = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-					printf("%s\n", triple2_p);
-
+					//					printf("%s\n", triple2_p);
 
 					if(strcmp(triple2_p, "magnet-ontology/authorization/acl#targetSubsystemElement\0") == 0)
 					{
-							Stdout.format("###1").newline;
+						//							Stdout.format("###1").newline;
 
 						// проверим, это ACL для нашего пользователя или нет
 						char*
 								triple2_o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
-					printf("%s\n", triple2_o);
+						//					printf("%s\n", triple2_o);
 
 						if(strcmp(triple2_o, user) == 0)
 						{
@@ -92,7 +91,8 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 					}
 					else if(this_user_in_ACL == true && strcmp(triple2_p, "magnet-ontology/authorization/acl#rights\0") == 0)
 					{
-						Stdout.format("this_user_in_ACL == true && strcmp(triple2_p, 'magnet-ontology/authorization/acl#rights\0'").newline;
+						Stdout.format(
+								"this_user_in_ACL == true && strcmp(triple2_p, 'magnet-ontology/authorization/acl#rights\0'").newline;
 
 						// проверим, есть ли тут требуемуе нами право
 						char*
@@ -100,10 +100,10 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts,
 
 						while(*triple2_o != 0)
 						{
-								Stdout.format("S11ACLRightsHierarhical.checkRight #5 ?").newline;
+							Stdout.format("S11ACLRightsHierarhical.checkRight #5 ?").newline;
 							if((rightType == RightType.READ) && *triple2_o == 'r')
 							{
-//								Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
+								//								Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
 								return true;
 							}
 							triple2_o++;

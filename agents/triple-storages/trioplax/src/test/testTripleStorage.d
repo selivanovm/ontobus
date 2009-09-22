@@ -5,6 +5,7 @@ private import tango.stdc.string;
 
 //import Integer = tango.text.convert.Integer;
 import fact_tools;
+import Log;
 
 version(tango_99_8)
 {
@@ -30,11 +31,13 @@ int main(char[][] args)
 {
 	uint count_add_triple = 0;
 
-	TripleStorage ts = new TripleStorage(0xff, 100, 5);
+	TripleStorage ts = new TripleStorage(0xff, 100, 100, 5);
 	//	Triple triple;
 	//		
 	auto elapsed = new StopWatch();
 	double time;
+
+	log.trace ("!!!! TEST !!!!");
 
 	elapsed.start;
 

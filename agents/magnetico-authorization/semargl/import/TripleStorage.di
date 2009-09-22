@@ -121,7 +121,7 @@ Stdout.format("index spo={} reads",stat__idx_spo__reads).newline;
 }
 private
 {
-    static
+    static 
 {
     char[] _toString(char* s)
 {

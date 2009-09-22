@@ -71,7 +71,7 @@ private
 }
 private
 {
-    static
+    static 
 {
     char[] _toString(char* s)
 {

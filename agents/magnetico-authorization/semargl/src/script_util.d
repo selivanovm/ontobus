@@ -3,7 +3,7 @@ module script_util;
 import RightTypeDef;
 import TripleStorage;
 private import tango.io.Stdout;
-import std.string;
+import fact_tools;
 
 public bool isInDocFlow(char* elementId, TripleStorage ts)
 {
@@ -34,7 +34,7 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 
 			if(iterator0 !is null)
 			{
-				Stdout.format("да, документ в документообороте {}", toString(elementId)).newline;
+				Stdout.format("да, документ в документообороте {}", getString(elementId)).newline;
 				return true;
 			}
 		}
@@ -108,3 +108,4 @@ public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 
 	return result;
 }
+

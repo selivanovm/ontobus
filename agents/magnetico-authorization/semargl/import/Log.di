@@ -1,14 +1,17 @@
 // D import file generated from 'src/Log.d'
 module Log;
-public
+private
 {
     import tango.util.log.Log;
 }
-import tango.time.Clock;
-import tango.time.WallClock;
-import tango.util.log.AppendFile;
-import tango.util.log.AppendConsole;
-import tango.text.convert.Layout;
+private
+{
+    import tango.time.Clock;
+    import tango.time.WallClock;
+    import tango.util.log.AppendFile;
+    import tango.util.log.AppendConsole;
+    import tango.text.convert.Layout;
+}
 package
 {
     Logger log;

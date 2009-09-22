@@ -27,7 +27,7 @@ void main()
 	uint* res_triples;
 	Stdout.format("main:1 Test HashMap").newline;
 
-	HashMap hm = new HashMap(1_000, 1024 * 1024, 8);
+	HashMap hm = new HashMap("test", 1_000, 1024 * 1024, 8);
 
 	char[] triple = null;
 

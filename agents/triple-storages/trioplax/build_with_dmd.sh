@@ -14,7 +14,7 @@ dmd src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d -O -Hdexport -release
 
 #dmd Triple.d socketserver.d ListStrings.d TripleStorage.d Log.d HashMap.d Hash.d -O -release -ofFRTSServer
 rm hashMap.log
-rm *.o
+#rm *.o
 date
 
 #dmd Triple.d test_triple_storage.d TripleStorage.d Log.d HashMap.d Hash.d libfs.a *.a libamq_common.a libamq_operate.a libamq_server.a libamq_wireapi.a libapr.a libaprutil.a libasl.a libfs.a libgsl.a libgsl3.a libicl.a libipr.a libpcre.a libsfl.a libsmt.a libsmt3.a libzip.a -O -release -oftripleStorageRelease.test
