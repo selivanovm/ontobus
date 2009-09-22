@@ -31,11 +31,12 @@ object N3Uploader {
       
       val channel = conn.createChannel()
       
-      channel.exchangeDeclare(exchange, exchangeType)
-      channel.queueDeclare(queue)
-      channel.queueBind(queue, exchange, routingKey)
+//      channel.exchangeDeclare(exchange, exchangeType)
+      channel.queueDeclare(exchange)
+  //    channel.queueBind(queue, exchange, routingKey)
 
-      var msg = "<subject><store>{"
+      var msg = "<uid1><magnet-ontology#subject><magnet-ontology/logging#put>.<uid1><magnet-ontology/transport#reply_to>\"" + queue + 
+                "\".<uid1><magnet-ontology/transport#argument>{"
       var i = 0
       var total = 0
 
@@ -44,14 +45,20 @@ object N3Uploader {
           msg += line.substring(0, line.length - 1)
           i = i + 1
         } else {
-          channel.basicPublish(exchange, routingKey,
+          channel.basicPublish(routingKey, exchange,
                                MessageProperties.PERSISTENT_TEXT_PLAIN,
                                (msg + "}.").getBytes)
           total += i
           println("Uploaded " + total + " triplets")
           i = 0
-          msg = "<subject><store>{"
+          msg = "<uid1><magnet-ontology#subject><magnet-ontology/logging#put>.<uid1><magnet-ontology/transport#reply_to>\"" + queue + 
+                "\".<uid1><magnet-ontology/transport#argument>{"
         }
+      }
+      if (i > 0) {
+          channel.basicPublish(routingKey, exchange,
+                               MessageProperties.PERSISTENT_TEXT_PLAIN,
+                               (msg + "}.").getBytes)
       }
     } else
       println ("Usage : <inputFile> <host> <port> <vhost> <exchange> <targetQueue> <user> <password> <heartbeat> <routingKey> <exchangeType>")
