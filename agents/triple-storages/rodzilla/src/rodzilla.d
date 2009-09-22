@@ -91,8 +91,20 @@ void main()
 
   char[][char[]] props = load_props;
 
+  Cout(Format("{:d15} ", WallClock.now.span.millis));
+
   char[] hostname = make_null_string(props["amqp_server_address"]);
-  int port = atoi(props["amqp_server_port"]);
+  int portt = atoi(props["amqp_server_port"]);
+
+  /*      result["amqp_server_address"] = "localhost";
+      result["amqp_server_port"] = "5762";
+      result["amqp_server_exchange"] = "";
+      result["amqp_server_login"] = "rodzilla";
+      result["amqp_server_password"] = "rodzilla_password";
+      result["amqp_server_routingkey"] = "";
+      result["amqp_server_queue"] = "store";*/
+
+
 
   auto locale = new Locale();
   path = new FilePath(locale ("./data/{:yyyy-MM-dd}.triples", WallClock.now));
@@ -104,11 +116,7 @@ void main()
 
   file = new DataFileOutput(conduit, 1000, false);
 
-  client = new librabbitmq_client (props["amqp_server_address"], 5672, make_null_string(props["amqp_server_login"]), 
-				   props["amqp_server_password"], props["amqp_server_queue"],
-				   props["amqp_server_vhost"]);
-
-  client.set_callback(&get_message);
+  client = new librabbitmq_client (hostname, portt, &get_message);
 	
   (new Thread(&client.listener)).start;
   Thread.sleep(0.250);
@@ -123,7 +131,7 @@ void store_triplet(char* start, int l, char* s, int s_l, char* p,
   file.write("\n");
 }
 
-void get_triplet(char* uid, uint uid_l, char* destination, uint d_l)
+void get_triplet(char* uid, uint u_l, char* destination, uint d_l)
 {
 
   char[] dst = new char[d_l];
@@ -131,8 +139,8 @@ void get_triplet(char* uid, uint uid_l, char* destination, uint d_l)
     dst[i] = *(destination + i);
   }
 
-  char[] uid_str = new char[uid_l];
-  for(int i = 0; i < uid_l; i++) {
+  char[] uid_str = new char[u_l];
+  for(int i = 0; i < u_l; i++) {
     uid_str[i] = *(uid + i);
   }
 
@@ -141,11 +149,9 @@ void get_triplet(char* uid, uint uid_l, char* destination, uint d_l)
 
   int msg_length = 0;
   int triples_count = 0;
-
-  char[] header = "<" ~ uid_str  ~ "><" ~ RESULT_DATA ~ ">{\0";
+  char[] header = "<" ~ uid_str ~ "><" ~ RESULT_DATA  ~ ">{\0";
   char[] footer = "}.\0";
   char[] root = "./data/";
-
   auto scan = (new FileScan)(root, ".triples");
 
   int total_chars_sent = 0;
@@ -155,63 +161,71 @@ void get_triplet(char* uid, uint uid_l, char* destination, uint d_l)
   char* line_ptr = &(line[0]);
   char* t;
 
-  foreach (file; scan.files) {
-    memcpy(buf_ptr, cast(char*)header, header.length - 1);
-    msg_length = header.length - 1;
+  foreach (file; scan.files)
+    {
+      memcpy(buf_ptr, cast(char*)header, header.length - 1);
+      msg_length = header.length - 1;
 
-    FILE *data_file = fopen ( &(file.toString[0]), "r" );
+      FILE *data_file = fopen ( &(file.toString[0]), "r" );
 
-    if (data_file != null) {
+      if (data_file != null)
+	{
  
-      while ( fgets ( line_ptr, 5000, data_file ) != null ) {
+	  while ( fgets ( line_ptr, 5000, data_file ) != null )
+	    {
 	      
-	if (line.length > time_mark_size) {
-	  triples_count++;
-	  
-	  uint line_length = time_mark_size;
-	  for(; line_length < 5000; line_length++) {
-	    if (*(line_ptr + line_length) == '\n' || *(line_ptr + line_length) == 0)
-	      break;
-	    *(buf_ptr + msg_length++) = *(line_ptr + line_length);
-	  }
-	  
-	  if (triples_count == TRIPLES_IN_PACKET) {
-	    memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
-	    msg_length += footer.length - 1;
-	    *(buf_ptr + msg_length) = 0;
-	    
-	    client.send(&dst[0], buf_ptr);
-	    
-	    total_chars_sent += msg_length;
-	    total_triples_sent += triples_count;
-	    
-	    memcpy(buf_ptr, cast(char*)header, header.length - 1);
-	    msg_length = header.length - 1;
-	    triples_count = 0;
-	  } 
+	      if (line.length > time_mark_size)
+		{
+		  triples_count++;
+
+		  uint line_length = time_mark_size;
+		  for(; line_length < 5000; line_length++)
+		    {
+		      if (*(line_ptr + line_length) == '\n' || *(line_ptr + line_length) == 0)
+			  break;
+		      *(buf_ptr + msg_length++) = *(line_ptr + line_length);
+		    }
+
+		  if (triples_count == TRIPLES_IN_PACKET)
+		    {
+		      memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
+		      msg_length += footer.length - 1;
+		      *(buf_ptr + msg_length) = 0;
+
+		      client.send(&dst[0], buf_ptr);
+
+		      total_chars_sent += msg_length;
+		      total_triples_sent += triples_count;
+
+		      memcpy(buf_ptr, cast(char*)header, header.length - 1);
+		      msg_length = header.length - 1;
+		      triples_count = 0;
+		    } 
+		}
+  	      
+	    }
+	  fclose(data_file);
 	}
-  	
-      }
-      fclose(data_file);
+
+      if (triples_count > 0)
+	{
+
+	  memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
+	  msg_length += footer.length - 1;
+
+	  *(buf_ptr + msg_length) = 0;
+	  //	  printf("%s\n", buf_ptr);
+	  client.send(&dst[0], buf_ptr);
+	  total_chars_sent += msg_length;
+	  total_triples_sent += triples_count;
+	}
     }
-    
-    if (triples_count > 0) {
-      
-      memcpy(buf_ptr + msg_length, cast(char*)footer, footer.length - 1);
-      msg_length += footer.length - 1;
-      
-      *(buf_ptr + msg_length) = 0;
-      //	  printf("%s\n", buf_ptr);
-      client.send(&dst[0], buf_ptr);
-      total_chars_sent += msg_length;
-      total_triples_sent += triples_count;
-    }
-    
-    client.send(&dst[0], buf_ptr);
-  }
-  
-  Stdout.format("Total sent: {} chars, {} triples", total_chars_sent, total_triples_sent).newline;
-  
+
+    char[] state_message = "<" ~ uid_str ~ "><" ~ RESULT_STATE ~ ">\"ok\".\0";
+    client.send(&dst[0], &state_message[0]);
+
+    Stdout.format("Total sent: {} chars, {} triples", total_chars_sent, total_triples_sent).newline;
+
 }
 
 void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
@@ -252,23 +266,6 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
   }
 
-  /*  if (*s == 's' && *(s + 1) == 'u' && *(s + 2) == 'b' && 
-      *(s + 3) == 'j' && *(s + 4) == 'e' && *(s + 5) == 'c' && 
-      *(s + 6) == 't')
-    {
-      if (*p == 's' && *(p + 1) == 't' && *(p + 2) == 'o' && 
-	  *(p + 3) == 'r' && *(p + 4) == 'e')
-	{
-	  split_triples_line(o, o_l, &store_triplet);
-	} else if (*p == 'g' && *(p + 1) == 'e' && *(p + 2) == 't')
-	{
- 	  *(o + o_l) = 0;
-	  get_triplet(o);
-	}
-	}*/
-
-
-
 }
 	
 void get_message (byte* message, ulong message_size)
@@ -280,7 +277,8 @@ void get_message (byte* message, ulong message_size)
 	
   *(message + message_size) = 0;
 
-  Cout(str_2_char_array(cast(char*)message, message_size));
+  //  Cout(str_2_char_array(cast(char*)message, message_size));
+  
   fn_cnt = 0;
   args_cnt = 0;
   reply_to_cnt = 0;
@@ -307,8 +305,10 @@ void get_message (byte* message, ulong message_size)
     }
 
     if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
+      Cout("l").newline;
       for(uint j = 0; j < args_cnt; j++) {
-	//      print_buf(args_uids[j], args_uids_l[j]);
+	print_buf(fn_uids[i], fn_uids_l[i]);
+	print_buf(args_uids[j], args_uids_l[j]);
 	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
 	 split_triples_line(args[j], args_l[j], &store_triplet);	  
 	}
@@ -316,7 +316,7 @@ void get_message (byte* message, ulong message_size)
     } else if (cmp_str(fn_names[i], fn_names_l[i], GET)) {
       get_triplet(fn_uids[i], fn_uids_l[i], reply_to_ptr, reply_to_length);
     }
-    //    print_buf(fn_uids[i], fn_uids_l[i]);
+
   }
   file.flush;
 
@@ -515,7 +515,7 @@ private char[][char[]] load_props()
   if (!props_path.exists) // props file doesn't exists, so create new one with defaults
     {
       result["amqp_server_address"] = "localhost";
-      result["amqp_server_port"] = "5672";
+      result["amqp_server_port"] = "5762";
       result["amqp_server_exchange"] = "";
       result["amqp_server_login"] = "rodzilla";
       result["amqp_server_password"] = "rodzilla_password";
