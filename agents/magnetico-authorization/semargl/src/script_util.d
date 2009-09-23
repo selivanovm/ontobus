@@ -1,9 +1,10 @@
 module script_util;
 
-import RightTypeDef;
-import TripleStorage;
+private import RightTypeDef;
+private import TripleStorage;
 private import tango.io.Stdout;
-import fact_tools;
+private import fact_tools;
+private import Log;
 
 public bool isInDocFlow(char* elementId, TripleStorage ts)
 {
@@ -44,45 +45,52 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 }
 
 /*
- * возвращает массив итераторов на списки субьектов 
- * имеющих факты magnet-ontology#target = подразделение по иерархии  
+ * возвращает массив субьектов вышестоящих подразделений по отношению к user   
  */
-public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
+public char*[] getDepartmentTreePath(char* user, TripleStorage ts)
 {
 	// получаем путь до корня в дереве подразделений начиная от заданного подразделения
 
-	uint*[] result = new uint*[16];
+	char*[] result = new char*[16];
 	ubyte count_result = 0;
 
 	uint* iterator0;
 	byte* triple0;
 
-	//	Stdout.format("getDepartmentTreePath #1 user={}", str_2_chararray(user)).newline;
+//	log.trace("getDepartmentTreePath #1 user={}", getString(user));
 
 	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null, false);
+
+//	print_list_triple(iterator0);
+
 	if(iterator0 !is null)
 	{
 		triple0 = cast(byte*) *iterator0;
-		char*
-				next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
-		//		if(next_branch !is null)
-		//			Stdout.format("getDepartmentTreePath #1 next_branch  {}", str_2_chararray(next_branch)).newline;
+		char* next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
+
+		if(next_branch !is null)
+		{
+//			log.trace("getDepartmentTreePath #1 next_branch={}", getString(next_branch));
+			result[count_result] = next_branch;
+			count_result++;
+		}
 
 		while(next_branch !is null)
 		{
 
-			uint* iterator1 = ts.getTriples(null, "magnet-ontology#target", next_branch, false);
+			uint* iterator1 = ts.getTriples(null, "magnet-ontology#hasPart", next_branch, false);
 			if(iterator1 !is null)
 			{
+				byte* triple = cast(byte*) *iterator1;
+				char* s = cast(char*) triple + 6;
+//				log.trace("next_element1={}", getString (s));
 
-				//				Stdout.format("iterator1 next_element1={:X4}", iterator1).newline;
-
-				result[count_result] = iterator1;
+				result[count_result] = s;
 				count_result++;
 
 			}
 
-			iterator0 = ts.getTriples(next_branch, "magnet-ontology#memberOf", null, false);
+			iterator0 = ts.getTriples(next_branch, "magnet-ontology#hasPart", null, false);
 			if(iterator0 !is null)
 			{
 				triple0 = cast(byte*) *iterator0;
@@ -90,8 +98,9 @@ public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 				if(triple0 !is null)
 				{
 					next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
-				//					if(next_branch !is null)
-				//						Stdout.format("getDepartmentTreePath #2 next_branch  {}", str_2_chararray(next_branch)).newline;
+
+//					if(next_branch !is null)
+//						log.trace("getDepartmentTreePath #2 next_branch  {}", getString(next_branch));
 				}
 				else
 					next_branch = null;
@@ -108,4 +117,3 @@ public uint*[] getDepartmentTreePath(char* user, TripleStorage ts)
 
 	return result;
 }
-

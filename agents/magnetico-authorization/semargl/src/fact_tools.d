@@ -5,6 +5,7 @@ private import tango.time.Time;
 private import tango.stdc.posix.stdio;
 private import tango.io.Stdout;
 private import tango.stdc.string;
+private import Log;
 
 struct Counts
 {
@@ -15,22 +16,21 @@ struct Counts
 public void print_list_triple(uint* list_iterator)
 {
 	byte* triple;
-	Stdout.format(\n "list_iterator {:X4}", list_iterator).newline;
+	log.trace("list_iterator {:X4}", list_iterator);
 	if(list_iterator !is null)
 	{
 		uint next_element0 = 0xFF;
 		while(next_element0 > 0)
 		{
 			triple = cast(byte*) *list_iterator;
-			Stdout.format("triple {:X4}", triple).newline;
+			log.trace("triple {:X4}", triple);
 			print_triple(triple);
 
 			next_element0 = *(list_iterator + 1);
-			Stdout.format("next_element0 {:X4}", next_element0).newline;
+			log.trace("next_element0 {:X4}", next_element0);
 			list_iterator = cast(uint*) next_element0;
 		}
 	}
-
 }
 
 public void print_triple(byte* triple)
@@ -45,7 +45,7 @@ public void print_triple(byte* triple)
 	char*
 			o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-	printf("triple: <%s><%s><%s>\n", s, p, o);
+	log.trace("triple: <{}><{}><{}>", getString (s), getString (p), getString (o));
 }
 
 public Counts calculate_count_facts(char* message, ulong message_size)

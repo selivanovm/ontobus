@@ -37,7 +37,7 @@ private
                 //-------------------- log -------------------------------------------------
 
                 // all loggers, as children of root, print also to console by default
-                Log.root.add( new AppendConsole( new VerySimpleLayout ) );
+//                Log.root.add( new AppendConsole( new VerySimpleLayout ) );
                 // trace is the lowest level, so all levels are logged
                 Log.root.level( Logger.Level.Trace );
 

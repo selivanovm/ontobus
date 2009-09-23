@@ -51,7 +51,7 @@ class Authorization
 
 	this()
 	{
-		i_know_predicates = new char[][40];
+		i_know_predicates = new char[][43];
 
 		uint d = 0;
 
@@ -100,7 +100,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateFrom"; // 				- период действия прав (до (с возможностью указания открытых интервалов значение null)).
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateTo"; // 				- период действия прав (от (с возможностью указания открытых интервалов- значение null)).
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#elementId"; // 				- идентификатор элемента, на который выдаются права.
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rights"; // 				- "c|r|u|d"
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rigths"; // 				- "c|r|u|d"
 
 		//		 запись о делегировании
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#owner"; // - кто делегирует
@@ -128,7 +128,7 @@ class Authorization
 	{
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO, 1_100_000, 8, 1024 * 1024 * 55);
+		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO, 1_200_000, 8, 1024 * 1024 * 60);
 
 		//		
 
@@ -226,7 +226,7 @@ class Authorization
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для всех документов 
 
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
-			uint*[] hierarhical_departments)
+			char*[] hierarhical_departments)
 	{
 		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(
 		//				authorizedElementCategory), getString(authorizedElementId), getString(User));

@@ -375,7 +375,7 @@ void get_message(byte* message, ulong message_size)
 
 				//						printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
 
-				uint*[] hierarhical_departments = null;
+				char*[] hierarhical_departments = null;
 				hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
 				//						log.trace("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length);
 
