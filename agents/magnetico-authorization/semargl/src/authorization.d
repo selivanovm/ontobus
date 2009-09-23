@@ -56,6 +56,11 @@ class Authorization
 		uint d = 0;
 
 		// общая онтология
+		i_know_predicates[d++] = "magnet-ontology#put"; //
+		i_know_predicates[d++] = "magnet-ontology#get"; //
+		i_know_predicates[d++] = "magnet-ontology#delete"; //
+		i_know_predicates[d++] = "magnet-ontology#delete_by_subject";
+		i_know_predicates[d++] = "magnet-ontology#delete_subjects_by_predicate";
 
 		i_know_predicates[d++] = "magnet-ontology/subject"; //
 		i_know_predicates[d++] = "magnet-ontology/argument"; //
@@ -70,9 +75,6 @@ class Authorization
 		//		 функции авторизации
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#create"; //
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#update"; //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#delete"; //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#delete_by_element_id"; //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#put"; //
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_authorization_rights_records"; //
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#is_in_docflow"; //
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#is_admin"; //
@@ -175,8 +177,8 @@ class Authorization
 	public void logginTriple(char command, char[] s, char[] p, char[] o)
 	{
 		auto layout = new Locale;
-		auto nameFile = layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now);
-		auto file = new File(nameFile);
+		//		auto nameFile = layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now);
+		//		auto file = new File(nameFile, File.WriteAppending);
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
@@ -192,7 +194,7 @@ class Authorization
 							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
 							dt.time.millis), s, p, o);
 
-			file.append(now, null);
+			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 		else if(command == 'U')
 		{
@@ -202,7 +204,7 @@ class Authorization
 							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
 							dt.time.millis), s, p, o);
 
-			file.append(now, null);
+			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 		else if(command == 'D')
 		{
@@ -212,7 +214,7 @@ class Authorization
 							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
 							dt.time.millis), s, p, o);
 
-			file.append(now, null);
+			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 	}
 
@@ -282,7 +284,7 @@ class Authorization
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
 					targetRightType, ts);
-//			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			//			log.trace("autorize end#0, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 
@@ -305,41 +307,41 @@ class Authorization
 		{
 			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
 					hierarhical_departments);
-//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+		//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
+		//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+		//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
+		//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
+		//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
 					iterator_facts_of_document);
-//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+		//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		//		next_element = *(iterator0 + 1);

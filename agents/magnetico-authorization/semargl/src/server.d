@@ -104,13 +104,14 @@ void get_message(byte* message, ulong message_size)
 			fact_p = new char*[count_elements.facts];
 			fact_o = new char*[count_elements.facts];
 			is_fact_in_object = new uint[count_elements.facts];
-			uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s,
-					fact_p, fact_o, is_fact_in_object);
+			uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o,
+					is_fact_in_object);
 			// 				
 			// замапим предикаты фактов на конкретные переменные put_id, arg_id
+			int delete_subjects_id = -1;
 			int get_id = -1;
 			int put_id = -1;
-			int delete_by_element_id = -1;
+			int delete_subjects_by_predicate_id = -1;
 			int arg_id = -1;
 
 			for(int i = 0; i < count_facts; i++)
@@ -118,8 +119,7 @@ void get_message(byte* message, ulong message_size)
 				//				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), toString(
 				//						cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 
-				if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#put") == 0 && strcmp(
-						fact_p[i], "magnet-ontology#subject") == 0)
+				if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#put") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
 				{
 					put_id = i;
 				//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
@@ -133,20 +133,27 @@ void get_message(byte* message, ulong message_size)
 					}
 					else
 					{
-						if(delete_by_element_id < 0 && strcmp(fact_o[i],
-								"magnet-ontology/authorization/functions#delete_by_element_id") == 0 && strcmp(
+						if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], "magnet-ontology#delete_subjects_by_predicate") == 0 && strcmp(
 								fact_p[i], "magnet-ontology#subject") == 0)
 						{
-							delete_by_element_id = i;
+							delete_subjects_by_predicate_id = i;
 						//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 						}
 						else
 						{
-							if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#get") == 0 && strcmp(
-									fact_p[i], "magnet-ontology#subject") == 0)
+							if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology#get") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
 							{
 								get_id = i;
-												Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+								Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+							}
+							else
+							{
+								if(delete_subjects_id < 0 && strcmp(fact_o[i], "magnet-ontology#delete_subjects") == 0 && strcmp(fact_p[i],
+										"magnet-ontology#subject") == 0)
+								{
+									delete_subjects_id = i;
+									Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+								}
 							}
 
 						}
@@ -155,24 +162,24 @@ void get_message(byte* message, ulong message_size)
 				}
 
 			}
-			
-			if(delete_by_element_id >= 0 && arg_id > 0)
+
+			if(get_id >= 0 && arg_id > 0)
 			{
 				log.trace("команда get, argd={} ", getString(fact_o[arg_id]));
 			}
 
-			if(delete_by_element_id >= 0 && arg_id > 0)
+			if(delete_subjects_id >= 0 && arg_id > 0)
 			{
-				log.trace("команда на удаление всех фактов с s={}", getString(fact_o[arg_id]));
+				log.trace("команда на удаление всех фактов у которых субьект, s={}", getString(fact_o[arg_id]));
+				
+				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
 
-				uint* removed_triples = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
-
-				if(removed_triples !is null)
+				if(removed_facts !is null)
 				{
-					uint next_element0 = 0xFF;
-					while(next_element0 > 0)
+					uint next_element1 = 0xFF;
+					while(next_element1 > 0)
 					{
-						byte* triple = cast(byte*) *removed_triples;
+						byte* triple = cast(byte*) *removed_facts;
 
 						char* s = cast(char*) triple + 6;
 
@@ -186,9 +193,71 @@ void get_message(byte* message, ulong message_size)
 						az.getTripleStorage.removeTriple(s, p, o);
 						az.logginTriple('D', getString(s), getString(p), getString(o));
 
-						next_element0 = *(removed_triples + 1);
-						removed_triples = cast(uint*) next_element0;
+						next_element1 = *(removed_facts + 1);
+						removed_facts = cast(uint*) next_element1;
+					}
 
+				}
+			}
+			
+			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
+			{
+				char *arg_p;
+				char *arg_o;
+				
+				for (ubyte i = 0; i < count_facts; i++)
+				{
+				 if (is_fact_in_object[i] == arg_id)
+				 {
+					 arg_p = fact_p[i];
+					 arg_o = fact_o[i];
+					 break;
+				 }
+				}
+				
+				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
+						getString(arg_o));
+
+				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o, false);
+
+				if(removed_subjects !is null)
+				{
+					uint next_element0 = 0xFF;
+					while(next_element0 > 0)
+					{
+						byte* triple = cast(byte*) *removed_subjects;
+
+						char* s = cast(char*) triple + 6;
+						log.trace("removed_subjects <{}>", getString(s));
+
+						uint* removed_facts = az.getTripleStorage.getTriples(s, null, null, false);
+
+						if(removed_facts !is null)
+						{
+							uint next_element1 = 0xFF;
+							while(next_element1 > 0)
+							{
+								triple = cast(byte*) *removed_facts;
+
+								s = cast(char*) triple + 6;
+
+								char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+								char*
+										o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+								log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
+
+								az.getTripleStorage.removeTriple(s, p, o);
+								az.logginTriple('D', getString(s), getString(p), getString(o));
+
+								next_element1 = *(removed_facts + 1);
+								removed_facts = cast(uint*) next_element1;
+							}
+
+						}
+						next_element0 = *(removed_subjects + 1);
+						removed_subjects = cast(uint*) next_element0;
 					}
 				}
 
@@ -213,8 +282,8 @@ void get_message(byte* message, ulong message_size)
 							longToHex(uuid, fact_s[i]);
 						}
 
-						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(
-								cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+								cast(char*) fact_o[i]));
 						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 					}
@@ -226,8 +295,7 @@ void get_message(byte* message, ulong message_size)
 
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
-			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0],
-					"magnet-ontology#subject") == 0)
+			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0], "magnet-ontology#subject") == 0)
 			{
 				/* пример сообщения:
 				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
@@ -360,8 +428,7 @@ void get_message(byte* message, ulong message_size)
 						//					Stdout.format("this request on authorization #1.3, {} docId={}", i, getString (autz_elements + doc_pos)).newline;
 
 						count_prepared_doc++;
-						bool calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType,
-								hierarhical_departments);
+						bool calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
 						//					Stdout.format("right = {}", calculatedRight).newline;
 
 						//					if(calculatedRight == false)
@@ -403,8 +470,7 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 
-				log.trace(
-						"count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
+				log.trace("count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
 						count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc / time);
 
 				log.trace("queue_name:{}", getString(queue_name));
