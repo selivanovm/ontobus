@@ -16,18 +16,18 @@ struct Counts
 public void print_list_triple(uint* list_iterator)
 {
 	byte* triple;
-	log.trace("list_iterator {:X4}", list_iterator);
+//	log.trace("list_iterator {:X4}", list_iterator);
 	if(list_iterator !is null)
 	{
 		uint next_element0 = 0xFF;
 		while(next_element0 > 0)
 		{
 			triple = cast(byte*) *list_iterator;
-			log.trace("triple {:X4}", triple);
+//			log.trace("triple {:X4}", triple);
 			print_triple(triple);
 
 			next_element0 = *(list_iterator + 1);
-			log.trace("next_element0 {:X4}", next_element0);
+//			log.trace("next_element0 {:X4}", next_element0);
 			list_iterator = cast(uint*) next_element0;
 		}
 	}

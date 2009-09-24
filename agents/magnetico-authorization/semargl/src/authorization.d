@@ -284,8 +284,8 @@ class Authorization
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
 					targetRightType, ts);
+			
 			//			log.trace("autorize end#0, return:[{}]", calculatedRight);
-			return calculatedRight;
 		}
 
 		if(calculatedRight == true)
