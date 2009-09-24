@@ -20,7 +20,7 @@ void main()
 {	
 //	TripleStorage ts = new TripleStorage ();
 
-	char[] hostname = "192.168.150.196\0";
+	char[] hostname = "localhost\0";
 //	char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
 	

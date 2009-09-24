@@ -15,7 +15,8 @@ enum idx_name
 	SP = (1 << 3),
 	PO = (1 << 4),
 	SO = (1 << 5),
-	SPO = (1 << 6)
+	SPO = (1 << 6),
+        S1PPOO = (1 << 7)
 };
 
 class TripleStorage
@@ -27,6 +28,12 @@ class TripleStorage
 	private HashMap idx_po = null;
 	private HashMap idx_so = null;
 	private HashMap idx_spo = null;
+
+	private HashMap idx_s1ppoo = null;
+        private char[][] look_predicate_p1_on_idx_s1ppoo;
+        private char[][] look_predicate_p2_on_idx_s1ppoo;
+        private uint count_look_predicate_on_idx_s1ppoo = 0;
+
 	private char* idx;
 
 	private ulong stat__idx_s__reads = 0;
@@ -76,8 +83,24 @@ class TripleStorage
 			idx_so = new HashMap("SO", max_count_element, inital_triple_area_length*2, max_length_order);
 		}
 
-		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length*3, max_length_order); // является особенным индексом, хранящим экземпляры триплетов
+		if(useindex & idx_name.S1PPOO)
+		{
+			idx_s1ppoo = new HashMap("S1PPOO", max_count_element, inital_triple_area_length*2, max_length_order);
+                        look_predicate_p1_on_idx_s1ppoo = new char [][16];
+                        look_predicate_p2_on_idx_s1ppoo = new char [][16];
+		}
+
+                // создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
+		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length*3, max_length_order); 
+
 	}
+
+        public void setPredicatesToS1PPOO (char[] P1, char[] P2)
+        {
+          look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
+          look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
+          count_look_predicate_on_idx_s1ppoo++;
+        }  
 
 	public uint* getTriples(char* s, char* p, char* o, bool debug_info)
 	{
@@ -315,6 +338,8 @@ class TripleStorage
 
 	public bool addTriple(char[] s, char[] p, char[] o)
 	{
+/* для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
+*/
 		//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
 		void* triple;
 
