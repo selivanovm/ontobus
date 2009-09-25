@@ -6,6 +6,7 @@ private import tango.io.Stdout;
 private import tango.stdc.string;
 
 private import Log;
+import tango.util.container.HashMap;
 
 enum idx_name
 {
@@ -16,7 +17,7 @@ enum idx_name
 	PO = (1 << 4),
 	SO = (1 << 5),
 	SPO = (1 << 6),
-        S1PPOO = (1 << 7)
+	S1PPOO = (1 << 7)
 };
 
 class TripleStorage
@@ -30,9 +31,9 @@ class TripleStorage
 	private HashMap idx_spo = null;
 
 	private HashMap idx_s1ppoo = null;
-        private char[][] look_predicate_p1_on_idx_s1ppoo;
-        private char[][] look_predicate_p2_on_idx_s1ppoo;
-        private uint count_look_predicate_on_idx_s1ppoo = 0;
+	private char[][char[]] look_predicate_p1_on_idx_s1ppoo;
+	private char[][char[]] look_predicate_p2_on_idx_s1ppoo;
+	private uint count_look_predicate_on_idx_s1ppoo = 0;
 
 	private char* idx;
 
@@ -70,37 +71,37 @@ class TripleStorage
 
 		if(useindex & idx_name.SP)
 		{
-			idx_sp = new HashMap("SP", max_count_element, inital_triple_area_length*2, max_length_order);
+			idx_sp = new HashMap("SP", max_count_element, inital_triple_area_length * 2, max_length_order);
 		}
 
 		if(useindex & idx_name.PO)
 		{
-			idx_po = new HashMap("PO", max_count_element, inital_triple_area_length*2, max_length_order);
+			idx_po = new HashMap("PO", max_count_element, inital_triple_area_length * 2, max_length_order);
 		}
 
 		if(useindex & idx_name.SO)
 		{
-			idx_so = new HashMap("SO", max_count_element, inital_triple_area_length*2, max_length_order);
+			idx_so = new HashMap("SO", max_count_element, inital_triple_area_length * 2, max_length_order);
 		}
 
 		if(useindex & idx_name.S1PPOO)
 		{
-			idx_s1ppoo = new HashMap("S1PPOO", max_count_element, inital_triple_area_length*2, max_length_order);
-                        look_predicate_p1_on_idx_s1ppoo = new char [][16];
-                        look_predicate_p2_on_idx_s1ppoo = new char [][16];
+			idx_s1ppoo = new HashMap("S1PPOO", max_count_element, inital_triple_area_length * 2, max_length_order);
+		//			look_predicate_p1_on_idx_s1ppoo = new char[][16];
+		//			look_predicate_p2_on_idx_s1ppoo = new char[][16];
 		}
 
-                // создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
-		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length*3, max_length_order); 
+		// создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
+		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length * 3, max_length_order);
 
 	}
 
-        public void setPredicatesToS1PPOO (char[] P1, char[] P2)
-        {
-          look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
-          look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
-          count_look_predicate_on_idx_s1ppoo++;
-        }  
+	public void setPredicatesToS1PPOO(char[] P1, char[] P2)
+	{
+		look_predicate_p1_on_idx_s1ppoo[P1] = P2;
+		look_predicate_p2_on_idx_s1ppoo[P2] = P1;
+	//		count_look_predicate_on_idx_s1ppoo++;
+	}
 
 	public uint* getTriples(char* s, char* p, char* o, bool debug_info)
 	{
@@ -192,7 +193,7 @@ class TripleStorage
 
 	public bool removeTriple(char* s, char* p, char* o)
 	{
-		if(s !is null  && p !is null && o !is null)
+		if(s !is null && p !is null && o !is null)
 			return false;
 		uint* removed_triple;
 
@@ -325,21 +326,31 @@ class TripleStorage
 				}
 			}
 		}
-		
+
 	}
-		
+
 	public bool removeTriple(char[] s, char[] p, char[] o)
 	{
 		if(s.length == 0 && p.length == 0 && o.length == 0)
 			return false;
-		
-		return removeTriple(cast (char*)s, cast (char*)p, cast (char*)o);
+
+		return removeTriple(cast(char*) s, cast(char*) p, cast(char*) o);
 	}
 
 	public bool addTriple(char[] s, char[] p, char[] o)
 	{
-/* для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
-*/
+		/* 
+		 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
+		 */
+		if(idx_s1ppoo !is null)
+		{
+			char[] p2 = (look_predicate_p1_on_idx_s1ppoo[p]);
+			if (p2 !is null)
+			{
+				// !
+			}
+		}
+
 		//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
 		void* triple;
 
