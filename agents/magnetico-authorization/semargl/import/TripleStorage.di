@@ -134,14 +134,7 @@ look_predicate_p2_on_idx_s1ppoo[P2] = P1;
 {
     void print_stat()
 {
-Stdout.format("*** statistic read ***").newline;
-Stdout.format("index s={} reads",stat__idx_s__reads).newline;
-Stdout.format("index p={} reads",stat__idx_p__reads).newline;
-Stdout.format("index o={} reads",stat__idx_o__reads).newline;
-Stdout.format("index sp={} reads",stat__idx_sp__reads).newline;
-Stdout.format("index po={} reads",stat__idx_po__reads).newline;
-Stdout.format("index so={} reads",stat__idx_so__reads).newline;
-Stdout.format("index spo={} reads",stat__idx_spo__reads).newline;
+log.trace("*** statistic read *** \x0aindex s={} reads \x0astat__idx_s__reads \x0aindex p={} reads \x0aindex o={} reads \x0aindex sp={} reads \x0aindex po={} reads \x0aindex so={} reads \x0aindex spo={} reads \x0a",stat__idx_s__reads,stat__idx_p__reads,stat__idx_o__reads,stat__idx_sp__reads,stat__idx_po__reads,stat__idx_so__reads,stat__idx_spo__reads);
 }
 }
 }

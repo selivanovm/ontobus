@@ -42,8 +42,7 @@ public void print_triple(byte* triple)
 
 	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-	char*
-			o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 	log.trace("triple: <{}><{}><{}>", getString (s), getString (p), getString (o));
 }

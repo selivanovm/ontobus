@@ -86,9 +86,9 @@ class TripleStorage
 
 		if(useindex & idx_name.S1PPOO)
 		{
-			idx_s1ppoo = new HashMap("S1PPOO", max_count_element, inital_triple_area_length * 2, max_length_order);
-		//			look_predicate_p1_on_idx_s1ppoo = new char[][16];
-		//			look_predicate_p2_on_idx_s1ppoo = new char[][16];
+			idx_s1ppoo = new HashMap("S1PPOO", max_count_element / 10, inital_triple_area_length, max_length_order/2);
+		//					look_predicate_p1_on_idx_s1ppoo = new char[16][char[]];
+		//					look_predicate_p2_on_idx_s1ppoo = new char[16][char[]];
 		}
 
 		// создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
@@ -339,82 +339,100 @@ class TripleStorage
 
 	public bool addTriple(char[] s, char[] p, char[] o)
 	{
-		/* 
-		 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
-		 */
-		if(idx_s1ppoo !is null)
+		synchronized
 		{
-			char[] p2 = (look_predicate_p1_on_idx_s1ppoo[p]);
-			if (p2 !is null)
+			//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
+			void* triple;
+
+			if(s.length == 0 && p.length == 0 && o.length == 0)
+				return false;
+
+			uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+			if(list !is null)
 			{
-				uint* list = idx_sp.get(cast(char*)s, cast(char*)p2, null, false);
-				if(list !is null)
+				//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
+				//		        throw new Exception ("addTriple: triple already exist");
+				return false;
+			}
+
+			//		log.trace("addTriple:add index spo");
+			idx_spo.put(s, p, o, null);
+			//		log.trace("addTriple:get this index as triple");
+			list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+			//		log.trace("addTriple:ok, list={:X4}", list);
+
+			if(list is null)
+				throw new Exception("addTriple: not found triple in index spo");
+
+			triple = cast(void*) *list;
+
+			//		log.trace("addTriple:3 addr={:X4}", triple);
+			//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, _toString(cast(char*) (triple + 6)));
+
+			if(idx_s !is null)
+				idx_s.put(s, null, null, triple);
+
+			if(idx_p !is null)
+				idx_p.put(p, null, null, triple);
+
+			if(idx_o !is null)
+				idx_o.put(o, null, null, triple);
+
+			if(idx_sp !is null)
+				idx_sp.put(s, p, null, triple);
+
+			if(idx_po !is null)
+				idx_po.put(p, o, null, triple);
+
+			if(idx_so !is null)
+				idx_so.put(s, o, null, triple);
+
+			/* 
+			 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
+			 */
+/*
+			if(idx_s1ppoo !is null)
+			{
+				char[] p2 = null;
+				if(look_predicate_p1_on_idx_s1ppoo !is null)
+					p2 = look_predicate_p1_on_idx_s1ppoo[p];
+				if(p2 !is null)
 				{
-					// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-					
+					log.trace("addTriple to S1PPOO {:X4}", triple);
+					log.trace("p = {}, p2 = {}", p, p2);
+
+					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+					if(listS !is null)
+					{
+						byte* tripleS = cast(byte*) *listS;
+						char[] o2 = _toString(
+								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+
+						// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
+						idx_s1ppoo.put(s, p ~ p2, o ~ o2, triple);
+					}
 				}
 			}
+*/
+			return true;
 		}
-
-		//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
-		void* triple;
-
-		if(s.length == 0 && p.length == 0 && o.length == 0)
-			return false;
-
-		uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		if(list !is null)
-		{
-			//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
-			//		        throw new Exception ("addTriple: triple already exist");
-			return false;
-		}
-
-		//		log.trace("addTriple:add index spo");
-		idx_spo.put(s, p, o, null);
-		//		log.trace("addTriple:get this index as triple");
-		list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-		//		log.trace("addTriple:ok, list={:X4}", list);
-
-		if(list is null)
-			throw new Exception("addTriple: not found triple in index spo");
-
-		triple = cast(void*) *list;
-
-		//		log.trace("addTriple:3 addr={:X4}", triple);
-		//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, _toString(cast(char*) (triple + 6)));
-
-		if(idx_s !is null)
-			idx_s.put(s, null, null, triple);
-
-		if(idx_p !is null)
-			idx_p.put(p, null, null, triple);
-
-		if(idx_o !is null)
-			idx_o.put(o, null, null, triple);
-
-		if(idx_sp !is null)
-			idx_sp.put(s, p, null, triple);
-
-		if(idx_po !is null)
-			idx_po.put(p, o, null, triple);
-
-		if(idx_so !is null)
-			idx_so.put(s, o, null, triple);
-
-		return true;
 	}
 
 	public void print_stat()
 	{
-		Stdout.format("*** statistic read ***").newline;
-		Stdout.format("index s={} reads", stat__idx_s__reads).newline;
-		Stdout.format("index p={} reads", stat__idx_p__reads).newline;
-		Stdout.format("index o={} reads", stat__idx_o__reads).newline;
-		Stdout.format("index sp={} reads", stat__idx_sp__reads).newline;
-		Stdout.format("index po={} reads", stat__idx_po__reads).newline;
-		Stdout.format("index so={} reads", stat__idx_so__reads).newline;
-		Stdout.format("index spo={} reads", stat__idx_spo__reads).newline;
+		log.trace(
+				"*** statistic read *** \n" //
+				"index s={} reads \n" //
+				"stat__idx_s__reads \n" //
+				"index p={} reads \n" //
+				"index o={} reads \n" //
+				"index sp={} reads \n" //
+				"index po={} reads \n" //
+				"index so={} reads \n" //
+				"index spo={} reads \n",
+				//
+				stat__idx_s__reads, stat__idx_p__reads, stat__idx_o__reads, stat__idx_sp__reads, stat__idx_po__reads, stat__idx_so__reads,
+				stat__idx_spo__reads);
 	}
 
 }

@@ -1,6 +1,5 @@
 module persistent_triple_storage;
 
-//import tango.io.File;
 version(tango_99_8)
 {
 	private import tango.io.device.File;
@@ -18,6 +17,7 @@ private import Text = tango.text.Util;
 
 private import TripleStorage;
 private import fact_tools;
+private import Log;
 
 public void load_from_file(FilePath file_path, char[][] i_know_predicates, TripleStorage ts)
 {
@@ -26,7 +26,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 	auto elapsed = new StopWatch();
 	double time;
-	Stdout.format("load triples from file {}", file_path).newline;
+	log.trace("load triples from file {}", file_path);
 
 	auto file = new File(file_path.path ~ file_path.name ~ file_path.suffix);
 
@@ -91,7 +91,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 		}
 
-		//		Stdout.format("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+		//	log.trace("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
 
 		if(s.length == 0 && p.length == 0 && o.length == 0)
 			continue;
@@ -109,7 +109,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 		if(i_know_predicat)
 		{
-			//						Stdout.format("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+			//	log.trace("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
 
 			if(command == 'A')
 			{
@@ -119,14 +119,14 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 				}
 				else
 				{
-					Stdout.format("!!! triple not added").newline;
+					log.trace("!!! triple not added");
 
 					count_ignored_triple++;
 				}
 			}
 			if(command == 'D')
 			{
-				Stdout.format("persistent_triple_storage: remove triple [{}] <{}><{}><{}>", count_add_triple, s, p, o).newline;
+				log.trace("persistent_triple_storage: remove triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
 				ts.removeTriple(s, p, o);
 			}
 
@@ -134,7 +134,6 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 		else
 		{
 			count_ignored_triple++;
-
 		}
 
 	//				if(count_add_triple > 5)
@@ -145,6 +144,5 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 	time = elapsed.stop;
 
-	Stdout.format("create TripleStorage time = {}, count add triples = {}, ignored = {}", time, count_add_triple,
-			count_ignored_triple).newline;
+	log.trace("load triples to TripleStorage time = {}, count add triples = {}, ignored = {}", time, count_add_triple, count_ignored_triple);
 }
