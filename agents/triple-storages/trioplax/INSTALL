@@ -1,12 +1,12 @@
 Installation Instructions
 *************************
 
-compiling on ubuntu
+compiling on ubuntu 9.04
 
-download dmd+tango+tangobos
+download dmd+tango
 
-http://download.palos.ro/Debian%20D%20Packages/
+http://code.google.com/p/ontobus/source/browse/trunk/d/dmd_1.043_i386.deb
+http://code.google.com/p/ontobus/source/browse/trunk/d/tango-dmd_0.99.8_i386.deb
 
-dmd_1.035-1_i386.deb
-tango-dmd_0.99.7-1_i386.deb
-tangobos-dmd_59-1_i386.deb
+dmd_1.043_i386.deb
+tango-dmd_0.99.8_i386.deb

@@ -126,10 +126,12 @@ class Authorization
 
 	private void init()
 	{
+		log.trace ("authorization init..");
 		Stdout.format("authorization init..").newline;
 
 		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
 
+		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId");
 		//		
 
 		char[] root = ".";
@@ -172,6 +174,9 @@ class Authorization
 		//		print_list_triple(ts.getTriples("record", null, null, false));
 
 		log.trace("authorization init ... ok");
+		Stdout.format("authorization init.. ok").newline;
+		
+		ts.print_stat();
 	}
 
 	public void logginTriple(char command, char[] s, char[] p, char[] o)

@@ -2,6 +2,5 @@ authorization agent prototype
 
 compile:
 +linux 
-+dmd 1.35
-+tango 0.99.7
-+tangobos
++dmd 1.43
++tango 0.99.8

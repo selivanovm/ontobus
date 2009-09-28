@@ -1,14 +1,6 @@
 module persistent_triple_storage;
 
-version(tango_99_8)
-{
-	private import tango.io.device.File;
-}
-
-version(tango_99_7)
-{
-	private import tango.io.File;
-}
+private import tango.io.File;
 
 private import tango.io.FileScan;
 private import tango.time.StopWatch;
@@ -28,17 +20,12 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 	double time;
 	log.trace("load triples from file {}", file_path);
 
+	log.trace("open file");
 	auto file = new File(file_path.path ~ file_path.name ~ file_path.suffix);
 
-	version(tango_99_8)
-	{
-		auto content = cast(char[]) file.load;
-	}
-	version(tango_99_7)
-	{
-		auto content = cast(char[]) file.read;
-	}
+	auto content = cast(char[]) file.read;
 
+	log.trace("read triples");
 	elapsed.start;
 
 	foreach(line; Text.lines(content))
@@ -144,5 +131,5 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 	time = elapsed.stop;
 
-	log.trace("load triples to TripleStorage time = {}, count add triples = {}, ignored = {}", time, count_add_triple, count_ignored_triple);
+	log.trace("end read triples, total time = {}, count add triples = {}, ignored = {}", time, count_add_triple, count_ignored_triple);
 }

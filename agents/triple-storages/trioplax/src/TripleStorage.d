@@ -31,8 +31,8 @@ class TripleStorage
 	private HashMap idx_spo = null;
 
 	private HashMap idx_s1ppoo = null;
-	private char[][char[]] look_predicate_p1_on_idx_s1ppoo;
-	private char[][char[]] look_predicate_p2_on_idx_s1ppoo;
+	private char[][16] look_predicate_p1_on_idx_s1ppoo;
+	private char[][16] look_predicate_p2_on_idx_s1ppoo;
 	private uint count_look_predicate_on_idx_s1ppoo = 0;
 
 	private char* idx;
@@ -86,9 +86,7 @@ class TripleStorage
 
 		if(useindex & idx_name.S1PPOO)
 		{
-			idx_s1ppoo = new HashMap("S1PPOO", max_count_element / 10, inital_triple_area_length, max_length_order/2);
-		//					look_predicate_p1_on_idx_s1ppoo = new char[16][char[]];
-		//					look_predicate_p2_on_idx_s1ppoo = new char[16][char[]];
+			idx_s1ppoo = new HashMap("S1PPOO", max_count_element / 10, inital_triple_area_length, max_length_order);
 		}
 
 		// создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
@@ -98,9 +96,9 @@ class TripleStorage
 
 	public void setPredicatesToS1PPOO(char[] P1, char[] P2)
 	{
-		look_predicate_p1_on_idx_s1ppoo[P1] = P2;
-		look_predicate_p2_on_idx_s1ppoo[P2] = P1;
-	//		count_look_predicate_on_idx_s1ppoo++;
+		look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
+		look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
+		count_look_predicate_on_idx_s1ppoo++;
 	}
 
 	public uint* getTriples(char* s, char* p, char* o, bool debug_info)
@@ -390,30 +388,56 @@ class TripleStorage
 			/* 
 			 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
 			 */
-/*
+
 			if(idx_s1ppoo !is null)
 			{
-				char[] p2 = null;
-				if(look_predicate_p1_on_idx_s1ppoo !is null)
-					p2 = look_predicate_p1_on_idx_s1ppoo[p];
-				if(p2 !is null)
+				for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
 				{
-					log.trace("addTriple to S1PPOO {:X4}", triple);
-					log.trace("p = {}, p2 = {}", p, p2);
-
-					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
-					if(listS !is null)
+					if(look_predicate_p1_on_idx_s1ppoo[i] == p)
 					{
-						byte* tripleS = cast(byte*) *listS;
-						char[] o2 = _toString(
-								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+						char[] o1 = o;
+						char[] p1 = p;
+						char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
 
-						// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-						idx_s1ppoo.put(s, p ~ p2, o ~ o2, triple);
+						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+						if(listS !is null)
+						{
+							byte* tripleS = cast(byte*) *listS;
+							char[]
+									o2 = _toString(
+											cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+
+//							log.trace("add A: p1 = {}, p2 = {}", p1, p2);
+							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
+							idx_s1ppoo.put(s, p1 ~ p2, o1 ~ o2, triple);
+						}
+
+					}
+					else if(look_predicate_p2_on_idx_s1ppoo[i] == p)
+					{
+						char[] o2 = o;
+						char[] p2 = p;
+						char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
+
+						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
+						if(listS !is null)
+						{
+							byte* tripleS = cast(byte*) *listS;
+							char[]
+									o1 = _toString(
+											cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+
+//							log.trace("add B: p1 = {}, p2 = {}", p1, p2);
+							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
+							idx_s1ppoo.put(s, p1 ~ p2, o1 ~ o2, triple);
+						}
+
 					}
 				}
+
+
 			}
-*/
+
 			return true;
 		}
 	}
