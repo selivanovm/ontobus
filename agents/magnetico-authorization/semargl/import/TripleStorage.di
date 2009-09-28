@@ -13,6 +13,7 @@ private
 {
     import Log;
 }
+import tango.util.container.HashMap;
 enum idx_name 
 {
 S = 1 << 0,
@@ -22,6 +23,7 @@ SP = 1 << 3,
 PO = 1 << 4,
 SO = 1 << 5,
 SPO = 1 << 6,
+S1PPOO = 1 << 7,
 }
 class TripleStorage
 {
@@ -52,6 +54,22 @@ class TripleStorage
     private
 {
     HashMap idx_spo = null;
+}
+    private
+{
+    HashMap idx_s1ppoo = null;
+}
+    private
+{
+    char[][char[]] look_predicate_p1_on_idx_s1ppoo;
+}
+    private
+{
+    char[][char[]] look_predicate_p2_on_idx_s1ppoo;
+}
+    private
+{
+    uint count_look_predicate_on_idx_s1ppoo = 0;
 }
     private
 {
@@ -88,6 +106,14 @@ class TripleStorage
     uint max_count_element = 100000;
     uint max_length_order = 4;
     this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length);
+    public
+{
+    void setPredicatesToS1PPOO(char[] P1, char[] P2)
+{
+look_predicate_p1_on_idx_s1ppoo[P1] = P2;
+look_predicate_p2_on_idx_s1ppoo[P2] = P1;
+}
+}
     public
 {
     uint* getTriples(char* s, char* p, char* o, bool debug_info);

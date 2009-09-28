@@ -69,7 +69,7 @@ class TripleStorage
 			idx_o = new HashMap("O", max_count_element, inital_triple_area_length, max_length_order);
 		}
 
-		if(useindex & idx_name.SP)
+		if(useindex & idx_name.SP || useindex & idx_name.S1PPOO)
 		{
 			idx_sp = new HashMap("SP", max_count_element, inital_triple_area_length * 2, max_length_order);
 		}
@@ -347,7 +347,12 @@ class TripleStorage
 			char[] p2 = (look_predicate_p1_on_idx_s1ppoo[p]);
 			if (p2 !is null)
 			{
-				// !
+				uint* list = idx_sp.get(cast(char*)s, cast(char*)p2, null, false);
+				if(list !is null)
+				{
+					// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
+					
+				}
 			}
 		}
 
