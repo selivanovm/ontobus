@@ -9,9 +9,9 @@ import tango.io.FileScan;
 import tango.io.stream.DataFileStream;
 import tango.io.FileConduit;
 
-import std.c.string;
-import std.c.stdio;
-import std.string;
+import tango.stdc.string;
+import tango.stdc.stdio;
+import tango.stdc.stdlib;
 import tango.io.Stdout;
 import tango.text.locale.Locale;
 import tango.time.StopWatch;
@@ -94,7 +94,7 @@ void main()
   Cout(Format("{:d15} ", WallClock.now.span.millis));
 
   char[] hostname = make_null_string(props["amqp_server_address"]);
-  int portt = atoi(props["amqp_server_port"]);
+  int portt = atoi(&(props["amqp_server_port"][0]));
 
   /*      result["amqp_server_address"] = "localhost";
       result["amqp_server_port"] = "5762";
@@ -114,10 +114,13 @@ void main()
   else
     conduit = new FileConduit(path.toString(), FileConduit.WriteCreate);
 
-  file = new DataFileOutput(conduit, 1000, false);
+		   //  file = new DataFileOutput(conduit, 1000, false);
+  file = new DataFileOutput(conduit);
 
-  client = new librabbitmq_client (hostname, portt, &get_message);
-	
+  client = new librabbitmq_client (hostname, portt, make_null_string(props["amqp_server_login"]), props["amqp_server_password"],
+				   props["amqp_server_queue"], props["amqp_server_vhost"]);
+
+  client.set_callback(&get_message);
   (new Thread(&client.listener)).start;
   Thread.sleep(0.250);
 
@@ -127,7 +130,9 @@ void store_triplet(char* start, int l, char* s, int s_l, char* p,
 		   int p_l, char* o, int o_l, uint  m)
 {
   file.write(now);
-  file.buffer.append(start, l);
+  char[] line = new char[l];
+  memcpy (cast(void*)line.ptr, cast(void*)start, l);
+  file.write(line);
   file.write("\n");
 }
 
@@ -305,16 +310,18 @@ void get_message (byte* message, ulong message_size)
     }
 
     if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
-      Cout("l").newline;
       for(uint j = 0; j < args_cnt; j++) {
-	print_buf(fn_uids[i], fn_uids_l[i]);
-	print_buf(args_uids[j], args_uids_l[j]);
 	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
 	 split_triples_line(args[j], args_l[j], &store_triplet);	  
 	}
       }
     } else if (cmp_str(fn_names[i], fn_names_l[i], GET)) {
-      get_triplet(fn_uids[i], fn_uids_l[i], reply_to_ptr, reply_to_length);
+      uint arg_idx  = -1;
+      for(uint j = 0; j < args_cnt; j++) {
+	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
+	  //	  split_triples_line(args[j], args_l[j], &get_triplet(fn_uids[i], fn_uids_l[i], reply_to_ptr, reply_to_length);
+	}
+      }
     }
 
   }
@@ -491,6 +498,187 @@ private void split_triples_line(char* line, ulong line_size, void function(char*
   }
 }
 
+private int parse_query(char* query, uint query_length)
+{
+  //  split_triples_line(query, query_length, &eval_query_triple);
+
+  Cout(str_2_char_array(query, query_length)).newline;
+
+  char[] OP_AND = "and";
+  char[] OP_OR = "or";
+  char[] OP_SELECT = "select";
+  char[] OP_WHERE = "where";
+
+  char*[] variables = new char*[1000];
+  uint[] variables_l = new uint[1000];
+  uint variables_cnt = 0;
+
+  uint char_idx = 0;
+  char* prev_c = null;
+  char* c = null;
+  char* token_start_ptr = null;
+
+  uint token_length = 0;
+  
+  bool is_new_token = false;
+
+  uint query_part = 0;
+
+  uint patterns_cnt = 0;
+  uint pattern_token_cnt = 0;
+
+  char*[] patterns_op = new char*[1000];
+  uint[] patterns_op_l = new uint[1000];
+  uint[] patterns_op_map = new uint[1000];
+  uint patterns_op_cnt = 0;
+
+  uint variables_to_return_cnt = 0;
+
+  bool is_open_brace = false;
+  bool is_open_quota = false;
+  bool is_delimiter = false;
+
+  while (char_idx < query_length)
+    {
+      c = (query + char_idx++);
+
+      //      Stdout.format("<{}>", "" ~ *c).newline;
+
+      switch (query_part)
+	{
+	case 2:
+	  if ((*c == ' ' && !is_open_quota) || 
+	      (*prev_c != '\\' && (*c == '{' && !is_open_brace) || ((*c == '"' || *c == '}') && is_open_brace)))
+	    is_delimiter = true;
+	  else
+	    is_delimiter = false;
+	  break;
+	default:
+	  if (*c == ' ')
+	    is_delimiter = true;
+	  else
+	    is_delimiter = false;
+	  break;
+	}
+
+      //      Stdout.format("{} : is_open_brace = {}, is_open_quota={} is_delimiter={}, is_new_token={}", 
+      //	    "I='" ~ *c ~ '\'', is_open_brace, is_open_quota, is_delimiter, is_new_token).newline;
+      
+      if (is_delimiter)
+	{
+	  if (is_new_token)
+	    {
+	      token_length = c - token_start_ptr;
+	      Cout("|");
+	      Cout(str_2_char_array(token_start_ptr, token_length));
+	      Cout("|").newline;
+
+	      switch (query_part)
+		{
+		case 0: //select
+		  if (!cmp_str(OP_SELECT.ptr, OP_SELECT.length, token_start_ptr, token_length))
+		    {
+		      Cout("ERROR! Select part must be first query part.").newline;
+		      return -1;
+		    }
+		  query_part++;
+		  break;
+		case 1: // variables
+		  if (cmp_str(OP_WHERE.ptr, OP_WHERE.length, token_start_ptr, token_length))
+		    {
+		      if (variables_to_return_cnt < 1)
+			{
+			  Cout("ERROR! Variables count must be non zero.");
+			  return -1;
+			}
+		      Cout("Variables: ");
+		      for(uint i = 0; i < variables_to_return_cnt; i++)
+			{
+			  Stdout.format("{} ", str_2_char_array(variables[i], variables_l[i]));
+			}
+		      Cout("\n");
+		      query_part++;
+		    } 
+		  else
+		    {
+		      variables[variables_cnt] = token_start_ptr;
+		      variables_l[variables_cnt] = token_length;
+		      variables_cnt++;
+		      variables_to_return_cnt++;
+		    }
+		  break;
+		case 2: //patterns
+		  //		  Stdout.format("{}", "" ~ *c).newline;
+		  if (*c == ' ')
+		    {
+		      if (!is_open_brace)
+			{
+			  patterns_op[patterns_op_cnt] = token_start_ptr;
+			  patterns_op_l[patterns_op_cnt] = token_length;
+			  patterns_op_map[patterns_op_cnt] = patterns_cnt;
+			  patterns_op_cnt++;
+			}
+		    }
+		  else if (*c == '}')
+		    {
+		      is_open_brace = false;
+		    }
+		  else if (*c == '"')
+		    {
+		      if (is_open_quota == true) 
+			{
+			  is_open_quota = false;
+			}
+		      else
+			is_open_quota = true;
+		    }
+		  break;
+		default:
+		  break;
+		}
+	      is_new_token = false;
+	    }
+	  else
+	    {
+	      if (query_part == 2)
+		{
+		  if (!is_open_brace && *c == '{')
+		    {
+		      is_open_brace = true;
+		    } 
+		  else if (*c == '"')
+		    {
+		      is_open_quota = ! is_open_quota;
+		    }
+		  else if (*c == '}')
+		    {
+		      is_open_brace = false;
+		    }
+		}
+	    } 
+	}
+      else
+	{
+	  if (!is_new_token)
+	    {
+	      token_start_ptr = query + char_idx - 1;
+	      is_new_token = true;
+	    }
+	  
+	}
+      prev_c = c;
+    }
+  
+  return 0;
+
+}
+
+private void eval_query_triple(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m) {
+  Cout(str_2_char_array(s, s_l)).newline;
+  Cout(str_2_char_array(p, p_l)).newline;
+  Cout(str_2_char_array(o, o_l)).newline;
+}
+
 private char[] str_2_char_array(char* str, uint len)
 {
   if (str is null)
@@ -587,4 +775,19 @@ void print_buf(char* buf, uint l) {
     }
     Cout("\n");
   }
+}
+
+unittest {
+
+  char[] query = " select ?x ?y  where {?x \"pred1\"  \"obj1\"} and {?y \"pred1\" ?x}.";
+  int result = parse_query(query.ptr, query.length);
+  assert(result == 0);
+
+
+  query = " seldect ?x ?y  where x? \"pred1\"  \"obj1\" and ?y \"pred1\" ?x.";
+  result = parse_query(query.ptr, query.length);
+  assert(result == -1);
+
+  exit(0);
+
 }
