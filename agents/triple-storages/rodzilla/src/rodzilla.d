@@ -502,7 +502,7 @@ private int parse_query(char* query, uint query_length)
 {
   //  split_triples_line(query, query_length, &eval_query_triple);
 
-  Cout(str_2_char_array(query, query_length)).newline;
+  //  Cout(str_2_char_array(query, query_length)).newline;
 
   char[] OP_AND = "and";
   char[] OP_OR = "or";
@@ -530,7 +530,18 @@ private int parse_query(char* query, uint query_length)
   char*[] patterns_op = new char*[1000];
   uint[] patterns_op_l = new uint[1000];
   uint[] patterns_op_map = new uint[1000];
+
   uint patterns_op_cnt = 0;
+
+  char*[] pattern_s = new char*[1000];
+  uint[] pattern_s_l = new uint[1000];
+  uint[] pattern_s_mod = new uint[1000];
+  char*[] pattern_p = new char*[1000];
+  uint[] pattern_p_l = new uint[1000];
+  uint[] pattern_p_mod = new uint[1000];
+  char*[] pattern_o = new char*[1000];
+  uint[] pattern_o_l = new uint[1000];
+  uint[] pattern_o_mod = new uint[1000];
 
   uint variables_to_return_cnt = 0;
 
@@ -561,17 +572,17 @@ private int parse_query(char* query, uint query_length)
 	  break;
 	}
 
-      //      Stdout.format("{} : is_open_brace = {}, is_open_quota={} is_delimiter={}, is_new_token={}", 
-      //	    "I='" ~ *c ~ '\'', is_open_brace, is_open_quota, is_delimiter, is_new_token).newline;
+      //            Stdout.format("{} : is_open_brace = {}, is_open_quota={} is_delimiter={}, is_new_token={}", 
+      //		  "I='" ~ *c ~ '\'', is_open_brace, is_open_quota, is_delimiter, is_new_token).newline;
       
       if (is_delimiter)
 	{
 	  if (is_new_token)
 	    {
 	      token_length = c - token_start_ptr;
-	      Cout("|");
-	      Cout(str_2_char_array(token_start_ptr, token_length));
-	      Cout("|").newline;
+	      //	      Cout("|");
+	      //	      Cout(str_2_char_array(token_start_ptr, token_length));
+	      //	      Cout("|").newline;
 
 	      switch (query_part)
 		{
@@ -591,12 +602,12 @@ private int parse_query(char* query, uint query_length)
 			  Cout("ERROR! Variables count must be non zero.");
 			  return -1;
 			}
-		      Cout("Variables: ");
-		      for(uint i = 0; i < variables_to_return_cnt; i++)
-			{
-			  Stdout.format("{} ", str_2_char_array(variables[i], variables_l[i]));
-			}
-		      Cout("\n");
+		      //		      Cout("Variables: ");
+		      //		      for(uint i = 0; i < variables_to_return_cnt; i++)
+		      //	{
+		      //	  Stdout.format("{} ", str_2_char_array(variables[i], variables_l[i]));
+		      //	}
+		      //		      Cout("\n");
 		      query_part++;
 		    } 
 		  else
@@ -608,29 +619,83 @@ private int parse_query(char* query, uint query_length)
 		    }
 		  break;
 		case 2: //patterns
-		  //		  Stdout.format("{}", "" ~ *c).newline;
-		  if (*c == ' ')
+		  if (!is_open_brace && (*c == ' ' || *c == '{'))
 		    {
-		      if (!is_open_brace)
+		      patterns_op[patterns_op_cnt] = token_start_ptr;
+		      patterns_op_l[patterns_op_cnt] = token_length;
+		      patterns_op_map[patterns_op_cnt] = patterns_cnt;
+		      patterns_op_cnt++;
+		    }
+		  if (is_open_brace && (*c == '"' || *c == ' ' || *c == '}'))
+		    {
+		      /*		      if (pattern_token_cnt > 2 && (*c == '"' || *c == ' '))
+					      {
+					      Cout("Error! Illegal pattern tokens count. Must be three.").newline;
+					      return -1;
+					      }*/
+		      
+		      switch (pattern_token_cnt)
 			{
-			  patterns_op[patterns_op_cnt] = token_start_ptr;
-			  patterns_op_l[patterns_op_cnt] = token_length;
-			  patterns_op_map[patterns_op_cnt] = patterns_cnt;
-			  patterns_op_cnt++;
+			case 0:
+			  pattern_s[patterns_cnt] = token_start_ptr;
+			  pattern_s_l[patterns_cnt] = token_length;
+			  if (*c == '"')
+			    pattern_s_mod[patterns_cnt] = 0;
+			  else
+			    pattern_s_mod[patterns_cnt] = 1;
+			  pattern_token_cnt++;
+			  break;
+			case 1:
+			  pattern_p[patterns_cnt] = token_start_ptr;
+			  pattern_p_l[patterns_cnt] = token_length;
+			  if (*c == '"')
+			    pattern_p_mod[patterns_cnt] = 0;
+			  else
+			    pattern_p_mod[patterns_cnt] = 1;
+			  pattern_token_cnt++;
+			  break;
+			case 2:
+			  pattern_o[patterns_cnt] = token_start_ptr;
+			  pattern_o_l[patterns_cnt] = token_length;
+			  pattern_token_cnt = 0;
+			  if (*c == '"')
+			    pattern_o_mod[patterns_cnt] = 0;
+			  else
+			    pattern_o_mod[patterns_cnt] = 1;
+			  patterns_cnt++;
+			  break;
+			default:
+			  Cout("Invalid patterns token number. Must be three.").newline;
+			  return -1;
 			}
 		    }
-		  else if (*c == '}')
-		    {
+		  
+		  if (*c == '"')
+		    if (is_open_quota == true) 
+		      {
+			is_open_quota = false;
+		      }
+		    else
+		      is_open_quota = true;
+
+		  if (*c == '}')
+		    if (is_open_brace)
 		      is_open_brace = false;
-		    }
-		  else if (*c == '"')
+		    else
+		      {
+			Cout("Error! Illegal '}' position.").newline;
+			return -1;
+		      }
+
+		  if (*c == '{')
 		    {
-		      if (is_open_quota == true) 
+		      if (is_open_brace)
 			{
-			  is_open_quota = false;
+			  Cout("Error! Illegal '{' position.").newline;
+			  return -1;
 			}
 		      else
-			is_open_quota = true;
+			is_open_brace = true;
 		    }
 		  break;
 		default:
@@ -668,6 +733,20 @@ private int parse_query(char* query, uint query_length)
 	}
       prev_c = c;
     }
+
+  /*  for(int i = 0; i < patterns_cnt; i++)
+    {
+      Stdout.format("Pattern {} : s = {} : mod = {} | p = {} : mod = {} | o = {} : mod = {}.", 
+		    i, str_2_char_array(pattern_s[i], pattern_s_l[i]), pattern_s_mod[i],
+		    str_2_char_array(pattern_p[i], pattern_p_l[i]), pattern_p_mod[i],
+		    str_2_char_array(pattern_o[i], pattern_o_l[i]), pattern_o_mod[i]).newline;
+    }
+
+  for(int i = 0; i < patterns_op_cnt; i++)
+    {
+      Stdout.format("Patterns operations : op = {} | pattern number = {}.", str_2_char_array(patterns_op[i], patterns_op_l[i]), 
+		    patterns_op_map[i]).newline;
+    }*/
   
   return 0;
 
@@ -779,8 +858,19 @@ void print_buf(char* buf, uint l) {
 
 unittest {
 
-  char[] query = " select ?x ?y  where {?x \"pred1\"  \"obj1\"} and {?y \"pred1\" ?x}.";
-  int result = parse_query(query.ptr, query.length);
+  char[] query = " select ?x ?y  where not {?x \"pred1\" \"obj1\"} and{?y \"pred1\" ?x}.";
+
+  auto elapsed = new StopWatch();  
+  elapsed.start;
+
+  int result;
+  for(int i = 0; i < 10000; i++)
+    result = parse_query(query.ptr, query.length);
+  
+  double time = elapsed.stop;  
+  
+  Stdout.format("{} \n Query parsed in {:d6} msec.", query, time / 10000.0).newline;
+  
   assert(result == 0);
 
 
