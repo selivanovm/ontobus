@@ -5,6 +5,8 @@ private import tango.stdc.posix.stdio;
 import librabbitmq_headers;
 import mom_client;
 
+private import tango.core.Thread;
+
 class librabbitmq_client: mom_client
 {
 	amqp_connection_state_t_ conn;
@@ -14,6 +16,8 @@ class librabbitmq_client: mom_client
 	char[] queue;// = "semargl";
 	char* bindingkey = cast(char*) "\0";
 	char* exchange = "";
+	
+	int waiting_for_login = 5;
 
 	char[] hostname;
 	int port;
@@ -95,25 +99,40 @@ class librabbitmq_client: mom_client
 
 		while(true)
 		{
-			conn = amqp_new_connection();
-			Stdout.format("conn={:X4} ", &conn).newline;
+			bool is_connect_succsess = false;
+			while (!is_connect_succsess)
+			  {
+			    conn = amqp_new_connection();
+			    Stdout.format("conn={:X4} ", &conn).newline;
+			    
+			    Stdout.format("listener:connect to AMQP server {}:{}", hostname, port).newline;
+			    
+			    int sockfd;
+			    sockfd = amqp_open_socket(cast(char*) hostname, port);
+			    
+			    if(sockfd < 0)
+			      Stdout.format("connection faled, errcode={} ", sockfd).newline;
+			    else
+			      Stdout.format("connection is ok, code={}", sockfd).newline;
+			    
+			    if (sockfd == 4)
+			      {
+				amqp_set_sockfd(&conn, sockfd);
+				
+				amqp_rpc_reply_t_ res_login;
+				
+				res_login = amqp_login(&conn, cast(char*)vhost, 131072, 
+						       amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, cast(char*)login, cast(char*)passw);
+				Stdout.format("login state={}", res_login.reply_type).newline;
 
-			Stdout.format("listener:connect to AMQP server {}:{}", hostname, port).newline;
+				if (res_login.reply_type == 1)
+				  is_connect_succsess = true;
 
-			int sockfd;
-			sockfd = amqp_open_socket(cast(char*) hostname, port);
+			      }
+			    if (!is_connect_succsess)
+			      Thread.sleep(waiting_for_login);
+			  }
 
-			if(sockfd < 0)
-				Stdout.format("connection faled, errcode={} ", sockfd).newline;
-			else
-				Stdout.format("connection is ok, code={}", sockfd).newline;
-
-			amqp_set_sockfd(&conn, sockfd);
-
-			amqp_rpc_reply_t_ res_login;
-			res_login = amqp_login(&conn, cast(char*)vhost, 131072, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, cast(char*)login, cast(char*)passw);
-
-			Stdout.format("login state={}", res_login.reply_type).newline;
 
 			amqp_table_t_ arguments;
 			arguments.num_entries = 0;
