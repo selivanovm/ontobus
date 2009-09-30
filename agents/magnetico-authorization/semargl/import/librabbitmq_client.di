@@ -13,6 +13,10 @@ private
 }
 import librabbitmq_headers;
 import mom_client;
+private
+{
+    import tango.core.Thread;
+}
 class librabbitmq_client : mom_client
 {
     amqp_connection_state_t_ conn;
@@ -22,6 +26,7 @@ class librabbitmq_client : mom_client
     char[] queue;
     char* bindingkey = cast(char*)"\x00";
     char* exchange = "";
+    int waiting_for_login = 5;
     char[] hostname;
     int port;
     void function(byte* txt, ulong size) message_acceptor;
