@@ -86,7 +86,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 		bool i_know_predicat = false;
 		for(int i = 0; i < i_know_predicates.length; i++)
 		{
-			if(p == i_know_predicates[i])
+			if(i_know_predicates[i] !is null && p == i_know_predicates[i])
 			{
 				i_know_predicat = true;
 				break;
@@ -106,7 +106,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 				}
 				else
 				{
-					log.trace("!!! triple not added");
+					log.trace("!!! triple [{}] <{}><{}><{}> not added", count_add_triple, s, p, o);
 
 					count_ignored_triple++;
 				}

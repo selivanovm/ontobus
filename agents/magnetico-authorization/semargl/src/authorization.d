@@ -51,7 +51,7 @@ class Authorization
 
 	this()
 	{
-		i_know_predicates = new char[][43];
+		i_know_predicates = new char[][47];
 
 		uint d = 0;
 
@@ -126,10 +126,10 @@ class Authorization
 
 	private void init()
 	{
-		log.trace ("authorization init..");
+		log.trace("authorization init..");
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O |idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
+		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId");
 		//		
@@ -175,7 +175,7 @@ class Authorization
 
 		log.trace("authorization init ... ok");
 		Stdout.format("authorization init.. ok").newline;
-		
+
 		ts.print_stat();
 	}
 
@@ -193,31 +193,25 @@ class Authorization
 		// так сделано из невозможности задать параметр из двух цифр в Util.layout
 		if(command == 'A')
 		{
-			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 A <%7><%8>\"%9\" .\n",
-					convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8],
-							dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12],
-							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
-							dt.time.millis), s, p, o);
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 A <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6],
+					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
+					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
 			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 		else if(command == 'U')
 		{
-			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 U <%7><%8>\"%9\" .\n",
-					convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8],
-							dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12],
-							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
-							dt.time.millis), s, p, o);
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 U <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6],
+					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
+					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
 			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 		else if(command == 'D')
 		{
-			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 D <%7><%8>\"%9\" .\n",
-					convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6], dt.date.day), convert(tmp[6 .. 8],
-							dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12],
-							dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17],
-							dt.time.millis), s, p, o);
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 D <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6],
+					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
+					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
 			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
@@ -236,13 +230,6 @@ class Authorization
 		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(
 		//				authorizedElementCategory), getString(authorizedElementId), getString(User));
 
-		//		elapsed.start;
-
-		//		char* User = "671d8e10-d7ca-48ae-b027-76a97172f304";
-		//	char* User = "61b807a9-e350-45a1-a0ed-10afa8f987a4";
-
-		// 
-
 		//		uint count_auth_doc = 0;
 		// считываем все документы
 		//		uint* iterator0 = ts.getTriples(null, "magnet-ontology#subject", "DOCUMENT", false);
@@ -253,8 +240,6 @@ class Authorization
 		//		}
 
 		//		char* char_p_dept = cast(char*) "Department";
-
-		//		Stdout.format("#1 predicate_department={}", char_p_dept).newline;
 
 		//		elapsed.start;
 
@@ -268,30 +253,15 @@ class Authorization
 			return calculatedRight;
 		}
 
-		//		uint next_element = 0xFF;
-		//		while(next_element > 0)
-		//		{
-		//			byte* triple0 = cast(byte*) *iterator0;
-		//				Stdout.format("#2 triple0={:X4}", cast(void*) triple0).newline;
-
-		//				uint key1_length = (*(triple0 + 0) << 8) + *(triple0 + 1);
-		//				uint key2_length = (*(triple0 + 2) << 8) + *(triple0 + 3);
-		//				uint key3_length = (*(triple0 + 4) << 8) + *(triple0 + 5);
-
-		//char* triple0_s = cast(char*) triple0 + 6;
-		//				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-
-		//			char* subject_document = cast(char*) triple0 + 6;
 		char* subject_document = authorizedElementId;
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
-		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || 
-		   strcmp(authorizedElementCategory, "DOCUMENTTYPE") || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
+		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory,
+				"DOCUMENTTYPE") || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
 		{
-			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
-					targetRightType, ts);
-			
-			//			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
+
+		//			log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
 		if(calculatedRight == true)
@@ -311,8 +281,7 @@ class Authorization
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts,
-					hierarhical_departments);
+			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts, hierarhical_departments);
 		//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
@@ -324,39 +293,27 @@ class Authorization
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts,
-					iterator_facts_of_document);
+			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
 		//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts,
-					iterator_facts_of_document);
+			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
 		//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts,
-					iterator_facts_of_document);
+			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
 		//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts,
-					iterator_facts_of_document);
+			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
 		//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
-
-		//		next_element = *(iterator0 + 1);
-		//		iterator0 = cast(uint*) next_element;
-
-		//		count_auth_doc++;
-		//				log.trace ("next_element={:X}, iterator0={:X}", next_element, iterator0);
-		//			calculatedRight = false;
-		//		}
 
 		//		time = elapsed.stop;
 

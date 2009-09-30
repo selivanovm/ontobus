@@ -71,7 +71,7 @@ void get_message(byte* message, ulong message_size)
 		}
 
 		*(message + message_size) = 0;
-		
+
 		//		Stdout.format ("{}", message).newline;
 		log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
 
@@ -157,15 +157,15 @@ void get_message(byte* message, ulong message_size)
 								{
 									delete_subjects_id = i;
 									Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
-								} 
+								}
 								else
-								{ 
-								    if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#get_authorization_rights_records") == 0 &&
-								       strcmp(fact_p[i], "magnet-ontology#subject") == 0)
-								    {
-									get_authorization_rights_records_id = i;
+								{
+									if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#get_authorization_rights_records") == 0 && strcmp(
+											fact_p[i], "magnet-ontology#subject") == 0)
+									{
+										get_authorization_rights_records_id = i;
 									//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
-								    }
+									}
 								}
 							}
 						}
@@ -177,13 +177,44 @@ void get_message(byte* message, ulong message_size)
 
 			if(get_id >= 0 && arg_id > 0)
 			{
+				/* пример сообщения: запрос всех фактов с p=predicate1 и o=object1
+				 
+				 <2014a><magnet-ontology#subject><magnet-ontology#get>.
+				 <2014a><magnet-ontology/transport#argument>
+				 {<><predicate1>"object1".}.
+				 <85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
+				 <85f3><magnet-ontology/transport#argument>"2014a".
+				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
+				 */
 				log.trace("команда get, argd={} ", getString(fact_o[arg_id]));
+
+				uint* list_facts = az.getTripleStorage.getTriples(fact_s[arg_id], fact_p[arg_id], fact_o[arg_id], false);
+
+				if(list_facts !is null)
+				{
+					uint next_element1 = 0xFF;
+					while(next_element1 > 0)
+					{
+						byte* triple = cast(byte*) *list_facts;
+
+						char* s = cast(char*) triple + 6;
+
+						char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+						char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+						log.trace("list triple <{}><{}><{}>", getString(s), getString(p), getString(p));
+
+						next_element1 = *(list_facts + 1);
+						list_facts = cast(uint*) next_element1;
+					}
+				}
 			}
 
 			if(delete_subjects_id >= 0 && arg_id > 0)
 			{
 				log.trace("команда на удаление всех фактов у которых субьект, s={}", getString(fact_o[arg_id]));
-				
+
 				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
 
 				if(removed_facts !is null)
@@ -197,8 +228,7 @@ void get_message(byte* message, ulong message_size)
 
 						char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-						char*
-								o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+						char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 						log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
 
@@ -211,22 +241,22 @@ void get_message(byte* message, ulong message_size)
 
 				}
 			}
-			
+
 			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
 			{
-				char *arg_p;
-				char *arg_o;
-				
-				for (ubyte i = 0; i < count_facts; i++)
+				char* arg_p;
+				char* arg_o;
+
+				for(ubyte i = 0; i < count_facts; i++)
 				{
-				 if (is_fact_in_object[i] == arg_id)
-				 {
-					 arg_p = fact_p[i];
-					 arg_o = fact_o[i];
-					 break;
-				 }
+					if(is_fact_in_object[i] == arg_id)
+					{
+						arg_p = fact_p[i];
+						arg_o = fact_o[i];
+						break;
+					}
 				}
-				
+
 				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
 						getString(arg_o));
 
@@ -278,241 +308,245 @@ void get_message(byte* message, ulong message_size)
 			}
 
 			// GET_AUTHORIZATION_RIGHTS_RECORDS
-			if(get_authorization_rights_records_id >= 0 && arg_id > 0) 
+			if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 			{
-			    log.trace("запрос на выборку записей прав");
+				log.trace("запрос на выборку записей прав");
 
-			    int authorize_id = 0;
-			    int from_id = 0;
+				int authorize_id = 0;
+				int from_id = 0;
 
-			    int author_system_id = 0;
-			    int author_subsystem_id = 0;
-			    int author_subsystem_element_id = 0;
-			    int target_system_id = 0;
-			    int target_subsystem_id = 0;
-			    int target_subsystem_element_id = 0;
-			    int category_id = 0;
-			    int elements_id = 0;
-			    int reply_to_id = 0;
+				int author_system_id = 0;
+				int author_subsystem_id = 0;
+				int author_subsystem_element_id = 0;
+				int target_system_id = 0;
+				int target_subsystem_id = 0;
+				int target_subsystem_element_id = 0;
+				int category_id = 0;
+				int elements_id = 0;
+				int reply_to_id = 0;
 
-			    char* result_ptr = cast(char*) result_buffer;
-			    char* command_uid = fact_s[0];
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
 
-			    for(int i = 0; i < count_facts; i++)
-			    {
-			      if (strlen(fact_o[i]) > 0)
+				for(int i = 0; i < count_facts; i++)
 				{
-				  log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]), strlen(fact_o[i]));
-				  if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
-				    {
-				      from_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0)
-				    {
-				      author_system_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystem") == 0)
-				    {
-				      author_subsystem_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
-				    {
-				      author_subsystem_element_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSystem") == 0)
-				    {
-				      target_system_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystem") == 0)
-				    {
-				      target_subsystem_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
-				    {
-				      target_subsystem_element_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0)
-				    {
-				      category_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
-				    {
-				      elements_id = i;
-				    }
-				  else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-				    {
-				      reply_to_id = i;
-				    }
-				}
-			    }
-
-			    uint* start_facts_set = null;
-			    byte start_set_marker = 0;
-			    if (elements_id > 0)
-			    {
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[elements_id], false);
-			    }
-			    else if (author_subsystem_element_id > 0)
-			    {
-				start_set_marker = 1;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[author_subsystem_element_id], false);
-			    }
-			    else if (target_subsystem_element_id > 0)
-			    {
-				start_set_marker = 2;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_subsystem_element_id], false);
-			    }
-			    else if (category_id > 0)
-			    {
-				start_set_marker = 3;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[category_id], false);
-			    }
-			    else if (author_subsystem_id > 0)
-			    {
-				start_set_marker = 4;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[author_subsystem_id], false);
-			    }
-			    else if (target_subsystem_id > 0)
-			    {
-				start_set_marker = 5;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_subsystem_id], false);
-			    }
-			    else if (author_system_id > 0)
-			    {
-				start_set_marker = 6;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[author_system_id], false);
-			    }
-			    else if (target_system_id > 0)
-			    {
-				start_set_marker = 7;
-				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_system_id], false);
-			    }
-
-			    log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", 
-				      elements_id, author_subsystem_element_id, target_subsystem_element_id);
-			    log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}", 
-				      category_id, author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
-			    log.trace("start_set_marker = {}", start_set_marker);
-
-			    strcpy(queue_name, fact_o[reply_to_id]);
-
-			    *result_ptr = '<';
-			    strcpy(result_ptr + 1, command_uid);
-			    result_ptr += strlen(command_uid) + 1;
-			    strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
-			    result_ptr += 41;
-
-			    if(start_facts_set !is null)
-			    {
-				log.trace("Found some elements.");
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-				    byte* triple = cast(byte*) *start_facts_set;
-				    char* s = cast(char*) triple + 6;
-				    
-				    uint* founded_facts = az.getTripleStorage.getTriples(s, null, null, false);
-				    uint* founded_facts_copy = founded_facts;
-				    if (founded_facts !is null)
-				    {
-					uint next_element1 = 0xFF;
-					bool is_match = true;
-					while(next_element1 > 0)
+					if(strlen(fact_o[i]) > 0)
 					{
-					    byte* triple1 = cast(byte*) *founded_facts;
-					    
-					    char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-					    char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
-
-					    if (start_set_marker < 1 && author_subsystem_element_id > 0 && 
-						strcmp(p1, "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
-					    }
-					    if (start_set_marker < 2 && target_subsystem_element_id > 0 && 
-						strcmp(p1, "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
-					    }
-					    if (start_set_marker < 3 && category_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[category_id]) == 0;
-					    }
-					    if (start_set_marker < 4 && author_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSubsystem") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[author_subsystem_id]) == 0;
-					    }
-					    if (start_set_marker < 5 && target_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSubsystem") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[target_subsystem_id]) == 0;
-					    }
-					    if (start_set_marker < 6 && author_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSystem") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[author_system_id]) == 0;
-					    }
-					    if (start_set_marker < 7 && target_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSystem") == 0)
-					    { 
-						is_match = is_match & strcmp(o1, fact_o[target_system_id]) == 0;
-					    }
-					    next_element1 = *(founded_facts + 1);
-					    founded_facts = cast(uint*) next_element1;
+						log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]),
+								strlen(fact_o[i]));
+						if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
+						{
+							from_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0)
+						{
+							author_system_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystem") == 0)
+						{
+							author_subsystem_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
+						{
+							author_subsystem_element_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSystem") == 0)
+						{
+							target_system_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystem") == 0)
+						{
+							target_subsystem_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
+						{
+							target_subsystem_element_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0)
+						{
+							category_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
+						{
+							elements_id = i;
+						}
+						else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
 					}
-
-					if (is_match) {
-					    next_element1 = 0xFF;
-					    while(next_element1 > 0)
-					    {
-						byte* triple1 = cast(byte*) *founded_facts_copy;
-						char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-						char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
-
-						strcpy(result_ptr++, "<");
-						strcpy(result_ptr, s);
-						result_ptr += strlen(s);
-						strcpy(result_ptr, "><");
-						result_ptr += 2;
-						strcpy(result_ptr, p1);
-						result_ptr += strlen(p1);
-						strcpy(result_ptr, ">\"");
-						result_ptr += 2;
-						strcpy(result_ptr, o1);
-						result_ptr += strlen(o1);
-						strcpy(result_ptr, "\".");
-						result_ptr += 2;
-
-						next_element1 = *(founded_facts_copy + 1);
-						founded_facts_copy = cast(uint*) next_element1;
-					    }
-					}
-
-					if (strlen(result_buffer) > 1000)
-					  {
-
-					    strcpy(result_ptr, "}.\0");
-					    
-					    client.send(queue_name, result_buffer);
-					    
-					    result_ptr = cast(char*) result_buffer;
-					    
-					    *result_ptr = '<';
-					    strcpy(result_ptr + 1, command_uid);
-					    result_ptr += strlen(command_uid) + 1;
-					    strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
-					    result_ptr += 41;
-
-					  }
-				    }
-				    next_element0 = *(start_facts_set + 1);			
-				    start_facts_set = cast(uint*) next_element0;	    
 				}
 
-			    }
+				uint* start_facts_set = null;
+				byte start_set_marker = 0;
+				if(elements_id > 0)
+				{
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[elements_id], false);
+				}
+				else if(author_subsystem_element_id > 0)
+				{
+					start_set_marker = 1;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[author_subsystem_element_id], false);
+				}
+				else if(target_subsystem_element_id > 0)
+				{
+					start_set_marker = 2;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_subsystem_element_id], false);
+				}
+				else if(category_id > 0)
+				{
+					start_set_marker = 3;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[category_id], false);
+				}
+				else if(author_subsystem_id > 0)
+				{
+					start_set_marker = 4;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[author_subsystem_id], false);
+				}
+				else if(target_subsystem_id > 0)
+				{
+					start_set_marker = 5;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_subsystem_id], false);
+				}
+				else if(author_system_id > 0)
+				{
+					start_set_marker = 6;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[author_system_id], false);
+				}
+				else if(target_system_id > 0)
+				{
+					start_set_marker = 7;
+					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_system_id], false);
+				}
 
-			    strcpy(result_ptr, "}.\0");
-			    client.send(queue_name, result_buffer);
+				log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id,
+						author_subsystem_element_id, target_subsystem_element_id);
+				log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}",
+						category_id, author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
+				log.trace("start_set_marker = {}", start_set_marker);
 
-			    time = elapsed.stop;
-			    log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
+				result_ptr += 41;
+
+				if(start_facts_set !is null)
+				{
+					log.trace("Found some elements.");
+					uint next_element0 = 0xFF;
+					while(next_element0 > 0)
+					{
+						byte* triple = cast(byte*) *start_facts_set;
+						char* s = cast(char*) triple + 6;
+
+						uint* founded_facts = az.getTripleStorage.getTriples(s, null, null, false);
+						uint* founded_facts_copy = founded_facts;
+						if(founded_facts !is null)
+						{
+							uint next_element1 = 0xFF;
+							bool is_match = true;
+							while(next_element1 > 0)
+							{
+								byte* triple1 = cast(byte*) *founded_facts;
+
+								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
+								char*
+										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+
+								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
+										"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
+								}
+								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1,
+										"magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
+								}
+								if(start_set_marker < 3 && category_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[category_id]) == 0;
+								}
+								if(start_set_marker < 4 && author_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSubsystem") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[author_subsystem_id]) == 0;
+								}
+								if(start_set_marker < 5 && target_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSubsystem") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[target_subsystem_id]) == 0;
+								}
+								if(start_set_marker < 6 && author_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSystem") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[author_system_id]) == 0;
+								}
+								if(start_set_marker < 7 && target_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSystem") == 0)
+								{
+									is_match = is_match & strcmp(o1, fact_o[target_system_id]) == 0;
+								}
+								next_element1 = *(founded_facts + 1);
+								founded_facts = cast(uint*) next_element1;
+							}
+
+							if(is_match)
+							{
+								next_element1 = 0xFF;
+								while(next_element1 > 0)
+								{
+									byte* triple1 = cast(byte*) *founded_facts_copy;
+									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
+									char*
+											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+
+									strcpy(result_ptr++, "<");
+									strcpy(result_ptr, s);
+									result_ptr += strlen(s);
+									strcpy(result_ptr, "><");
+									result_ptr += 2;
+									strcpy(result_ptr, p1);
+									result_ptr += strlen(p1);
+									strcpy(result_ptr, ">\"");
+									result_ptr += 2;
+									strcpy(result_ptr, o1);
+									result_ptr += strlen(o1);
+									strcpy(result_ptr, "\".");
+									result_ptr += 2;
+
+									next_element1 = *(founded_facts_copy + 1);
+									founded_facts_copy = cast(uint*) next_element1;
+								}
+							}
+
+							if(strlen(result_buffer) > 1000)
+							{
+
+								strcpy(result_ptr, "}.\0");
+
+								client.send(queue_name, result_buffer);
+
+								result_ptr = cast(char*) result_buffer;
+
+								*result_ptr = '<';
+								strcpy(result_ptr + 1, command_uid);
+								result_ptr += strlen(command_uid) + 1;
+								strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
+								result_ptr += 41;
+
+							}
+						}
+						next_element0 = *(start_facts_set + 1);
+						start_facts_set = cast(uint*) next_element0;
+					}
+
+				}
+
+				strcpy(result_ptr, "}.\0");
+				client.send(queue_name, result_buffer);
+
+				time = elapsed.stop;
+				log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
 			}
 
@@ -543,8 +577,6 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 				log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
-
 
 			}
 
@@ -685,15 +717,6 @@ void get_message(byte* message, ulong message_size)
 						bool calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
 						//					Stdout.format("right = {}", calculatedRight).newline;
 
-						//					if(calculatedRight == false)
-						//					{
-						//						for(uint j = doc_pos; *(autz_elements + j) != 0; j++)
-						//						{
-						//							*(autz_elements + j) = ' ';
-						//						}
-						//						*(autz_elements + i) = ' ';
-						//					}
-						//					else
 						if(calculatedRight == true)
 						{
 							if(count_prepared_doc > 1)
@@ -706,7 +729,6 @@ void get_message(byte* message, ulong message_size)
 							result_ptr += strlen(docId);
 
 							//						Stdout.format("this request on authorization #1.4 true").newline;
-							//						*(autz_elements + i) = ',';
 							count_authorized_doc++;
 						}
 
@@ -754,38 +776,38 @@ void get_message(byte* message, ulong message_size)
 // Loads server properties
 private char[][char[]] load_props()
 {
-  char[][char[]] result;
-  FileConduit props_conduit;
+	char[][char[]] result;
+	FileConduit props_conduit;
 
-  auto props_path = new FilePath("./semargl.properties");
+	auto props_path = new FilePath("./semargl.properties");
 
-  if (!props_path.exists) // props file doesn't exists, so create new one with defaults
-    {
-      result["amqp_server_address"] = "localhost";
-      result["amqp_server_port"] = "5672";
-      result["amqp_server_exchange"] = "";
-      result["amqp_server_login"] = "ba";
-      result["amqp_server_password"] = "123456";
-      result["amqp_server_routingkey"] = "";
-      result["amqp_server_queue"] = "semargl";
-      result["amqp_server_vhost"] = "magnetico";
+	if(!props_path.exists)
+	// props file doesn't exists, so create new one with defaults
+	{
+		result["amqp_server_address"] = "localhost";
+		result["amqp_server_port"] = "5672";
+		result["amqp_server_exchange"] = "";
+		result["amqp_server_login"] = "ba";
+		result["amqp_server_password"] = "123456";
+		result["amqp_server_routingkey"] = "";
+		result["amqp_server_queue"] = "semargl";
+		result["amqp_server_vhost"] = "magnetico";
 
-      props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
-      auto output = new MapOutput!(char)(props_conduit.output);
+		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
+		auto output = new MapOutput!(char)(props_conduit.output);
 
-      output.append(result);
-      output.flush;
-      props_conduit.close;
-    }
-  else
-    {
-      props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadExisting);
-      auto input = new MapInput!(char)(props_conduit.input);
-      result = result.init;
-      input.load(result);
-      props_conduit.close;
-    }
+		output.append(result);
+		output.flush;
+		props_conduit.close;
+	}
+	else
+	{
+		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadExisting);
+		auto input = new MapInput!(char)(props_conduit.input);
+		result = result.init;
+		input.load(result);
+		props_conduit.close;
+	}
 
-  return result;
+	return result;
 }
-
