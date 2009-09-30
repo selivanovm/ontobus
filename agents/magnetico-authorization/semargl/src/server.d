@@ -3,9 +3,14 @@ module server;
 private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
+private import tango.stdc.stdlib;
 //private import std.string;
 private import tango.stdc.posix.stdio;
 private import Log;
+
+private import tango.io.FileScan;
+private import tango.io.FileConduit;
+private import tango.io.stream.MapStream;
 
 private import Integer = tango.text.convert.Integer;
 
@@ -39,15 +44,13 @@ void main(char[][] args)
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
-	//char[] hostname = "192.168.150.197\0";
-	//	char[] hostname = "192.168.150.44\0";
-	//	char[] hostname = "192.168.150.196\0";
-	char[] hostname = "services.magnetosoft.ru\0";
-	int port = 5672;
-	char[] vhost = "magnetico\0";
-	char[] login = "ba\0";
-	char[] passw = "123456\0";
-	char[] queue = "semargl";
+	char[][char[]] props = load_props;
+	char[] hostname = props["amqp_server_address"] ~ "\0";
+	int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
+	char[] vhost = props["amqp_server_vhost"] ~ "\0";
+	char[] login = props["amqp_server_login"] ~ "\0";
+	char[] passw = props["amqp_server_password"] ~ "\0";
+	char[] queue = props["amqp_server_queue"] ~ "\0";
 
 	Stdout.format("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue).newline;
 	client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
@@ -505,12 +508,8 @@ void get_message(byte* message, ulong message_size)
 
 			    }
 
-			    //if (strlen(result_buffer) > 0)
-			    //  {
 			    strcpy(result_ptr, "}.\0");
 			    client.send(queue_name, result_buffer);
-				//			      }
-
 
 			    time = elapsed.stop;
 			    log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -751,3 +750,42 @@ void get_message(byte* message, ulong message_size)
 	//	Stdout.format("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length)).newline;
 	}
 }
+
+// Loads server properties
+private char[][char[]] load_props()
+{
+  char[][char[]] result;
+  FileConduit props_conduit;
+
+  auto props_path = new FilePath("./semargl.properties");
+
+  if (!props_path.exists) // props file doesn't exists, so create new one with defaults
+    {
+      result["amqp_server_address"] = "localhost";
+      result["amqp_server_port"] = "5672";
+      result["amqp_server_exchange"] = "";
+      result["amqp_server_login"] = "ba";
+      result["amqp_server_password"] = "123456";
+      result["amqp_server_routingkey"] = "";
+      result["amqp_server_queue"] = "semargl";
+      result["amqp_server_vhost"] = "magnetico";
+
+      props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
+      auto output = new MapOutput!(char)(props_conduit.output);
+
+      output.append(result);
+      output.flush;
+      props_conduit.close;
+    }
+  else
+    {
+      props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadExisting);
+      auto input = new MapInput!(char)(props_conduit.input);
+      result = result.init;
+      input.load(result);
+      props_conduit.close;
+    }
+
+  return result;
+}
+
