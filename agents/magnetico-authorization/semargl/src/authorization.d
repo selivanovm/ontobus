@@ -285,7 +285,8 @@ class Authorization
 		char* subject_document = authorizedElementId;
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
-		if(targetRightType == RightType.CREATE && strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory, "DOCUMENTTYPE") == 0)
+		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || 
+		   strcmp(authorizedElementCategory, "DOCUMENTTYPE") || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
 					targetRightType, ts);
