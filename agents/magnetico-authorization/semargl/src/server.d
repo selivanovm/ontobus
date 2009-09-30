@@ -297,45 +297,49 @@ void get_message(byte* message, ulong message_size)
 
 			    for(int i = 0; i < count_facts; i++)
 			    {
-			      if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0 && strlen(fact_o[i]) > 0)
+			      if (strlen(fact_o[i]) > 0)
 				{
-				  from_id = i;
-				}
-			      else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    author_system_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystem") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    author_subsystem_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    author_subsystem_element_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSystem") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    target_system_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystem") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    target_subsystem_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    target_subsystem_element_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    category_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    elements_id = i;
-				}
-				else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0  && strlen(fact_o[i]) > 0)
-				{
-				    reply_to_id = i;
+				  log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]), strlen(fact_o[i]));
+				  if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
+				    {
+				      from_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0)
+				    {
+				      author_system_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystem") == 0)
+				    {
+				      author_subsystem_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
+				    {
+				      author_subsystem_element_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSystem") == 0)
+				    {
+				      target_system_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystem") == 0)
+				    {
+				      target_subsystem_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
+				    {
+				      target_subsystem_element_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0)
+				    {
+				      category_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
+				    {
+				      elements_id = i;
+				    }
+				  else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+				    {
+				      reply_to_id = i;
+				    }
 				}
 			    }
 
@@ -380,6 +384,12 @@ void get_message(byte* message, ulong message_size)
 				start_set_marker = 7;
 				start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_system_id], false);
 			    }
+
+			    log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", 
+				      elements_id, author_subsystem_element_id, target_subsystem_element_id);
+			    log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}", 
+				      category_id, author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
+			    log.trace("start_set_marker = {}", start_set_marker);
 
 			    strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -495,11 +505,11 @@ void get_message(byte* message, ulong message_size)
 
 			    }
 
-			    if (strlen(result_buffer) > 0)
-			      {
-				strcpy(result_ptr, "}.\0");
-				client.send(queue_name, result_buffer);
-			      }
+			    //if (strlen(result_buffer) > 0)
+			    //  {
+			    strcpy(result_ptr, "}.\0");
+			    client.send(queue_name, result_buffer);
+				//			      }
 
 
 			    time = elapsed.stop;

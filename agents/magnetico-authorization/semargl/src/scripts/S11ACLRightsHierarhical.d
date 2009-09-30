@@ -81,9 +81,9 @@ bool lookRightInACLRecord (uint rightType, char* ACLRecordSubject, char* target,
 					}
 
 				}
+				next_element3 = *(iterator3 + 1);
+				iterator3 = cast(uint*) next_element3;
 			}
-			next_element3 = *(iterator3 + 1);
-			iterator3 = cast(uint*) next_element3;
 		}
 	}
 	

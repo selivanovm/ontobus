@@ -129,7 +129,7 @@ class Authorization
 		log.trace ("authorization init..");
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
+		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O |idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId");
 		//		
@@ -285,7 +285,7 @@ class Authorization
 		char* subject_document = authorizedElementId;
 
 		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
-		if(strcmp(authorizedElementCategory, "DOCUMENT") == 0)
+		if(targetRightType == RightType.CREATE && strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory, "DOCUMENTTYPE") == 0)
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document,
 					targetRightType, ts);
