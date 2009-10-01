@@ -24,8 +24,8 @@ public void print_list_triple(uint* list_iterator)
 		{
 			triple = cast(byte*) *list_iterator;
 //			log.trace("triple {:X4}", triple);
-			print_triple(triple);
-
+			if (triple !is null)
+			  print_triple(triple);
 			next_element0 = *(list_iterator + 1);
 //			log.trace("next_element0 {:X4}", next_element0);
 			list_iterator = cast(uint*) next_element0;

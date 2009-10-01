@@ -146,8 +146,8 @@ void print_triple_list(uint* res_triples)
 		{
 			char* readed_triple = cast(char*) *iterator;
 			//            Stdout.format("print_triple_list:1 readed_triple={:X}", readed_triple);
-
-			Stdout.format("print_triple_list:2 readed buff {}",
+			if(readed_triple !is null)
+			  Stdout.format("print_triple_list:2 readed buff {}",
 					str_2_char_array(readed_triple)).newline;
 
 			next_element = *(iterator + 1);

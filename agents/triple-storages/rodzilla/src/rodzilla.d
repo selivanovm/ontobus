@@ -96,16 +96,6 @@ void main()
   char[] hostname = make_null_string(props["amqp_server_address"]);
   int portt = atoi(&(props["amqp_server_port"][0]));
 
-  /*      result["amqp_server_address"] = "localhost";
-      result["amqp_server_port"] = "5762";
-      result["amqp_server_exchange"] = "";
-      result["amqp_server_login"] = "rodzilla";
-      result["amqp_server_password"] = "rodzilla_password";
-      result["amqp_server_routingkey"] = "";
-      result["amqp_server_queue"] = "store";*/
-
-
-
   auto locale = new Locale();
   path = new FilePath(locale ("./data/{:yyyy-MM-dd}.triples", WallClock.now));
 
@@ -782,12 +772,13 @@ private char[][char[]] load_props()
   if (!props_path.exists) // props file doesn't exists, so create new one with defaults
     {
       result["amqp_server_address"] = "localhost";
-      result["amqp_server_port"] = "5762";
+      result["amqp_server_port"] = "5672";
       result["amqp_server_exchange"] = "";
       result["amqp_server_login"] = "rodzilla";
       result["amqp_server_password"] = "rodzilla_password";
       result["amqp_server_routingkey"] = "";
       result["amqp_server_queue"] = "store";
+      result["amqp_server_vhost"] = "magnetico";
 
       props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
       auto output = new MapOutput!(char)(props_conduit.output);

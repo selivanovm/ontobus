@@ -227,8 +227,8 @@ class Authorization
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
 			char*[] hierarhical_departments)
 	{
-		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(
-		//				authorizedElementCategory), getString(authorizedElementId), getString(User));
+	  	log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(authorizedElementCategory), 
+			  getString(authorizedElementId), getString(User));
 
 		//		uint count_auth_doc = 0;
 		// считываем все документы
@@ -249,19 +249,20 @@ class Authorization
 		calculatedRight = scripts.S01UserIsAdmin.calculate(User, null, targetRightType, ts);
 		if(calculatedRight == true)
 		{
-			//			log.trace("autorize end#0, return:[{}]", calculatedRight);
+		  			//log.trace("autorize end#0, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 
 		char* subject_document = authorizedElementId;
 
-		//		printf("authorize:docId=%s user=%s target_right_type=%i\n", docId, User, targetRightType);
+		log.trace("authorize: category={} target_right_type={}", getString(authorizedElementCategory), targetRightType);
+
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory,
-				"DOCUMENTTYPE") || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
+				"DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
 
-		//			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
 		if(calculatedRight == true)
@@ -275,44 +276,44 @@ class Authorization
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
 			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-			log.trace("autorize end#2, return:[false]");
+			//log.trace("autorize end#2, return:[false]");
 			return false;
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts, hierarhical_departments);
-		//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-		//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
+			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
+			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
+			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		//		time = elapsed.stop;

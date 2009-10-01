@@ -191,8 +191,9 @@ class TripleStorage
 
 	public bool removeTriple(char* s, char* p, char* o)
 	{
-		if(s !is null && p !is null && o !is null)
+		if(s is null && p is null && o is null)
 			return false;
+
 		uint* removed_triple;
 
 		uint* list_iterator = idx_spo.get(s, p, o, false);
@@ -324,7 +325,7 @@ class TripleStorage
 				}
 			}
 		}
-
+		return true;
 	}
 
 	public bool removeTriple(char[] s, char[] p, char[] o)

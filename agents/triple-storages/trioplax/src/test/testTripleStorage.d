@@ -91,6 +91,10 @@ int main(char[][] args)
 			while(next_element > 0)
 			{
 				byte* triple0 = cast(byte*) *iterator0;
+
+				if(triple0 !is null)
+				  {
+
 				//				Stdout.format("#2 triple0={:X4}", cast(void*) triple0).newline;
 
 				//				uint key1_length = (*(triple0 + 0) << 8) + *(triple0 + 1);
@@ -157,6 +161,9 @@ int main(char[][] args)
 				//					triple.s, triple.p, triple.o).newline;
 
 				}
+
+				  }
+
 				next_element = *(iterator0 + 1);
 				iterator0 = cast(uint*) next_element;
 				count_read++;

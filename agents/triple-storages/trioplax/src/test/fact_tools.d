@@ -13,9 +13,11 @@ public void print_list_triple (uint* list_iterator)
 		while(next_element0 > 0)
 		{
 			triple = cast(byte*) *list_iterator;
+			if(triple !is null)
+			  {
 			Stdout.format("triple {:X4}", triple).newline;
 			print_triple(triple);
-
+			  }
 			next_element0 = *(list_iterator + 1);
 			list_iterator = cast(uint*) next_element0;
 		}

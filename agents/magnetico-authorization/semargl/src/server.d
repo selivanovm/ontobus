@@ -196,7 +196,8 @@ void get_message(byte* message, ulong message_size)
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *list_facts;
-
+						if(triple !is null)
+						  {
 						char* s = cast(char*) triple + 6;
 
 						char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
@@ -204,7 +205,7 @@ void get_message(byte* message, ulong message_size)
 						char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 						log.trace("list triple <{}><{}><{}>", getString(s), getString(p), getString(p));
-
+						  }
 						next_element1 = *(list_facts + 1);
 						list_facts = cast(uint*) next_element1;
 					}
@@ -215,6 +216,19 @@ void get_message(byte* message, ulong message_size)
 			{
 				log.trace("команда на удаление всех фактов у которых субьект, s={}", getString(fact_o[arg_id]));
 
+				int reply_to_id = 0;
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(strlen(fact_o[i]) > 0)
+					{
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
+					}
+				}
+
+
 				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
 
 				if(removed_facts !is null)
@@ -223,6 +237,9 @@ void get_message(byte* message, ulong message_size)
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *removed_facts;
+
+						if(triple !is null)
+						  {
 
 						char* s = cast(char*) triple + 6;
 
@@ -235,11 +252,39 @@ void get_message(byte* message, ulong message_size)
 						az.getTripleStorage.removeTriple(s, p, o);
 						az.logginTriple('D', getString(s), getString(p), getString(o));
 
+						  }
+
 						next_element1 = *(removed_facts + 1);
 						removed_facts = cast(uint*) next_element1;
 					}
 
 				}
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:status>\"ok\".");
+				result_ptr += 48;
+
+				strcpy(result_ptr, "\".\0");
+
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				log.trace("queue_name:{}", getString(queue_name));
+				log.trace("result:{}", getString(result_buffer));
+
+				elapsed.start;
+
+				client.send(queue_name, result_buffer);
+
+				time = elapsed.stop;
+
+				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+
 			}
 
 			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
@@ -269,6 +314,9 @@ void get_message(byte* message, ulong message_size)
 					{
 						byte* triple = cast(byte*) *removed_subjects;
 
+						if(triple !is null)
+						  {
+
 						char* s = cast(char*) triple + 6;
 						log.trace("removed_subjects <{}>", getString(s));
 
@@ -280,6 +328,9 @@ void get_message(byte* message, ulong message_size)
 							while(next_element1 > 0)
 							{
 								triple = cast(byte*) *removed_facts;
+
+								if(triple !is null)
+								  {
 
 								s = cast(char*) triple + 6;
 
@@ -293,11 +344,14 @@ void get_message(byte* message, ulong message_size)
 								az.getTripleStorage.removeTriple(s, p, o);
 								az.logginTriple('D', getString(s), getString(p), getString(o));
 
+								  }
+
 								next_element1 = *(removed_facts + 1);
 								removed_facts = cast(uint*) next_element1;
 							}
 
 						}
+						  }
 						next_element0 = *(removed_subjects + 1);
 						removed_subjects = cast(uint*) next_element0;
 					}
@@ -439,7 +493,10 @@ void get_message(byte* message, ulong message_size)
 					uint next_element0 = 0xFF;
 					while(next_element0 > 0)
 					{
+
 						byte* triple = cast(byte*) *start_facts_set;
+						if(triple !is null)
+						  {
 						char* s = cast(char*) triple + 6;
 
 						uint* founded_facts = az.getTripleStorage.getTriples(s, null, null, false);
@@ -450,7 +507,11 @@ void get_message(byte* message, ulong message_size)
 							bool is_match = true;
 							while(next_element1 > 0)
 							{
+
 								byte* triple1 = cast(byte*) *founded_facts;
+
+								if(triple1 !is null)
+								  {
 
 								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
 								char*
@@ -486,8 +547,11 @@ void get_message(byte* message, ulong message_size)
 								{
 									is_match = is_match & strcmp(o1, fact_o[target_system_id]) == 0;
 								}
+
+								  }
 								next_element1 = *(founded_facts + 1);
 								founded_facts = cast(uint*) next_element1;
+
 							}
 
 							if(is_match)
@@ -496,6 +560,10 @@ void get_message(byte* message, ulong message_size)
 								while(next_element1 > 0)
 								{
 									byte* triple1 = cast(byte*) *founded_facts_copy;
+
+									if(triple1 !is null)
+									  {
+
 									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
 									char*
 											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
@@ -513,6 +581,7 @@ void get_message(byte* message, ulong message_size)
 									result_ptr += strlen(o1);
 									strcpy(result_ptr, "\".");
 									result_ptr += 2;
+									  }
 
 									next_element1 = *(founded_facts_copy + 1);
 									founded_facts_copy = cast(uint*) next_element1;
@@ -536,6 +605,7 @@ void get_message(byte* message, ulong message_size)
 
 							}
 						}
+						  }
 						next_element0 = *(start_facts_set + 1);
 						start_facts_set = cast(uint*) next_element0;
 					}
@@ -554,6 +624,18 @@ void get_message(byte* message, ulong message_size)
 			if(put_id >= 0 && arg_id > 0)
 			{
 				log.trace("команда на добавление");
+
+				int reply_to_id = 0;
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(strlen(fact_o[i]) > 0)
+					{
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
+					}
+				}
 
 				ulong uuid = getUUID();
 
@@ -577,6 +659,30 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 				log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:status>\"ok\".");
+				result_ptr += 48;
+
+				strcpy(result_ptr, "\".\0");
+
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				log.trace("queue_name:{}", getString(queue_name));
+				log.trace("result:{}", getString(result_buffer));
+
+				elapsed.start;
+
+				client.send(queue_name, result_buffer);
+
+				time = elapsed.stop;
+
+				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
 			}
 

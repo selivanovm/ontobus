@@ -40,6 +40,9 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		{
 //			Stdout.format("UserIsAuthorOfDocument #2").newline;
 			byte* triple0 = cast(byte*) *iterator_facts_of_document;
+			
+			if(triple0 !is null)
+			  {
 
 //			Stdout.format("UserIsAuthorOfDocument #2.1").newline;
 
@@ -58,7 +61,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 				}
 			}
-
+			  }
 			next_element0 = *(iterator_facts_of_document + 1);
 			iterator_facts_of_document = cast(uint*) next_element0;
 		}
