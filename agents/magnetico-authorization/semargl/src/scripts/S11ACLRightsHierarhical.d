@@ -36,27 +36,24 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	return result;
 }
 
-bool lookRightInACLRecord (uint rightType, char* ACLRecordSubject, char* target, TripleStorage ts)
+bool lookRightInACLRecord(uint rightType, char* ACLRecordSubject, char* target, TripleStorage ts)
 {
-
-  //log.trace("!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  
 	// возьмем факты этой записи ACL
 	uint* iterator2 = ts.getTriples(ACLRecordSubject, "magnet-ontology/authorization/acl#targetSubsystemElement", target, false);
 
-	//log.trace("query: s={}, p={}, o={}", getString(ACLRecordSubject), "magnet-ontology/authorization/acl#targetSubsystemElement", getString(target));
-	//print_list_triple(iterator2);
+//	log.trace("query: s={}, p={}, o={}", getString(ACLRecordSubject), "magnet-ontology/authorization/acl#targetSubsystemElement", getString(target));
+//	print_list_triple(iterator2);
 
 	if(iterator2 !is null)
 	{
-		//log.trace ("#1 lookRightInACLRecord ACLRecordSubject={}, target={}", getString (ACLRecordSubject), getString (target));
+//		log.trace ("#1 lookRightInACLRecord ACLRecordSubject={}, target={}", getString (ACLRecordSubject), getString (target));
 		// это означает, что данная ACL запись содержит нашего пользователя в качестве target
 		// теперь считаем сами права
 
 		uint* iterator3 = ts.getTriples(ACLRecordSubject, "magnet-ontology/authorization/acl#rights", null, false);
 
-		//log.trace("query: s={}, p={}, o={}", getString(ACLRecordSubject), "magnet-ontology/authorization/acl#rights", null);
-		//print_list_triple(iterator3);
+//		log.trace("query: s={}, p={}, o={}", getString(ACLRecordSubject), "magnet-ontology/authorization/acl#rights", null);
+//		print_list_triple(iterator3);
 
 		if(iterator3 !is null)
 		{
@@ -74,11 +71,11 @@ bool lookRightInACLRecord (uint rightType, char* ACLRecordSubject, char* target,
 
 					while(*triple2_o != 0)
 					{
-					  //Stdout.format("S11ACLRightsHierarhical.checkRight #5 ?").newline;
-					  
+						//Stdout.format("S11ACLRightsHierarhical.checkRight #5 ?").newline;
+
 						if((rightType == RightType.READ) && (*triple2_o == 'r' || *(triple2_o + 1) == 'r'))
 						{
-						  //Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
+							//Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
 							return true;
 						}
 						triple2_o++;
@@ -90,13 +87,13 @@ bool lookRightInACLRecord (uint rightType, char* ACLRecordSubject, char* target,
 			}
 		}
 	}
-	
+
 	return false;
 }
 
 bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
 {
-	//log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
+//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
 	uint* iterator_subjects_of_elementId;
 
@@ -104,8 +101,8 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	uint* iterator1 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId, false);
 	iterator_subjects_of_elementId = iterator1;
 
-	    	//log.trace("query: s={}, p={}, o={}", null, "magnet-ontology/authorization/acl#elementId", getString (elementId));
-			//print_list_triple(iterator1);
+//	log.trace("query: s={}, p={}, o={}", null, "magnet-ontology/authorization/acl#elementId", getString (elementId));
+//	print_list_triple(iterator1);
 
 	bool this_user_in_ACL = false;
 
@@ -119,28 +116,31 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 			byte* triple1 = cast(byte*) *iterator1;
 
 			if(triple1 !is null)
-			  {
-
-			char* acl_subject = cast(char*) triple1 + 6;
-
-			// проверим на вхождение elementId в вышестоящих узлах орг структуры
-			for(int i = 0; i < iterator_on_targets_of_hierarhical_departments.length; i++)
 			{
-				if (lookRightInACLRecord (rightType, acl_subject, iterator_on_targets_of_hierarhical_departments[i], ts) == true) 
+
+				char* acl_subject = cast(char*) triple1 + 6;
+
+				// проверим на вхождение elementId в вышестоящих узлах орг структуры
+				for(int i = 0; i < iterator_on_targets_of_hierarhical_departments.length; i++)
 				{
+					if(lookRightInACLRecord(rightType, acl_subject, iterator_on_targets_of_hierarhical_departments[i], ts) == true)
+					{
+//						log.trace("#!1 ret");
+						return true;
+					}
+				}
+				if(lookRightInACLRecord(rightType, acl_subject, user, ts) == true)
+				{
+//					log.trace("#!2 ret");
 					return true;
 				}
-			}
-			if (lookRightInACLRecord (rightType, acl_subject, user, ts) == true) 
-			{
-				return true;
-			}
 
-			  }
+			}
 			next_element1 = *(iterator1 + 1);
 			iterator1 = cast(uint*) next_element1;
 		}
 	}
-
+	
+//	log.trace("#!3 ret");
 	return this_user_in_ACL;
 }

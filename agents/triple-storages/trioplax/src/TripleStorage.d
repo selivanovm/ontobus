@@ -408,7 +408,7 @@ class TripleStorage
 									o2 = _toString(
 											cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
-//							log.trace("add A: p1 = {}, p2 = {}", p1, p2);
+							//							log.trace("add A: p1 = {}, p2 = {}", p1, p2);
 							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
 							idx_s1ppoo.put(s, p1 ~ p2, o1 ~ o2, triple);
 						}
@@ -428,14 +428,13 @@ class TripleStorage
 									o1 = _toString(
 											cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
-//							log.trace("add B: p1 = {}, p2 = {}", p1, p2);
+							//							log.trace("add B: p1 = {}, p2 = {}", p1, p2);
 							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
 							idx_s1ppoo.put(s, p1 ~ p2, o1 ~ o2, triple);
 						}
 
 					}
 				}
-
 
 			}
 
