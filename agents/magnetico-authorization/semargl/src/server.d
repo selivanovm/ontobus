@@ -265,7 +265,7 @@ void get_message(byte* message, ulong message_size)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:status>\"ok\".");
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
 				result_ptr += 48;
 
 				strcpy(result_ptr, "\".\0");
@@ -384,8 +384,8 @@ void get_message(byte* message, ulong message_size)
 				{
 					if(strlen(fact_o[i]) > 0)
 					{
-						log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]),
-								strlen(fact_o[i]));
+					  //log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]),
+					  //								strlen(fact_o[i]));
 						if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
 						{
 							from_id = i;
@@ -471,11 +471,11 @@ void get_message(byte* message, ulong message_size)
 					start_facts_set = az.getTripleStorage.getTriples(null, null, fact_o[target_system_id], false);
 				}
 
-				log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id,
-						author_subsystem_element_id, target_subsystem_element_id);
-				log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}",
-						category_id, author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
-				log.trace("start_set_marker = {}", start_set_marker);
+				//				log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id,
+				//	author_subsystem_element_id, target_subsystem_element_id);
+				//				log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}",
+				//	category_id, author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
+				//				log.trace("start_set_marker = {}", start_set_marker);
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -487,11 +487,9 @@ void get_message(byte* message, ulong message_size)
 
 				if(start_facts_set !is null)
 				{
-					log.trace("Found some elements.");
 					uint next_element0 = 0xFF;
 					while(next_element0 > 0)
 					{
-
 						byte* triple = cast(byte*) *start_facts_set;
 						if(triple !is null)
 						{
@@ -504,6 +502,7 @@ void get_message(byte* message, ulong message_size)
 								uint next_element1 = 0xFF;
 								bool is_match = true;
 								while(next_element1 > 0)
+								  
 								{
 
 									byte* triple1 = cast(byte*) *founded_facts;
@@ -512,8 +511,8 @@ void get_message(byte* message, ulong message_size)
 									{
 
 										char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-										char*
-												o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+										char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + 
+													(*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 										if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
 												"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
@@ -525,7 +524,8 @@ void get_message(byte* message, ulong message_size)
 										{
 											is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
 										}
-										if(start_set_marker < 3 && category_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
+										if(start_set_marker < 3 && category_id > 0 && 
+										   strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
 										{
 											is_match = is_match & strcmp(o1, fact_o[category_id]) == 0;
 										}
@@ -558,17 +558,18 @@ void get_message(byte* message, ulong message_size)
 
 								if(is_match)
 								{
+								  // log.trace("found match");
 									next_element1 = 0xFF;
 									while(next_element1 > 0)
 									{
 										byte* triple1 = cast(byte*) *founded_facts_copy;
-
+										//										log.trace("#3");
 										if(triple1 !is null)
 										{
-
+										  //  log.trace("...not null");
 											char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-											char*
-													o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+											char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + 
+														(*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 											strcpy(result_ptr++, "<");
 											strcpy(result_ptr, s);
@@ -590,9 +591,8 @@ void get_message(byte* message, ulong message_size)
 									}
 								}
 
-								if(strlen(result_buffer) > 1000)
+								if(strlen(result_buffer) > 10000)
 								{
-
 									strcpy(result_ptr, "}.\0");
 
 									client.send(queue_name, result_buffer);
@@ -614,11 +614,17 @@ void get_message(byte* message, ulong message_size)
 
 				}
 
-				strcpy(result_ptr, "}.\0");
+				strcpy(result_ptr, "}.<");
+				result_ptr += 3;
+				strcpy(result_ptr, command_uid);
+				result_ptr += strlen(command_uid);
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+
 				client.send(queue_name, result_buffer);
 
 				time = elapsed.stop;
 				log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+				log.trace("result:{}", getString(result_buffer));
 
 			}
 
@@ -668,7 +674,7 @@ void get_message(byte* message, ulong message_size)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:status>\"ok\".");
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
 				result_ptr += 48;
 
 				strcpy(result_ptr, "\".\0");
@@ -850,7 +856,11 @@ void get_message(byte* message, ulong message_size)
 					}
 				}
 
-				strcpy(result_ptr, "\".\0");
+				strcpy(result_ptr, "\".<");
+				strcpy(result_ptr + 3, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+				result_ptr += 48;
 
 				time = elapsed.stop;
 
