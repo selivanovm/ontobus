@@ -47,9 +47,14 @@ class TripleStorage
 
 	uint max_count_element = 100_000;
 	uint max_length_order = 4;
+	private char[] cat_buff1;
+	private char[] cat_buff2;
 
 	this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length)
 	{
+		cat_buff1 = new char[64 * 1024];
+		cat_buff2 = new char[64 * 1024];
+
 		max_count_element = _max_count_element;
 		max_length_order = _max_length_order;
 		//		Stdout.format("TripleStorage:use_index={:X1}", useindex).newline;
@@ -99,6 +104,31 @@ class TripleStorage
 		look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
 		look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
 		count_look_predicate_on_idx_s1ppoo++;
+	}
+
+	public uint* getTriples(char* p1, char* p2, char* o1, char* o2)
+	{
+		synchronized
+		{
+			uint* list = null;
+
+			if(idx_s1ppoo !is null)
+			{
+				char* p1p2 = cast(char*) cat_buff1;
+				strncpy(p1p2, p1, strlen(p1));
+				strcpy(p1p2 + strlen(p1), p2);
+
+				char* o1o2 = cast(char*) cat_buff2;
+				strncpy(o1o2, o1, strlen(o1));
+				strcpy(o1o2 + strlen(o1), o2);
+
+				//			log.trace ("getTriples: p1p2={}, o1o2={}", _toString(cast(char*)p1p2), _toString(cast(char*)o1o2));
+
+				list = idx_s1ppoo.get(p1p2, o1o2, null, false);
+			}
+
+			return list;
+		}
 	}
 
 	public uint* getTriples(char* s, char* p, char* o, bool debug_info)
@@ -215,7 +245,7 @@ class TripleStorage
 				{
 					if(cast(uint*) (*list_iterator) == removed_triple)
 					{
-						Stdout.format("removeTriple from S, removed_triple={:X4}", removed_triple).newline;
+						//						Stdout.format("removeTriple from S, removed_triple={:X4}", removed_triple).newline;
 						*list_iterator = 0;
 					}
 
@@ -236,7 +266,7 @@ class TripleStorage
 				{
 					if(cast(uint*) (*list_iterator) == removed_triple)
 					{
-						Stdout.format("removeTriple from P, removed_triple={:X4}", removed_triple).newline;
+						//						Stdout.format("removeTriple from P, removed_triple={:X4}", removed_triple).newline;
 						*list_iterator = 0;
 					}
 
@@ -256,7 +286,7 @@ class TripleStorage
 				{
 					if(cast(uint*) (*list_iterator) == removed_triple)
 					{
-						Stdout.format("removeTriple from O, removed_triple={:X4}", removed_triple).newline;
+						//						Stdout.format("removeTriple from O, removed_triple={:X4}", removed_triple).newline;
 						*list_iterator = 0;
 					}
 
@@ -276,7 +306,7 @@ class TripleStorage
 				{
 					if(cast(uint*) (*list_iterator) == removed_triple)
 					{
-						Stdout.format("removeTriple from SP, removed_triple={:X4}", removed_triple).newline;
+						//						Stdout.format("removeTriple from SP, removed_triple={:X4}", removed_triple).newline;
 						*list_iterator = 0;
 					}
 
@@ -296,7 +326,7 @@ class TripleStorage
 				{
 					if(cast(uint*) (*list_iterator) == removed_triple)
 					{
-						Stdout.format("removeTriple from PO, removed_triple={:X4}", removed_triple).newline;
+						//						Stdout.format("removeTriple from PO, removed_triple={:X4}", removed_triple).newline;
 						*list_iterator = 0;
 					}
 
@@ -316,7 +346,7 @@ class TripleStorage
 				{
 					if(cast(uint*) (*list_iterator) == removed_triple)
 					{
-						Stdout.format("removeTriple from SO, removed_triple={:X4}", removed_triple).newline;
+						//						Stdout.format("removeTriple from SO, removed_triple={:X4}", removed_triple).newline;
 						*list_iterator = 0;
 					}
 
@@ -410,7 +440,7 @@ class TripleStorage
 
 							//							log.trace("add A: p1 = {}, p2 = {}", p1, p2);
 							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-							idx_s1ppoo.put(s, p1 ~ p2, o1 ~ o2, triple);
+							idx_s1ppoo.put(p1 ~ p2, o1 ~ o2, null, triple);
 						}
 
 					}
@@ -430,7 +460,7 @@ class TripleStorage
 
 							//							log.trace("add B: p1 = {}, p2 = {}", p1, p2);
 							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-							idx_s1ppoo.put(s, p1 ~ p2, o1 ~ o2, triple);
+							idx_s1ppoo.put(p1 ~ p2, o1 ~ o2, null, triple);
 						}
 
 					}
@@ -447,7 +477,6 @@ class TripleStorage
 		log.trace(
 				"*** statistic read *** \n" //
 				"index s={} reads \n" //
-				"stat__idx_s__reads \n" //
 				"index p={} reads \n" //
 				"index o={} reads \n" //
 				"index sp={} reads \n" //

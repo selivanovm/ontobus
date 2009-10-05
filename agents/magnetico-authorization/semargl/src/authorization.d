@@ -276,7 +276,7 @@ class Authorization
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
 //			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-			//log.trace("autorize end#2, return:[false]");
+//			log.trace("autorize end#2, return:[false]");
 			return false;
 		}
 

@@ -61,11 +61,11 @@ class TripleStorage
 }
     private
 {
-    char[][char[]] look_predicate_p1_on_idx_s1ppoo;
+    char[][16] look_predicate_p1_on_idx_s1ppoo;
 }
     private
 {
-    char[][char[]] look_predicate_p2_on_idx_s1ppoo;
+    char[][16] look_predicate_p2_on_idx_s1ppoo;
 }
     private
 {
@@ -105,14 +105,27 @@ class TripleStorage
 }
     uint max_count_element = 100000;
     uint max_length_order = 4;
+    private
+{
+    char[] cat_buff1;
+}
+    private
+{
+    char[] cat_buff2;
+}
     this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length);
     public
 {
     void setPredicatesToS1PPOO(char[] P1, char[] P2)
 {
-look_predicate_p1_on_idx_s1ppoo[P1] = P2;
-look_predicate_p2_on_idx_s1ppoo[P2] = P1;
+look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
+look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
+count_look_predicate_on_idx_s1ppoo++;
 }
+}
+    public
+{
+    uint* getTriples(char* p1, char* p2, char* o1, char* o2);
 }
     public
 {
@@ -134,7 +147,7 @@ look_predicate_p2_on_idx_s1ppoo[P2] = P1;
 {
     void print_stat()
 {
-log.trace("*** statistic read *** \x0aindex s={} reads \x0astat__idx_s__reads \x0aindex p={} reads \x0aindex o={} reads \x0aindex sp={} reads \x0aindex po={} reads \x0aindex so={} reads \x0aindex spo={} reads \x0a",stat__idx_s__reads,stat__idx_p__reads,stat__idx_o__reads,stat__idx_sp__reads,stat__idx_po__reads,stat__idx_so__reads,stat__idx_spo__reads);
+log.trace("*** statistic read *** \x0aindex s={} reads \x0aindex p={} reads \x0aindex o={} reads \x0aindex sp={} reads \x0aindex po={} reads \x0aindex so={} reads \x0aindex spo={} reads \x0a",stat__idx_s__reads,stat__idx_p__reads,stat__idx_o__reads,stat__idx_sp__reads,stat__idx_po__reads,stat__idx_so__reads,stat__idx_spo__reads);
 }
 }
 }
