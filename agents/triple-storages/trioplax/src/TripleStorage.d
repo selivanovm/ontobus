@@ -1,12 +1,12 @@
 module TripleStorage;
 
-import HashMap;
+private import HashMap;
 //import Triple;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 
 private import Log;
-import tango.util.container.HashMap;
+private import tango.util.container.HashMap;
 
 enum idx_name
 {
@@ -33,6 +33,7 @@ class TripleStorage
 	private HashMap idx_s1ppoo = null;
 	private char[][16] look_predicate_p1_on_idx_s1ppoo;
 	private char[][16] look_predicate_p2_on_idx_s1ppoo;
+	private char[][16] store_predicate_in_list_on_idx_s1ppoo;
 	private uint count_look_predicate_on_idx_s1ppoo = 0;
 
 	private char* idx;
@@ -99,10 +100,11 @@ class TripleStorage
 
 	}
 
-	public void setPredicatesToS1PPOO(char[] P1, char[] P2)
+	public void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 	{
 		look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
 		look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
+                store_predicate_in_list_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = _store_predicate_in_list_on_idx_s1ppoo;
 		count_look_predicate_on_idx_s1ppoo++;
 	}
 
@@ -424,7 +426,7 @@ class TripleStorage
 			{
 				for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
 				{
-					if(look_predicate_p1_on_idx_s1ppoo[i] == p)
+					if(p == look_predicate_p1_on_idx_s1ppoo[i])
 					{
 						char[] o1 = o;
 						char[] p1 = p;
@@ -444,7 +446,7 @@ class TripleStorage
 						}
 
 					}
-					else if(look_predicate_p2_on_idx_s1ppoo[i] == p)
+					else if(p == look_predicate_p2_on_idx_s1ppoo[i])
 					{
 						char[] o2 = o;
 						char[] p2 = p;
@@ -464,6 +466,12 @@ class TripleStorage
 						}
 
 					}
+                                       else if (p == store_predicate_in_list_on_idx_s1ppoo[i])
+                                       {
+                                       } 
+
+					
+
 				}
 
 			}

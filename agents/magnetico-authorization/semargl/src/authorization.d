@@ -131,7 +131,7 @@ class Authorization
 
 		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
 
-		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId");
+		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId", "store_predicate_in_list_on_idx_s1ppoo");
 		//		
 
 		char[] root = ".";

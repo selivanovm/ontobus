@@ -1,6 +1,9 @@
 // D import file generated from 'src/TripleStorage.d'
 module TripleStorage;
-import HashMap;
+private
+{
+    import HashMap;
+}
 private
 {
     import tango.io.Stdout;
@@ -13,7 +16,10 @@ private
 {
     import Log;
 }
-import tango.util.container.HashMap;
+private
+{
+    import tango.util.container.HashMap;
+}
 enum idx_name 
 {
 S = 1 << 0,
@@ -69,6 +75,10 @@ class TripleStorage
 }
     private
 {
+    char[][16] store_predicate_in_list_on_idx_s1ppoo;
+}
+    private
+{
     uint count_look_predicate_on_idx_s1ppoo = 0;
 }
     private
@@ -116,10 +126,11 @@ class TripleStorage
     this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length);
     public
 {
-    void setPredicatesToS1PPOO(char[] P1, char[] P2)
+    void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 {
 look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
 look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
+store_predicate_in_list_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = _store_predicate_in_list_on_idx_s1ppoo;
 count_look_predicate_on_idx_s1ppoo++;
 }
 }
