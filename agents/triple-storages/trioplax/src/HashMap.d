@@ -649,7 +649,6 @@ class HashMap
 
 private bool _strcmp(char[] mem, uint ptr, char[] key)
 {
-	bool res = true;
 	//	log.trace("_strcmp key={}", key);
 	for(int i = key.length - 1; i >= 0; i--)
 	{
@@ -657,33 +656,28 @@ private bool _strcmp(char[] mem, uint ptr, char[] key)
 		//				cast(char) mem[ptr + i], cast(ubyte) key[i], key[i]);
 		if(cast(char) mem[ptr + i] != key[i])
 		{
-			res = false;
-			break;
+			return false;
 		}
 	}
-	return res;
+	return true;
 }
 
 private bool _strcmp(char[] mem, uint ptr, char* key)
 {
-	bool res = true;
 	//		log.trace("_strcmp key={}", key);
-	uint i = 0;
-
 	while(*key != 0)
 	{
 		//		log.trace("{:X4} {:X2} {} =? {:X2} {}", ptr + i, cast(ubyte) mem[ptr + i], cast(char) mem[ptr + i], cast(ubyte) *key, *key);
-		if(cast(char) mem[ptr + i] != *key)
+		if(cast(char) mem[ptr] != *key)
 		{
-			res = false;
-			break;
+			return false;
 		}
 
-		i++;
+		ptr++;
 		key++;
 	}
 
-	return res;
+	return true;
 }
 
 //@ private char[] mem_to_char(char* ptr, int length)
@@ -723,7 +717,7 @@ private void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr)
 
 	try
 	{
-		uint ui = cast(uint) addr;
+		uint ui = addr;
 
 		mem[ptr + 3] = (ui & 0xFF000000) >> 24;
 		mem[ptr + 2] = (ui & 0x00FF0000) >> 16;

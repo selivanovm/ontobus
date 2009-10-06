@@ -124,6 +124,8 @@ class Authorization
 		return ts;
 	}
 
+	private char[] pp = null;
+
 	private void init()
 	{
 		log.trace("authorization init..");
@@ -131,7 +133,10 @@ class Authorization
 
 		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
 
-		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId", "store_predicate_in_list_on_idx_s1ppoo");
+		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
+				"magnet-ontology/authorization/acl#rights");
+
+		pp = "magnet-ontology/authorization/acl#targetSubsystemElement" ~ "magnet-ontology/authorization/acl#elementId";
 		//		
 
 		char[] root = ".";
@@ -223,103 +228,74 @@ class Authorization
 	}
 
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для всех документов 
-
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
 			char*[] hierarhical_departments)
 	{
-//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(authorizedElementCategory), getString(
-//				authorizedElementId), getString(User));
-
-		//		uint count_auth_doc = 0;
-		// считываем все документы
-		//		uint* iterator0 = ts.getTriples(null, "magnet-ontology#subject", "DOCUMENT", false);
-
-		//		if(iterator0 is null)
-		//		{
-		//			throw new Exception("not found documents");
-		//		}
-
-		//		char* char_p_dept = cast(char*) "Department";
-
-		//		elapsed.start;
-
-		//		uint targetRightType = RightType.READ;
-
-		bool calculatedRight = false;
-		calculatedRight = scripts.S01UserIsAdmin.calculate(User, null, targetRightType, ts);
-		if(calculatedRight == true)
-		{
-			//log.trace("autorize end#0, return:[{}]", calculatedRight);
-			return calculatedRight;
-		}
-
-		char* subject_document = authorizedElementId;
-
-//		log.trace("authorize: category={} target_right_type={}", getString(authorizedElementCategory), targetRightType);
+		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(authorizedElementCategory), getString(
+		//				authorizedElementId), getString(User));
+		bool calculatedRight;
 
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory,
 				"DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
 		{
-			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, subject_document, targetRightType, ts);
-
-//			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts);
+		//			log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
-
 		if(calculatedRight == true)
 		{
-//			log.trace("autorize end#1, return:[{}]", calculatedRight);
+			//			log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 
-		uint* iterator_facts_of_document = ts.getTriples(subject_document, null, null, false);
+		if(calculatedRight == false)
+		{
+			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
+		//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+		}
+
+		if(calculatedRight == false)
+		{
+			calculatedRight = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
+		//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
+		}
+
+		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null, false);
 
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
-//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-//			log.trace("autorize end#2, return:[false]");
+			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
+			//			log.trace("autorize end#2, return:[false]");
 			return false;
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, subject_document, targetRightType, ts, hierarhical_departments);
-//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+		//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S05InDocFlow.calculate(User, subject_document, targetRightType, ts);
-//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
+			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+		//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+		//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S20UserIsInOUP.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
+			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+		//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
+			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
 		}
-
-		if(calculatedRight == false)
-		{
-			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, subject_document, targetRightType, ts, iterator_facts_of_document);
-//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
-		}
-
-		//		time = elapsed.stop;
-
-		//		Stdout.format("calculate rules for documents, count={}, time ={}, cps={}", count_auth_doc, time,
-		//				count_auth_doc / time).newline;
 
 		//		log.trace("autorize end#3, return:[{}]", calculatedRight);
 		return calculatedRight;

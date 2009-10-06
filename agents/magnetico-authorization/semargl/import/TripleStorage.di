@@ -75,6 +75,10 @@ class TripleStorage
 }
     private
 {
+    char[][16] look_predicate_pp_on_idx_s1ppoo;
+}
+    private
+{
     char[][16] store_predicate_in_list_on_idx_s1ppoo;
 }
     private
@@ -130,13 +134,14 @@ class TripleStorage
 {
 look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
 look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
+look_predicate_pp_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1 ~ P2;
 store_predicate_in_list_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = _store_predicate_in_list_on_idx_s1ppoo;
 count_look_predicate_on_idx_s1ppoo++;
 }
 }
     public
 {
-    uint* getTriples(char* p1, char* p2, char* o1, char* o2);
+    uint* getTriples(char* s, char* p, char* o, ubyte useindex);
 }
     public
 {

@@ -31,7 +31,7 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 
 			// найдем для этого автора группу
 
-			iterator0 = ts.getTriples(autor_in_acl, "magnet-ontology#group", "DOCFLOW\0", false);
+			iterator0 = ts.getTriples(autor_in_acl, "magnet-ontology#group", "DOCFLOW", false);
 
 			if(iterator0 !is null)
 			{

@@ -76,6 +76,7 @@ void get_message(byte* message, ulong message_size)
 		log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
 
 		auto elapsed = new StopWatch();
+		auto time_calculate_right = new StopWatch();
 		elapsed.start;
 
 		double time;
@@ -100,15 +101,17 @@ void get_message(byte* message, ulong message_size)
 
 		if(*(message + 0) == '<' && *(message + (message_size - 1)) == '.')
 		{
-			//		Stdout.format("this is facts...").newline;
+			log.trace("разбор сообщения");
 
 			Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
 			fact_s = new char*[count_elements.facts];
 			fact_p = new char*[count_elements.facts];
 			fact_o = new char*[count_elements.facts];
 			is_fact_in_object = new uint[count_elements.facts];
+
 			uint count_facts = extract_facts_from_message(cast(char*) message, message_size, count_elements, fact_s, fact_p, fact_o,
 					is_fact_in_object);
+
 			// 				
 			// замапим предикаты фактов на конкретные переменные put_id, arg_id
 			int delete_subjects_id = -1;
@@ -174,6 +177,8 @@ void get_message(byte* message, ulong message_size)
 				}
 
 			}
+			
+			log.trace("разбор сообщения закончен");
 
 			if(get_id >= 0 && arg_id > 0)
 			{
@@ -186,7 +191,7 @@ void get_message(byte* message, ulong message_size)
 				 <85f3><magnet-ontology/transport#argument>"2014a".
 				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
 				 */
-				log.trace("get: query={} ", getString(fact_o[arg_id]));
+				log.trace("function get: query={} ", getString(fact_o[arg_id]));
 
 				uint* list_facts = az.getTripleStorage.getTriples(fact_s[arg_id], fact_p[arg_id], fact_o[arg_id], false);
 
@@ -384,8 +389,8 @@ void get_message(byte* message, ulong message_size)
 				{
 					if(strlen(fact_o[i]) > 0)
 					{
-					  //log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]),
-					  //								strlen(fact_o[i]));
+						//log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]),
+						//								strlen(fact_o[i]));
 						if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
 						{
 							from_id = i;
@@ -502,7 +507,7 @@ void get_message(byte* message, ulong message_size)
 								uint next_element1 = 0xFF;
 								bool is_match = true;
 								while(next_element1 > 0)
-								  
+
 								{
 
 									byte* triple1 = cast(byte*) *founded_facts;
@@ -511,8 +516,8 @@ void get_message(byte* message, ulong message_size)
 									{
 
 										char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-										char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + 
-													(*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+										char*
+												o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 										if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
 												"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
@@ -524,8 +529,7 @@ void get_message(byte* message, ulong message_size)
 										{
 											is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
 										}
-										if(start_set_marker < 3 && category_id > 0 && 
-										   strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
+										if(start_set_marker < 3 && category_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
 										{
 											is_match = is_match & strcmp(o1, fact_o[category_id]) == 0;
 										}
@@ -558,7 +562,7 @@ void get_message(byte* message, ulong message_size)
 
 								if(is_match)
 								{
-								  // log.trace("found match");
+									// log.trace("found match");
 									next_element1 = 0xFF;
 									while(next_element1 > 0)
 									{
@@ -566,10 +570,10 @@ void get_message(byte* message, ulong message_size)
 										//										log.trace("#3");
 										if(triple1 !is null)
 										{
-										  //  log.trace("...not null");
+											//  log.trace("...not null");
 											char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-											char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + 
-														(*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+											char*
+													o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 											strcpy(result_ptr++, "<");
 											strcpy(result_ptr, s);
@@ -698,6 +702,8 @@ void get_message(byte* message, ulong message_size)
 
 			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0], "magnet-ontology#subject") == 0)
 			{
+				log.trace("function authorize");
+				
 				/* пример сообщения:
 				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
 				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport#argument>
@@ -712,10 +718,8 @@ void get_message(byte* message, ulong message_size)
 				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport/message#reply_to>"client-3516df90-522a-476a-9470-8293daf2014a".  
 				 */
 
-				//			Stdout.format("this request on authorization").newline;
 				char* command_uid = null;
 
-				// это команда authorize?
 				int authorize_id = 0;
 				int from_id = 0;
 				int right_id = 0;
@@ -724,10 +728,6 @@ void get_message(byte* message, ulong message_size)
 				int elements_id = 0;
 				int reply_to_id = 0;
 				command_uid = fact_s[0];
-
-				//				log.trace("this request on authorization #1");
-
-				//			Stdout.format("this request on authorization #2").newline;
 
 				if(authorize_id >= 0)
 				{
@@ -773,13 +773,7 @@ void get_message(byte* message, ulong message_size)
 				char* check_right = fact_o[right_id];
 
 				char* result_ptr = cast(char*) result_buffer;
-
-				//						printf("!!!! user_id=%s, elements=%s\n", user_id, autz_elements);
-
-				char*[] hierarhical_departments = null;
-				hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
-				//						log.trace("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length);
-
+								
 				for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 				{
 					if(*(check_right + j) == 'c')
@@ -794,13 +788,12 @@ void get_message(byte* message, ulong message_size)
 						targetRightType = RightType.DELETE;
 				}
 
-				//						Stdout.format("this request on authorization #1.1.0 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
+				char*[] hierarhical_departments = null;
+				log.trace("function authorize: calculate department tree for this target");
+				hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
+				//						log.trace("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length);
 
-				//				bool calculatedRight_isAdmin;
-				//				calculatedRight_isAdmin = scripts.S01UserIsAdmin.calculate(user, null, targetRightType,
-				//						az.getTripleStorage());
-
-				uint count_prepared_doc = 0;
+				uint count_prepared_elements = 0;
 				uint count_authorized_doc = 0;
 				uint doc_pos = 0;
 				uint prev_doc_pos = 0;
@@ -812,6 +805,11 @@ void get_message(byte* message, ulong message_size)
 				result_ptr += strlen(command_uid) + 1;
 				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
 				result_ptr += 41;
+
+				time_calculate_right.start;
+				
+				log.trace("function authorize: repair all elementIds");
+
 				for(uint i = 0; true; i++)
 				{
 					char prev_state_byte = *(autz_elements + i);
@@ -823,24 +821,27 @@ void get_message(byte* message, ulong message_size)
 						*(autz_elements + i) = 0;
 
 						docId = cast(char*) (autz_elements + doc_pos);
-						//					printf("docId:%s\n", docId);
+						//					printf("elId:%s\n", elId);
 
 						//					Stdout.format("this request on authorization #1.3, {} docId={}", i, getString (autz_elements + doc_pos)).newline;
 
-						count_prepared_doc++;
+						count_prepared_elements++;
 						bool calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
 						//					Stdout.format("right = {}", calculatedRight).newline;
 
 						if(calculatedRight == true)
 						{
-							if(count_prepared_doc > 1)
+							if(count_prepared_elements > 1)
 							{
 								*result_ptr = ',';
 								result_ptr++;
 							}
 
-							strcpy(result_ptr, docId);
-							result_ptr += strlen(docId);
+							while(*docId != 0)
+								*result_ptr++ = *docId++;
+
+							//							strcpy(result_ptr, docId);
+							//							result_ptr += strlen(docId);
 
 							//						Stdout.format("this request on authorization #1.4 true").newline;
 							count_authorized_doc++;
@@ -856,6 +857,8 @@ void get_message(byte* message, ulong message_size)
 					}
 				}
 
+				double total_time_calculate_right = time_calculate_right.stop;
+
 				strcpy(result_ptr, "\".<");
 				strcpy(result_ptr + 3, command_uid);
 				result_ptr += strlen(command_uid) + 1;
@@ -864,8 +867,12 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 
-				log.trace("count auth in count docs={}, authorized count docs={}, calculate right time = {:d6} ms. ( {:d6} sec.), cps={}",
-						count_prepared_doc, count_authorized_doc, time * 1000, time, count_prepared_doc / time);
+				log.trace("count auth in count docs={}, authorized count docs={}", count_prepared_elements, count_authorized_doc);
+
+				log.trace("total time = {:d6} ms. ( {:d6} sec.), cps={}", time * 1000, time, count_prepared_elements / time);
+
+				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
+						count_prepared_elements / total_time_calculate_right);
 
 				log.trace("queue_name:{}", getString(queue_name));
 				log.trace("result:{}", getString(result_buffer));
