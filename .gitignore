@@ -1,0 +1,6 @@
+*.class
+*.properties
+*.orig
+*.n3log
+*~
+*.test

@@ -103,6 +103,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rights"; // 				- "c|r|u|d"
 
 		//		 запись о делегировании
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#delegate"; // - кому делегируют
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#owner"; // - кто делегирует
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#withTree"; // - делегировать с учетом дерева делегатов
 
