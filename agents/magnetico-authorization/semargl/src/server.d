@@ -36,8 +36,6 @@ char* result_buffer = null;
 char* queue_name = null;
 char* user = null;
 
-
-
 void main(char[][] args)
 {
 	az = new Authorization();
@@ -167,35 +165,31 @@ void get_message(byte* message, ulong message_size)
 								}
 								else
 								{
-									if(get_id < 0 && 
-									   strcmp(fact_o[i], "magnet-ontology/authorization/functions#get_authorization_rights_records") == 0 &&
-									   strcmp(fact_p[i], "magnet-ontology#subject") == 0)
+									if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#get_authorization_rights_records") == 0 && strcmp(
+											fact_p[i], "magnet-ontology#subject") == 0)
 									{
 										get_authorization_rights_records_id = i;
-										//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+									//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 									}
 									else
-									  {
-									    if(add_delegates_id < 0 && 
-									       strcmp(fact_o[i], 
-										      "magnet-ontology/authorization/functions#add_delegates") == 0 &&
-									       strcmp(fact_p[i], "magnet-ontology#subject") == 0)
-									      {
-										add_delegates_id = i;
-									//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
-									      } 
-									    else
-									      {
-										if(get_delegate_assigners_id < 0 && 
-										   strcmp(fact_o[i], 
-											  "magnet-ontology/authorization/functions#get_delegate_assigners") == 0 &&
-										   strcmp(fact_p[i], "magnet-ontology#subject") == 0)
-										  {
-										    get_delegate_assigners_id = i;
-										    //Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
-										  } 
-									      }
-									  }
+									{
+										if(add_delegates_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#add_delegates") == 0 && strcmp(
+												fact_p[i], "magnet-ontology#subject") == 0)
+										{
+											add_delegates_id = i;
+										//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+										}
+										else
+										{
+											if(get_delegate_assigners_id < 0 && strcmp(fact_o[i],
+													"magnet-ontology/authorization/functions#get_delegate_assigners") == 0 && strcmp(fact_p[i],
+													"magnet-ontology#subject") == 0)
+											{
+												get_delegate_assigners_id = i;
+											//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+											}
+										}
+									}
 								}
 							}
 						}
@@ -204,7 +198,7 @@ void get_message(byte* message, ulong message_size)
 				}
 
 			}
-			
+
 			log.trace("разбор сообщения закончен");
 
 			if(get_id >= 0 && arg_id > 0)
@@ -394,7 +388,7 @@ void get_message(byte* message, ulong message_size)
 			// GET_AUTHORIZATION_RIGHTS_RECORDS
 			if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 			{
-			  az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, client);
+				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, client);
 			}
 
 			// PUT
@@ -408,21 +402,21 @@ void get_message(byte* message, ulong message_size)
 
 				for(int i = 0; i < count_facts; i++)
 				{
-				  if (strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-				    reply_to_id = i;
-				  else if(is_fact_in_object[i] == arg_id)
-				    {
-				      if(strlen(fact_s[i]) == 0)
+					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						reply_to_id = i;
+					else if(is_fact_in_object[i] == arg_id)
 					{
-					  fact_s[i] = cast(char*) new char[16];
-					  longToHex(uuid, fact_s[i]);
+						if(strlen(fact_s[i]) == 0)
+						{
+							fact_s[i] = cast(char*) new char[16];
+							longToHex(uuid, fact_s[i]);
+						}
 					}
-				    }
-				  
-				  log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-																		     cast(char*) fact_o[i]));
-				  az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-				  az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+
+					log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+							cast(char*) fact_o[i]));
+					az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+					az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 				}
 
 				time = elapsed.stop;
@@ -457,97 +451,96 @@ void get_message(byte* message, ulong message_size)
 			// GET_DELEGATE_ASSIGNERS
 			if(get_delegate_assigners_id >= 0 && arg_id > 0)
 			{
-			  log.trace("команда на выборку делегировавших");
-			  
-			  int reply_to_id = 0;
-			  for(int i = 0; i < count_facts; i++)
-			    {
-			      if(strlen(fact_o[i]) > 0)
-				{
-				  if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-				    {
-				      reply_to_id = i;
-				    }
-				}
-			    }
-			  
-			  uint* delegates_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#delegate", fact_o[arg_id], false);
-			  
-			  //log.trace("#1 gda");
+				log.trace("команда на выборку делегировавших");
 
-			  char* result_ptr = cast(char*) result_buffer;
-			  char* command_uid = fact_s[0];
-			  strcpy(queue_name, fact_o[reply_to_id]);
-
-			  *result_ptr = '<';
-			  strcpy(result_ptr + 1, command_uid);
-			  result_ptr += strlen(command_uid) + 1;
-			  strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
-			  result_ptr += 41;
-				
-			  if(delegates_facts !is null)
-			    {
-			      //log.trace("#2 gda");
-			      uint next_delegate = 0xFF;
-			      while(next_delegate > 0)
+				int reply_to_id = 0;
+				for(int i = 0; i < count_facts; i++)
 				{
-				  //log.trace("#3 gda");
-				  byte* de_legate = cast(byte*) *delegates_facts;
-				  if(de_legate !is null)
-				    {
-				      char* subject = cast(char*) de_legate + 6;
-				      uint* owners_facts = 
-					az.getTripleStorage.getTriples(subject, "magnet-ontology/authorization/acl#owner", null, false);
-				      
-				      if(owners_facts !is null)
+					if(strlen(fact_o[i]) > 0)
 					{
-					  uint next_owner = 0xFF;
-					  while(next_owner > 0)
-					    {
-					      byte* owner = cast(byte*) *owners_facts;
-					      if(owner !is null)
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
 						{
-						  //log.trace("#4 gda");
-						  char* object = cast(char*) (owner + 6 + (*(owner + 0) << 8) + *(owner + 1) + 1 + 
-									      (*(owner + 2) << 8) + *(owner + 3) + 1);
-
-						  //log.trace("delegate = {}, owner = {}", getString(subject), getString(object));
-
-						  strcpy(result_ptr++, ",");
-						  strcpy(result_ptr, object);
-						  result_ptr += strlen(object);
-
+							reply_to_id = i;
 						}
-					      next_owner = *(owners_facts + 1);
-					      owners_facts = cast(uint*) next_owner;
-					    }
 					}
-				    }
-				  next_delegate = *(delegates_facts + 1);
-				  delegates_facts = cast(uint*) next_delegate;
 				}
-			    }
 
-			  strcpy(result_ptr, "\".<");
-			  result_ptr += 3;
-			  strcpy(result_ptr, command_uid);
-			  result_ptr += strlen(command_uid);
-			  strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-			  
-			  client.send(queue_name, result_buffer);
-			  
-			  time = elapsed.stop;
-			  log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-			  log.trace("result:{}", getString(result_buffer));
+				uint* delegates_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#delegate", fact_o[arg_id], false);
+
+				//log.trace("#1 gda");
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+				result_ptr += 41;
+
+				if(delegates_facts !is null)
+				{
+					//log.trace("#2 gda");
+					uint next_delegate = 0xFF;
+					while(next_delegate > 0)
+					{
+						//log.trace("#3 gda");
+						byte* de_legate = cast(byte*) *delegates_facts;
+						if(de_legate !is null)
+						{
+							char* subject = cast(char*) de_legate + 6;
+							uint* owners_facts = az.getTripleStorage.getTriples(subject, "magnet-ontology/authorization/acl#owner", null, false);
+
+							if(owners_facts !is null)
+							{
+								uint next_owner = 0xFF;
+								while(next_owner > 0)
+								{
+									byte* owner = cast(byte*) *owners_facts;
+									if(owner !is null)
+									{
+										//log.trace("#4 gda");
+										char*
+												object = cast(char*) (owner + 6 + (*(owner + 0) << 8) + *(owner + 1) + 1 + (*(owner + 2) << 8) + *(owner + 3) + 1);
+
+										//log.trace("delegate = {}, owner = {}", getString(subject), getString(object));
+
+										strcpy(result_ptr++, ",");
+										strcpy(result_ptr, object);
+										result_ptr += strlen(object);
+
+									}
+									next_owner = *(owners_facts + 1);
+									owners_facts = cast(uint*) next_owner;
+								}
+							}
+						}
+						next_delegate = *(delegates_facts + 1);
+						delegates_facts = cast(uint*) next_delegate;
+					}
+				}
+
+				strcpy(result_ptr, "\".<");
+				result_ptr += 3;
+				strcpy(result_ptr, command_uid);
+				result_ptr += strlen(command_uid);
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+
+				client.send(queue_name, result_buffer);
+
+				time = elapsed.stop;
+				log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+				log.trace("result:{}", getString(result_buffer));
 
 			}
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
-			
+
 			// AUTHORIZE
 			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0], "magnet-ontology#subject") == 0)
 			{
 				log.trace("function authorize");
-				
+
 				/* пример сообщения:
 				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
 				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport#argument>
@@ -617,7 +610,7 @@ void get_message(byte* message, ulong message_size)
 				char* check_right = fact_o[right_id];
 
 				char* result_ptr = cast(char*) result_buffer;
-								
+
 				for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 				{
 					if(*(check_right + j) == 'c')
@@ -651,7 +644,7 @@ void get_message(byte* message, ulong message_size)
 				result_ptr += 41;
 
 				time_calculate_right.start;
-				
+
 				log.trace("function authorize: repair all elementIds");
 
 				for(uint i = 0; true; i++)
