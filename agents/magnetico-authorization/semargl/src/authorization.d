@@ -230,7 +230,7 @@ class Authorization
 		return Integer.formatter(tmp, i, 'u', '?', 8);
 	}
 
-	// необходимые данные загружены, сделаем пробное выполнение скриптов для всех документов 
+	// необходимые данные загружены, сделаем пробное выполнение скриптов для заданного пользователя 
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
 			char*[] hierarhical_departments)
 	{

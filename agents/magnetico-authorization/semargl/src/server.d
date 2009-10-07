@@ -28,13 +28,13 @@ private import script_util;
 private import RightTypeDef;
 private import fact_tools;
 
-librabbitmq_client client = null;
+private librabbitmq_client client = null;
 
-Authorization az = null;
+private Authorization az = null;
 
-char* result_buffer = null;
-char* queue_name = null;
-char* user = null;
+private char* result_buffer = null;
+private char* queue_name = null;
+private char* user = null;
 
 void main(char[][] args)
 {
@@ -608,9 +608,11 @@ void get_message(byte* message, ulong message_size)
 				strcpy(user, fact_o[targetId_id]);
 
 				char* check_right = fact_o[right_id];
-
 				char* result_ptr = cast(char*) result_buffer;
 
+// нужно найти всех делегатов и вычислить для них пути в дереве подразделений				
+//				uint* delegates_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#delegate", fact_o[arg_id], false);			
+				
 				for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 				{
 					if(*(check_right + j) == 'c')
@@ -626,9 +628,8 @@ void get_message(byte* message, ulong message_size)
 				}
 
 				char*[] hierarhical_departments = null;
-				log.trace("function authorize: calculate department tree for this target");
 				hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
-				//						log.trace("!!!! load_hierarhical_departments, count={}", hierarhical_departments.length);
+				// log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
 
 				uint count_prepared_elements = 0;
 				uint count_authorized_doc = 0;
@@ -658,14 +659,17 @@ void get_message(byte* message, ulong message_size)
 						*(autz_elements + i) = 0;
 
 						docId = cast(char*) (autz_elements + doc_pos);
-						//					printf("elId:%s\n", elId);
-
-						//					Stdout.format("this request on authorization #1.3, {} docId={}", i, getString (autz_elements + doc_pos)).newline;
 
 						count_prepared_elements++;
-						bool calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
+						bool calculatedRight;
+						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
 						//					Stdout.format("right = {}", calculatedRight).newline;
 
+						if (calculatedRight == false)
+						{
+							// вычислим права для найденных делегатов
+						}
+						
 						if(calculatedRight == true)
 						{
 							if(count_prepared_elements > 1)
