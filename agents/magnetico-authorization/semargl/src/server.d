@@ -52,7 +52,7 @@ void main(char[][] args)
 	char[] passw = props["amqp_server_password"] ~ "\0";
 	char[] queue = props["amqp_server_queue"] ~ "\0";
 
-	Stdout.format("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue).newline;
+	Stdout.format("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
 	client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
 	client.set_callback(&get_message);
 
@@ -72,7 +72,7 @@ void get_message(byte* message, ulong message_size)
 
 		*(message + message_size) = 0;
 
-		//		Stdout.format ("{}", message).newline;
+		//		Stdout.format ("{}", message);
 		log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
 
 		auto elapsed = new StopWatch();
@@ -131,14 +131,14 @@ void get_message(byte* message, ulong message_size)
 				if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#put") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
 				{
 					put_id = i;
-					//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+					//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
 				}
 				else
 				{
 					if(arg_id < 0 && strcmp(fact_p[i], "magnet-ontology/transport#argument") == 0)
 					{
 						arg_id = i;
-						//						Stdout.format("found comand {}, id ={} ", getString(fact_p[i]), i).newline;
+						//						Stdout.format("found comand {}, id ={} ", getString(fact_p[i]), i);
 					}
 					else
 					{
@@ -146,14 +146,14 @@ void get_message(byte* message, ulong message_size)
 								fact_p[i], "magnet-ontology#subject") == 0)
 						{
 							delete_subjects_by_predicate_id = i;
-							//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+							//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
 						}
 						else
 						{
 							if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology#get") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
 							{
 								get_id = i;
-								Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+								Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
 							}
 							else
 							{
@@ -161,7 +161,7 @@ void get_message(byte* message, ulong message_size)
 										"magnet-ontology#subject") == 0)
 								{
 									delete_subjects_id = i;
-									Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+									log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 								}
 								else
 								{
@@ -169,7 +169,7 @@ void get_message(byte* message, ulong message_size)
 											fact_p[i], "magnet-ontology#subject") == 0)
 									{
 										get_authorization_rights_records_id = i;
-										//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+										//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 									}
 									else
 									{
@@ -177,7 +177,7 @@ void get_message(byte* message, ulong message_size)
 												fact_p[i], "magnet-ontology#subject") == 0)
 										{
 											add_delegates_id = i;
-											//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+											//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 										}
 										else
 										{
@@ -186,7 +186,7 @@ void get_message(byte* message, ulong message_size)
 													"magnet-ontology#subject") == 0)
 											{
 												get_delegate_assigners_tree_id = i;
-												//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+												//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 											}
 										}
 									}
@@ -411,9 +411,8 @@ void get_message(byte* message, ulong message_size)
 							fact_s[i] = cast(char*) new char[16];
 							longToHex(uuid, fact_s[i]);
 						}
-						log.trace("add triple <{}><{}><{}>", 
-							  getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), 
-							  getString(cast(char*) fact_o[i]));
+						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+								cast(char*) fact_o[i]));
 						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 					}
@@ -561,7 +560,7 @@ void get_message(byte* message, ulong message_size)
 				uint doc_pos = 0;
 				uint prev_doc_pos = 0;
 
-				//	log.trace("this request on authorization #1.1.1 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
+				//	log.trace("this request on authorization #1.1.1 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid));
 
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
@@ -577,7 +576,7 @@ void get_message(byte* message, ulong message_size)
 				{
 					char prev_state_byte = *(autz_elements + i);
 
-					//								Stdout.format("this request on authorization #1.2, {} {}", i, *(autz_elements + i)).newline;
+					//								log.trace("this request on authorization #1.2, {} {}", i, *(autz_elements + i));
 
 					if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 					{
@@ -588,7 +587,7 @@ void get_message(byte* message, ulong message_size)
 						count_prepared_elements++;
 						bool calculatedRight;
 						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
-						//					Stdout.format("right = {}", calculatedRight).newline;
+						//					log.trace("right = {}", calculatedRight);
 
 						if(calculatedRight == false)
 						{
@@ -620,7 +619,7 @@ void get_message(byte* message, ulong message_size)
 							//							strcpy(result_ptr, docId);
 							//							result_ptr += strlen(docId);
 
-							//						Stdout.format("this request on authorization #1.4 true").newline;
+							//						log.trace("this request on authorization #1.4 true");
 							count_authorized_doc++;
 						}
 
@@ -668,10 +667,11 @@ void get_message(byte* message, ulong message_size)
 		}
 
 		//	printf("!!!! queue_name=%s\n", queue_name);
-		//	Stdout.format("!!!! check_right={}", check_right).newline;
+		//	log.trace("!!!! check_right={}", check_right);
 		//	printf("!!!! list_docid=%s\n", list_docid);
 
-		//	Stdout.format("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length)).newline;
+		//	log.trace("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length));
+		log.trace("message successful prepared");
 	}
 }
 
