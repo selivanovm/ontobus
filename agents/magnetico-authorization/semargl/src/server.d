@@ -411,12 +411,12 @@ void get_message(byte* message, ulong message_size)
 							fact_s[i] = cast(char*) new char[16];
 							longToHex(uuid, fact_s[i]);
 						}
+						log.trace("add triple <{}><{}><{}>", 
+							  getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), 
+							  getString(cast(char*) fact_o[i]));
+						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 					}
-
-					log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-							cast(char*) fact_o[i]));
-					az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-					az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 				}
 
 				time = elapsed.stop;
