@@ -5,6 +5,7 @@ private import TripleStorage;
 private import tango.io.Stdout;
 private import fact_tools;
 private import Log;
+private import tango.stdc.string;
 
 public bool isInDocFlow(char* elementId, TripleStorage ts)
 {
@@ -116,4 +117,97 @@ public char*[] getDepartmentTreePath(char* user, TripleStorage ts)
 	result.length = count_result;
 
 	return result;
+}
+
+public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts)
+{
+
+
+  char*[] result = new char*[20];
+  uint result_cnt = 0;
+
+  void put_in_result(char* founded_delegate)
+  {
+    result[result_cnt++] = founded_delegate;
+  }
+  
+  getDelegateAssignersForDelegate(delegate_id, ts, &put_in_result);
+  
+  result.length = result_cnt;
+
+  return result;
+
+}
+
+public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
+{
+  
+  uint* delegates_facts = ts.getTriples(null, "magnet-ontology/authorization/acl#delegate", delegate_id, false);
+  
+  if(delegates_facts !is null)
+    {
+      //log.trace("#2 gda");
+      uint next_delegate = 0xFF;
+      while(next_delegate > 0)
+	{
+	  //log.trace("#3 gda");
+	  byte* de_legate = cast(byte*) *delegates_facts;
+	  if(de_legate !is null)
+	    {
+	      char* subject = cast(char*) de_legate + 6;
+	      uint* owners_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#owner", null, false);
+	      
+	      if(owners_facts !is null)
+		{
+		  uint next_owner = 0xFF;
+		  while(next_owner > 0)
+		    {
+		      byte* owner = cast(byte*) *owners_facts;
+		      if(owner !is null)
+			{
+			  //log.trace("#4 gda");
+			  
+			  char* object = cast(char*) (owner + 6 + (*(owner + 0) << 8) + *(owner + 1) + 1 + (*(owner + 2) << 8) + *(owner + 3) + 1);
+			  
+			  //log.trace("delegate = {}, owner = {}", getString(subject), getString(object));
+			  
+			  /*			  strcpy(result_ptr++, ",");
+			  strcpy(result_ptr, object);
+			  result_ptr += strlen(object);*/
+			  process_delegate(object);
+			  
+			  uint* with_tree_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#withTree", null, false);
+			  if(with_tree_facts !is null)
+			    {
+			      uint next_with_tree = 0xFF;
+			      while(next_with_tree > 0)
+				{
+				  byte* with_tree = cast(byte*) *with_tree_facts;
+				  if(with_tree !is null)
+				    {
+				      if(strcmp(cast(char*)with_tree, "1") == 0)
+					getDelegateAssignersForDelegate(object, ts, process_delegate);
+				      next_with_tree = 0;
+				    }
+				  else
+				    {
+				      next_with_tree = *(with_tree_facts + 1);
+				      with_tree_facts = cast(uint*) next_with_tree;
+				    }
+				}
+			    }
+			  next_owner = 0;
+			}
+		      else
+			{
+			  next_owner = *(owners_facts + 1);
+			  owners_facts = cast(uint*) next_owner;
+			}
+		    }
+		}
+	    }
+	  next_delegate = *(delegates_facts + 1);
+	  delegates_facts = cast(uint*) next_delegate;
+	}
+    }
 }
