@@ -574,4 +574,132 @@ class Authorization
 
 	}
 
+  public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
+				       librabbitmq_client client)
+  {
+
+    log.trace("команда на выборку делегировавших");
+
+    auto elapsed = new StopWatch();
+    elapsed.start;
+
+    int reply_to_id = 0;
+    for(int i = 0; i < count_facts; i++)
+      {
+	if(strlen(fact_o[i]) > 0)
+	  {
+	    if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+	      {
+		reply_to_id = i;
+	      }
+	  }
+      }
+    
+    
+    char* queue_name = cast(char*) (new char[40]);
+    strcpy(queue_name, fact_o[reply_to_id]);
+    
+    log.trace("#1 gda");
+    
+    char* result_ptr = cast(char*) result_buffer;
+    char* command_uid = fact_s[0];
+    strcpy(queue_name, fact_o[reply_to_id]);
+    
+    *result_ptr = '<';
+    strcpy(result_ptr + 1, command_uid);
+    result_ptr += strlen(command_uid) + 1;
+    strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+    result_ptr += 41;
+    
+    char*[] subjects = new char*[1000];
+    uint subjects_count = 0;
+
+    getDelegateAssignersForDelegate(fact_o[arg_id], result_ptr, subjects, subjects_count);
+
+    strcpy(result_ptr, "\".<");
+    result_ptr += 3;
+    strcpy(result_ptr, command_uid);
+    result_ptr += strlen(command_uid);
+    strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+    
+    client.send(queue_name, result_buffer);
+    
+    double time = elapsed.stop;
+    log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+    log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
+    
+  }
+
+  private void getDelegateAssignersForDelegate(char* delegate_id, ref char* result_ptr, ref char*[] delegate_assigners, ref uint subjects_count)
+  {
+
+    uint* delegates_facts = ts.getTriples(null, "magnet-ontology/authorization/acl#delegate", delegate_id, false);
+
+    if(delegates_facts !is null)
+      {
+	//log.trace("#2 gda");
+	uint next_delegate = 0xFF;
+	while(next_delegate > 0)
+	  {
+	    //log.trace("#3 gda");
+	    byte* de_legate = cast(byte*) *delegates_facts;
+	    if(de_legate !is null)
+	      {
+		char* subject = cast(char*) de_legate + 6;
+		uint* owners_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#owner", null, false);
+
+		if(owners_facts !is null)
+		  {
+		    uint next_owner = 0xFF;
+		    while(next_owner > 0)
+		      {
+			byte* owner = cast(byte*) *owners_facts;
+			if(owner !is null)
+			  {
+			    //log.trace("#4 gda");
+
+			    char* object = cast(char*) (owner + 6 + (*(owner + 0) << 8) + *(owner + 1) + 1 + (*(owner + 2) << 8) + *(owner + 3) + 1);
+			    
+			    //log.trace("delegate = {}, owner = {}", getString(subject), getString(object));
+			    
+			    strcpy(result_ptr++, ",");
+			    strcpy(result_ptr, object);
+			    result_ptr += strlen(object);
+			    
+			    uint* with_tree_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#withTree", null, false);
+			    if(with_tree_facts !is null)
+			      {
+				uint next_with_tree = 0xFF;
+				while(next_with_tree > 0)
+				  {
+				    byte* with_tree = cast(byte*) *with_tree_facts;
+				    if(with_tree !is null)
+				      {
+					if(strcmp(cast(char*)with_tree, "1") == 0)
+					  getDelegateAssignersForDelegate(object, result_ptr, delegate_assigners, subjects_count);
+					next_with_tree = 0;
+				      }
+				    else
+				      {
+					next_with_tree = *(with_tree_facts + 1);
+					with_tree_facts = cast(uint*) next_with_tree;
+				      }
+				  }
+			      }
+			    next_owner = 0;
+			  }
+			else
+			  {
+			    next_owner = *(owners_facts + 1);
+			    owners_facts = cast(uint*) next_owner;
+			  }
+		      }
+		  }
+	      }
+	    next_delegate = *(delegates_facts + 1);
+	    delegates_facts = cast(uint*) next_delegate;
+	  }
+      }
+  }
+  
 }
