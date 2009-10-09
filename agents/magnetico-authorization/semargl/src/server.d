@@ -131,14 +131,14 @@ void get_message(byte* message, ulong message_size)
 				if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#put") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
 				{
 					put_id = i;
-				//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+					//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 				}
 				else
 				{
 					if(arg_id < 0 && strcmp(fact_p[i], "magnet-ontology/transport#argument") == 0)
 					{
 						arg_id = i;
-					//						Stdout.format("found comand {}, id ={} ", getString(fact_p[i]), i).newline;
+						//						Stdout.format("found comand {}, id ={} ", getString(fact_p[i]), i).newline;
 					}
 					else
 					{
@@ -146,7 +146,7 @@ void get_message(byte* message, ulong message_size)
 								fact_p[i], "magnet-ontology#subject") == 0)
 						{
 							delete_subjects_by_predicate_id = i;
-						//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+							//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 						}
 						else
 						{
@@ -169,7 +169,7 @@ void get_message(byte* message, ulong message_size)
 											fact_p[i], "magnet-ontology#subject") == 0)
 									{
 										get_authorization_rights_records_id = i;
-									//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+										//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 									}
 									else
 									{
@@ -177,7 +177,7 @@ void get_message(byte* message, ulong message_size)
 												fact_p[i], "magnet-ontology#subject") == 0)
 										{
 											add_delegates_id = i;
-										//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+											//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 										}
 										else
 										{
@@ -186,7 +186,7 @@ void get_message(byte* message, ulong message_size)
 													"magnet-ontology#subject") == 0)
 											{
 												get_delegate_assigners_tree_id = i;
-											//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
+												//Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i).newline;
 											}
 										}
 									}
@@ -451,7 +451,7 @@ void get_message(byte* message, ulong message_size)
 			// GET_DELEGATE_ASSIGNERS
 			if(get_delegate_assigners_tree_id >= 0 && arg_id > 0)
 			{
-			  az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, client);
+				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, client);
 			}
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
@@ -529,9 +529,6 @@ void get_message(byte* message, ulong message_size)
 				char* check_right = fact_o[right_id];
 				char* result_ptr = cast(char*) result_buffer;
 
-// нужно найти всех делегатов и вычислить для них пути в дереве подразделений				
-//				uint* delegates_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#delegate", fact_o[arg_id], false);			
-				
 				for(byte j = 0; *(check_right + j) != 0 && j < 4; j++)
 				{
 					if(*(check_right + j) == 'c')
@@ -546,8 +543,17 @@ void get_message(byte* message, ulong message_size)
 						targetRightType = RightType.DELETE;
 				}
 
+				char*[] hierarhical_delegates = null;
+				hierarhical_delegates = getDelegateAssignersTreeArray(user, az.getTripleStorage());
+
+				char*[][] hierarhical_departments_of_delegate = new char*[][hierarhical_delegates.length];
+				for(int ii = 0; ii < hierarhical_delegates.length; ii++)
+				{
+					hierarhical_departments_of_delegate[ii] = getDepartmentTreePathOfUser(hierarhical_delegates[ii], az.getTripleStorage());
+				}
+
 				char*[] hierarhical_departments = null;
-				hierarhical_departments = getDepartmentTreePath(user, az.getTripleStorage());
+				hierarhical_departments = getDepartmentTreePathOfUser(user, az.getTripleStorage());
 				// log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
 
 				uint count_prepared_elements = 0;
@@ -555,7 +561,7 @@ void get_message(byte* message, ulong message_size)
 				uint doc_pos = 0;
 				uint prev_doc_pos = 0;
 
-				//			Stdout.format("this request on authorization #1.1.1 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
+				//	log.trace("this request on authorization #1.1.1 {}, command_uid={}, command_len={}", targetRightType, getString (command_uid), strlen(command_uid)).newline;
 
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
@@ -584,11 +590,22 @@ void get_message(byte* message, ulong message_size)
 						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
 						//					Stdout.format("right = {}", calculatedRight).newline;
 
-						if (calculatedRight == false)
+						if(calculatedRight == false)
+						{
+							for(int ii = 0; ii < hierarhical_delegates.length; ii++)
+							{
+								calculatedRight = az.authorize(fact_o[category_id], docId, hierarhical_delegates[ii], targetRightType,
+										hierarhical_departments_of_delegate[ii]);
+								if(calculatedRight == true)
+									break;
+							}
+						}
+
+						if(calculatedRight == false)
 						{
 							// вычислим права для найденных делегатов
 						}
-						
+
 						if(calculatedRight == true)
 						{
 							if(count_prepared_elements > 1)
@@ -645,16 +662,16 @@ void get_message(byte* message, ulong message_size)
 
 				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
-			//			az.getTripleStorage().print_stat();
+				//			az.getTripleStorage().print_stat();
 
 			}
 		}
 
-	//	printf("!!!! queue_name=%s\n", queue_name);
-	//	Stdout.format("!!!! check_right={}", check_right).newline;
-	//	printf("!!!! list_docid=%s\n", list_docid);
+		//	printf("!!!! queue_name=%s\n", queue_name);
+		//	Stdout.format("!!!! check_right={}", check_right).newline;
+		//	printf("!!!! list_docid=%s\n", list_docid);
 
-	//	Stdout.format("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length)).newline;
+		//	Stdout.format("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length)).newline;
 	}
 }
 
