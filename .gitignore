@@ -2,6 +2,7 @@
 *.properties
 *.orig
 *.n3log
+*.n3
 *~
 *.test
 *.log

@@ -45,24 +45,24 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 	return false;
 }
 
+
 /*
- * возвращает массив субьектов вышестоящих подразделений по отношению к user   
+ * возвращает массив субьектов (s) вышестоящих подразделений по отношению к user   
  */
-public char*[] getDepartmentTreePath(char* user, TripleStorage ts)
+public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 {
 	// получаем путь до корня в дереве подразделений начиная от заданного подразделения
-
 	char*[] result = new char*[16];
 	ubyte count_result = 0;
 
 	uint* iterator0;
 	byte* triple0;
 
-//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
+	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
 	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null, false);
 
-//	print_list_triple(iterator0);
+	//	print_list_triple(iterator0);
 
 	if(iterator0 !is null)
 	{
@@ -71,7 +71,7 @@ public char*[] getDepartmentTreePath(char* user, TripleStorage ts)
 
 		if(next_branch !is null)
 		{
-//			log.trace("getDepartmentTreePath #1 next_branch={}", getString(next_branch));
+			//			log.trace("getDepartmentTreePath #1 next_branch={}", getString(next_branch));
 			result[count_result] = next_branch;
 			count_result++;
 		}
@@ -84,41 +84,25 @@ public char*[] getDepartmentTreePath(char* user, TripleStorage ts)
 			{
 				byte* triple = cast(byte*) *iterator1;
 				char* s = cast(char*) triple + 6;
-//				log.trace("next_element1={}", getString (s));
+				//				log.trace("next_element1={}", getString (s));
 
 				result[count_result] = s;
 				count_result++;
 				next_branch = s;
 			}
 
-//			iterator0 = ts.getTriples(next_branch, "magnet-ontology#hasPart", null, false);
-//			if(iterator0 !is null)
-//			{
-//				triple0 = cast(byte*) *iterator0;
-//
-//				if(triple0 !is null)
-//				{
-//					next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
-//
-//					if(next_branch !is null)
-//						log.trace("getDepartmentTreePath #2 next_branch  {}", getString(next_branch));
-//				}
-//				else
-//					next_branch = null;
-//
-//			}
-//			else
-//				next_branch = null;
 		}
 	}
 
-//		Stdout.format("getDepartmentTreePath #5 ok").newline;
+	//		Stdout.format("getDepartmentTreePath #5 ok").newline;
 
 	result.length = count_result;
-
 	return result;
 }
 
+/*
+ * возвращает массив субьектов (s) вышестоящих подразделений по отношению к delegate_id   
+ */
 public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts)
 {
 
