@@ -1,3 +1,4 @@
+//#
 extern(C)
 	void amqp_dump(void* buffer, size_t len);
 
