@@ -13,6 +13,8 @@ struct Counts
 	byte open_brakets;
 }
 
+private enum TripleType { URI, LITERAL, SET }
+
 public void print_list_triple(uint* list_iterator)
 {
 	byte* triple;
@@ -161,6 +163,175 @@ public uint extract_facts_from_message(char* message, ulong message_size, Counts
 	return count_facts;
 }
 
+public void split_triples_line(char* line, ulong line_size, void delegate(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, 
+									   int o_l, uint  m) triple_handler)
+{
+
+  int idx_count = 0;
+  bool is_beetween_tokens = false;
+  int delim_num = 0;
+  char sp = ' ';
+  char* prev_delim = &sp;
+  int facts_cnt = 0;
+  int tk_start = 0;
+  int fact_start = 0;
+
+
+  char* start;
+  int l;
+  char* s;
+  int s_l;
+  char* p;
+  int p_l;
+  char* o;
+  int o_l;
+  uint  m;
+
+  log.trace("#11 {}", line_size);
+
+  // функция для определения параметров проверки разделителей
+  void get_scan_param(char* c, int dn, int char_pos) {
+    prev_delim = c;
+    
+    switch (dn) {
+    case 0:
+      is_beetween_tokens = false;
+      delim_num = 1;
+      //if (facts[facts_cnt] is null) { facts[facts_cnt] = new Triple(); }
+      s = c + 1;
+      start = c;
+      fact_start = char_pos;
+      tk_start = char_pos;
+      break;
+    case 1:
+      is_beetween_tokens = true;
+      delim_num = 2;
+      s_l = char_pos - tk_start - 1;
+      break;
+    case 2:
+      is_beetween_tokens = false;
+      delim_num = 3;
+      p = c + 1;
+      tk_start = char_pos;
+      break;
+    case 3:
+      is_beetween_tokens = true;
+      delim_num = 4;
+      p_l = char_pos - tk_start - 1;
+      //      triple_handler(null, 0, s, s_l, p, p_l, null, 0, 0);      
+      break;
+    case 4:
+      is_beetween_tokens = false;
+      delim_num = 5;
+      o = c + 1;
+      tk_start = char_pos;
+      break;
+    case 5:
+      is_beetween_tokens = true;
+      delim_num = 6;
+      o_l = char_pos - tk_start - 1;
+      switch (*c)
+	{
+	case '>':
+	  m = TripleType.URI;
+	  break;
+	case '}':
+	  m = TripleType.SET;
+	  break;
+	default:
+	  m = TripleType.LITERAL;
+	  break;
+	}
+      break;
+    case 6:
+      is_beetween_tokens = true;
+      delim_num = 0;
+      l = char_pos - fact_start + 1;
+      facts_cnt++;
+      break;
+    default:
+      break;
+    }
+  }
+
+  for(ulong ii = 0; ii < line_size; ii++) {
+    log.trace("#33 {}", line_size);      
+    char* c_ptr = line + ii;
+
+    Stdout.format("## {} {}\n", *c_ptr, ii).newline; 
+
+    bool is_process_needed = false;
+
+    if (*c_ptr != ' ') {
+
+      switch (delim_num) {
+      case 0:
+	is_process_needed = *(c_ptr) == '<';
+	break;
+      case 1:
+	is_process_needed = *(c_ptr) == '>';
+	break;
+      case 2:
+	is_process_needed = *(c_ptr) == '<';
+	break;
+      case 3:
+	is_process_needed = *(c_ptr) == '>';
+	break;
+      case 4:
+	is_process_needed = (*(c_ptr) == '"' || *(c_ptr) == '{' || *(c_ptr) == '<');
+	break;
+      case 5:
+	if (ii > 0 && *(c_ptr - 1) != '\\')
+	  {
+	    switch (*prev_delim) {
+	    case '"': 
+	      is_process_needed = *(c_ptr) == '"';
+	      break;
+	    case '<':
+	      is_process_needed = *(c_ptr) == '>';
+	      break;
+	    case '{':
+	      is_process_needed = *(c_ptr) == '}';
+	      break;
+	    default:
+	      is_process_needed = false;
+	    }
+	  }
+	break;
+      case 6:
+	is_process_needed = *(c_ptr) == '.';
+	break;
+      default:
+	is_process_needed = false;
+	break;
+      }
+
+      if (is_process_needed) 
+	{
+	  get_scan_param(c_ptr, delim_num, ii);
+	  if (*(c_ptr) == '.')
+	    {
+	      idx_count++;
+	      triple_handler(start, l, s, s_l, p, p_l, o, o_l, m);
+	    }
+	  
+	} else if (is_beetween_tokens) 
+	{
+	  if (delim_num == 0 && idx_count > 0) 
+	    {
+	      --idx_count;
+	      get_scan_param(prev_delim, 6, ii);
+	    } else 
+	    {
+	      is_beetween_tokens = false;
+	      if (delim_num > 0) {--delim_num; }
+	    }
+	}
+    }
+  }
+}
+
+
 public static final char[16] HEX_CHARS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
 		'f'];
 
@@ -195,4 +366,9 @@ public static final void longToHex(ulong dl, char* buff)
 public static char[] getString(char* s)
 {
 	return s ? s[0 .. strlen(s)] : cast(char[]) null;
+}
+
+public static char[] getString(char* s, uint l)
+{
+	return s ? s[0 .. l] : cast(char[]) null;
 }

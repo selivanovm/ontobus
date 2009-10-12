@@ -36,6 +36,36 @@ private char* result_buffer = null;
 private char* queue_name = null;
 private char* user = null;
 
+char[] PUT = "magnet-ontology#put";
+char[] GET = "magnet-ontology#get";
+char[] SUBJECT = "magnet-ontology#subject";
+char[] ARGUMENT = "magnet-ontology/transport#argument";
+char[] RESULT_DATA = "magnet-ontology/transport#result:data";
+char[] RESULT_STATE = "magnet-ontology/transport#result:state";
+char[] REPLY_TO = "magnet-ontology/transport#reply_to";
+
+uint fn_cnt = 0;
+uint args_cnt = 0;
+uint reply_to_cnt = 0;
+
+char*[] fn_names;
+uint[] fn_names_l;
+
+char*[] fn_uids;
+uint[] fn_uids_l;
+
+char*[] args;
+uint[] args_l;
+
+char*[] args_uids;
+uint[] args_uids_l;
+
+char*[] reply_to;
+uint[] reply_to_l;
+
+char*[] reply_to_uids;
+uint[] reply_to_uids_l;
+
 void main(char[][] args)
 {
 	az = new Authorization();
@@ -103,7 +133,7 @@ void get_message(byte* message, ulong message_size)
 		{
 			log.trace("разбор сообщения");
 
-			Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
+			/*			Counts count_elements = calculate_count_facts(cast(char*) message, message_size);
 			fact_s = new char*[count_elements.facts];
 			fact_p = new char*[count_elements.facts];
 			fact_o = new char*[count_elements.facts];
@@ -122,8 +152,101 @@ void get_message(byte* message, ulong message_size)
 			int get_authorization_rights_records_id = -1;
 			int add_delegates_id = -1;
 			int get_delegate_assigners_tree_id = -1;
+			*/
 
-			for(int i = 0; i < count_facts; i++)
+  fn_cnt = 0;
+  args_cnt = 0;
+  reply_to_cnt = 0;
+
+void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
+{
+
+  log.trace("Triple : <{}> <{}> <{}> .", getString(s, s_l), getString(p, p_l), getString(o, o_l));
+  
+  if (cmp_str(p, p_l, SUBJECT)) {
+
+    // сохраняем uid
+    fn_uids[fn_cnt] = s;
+    fn_uids_l[fn_cnt] = s_l;
+
+    // сохраняем функцию
+    fn_names[fn_cnt] = o;
+    fn_names_l[fn_cnt] = o_l;
+
+    fn_cnt++;
+
+  } else if (cmp_str(p, p_l, ARGUMENT)) {
+
+    // сохраняем uid
+    args_uids[args_cnt] = s;
+    args_uids_l[args_cnt] = s_l;
+
+    // сохраняем аргумент
+    args[args_cnt] = o;
+    args_l[args_cnt] = o_l;
+
+    args_cnt++;
+
+  } else if (cmp_str(p, p_l, REPLY_TO)) {
+    
+    reply_to_uids[reply_to_cnt] = s;
+    reply_to_uids_l[reply_to_cnt] = s_l;
+
+    reply_to[reply_to_cnt] = o;
+    reply_to_l[reply_to_cnt] = o_l;
+
+    reply_to_cnt++;
+
+  }
+
+}
+
+
+  split_triples_line(cast(char*) message, message_size, &parse_functions);
+
+  log.trace("разбор окончен.");
+
+  char* reply_to_ptr;
+  uint reply_to_length;
+
+  log.trace("Получено {} команд.", fn_cnt);
+
+  for(uint i = 0; i < fn_cnt; i++) {
+
+    reply_to_ptr = null;
+    reply_to_length = 0;
+    
+    for(uint k = 0; k < reply_to_cnt; k++) {
+      if (cmp_str(fn_uids[i], fn_uids_l[i], reply_to_uids[k], reply_to_uids_l[k])) {
+	reply_to_ptr = reply_to[k];
+	reply_to_length = reply_to_l[k];
+      }
+    }
+
+    if (reply_to_ptr == null || reply_to_length == 0) {
+      continue;
+    }
+
+    log.trace("Получена команда : {}", getString(fn_names[i], fn_names_l[i]));
+
+    if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
+      put_triplets(i);
+      /*      for(uint j = 0; j < args_cnt; j++) {
+	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
+	put_triples_line(args[j], args_l[j], &store_triplet);	  
+	}
+	}*/
+    } else if (cmp_str(fn_names[i], fn_names_l[i], GET)) {
+      /*      uint arg_idx  = -1;
+      for(uint j = 0; j < args_cnt; j++) {
+	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
+	  //	  split_triples_line(args[j], args_l[j], &get_triplet(fn_uids[i], fn_uids_l[i], reply_to_ptr, reply_to_length);
+	}*/
+      }
+    }
+			
+
+  /*			for(int i = 0; i < count_facts; i++)
 			{
 				//				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), toString(
 				//						cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
@@ -197,21 +320,13 @@ void get_message(byte* message, ulong message_size)
 
 				}
 
-			}
+				}*/
 
-			log.trace("разбор сообщения закончен");
+  /*			log.trace("разбор сообщения закончен");
 
 			if(get_id >= 0 && arg_id > 0)
 			{
-				/* пример сообщения: запрос всех фактов с p=predicate1 и o=object1
-				 
-				 <2014a><magnet-ontology#subject><magnet-ontology#get>.
-				 <2014a><magnet-ontology/transport#argument>
-				 {<><predicate1>"object1".}.
-				 <85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
-				 <85f3><magnet-ontology/transport#argument>"2014a".
-				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
-				 */
+
 				log.trace("function get: query={} ", getString(fact_o[arg_id]));
 
 				uint* list_facts = az.getTripleStorage.getTriples(fact_s[arg_id], fact_p[arg_id], fact_o[arg_id], false);
@@ -236,9 +351,9 @@ void get_message(byte* message, ulong message_size)
 						list_facts = cast(uint*) next_element1;
 					}
 				}
-			}
+			}*/
 
-			if(delete_subjects_id >= 0 && arg_id > 0)
+  /*			if(delete_subjects_id >= 0 && arg_id > 0)
 			{
 				log.trace("команда на удаление всех фактов у которых субьект, s={}", getString(fact_o[arg_id]));
 
@@ -309,9 +424,9 @@ void get_message(byte* message, ulong message_size)
 
 				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
-			}
+				}*/
 
-			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
+  /*			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
 			{
 				char* arg_p;
 				char* arg_o;
@@ -383,15 +498,15 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 				log.trace("remove triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-			}
+				}*/
 
-			// GET_AUTHORIZATION_RIGHTS_RECORDS
+  /*			// GET_AUTHORIZATION_RIGHTS_RECORDS
 			if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 			{
 				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, client);
-			}
+			}*/
 
-			// PUT
+  /*			// PUT
 			if(put_id >= 0 && arg_id > 0)
 			{
 				log.trace("команда на добавление");
@@ -445,33 +560,19 @@ void get_message(byte* message, ulong message_size)
 
 				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
-			}
+				}*/
 
-			// GET_DELEGATE_ASSIGNERS
+  /*			// GET_DELEGATE_ASSIGNERS
 			if(get_delegate_assigners_tree_id >= 0 && arg_id > 0)
 			{
 				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, client);
-			}
+				}*/
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
-			// AUTHORIZE
+  /*			// AUTHORIZE
 			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0], "magnet-ontology#subject") == 0)
 			{
 				log.trace("function authorize");
-
-				/* пример сообщения:
-				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology#subject><magnet-ontology/authorization/functions#authorize>.
-				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport#argument>
-				 {
-				 <><magnet-ontology/authorization/acl#rights>"u".
-				 <><magnet-ontology/authorization/acl#category>"DOCUMENT".
-				 <><magnet-ontology/authorization/acl#elementId>"c49cc462c6eb4e7ca50da4075b1a44fe".
-				 <><magnet-ontology/authorization/acl#targetSubsystemElement>"544c820e-ad22-4f3e-9eca-2e0d92ac0db9".
-				 }.
-				 <c5c8ce35-8082-4169-8c76-f0f40f4a85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
-				 <c5c8ce35-8082-4169-8c76-f0f40f4a85f3><magnet-ontology/transport#argument>"client-3516df90-522a-476a-9470-8293daf2014a".
-				 <3516df90-522a-476a-9470-8293daf2014a><magnet-ontology/transport/message#reply_to>"client-3516df90-522a-476a-9470-8293daf2014a".  
-				 */
 
 				char* command_uid = null;
 
@@ -663,7 +764,7 @@ void get_message(byte* message, ulong message_size)
 
 				//			az.getTripleStorage().print_stat();
 
-			}
+			}*/
 		}
 
 		//	printf("!!!! queue_name=%s\n", queue_name);
@@ -712,4 +813,106 @@ private char[][char[]] load_props()
 	}
 
 	return result;
+}
+
+
+bool cmp_str(char* buf1, uint l1, char[] buf2) {
+  if (l1 != buf2.length)
+    return false;
+  if (l1 == 0)
+    return true;
+
+  char* bbuf = &buf2[0];
+  for(uint i = 0; i < l1; i++) {
+    if (*(buf1 + i) != *(bbuf + i))
+      return false;
+  }
+  return true;
+}
+
+private bool cmp_str(char* buf1, uint l1, char* buf2, uint l2) {
+  if (l1 != l2)
+    return false;
+  if (l1 == 0)
+    return true;
+
+  for(uint i = 0; i < l1; i++) {
+    if (*(buf1 + i) != *(buf2 + i))
+      return false;
+  }
+  return true;
+}
+
+private void put_triplets(uint fn_num)
+{
+
+  log.trace("команда на добавление");
+  ulong uuid = getUUID();
+
+  void store_triplet(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
+  {
+    char* subject = null;
+    if(s_l == 0)
+      {
+	subject = cast(char*) new char[16];
+	s_l = 16;
+	longToHex(uuid, subject);
+      }
+    else
+      subject = s;
+    log.trace("add triple <{}><{}><{}>", getString(s, s_l), getString(p, p_l), getString(o, o_l));
+    az.getTripleStorage.addTriple(getString(s, s_l), getString(p, p_l), getString(o, o_l));
+    az.logginTriple('A', getString(s, s_l), getString(p, p_l), getString(o, o_l));
+    
+  }
+  for(uint j = 0; j < args_cnt; j++) {
+    if (cmp_str(fn_uids[fn_num], fn_uids_l[fn_num], args_uids[j], args_uids_l[j])) {
+      split_triples_line(args[j], args_l[j], &store_triplet);	  
+    }
+  }
+
+  // PUT
+    /*  if(put_id >= 0 && arg_id > 0)
+    {
+
+      
+      
+      for(int i = 0; i < count_facts; i++)
+	{
+	  if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+	    reply_to_id = i;
+	  else if(is_fact_in_object[i] == arg_id)
+	    {
+	    }
+	}
+      
+      time = elapsed.stop;
+      log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+      
+      char* result_ptr = cast(char*) result_buffer;
+      char* command_uid = fact_s[0];
+      
+      *result_ptr = '<';
+      strcpy(result_ptr + 1, command_uid);
+      result_ptr += strlen(command_uid) + 1;
+      strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
+      result_ptr += 48;
+      
+      strcpy(result_ptr, "\".\0");
+      
+      strcpy(queue_name, fact_o[reply_to_id]);
+      
+      log.trace("queue_name:{}", getString(queue_name));
+      log.trace("result:{}", getString(result_buffer));
+      
+      elapsed.start;
+      
+      client.send(queue_name, result_buffer);
+      
+      time = elapsed.stop;
+      
+      log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+      
+      }*/
+  
 }
