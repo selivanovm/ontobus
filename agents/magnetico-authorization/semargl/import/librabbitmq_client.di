@@ -46,10 +46,11 @@ message_acceptor = _message_acceptor;
     int send(char* routingkey, char* messagebody)
 {
 amqp_basic_properties_t props;
-props._flags = amqp_def.AMQP_BASIC_CONTENT_TYPE_FLAG;
+props._flags = amqp_def.AMQP_BASIC_CONTENT_TYPE_FLAG | amqp_def.AMQP_BASIC_DELIVERY_MODE_FLAG;
 props.content_type = amqp_cstring_bytes("text/plain");
-int result_publish = amqp_basic_publish(&conn,amqp_cstring_bytes(exchange),amqp_cstring_bytes(routingkey),0,0,&props,amqp_cstring_bytes(messagebody));
-return 0;
+props.delivery_mode = 2;
+int result_publish = amqp_basic_publish(&conn,1,amqp_cstring_bytes(exchange),amqp_cstring_bytes(routingkey),0,0,&props,amqp_cstring_bytes(messagebody));
+return result_publish;
 }
     void listener();
 }
