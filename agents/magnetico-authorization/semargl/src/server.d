@@ -42,7 +42,7 @@ char[] SUBJECT = "magnet-ontology#subject";
 char[] ARGUMENT = "magnet-ontology/transport#argument";
 char[] RESULT_DATA = "magnet-ontology/transport#result:data";
 char[] RESULT_STATE = "magnet-ontology/transport#result:state";
-char[] REPLY_TO = "magnet-ontology/transport#reply_to";
+char[] REPLY_TO = "magnet-ontology/transport/message#reply_to";
 
 uint fn_cnt = 0;
 uint args_cnt = 0;
@@ -66,8 +66,31 @@ uint[] reply_to_l;
 char*[] reply_to_uids;
 uint[] reply_to_uids_l;
 
-void main(char[][] args)
+void main(char[][] args_str)
 {
+
+  fn_names = new char*[1000];
+  fn_names_l = new uint[1000];
+
+  fn_uids = new char*[1000];
+  fn_uids_l = new uint[1000];
+
+  reply_to = new char*[1000];
+  reply_to_l = new uint[1000];
+
+  args = new char*[1000];
+  args_l = new uint[1000];
+  
+  args_uids = new char*[1000];
+  args_uids_l = new uint[1000];
+
+  reply_to = new char*[1000];
+  reply_to_l = new uint[1000];
+
+  reply_to_uids = new char*[1000];
+  reply_to_uids_l = new uint[1000];
+
+
 	az = new Authorization();
 
 	result_buffer = cast(char*) new char[10 * 1024];
@@ -165,6 +188,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
   
   if (cmp_str(p, p_l, SUBJECT)) {
 
+    log.trace("#1");
+
     // сохраняем uid
     fn_uids[fn_cnt] = s;
     fn_uids_l[fn_cnt] = s_l;
@@ -176,6 +201,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
     fn_cnt++;
 
   } else if (cmp_str(p, p_l, ARGUMENT)) {
+
+    log.trace("#2");
 
     // сохраняем uid
     args_uids[args_cnt] = s;
@@ -189,6 +216,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
   } else if (cmp_str(p, p_l, REPLY_TO)) {
     
+    log.trace("#3");
+
     reply_to_uids[reply_to_cnt] = s;
     reply_to_uids_l[reply_to_cnt] = s_l;
 
@@ -860,9 +889,10 @@ private void put_triplets(uint fn_num)
       }
     else
       subject = s;
-    log.trace("add triple <{}><{}><{}>", getString(s, s_l), getString(p, p_l), getString(o, o_l));
-    az.getTripleStorage.addTriple(getString(s, s_l), getString(p, p_l), getString(o, o_l));
-    az.logginTriple('A', getString(s, s_l), getString(p, p_l), getString(o, o_l));
+
+    log.trace("add triple <{}><{}><{}>. {} {} {}", getString(subject, s_l), getString(p, p_l), getString(o, o_l), s_l, p_l, o_l);
+    az.getTripleStorage.addTriple(getString(subject, s_l), getString(p, p_l), getString(o, o_l));
+    az.logginTriple('A', getString(subject, s_l), getString(p, p_l), getString(o, o_l));
     
   }
   for(uint j = 0; j < args_cnt; j++) {

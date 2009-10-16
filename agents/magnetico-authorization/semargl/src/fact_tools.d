@@ -254,11 +254,11 @@ public void split_triples_line(char* line, ulong line_size, void delegate(char* 
     }
   }
 
-  for(ulong ii = 0; ii < line_size; ii++) {
-    log.trace("#33 {}", line_size);      
-    char* c_ptr = line + ii;
+  for(ulong i = 0; i < line_size; i++) {
+    //    log.trace("#33 {}", line_size);      
+    char* c_ptr = line + i;
 
-    Stdout.format("## {} {}\n", *c_ptr, ii).newline; 
+    //    Stdout.format("## {} {}\n", *c_ptr, i).newline; 
 
     bool is_process_needed = false;
 
@@ -281,7 +281,7 @@ public void split_triples_line(char* line, ulong line_size, void delegate(char* 
 	is_process_needed = (*(c_ptr) == '"' || *(c_ptr) == '{' || *(c_ptr) == '<');
 	break;
       case 5:
-	if (ii > 0 && *(c_ptr - 1) != '\\')
+	if (i > 0 && *(c_ptr - 1) != '\\')
 	  {
 	    switch (*prev_delim) {
 	    case '"': 
@@ -308,7 +308,7 @@ public void split_triples_line(char* line, ulong line_size, void delegate(char* 
 
       if (is_process_needed) 
 	{
-	  get_scan_param(c_ptr, delim_num, ii);
+	  get_scan_param(c_ptr, delim_num, i);
 	  if (*(c_ptr) == '.')
 	    {
 	      idx_count++;
@@ -320,7 +320,7 @@ public void split_triples_line(char* line, ulong line_size, void delegate(char* 
 	  if (delim_num == 0 && idx_count > 0) 
 	    {
 	      --idx_count;
-	      get_scan_param(prev_delim, 6, ii);
+	      get_scan_param(prev_delim, 6, i);
 	    } else 
 	    {
 	      is_beetween_tokens = false;
@@ -370,5 +370,7 @@ public static char[] getString(char* s)
 
 public static char[] getString(char* s, uint l)
 {
-	return s ? s[0 .. l] : cast(char[]) null;
+  char[] result =  s ? s[0 .. l] : cast(char[]) null;
+  result[l - 1] = '\0';
+  return result;
 }
