@@ -894,8 +894,8 @@ private void put_triplets(uint fn_num)
     log.trace("add triple <{}><{}><{}>. {} {} {}", getString(subject, s_l), getString(p, p_l), getString(o, o_l), s_l, p_l, o_l);
     az.getTripleStorage.addTriple(getString(subject, s_l), getString(p, p_l), getString(o, o_l));
     az.logginTriple('A', getString(subject, s_l), getString(p, p_l), getString(o, o_l));
-    
   }
+
   for(uint j = 0; j < args_cnt; j++) {
     if (cmp_str(fn_uids[fn_num], fn_uids_l[fn_num], args_uids[j], args_uids_l[j])) {
       split_triples_line(args[j], args_l[j], &store_triplet);	  
