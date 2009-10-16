@@ -766,8 +766,9 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				double total_time_calculate_right = time_calculate_right.stop;
 
 				strcpy(result_ptr, "\".<");
-				strcpy(result_ptr + 3, command_uid);
-				result_ptr += strlen(command_uid) + 1;
+				result_ptr += 3;
+				strcpy(result_ptr, command_uid);
+				result_ptr += strlen(command_uid);
 				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 				result_ptr += 48;
 
@@ -784,7 +785,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				log.trace("result:{}", getString(result_buffer));
 
 				elapsed.start;
-
+				
 				client.send(queue_name, result_buffer);
 
 				time = elapsed.stop;
