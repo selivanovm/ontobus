@@ -370,7 +370,9 @@ public static char[] getString(char* s)
 
 public static char[] getString(char* s, uint l)
 {
-  char[] result =  s ? s[0 .. l] : cast(char[]) null;
-  result[l - 1] = '\0';
+  char[] result = new char[l];
+  //  s ? s[0 .. 2] : cast(char[]) null;
+  for(uint i = 0; i < l; i++)
+    result[i] = s[i];
   return result;
 }
