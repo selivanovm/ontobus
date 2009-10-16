@@ -187,7 +187,7 @@ public void split_triples_line(char* line, ulong line_size, void delegate(char* 
   int o_l;
   uint  m;
 
-  log.trace("#11 {}", line_size);
+  //log.trace("#11 {}", line_size);
 
   // функция для определения параметров проверки разделителей
   void get_scan_param(char* c, int dn, int char_pos) {

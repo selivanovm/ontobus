@@ -184,11 +184,11 @@ void get_message(byte* message, ulong message_size)
 void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
 {
 
-  log.trace("Triple : <{}> <{}> <{}> .", getString(s, s_l), getString(p, p_l), getString(o, o_l));
+  //log.trace("Triple : <{}> <{}> <{}> .", getString(s, s_l), getString(p, p_l), getString(o, o_l));
   
   if (cmp_str(p, p_l, SUBJECT)) {
 
-    log.trace("#1");
+    //log.trace("#1");
 
     // сохраняем uid
     fn_uids[fn_cnt] = s;
@@ -202,7 +202,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
   } else if (cmp_str(p, p_l, ARGUMENT)) {
 
-    log.trace("#2");
+    //log.trace("#2");
 
     // сохраняем uid
     args_uids[args_cnt] = s;
@@ -216,7 +216,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
   } else if (cmp_str(p, p_l, REPLY_TO)) {
     
-    log.trace("#3");
+    //log.trace("#3");
 
     reply_to_uids[reply_to_cnt] = s;
     reply_to_uids_l[reply_to_cnt] = s_l;
@@ -233,33 +233,33 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
   split_triples_line(cast(char*) message, message_size, &parse_functions);
 
-  log.trace("разбор окончен.");
+  //log.trace("разбор окончен.");
 
-  char* reply_to_ptr;
+  uint reply_to_id;
   uint reply_to_length;
 
-  log.trace("Получено {} команд.", fn_cnt);
+  //log.trace("Получено {} команд.", fn_cnt);
 
   for(uint i = 0; i < fn_cnt; i++) {
 
-    reply_to_ptr = null;
+    reply_to_id = -1;
     reply_to_length = 0;
     
     for(uint k = 0; k < reply_to_cnt; k++) {
       if (cmp_str(fn_uids[i], fn_uids_l[i], reply_to_uids[k], reply_to_uids_l[k])) {
-	reply_to_ptr = reply_to[k];
-	reply_to_length = reply_to_l[k];
+	reply_to_id = k;
+	//	reply_to_length = reply_to_l[k];
       }
     }
 
-    if (reply_to_ptr == null || reply_to_length == 0) {
+    if (reply_to_id < 0) {
       continue;
     }
 
     log.trace("Получена команда : {}", getString(fn_names[i], fn_names_l[i]));
 
     if (cmp_str(fn_names[i], fn_names_l[i], PUT)) {
-      put_triplets(i);
+      put_triplets(i, reply_to_id);
       /*      for(uint j = 0; j < args_cnt; j++) {
 	if (cmp_str(fn_uids[i], fn_uids_l[i], args_uids[j], args_uids_l[j])) {
 	put_triples_line(args[j], args_l[j], &store_triplet);	  
@@ -873,10 +873,13 @@ private bool cmp_str(char* buf1, uint l1, char* buf2, uint l2) {
   return true;
 }
 
-private void put_triplets(uint fn_num)
+private void put_triplets(uint fn_num, uint reply_to_id)
 {
-
   log.trace("команда на добавление");
+
+  auto elapsed = new StopWatch();
+  elapsed.start;
+
   ulong uuid = getUUID();
 
   void store_triplet(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
@@ -891,7 +894,7 @@ private void put_triplets(uint fn_num)
     else
       subject = s;
 
-    log.trace("add triple <{}><{}><{}>. {} {} {}", getString(subject, s_l), getString(p, p_l), getString(o, o_l), s_l, p_l, o_l);
+    //    log.trace("add triple <{}><{}><{}>. {} {} {}", getString(subject, s_l), getString(p, p_l), getString(o, o_l), s_l, p_l, o_l);
     az.getTripleStorage.addTriple(getString(subject, s_l), getString(p, p_l), getString(o, o_l));
     az.logginTriple('A', getString(subject, s_l), getString(p, p_l), getString(o, o_l));
   }
@@ -902,48 +905,31 @@ private void put_triplets(uint fn_num)
     }
   }
 
-  // PUT
-    /*  if(put_id >= 0 && arg_id > 0)
-    {
-
+  double time = elapsed.stop;
+  log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
       
+  char* result_ptr = cast(char*) result_buffer;
+  //  char* command_uid = fact_s[0];
       
-      for(int i = 0; i < count_facts; i++)
-	{
-	  if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-	    reply_to_id = i;
-	  else if(is_fact_in_object[i] == arg_id)
-	    {
-	    }
-	}
-      
-      time = elapsed.stop;
-      log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-      
-      char* result_ptr = cast(char*) result_buffer;
-      char* command_uid = fact_s[0];
-      
-      *result_ptr = '<';
-      strcpy(result_ptr + 1, command_uid);
-      result_ptr += strlen(command_uid) + 1;
-      strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-      result_ptr += 48;
-      
-      strcpy(result_ptr, "\".\0");
-      
-      strcpy(queue_name, fact_o[reply_to_id]);
-      
-      log.trace("queue_name:{}", getString(queue_name));
-      log.trace("result:{}", getString(result_buffer));
-      
-      elapsed.start;
-      
-      client.send(queue_name, result_buffer);
-      
-      time = elapsed.stop;
-      
-      log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-      
-      }*/
+  *result_ptr = '<';
+  strcpy(result_ptr + 1, getString(fn_uids[fn_num], fn_uids_l[fn_num]).ptr);
+  result_ptr += fn_uids_l[fn_num] + 1;
+  strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
+  result_ptr += 48;
   
+  strcpy(result_ptr, "\".\0");
+  
+  strcpy(queue_name, getString(reply_to[reply_to_id], reply_to_l[reply_to_id]).ptr);
+  
+  log.trace("queue_name:{}", getString(queue_name));
+  log.trace("result:{}", getString(result_buffer));
+  
+  elapsed.start;
+      
+  client.send(queue_name, result_buffer);
+  
+  time = elapsed.stop;
+      
+  log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+      
 }
