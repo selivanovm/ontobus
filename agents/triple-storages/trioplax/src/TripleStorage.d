@@ -358,13 +358,19 @@ class TripleStorage
 	{
 		synchronized
 		{
-			//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
+		  
+
+
+		  //		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
 			void* triple;
 
 			if(s.length == 0 && p.length == 0 && o.length == 0)
 				return false;
 
+
+
 			uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+		  //log.trace("addTriple #1");
 			if(list !is null)
 			{
 				//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
@@ -374,10 +380,11 @@ class TripleStorage
 
 			//		log.trace("addTriple:add index spo");
 			idx_spo.put(s, p, o, null);
+		  //log.trace("addTriple #2");
 			//		log.trace("addTriple:get this index as triple");
 			list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
 			//		log.trace("addTriple:ok, list={:X4}", list);
-
+		  //log.trace("addTriple #3");
 			if(list is null)
 				throw new Exception("addTriple: not found triple in index spo");
 
@@ -388,34 +395,38 @@ class TripleStorage
 
 			if(idx_s !is null)
 				idx_s.put(s, null, null, triple);
-
+		  //log.trace("addTriple #4");
 			if(idx_p !is null)
 				idx_p.put(p, null, null, triple);
-
+		  //log.trace("addTriple #5");
 			if(idx_o !is null)
 				idx_o.put(o, null, null, triple);
-
+		  //log.trace("addTriple #6");
 			if(idx_sp !is null)
 				idx_sp.put(s, p, null, triple);
-
+		  //log.trace("addTriple #7");
 			if(idx_po !is null)
+			  {
+			    //			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, _toString(cast(char*)triple));
 				idx_po.put(p, o, null, triple);
-
+			  }
+		  //log.trace("addTriple #8");
 			if(idx_so !is null)
 				idx_so.put(s, o, null, triple);
-
+		  //log.trace("addTriple #9");
 			/* 
 			 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
 			 */
 
 			if(idx_s1ppoo !is null)
 			{
-//				log.trace ("#1");
+				//log.trace ("#1_");
 				for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
 				{
-//					log.trace ("#2");
+					//log.trace ("#2_");
 					if(p == look_predicate_p1_on_idx_s1ppoo[i])
 					{
+					//log.trace ("#3");
 						char[] o1 = o;
 						char[] p1 = p;
 						char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
@@ -436,6 +447,7 @@ class TripleStorage
 					}
 					else if(p == look_predicate_p2_on_idx_s1ppoo[i])
 					{
+					//log.trace ("#4");
 						char[] o2 = o;
 						char[] p2 = p;
 						char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
@@ -456,6 +468,7 @@ class TripleStorage
 					}
 					else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
 					{
+					  //					log.trace ("#5");
 						// 1. найдем o1 и o2, для этого просмотрим все факты у которых subject = s  
 
 						// !!! НЕ РАССМОТРЕНЫ ВАРИАНТЫ КОГДА store_predicate_in_list_on_idx_s1ppoo[i] встречается раньше чем p1 или p2  
@@ -472,6 +485,11 @@ class TripleStorage
 							while(next_element0 > 0)
 							{
 								byte* triple0 = cast(byte*) *list_iterator;
+
+								//								log.trace("### {:X4}", triple0);
+
+								if(triple0 !is null)
+								  {
 
 								char* p_of_s = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
 
@@ -493,15 +511,18 @@ class TripleStorage
 										*list_iterator = cast(uint) triple;
 									}
 									else
-										log.trace("!!! idx_s1ppoo EX0000");
+									  log.trace("!!! idx_s1ppoo EX0000");
 
 									break;
 								}
+								
+								  }
 
 								next_element0 = *(list_iterator + 1);
 								list_iterator = cast(uint*) next_element0;
 							}
 						}
+						
 
 					/*											
 					 if(o1 !is null && o2 !is null)
@@ -514,6 +535,7 @@ class TripleStorage
 					 }
 					 */
 					}
+					//					log.trace ("#END");
 
 				}
 
