@@ -546,8 +546,10 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 				for(int i = 0; i < count_facts; i++)
 				{
-					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+				  if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+					  {
 						reply_to_id = i;
+					  }
 					else if(is_fact_in_object[i] == arg_id)
 					{
 						if(strlen(fact_s[i]) == 0)

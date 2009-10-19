@@ -10,6 +10,8 @@ private import tango.stdc.posix.stdio;
 private import fact_tools;
 private import Log;
 
+public static char* rt_symbols = "crwud";
+
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
 		char[] pp)
 {
@@ -47,7 +49,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 //	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 //	print_list_triple(iterator1);
 
-	if(lookRightOfIterator(iterator1, rightType, ts) == true)
+	if(lookRightOfIterator(iterator1, rt_symbols + rightType, ts) == true)
 		return true;
 
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
@@ -58,14 +60,14 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 //		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 //		print_list_triple(iterator2);
 
-		if(lookRightOfIterator(iterator2, rightType, ts) == true)
+		if(lookRightOfIterator(iterator2, rt_symbols + rightType, ts) == true)
 			return true;
 	}
 
 	return false;
 }
 
-bool lookRightOfIterator(uint* iterator3, uint rightType, TripleStorage ts)
+bool lookRightOfIterator(uint* iterator3, char *rightType, TripleStorage ts)
 {
 
 	//		log.trace("checkRight query: p1={}, p2={}, o1={}, o2={}", "magnet-ontology/authorization/acl#targetSubsystemElement",
@@ -92,14 +94,10 @@ bool lookRightOfIterator(uint* iterator3, uint rightType, TripleStorage ts)
 
 					while(*triple2_o != 0)
 					{
-						//			Stdout.format("S11ACLRightsHierarhical.checkRight #5 ?").newline;
-
-						if((rightType == RightType.READ) && (*triple2_o == 'r' || *(triple2_o + 1) == 'r'))
-						{
-							//Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
-							return true;
-						}
-						triple2_o++;
+					  //					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
+					  if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
+					    return true;
+					  triple2_o++;
 					}
 				}
 			}
