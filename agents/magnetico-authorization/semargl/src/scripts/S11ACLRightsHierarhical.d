@@ -98,7 +98,8 @@ bool lookRightOfIterator(uint* iterator3, uint rightType, TripleStorage ts)
 						{
 							//Stdout.format("S11ACLRightsHierarhical.checkRight #6 YES").newline;
 							return true;
-						}
+						} else if ((rightType == RightType.UPDATE) && (*triple2_o == 'u' || *(triple2_o + 1) == 'u'))
+						  return true;
 						triple2_o++;
 					}
 				}
