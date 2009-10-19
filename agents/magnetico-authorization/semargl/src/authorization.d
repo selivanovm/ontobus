@@ -238,8 +238,9 @@ class Authorization
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
-		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory,
-				"DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))
+		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || 
+		    (*authorizedElementId == '*' && (strcmp(authorizedElementCategory,"DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
+
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts);
 		//			log.trace("autorize end#0, return:[{}]", calculatedRight);
