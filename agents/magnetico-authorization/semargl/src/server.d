@@ -212,13 +212,13 @@ void get_message(byte* message, ulong message_size)
 				 <85f3><magnet-ontology/transport#argument>"2014a".
 				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
 				 */
-			  int i = 0;
+				int i = 0;
 				for(; i < count_facts; i++)
 				{
-				  if(is_fact_in_object[i] == arg_id)
-				    break;
+					if(is_fact_in_object[i] == arg_id)
+						break;
 				}
-				      
+
 				//log.trace("function get: query={} ", getString(fact_o[arg_id]));
 				log.trace("query s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 
@@ -228,8 +228,6 @@ void get_message(byte* message, ulong message_size)
 
 				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo, false);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
-
-
 
 				if(list_facts !is null)
 				{
@@ -418,10 +416,10 @@ void get_message(byte* message, ulong message_size)
 
 				for(int i = 0; i < count_facts; i++)
 				{
-				  if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-					  {
+					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+					{
 						reply_to_id = i;
-					  }
+					}
 					else if(is_fact_in_object[i] == arg_id)
 					{
 						if(strlen(fact_s[i]) == 0)
@@ -673,7 +671,7 @@ void get_message(byte* message, ulong message_size)
 				log.trace("result:{}", getString(result_buffer));
 
 				elapsed.start;
-				
+
 				client.send(queue_name, result_buffer);
 
 				time = elapsed.stop;

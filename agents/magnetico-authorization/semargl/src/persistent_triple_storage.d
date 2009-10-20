@@ -100,14 +100,14 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 			if(command == 'A')
 			{
-			  int result = ts.addTriple(s, p, o);
+				int result = ts.addTriple(s, p, o);
 				if(result >= 0)
 				{
 					count_add_triple++;
 				}
 				else
 				{
-				  log.trace("!!! triple [{}] <{}><{}><{}> not added. result = {}", count_add_triple, s, p, o, result);
+					log.trace("!!! triple [{}] <{}><{}><{}> not added. result = {}", count_add_triple, s, p, o, result);
 
 					count_ignored_triple++;
 				}
@@ -124,8 +124,8 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 			count_ignored_triple++;
 		}
 
-	//				if(count_add_triple > 5)
-	//					break;
+		//				if(count_add_triple > 5)
+		//					break;
 	}
 
 	//	

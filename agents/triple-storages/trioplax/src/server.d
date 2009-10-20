@@ -17,36 +17,36 @@ import TripleStorage;
 import librabbitmq_client;
 
 void main()
-{	
-//	TripleStorage ts = new TripleStorage ();
+{
+	//	TripleStorage ts = new TripleStorage ();
 
 	char[] hostname = "localhost\0";
-//	char[] hostname = "services.magnetosoft.ru\0";
+	//	char[] hostname = "services.magnetosoft.ru\0";
 	int port = 5672;
-	
-	librabbitmq_client client = new librabbitmq_client (hostname, port, &get_message);
-	
+
+	librabbitmq_client client = new librabbitmq_client(hostname, port, &get_message);
+
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
 }
-	
-void get_message (byte* txt, ulong size)
-{
-// найдем факты содержащие одну из команд агента (store<put, get, subscription, subscription, freez, unfreez, get_agent_ontology)
-// далее поочередно их выполним
-// если результатов много, то следует разбить их на несколько сообщений
 
-//	printf("DATA: %.*s\n", size, cast(void*)txt);
-	
-	Stdout.format("!!!! txt={}, size={}", str_2_char_array(cast(char *)txt, size), size).newline;	
+void get_message(byte* txt, ulong size)
+{
+	// найдем факты содержащие одну из команд агента (store<put, get, subscription, subscription, freez, unfreez, get_agent_ontology)
+	// далее поочередно их выполним
+	// если результатов много, то следует разбить их на несколько сообщений
+
+	//	printf("DATA: %.*s\n", size, cast(void*)txt);
+
+	Stdout.format("!!!! txt={}, size={}", str_2_char_array(cast(char*) txt, size), size).newline;
 
 }
 
 private char[] str_2_char_array(char* str, ulong len)
 {
-	if (str is null)
+	if(str is null)
 		return "null";
-		
+
 	char[] res = new char[len];
 
 	for(uint i = 0; i < len; i++)
