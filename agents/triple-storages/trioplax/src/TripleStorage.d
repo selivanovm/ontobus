@@ -4,9 +4,9 @@ private import HashMap;
 //import Triple;
 private import tango.io.Stdout;
 private import tango.stdc.string;
-
 private import Log;
 private import tango.util.container.HashMap;
+import tango.stdc.stringz;
 
 enum idx_name
 {
@@ -112,7 +112,9 @@ class TripleStorage
 	}
 
 	public uint* getTriples(char* s, char* p, char* o, ubyte useindex)
+
 	{
+	  //log.trace("### getTriples1");
 		if(useindex & idx_name.S1PPOO)
 		{
 			return idx_s1ppoo.get(s, p, o, false);
@@ -121,6 +123,7 @@ class TripleStorage
 	
 	public uint* getTriples(char* s, char* p, char* o, bool debug_info)
 	{
+	  //log.trace("### getTriples2");
 		uint* list = null;
 
 		if(s != null)
@@ -191,7 +194,7 @@ class TripleStorage
 			{
 				if(o != null)
 				{
-					//					Stdout.format("@get from index O").newline;
+				  //Stdout.format("@get from index O").newline;
 					// o
 					stat__idx_o__reads++;
 					if(idx_o !is null)
@@ -204,168 +207,87 @@ class TripleStorage
 
 			}
 		}
+		//log.trace("LIST {:X4}", list);
 		return list;
 	}
 
-	public bool removeTriple(char* s, char* p, char* o)
+	public bool removeTriple(char[] s, char[] p, char[] o)
 	{
+
+		if(s.length == 0 && p.length == 0 && o.length == 0)
+			return false;
+
+	  //do_things(o);
+
 		if(s is null && p is null && o is null)
 			return false;
 
 		uint* removed_triple;
 
-		uint* list_iterator = idx_spo.get(s, p, o, false);
+		uint* list_iterator = idx_spo.get(s.ptr, p.ptr, o.ptr, false);
 		if(list_iterator !is null)
 		{
 			removed_triple = cast(uint*) (*list_iterator);
-			*list_iterator = 0;
+			idx_spo.remove_triple_from_list(removed_triple,  s,  p,  o);
 		}
 		else
-			return false;
+		  return false;
 
 		if(idx_s !is null)
 		{
-			list_iterator = idx_s.get(cast(char*) s, null, null, false);
-			if(list_iterator !is null)
-			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-					if(cast(uint*) (*list_iterator) == removed_triple)
-					{
-						//						Stdout.format("removeTriple from S, removed_triple={:X4}", removed_triple).newline;
-						*list_iterator = 0;
-					}
-
-					next_element0 = *(list_iterator + 1);
-					list_iterator = cast(uint*) next_element0;
-
-				}
-			}
+		  idx_s.remove_triple_from_list(removed_triple,  s, null, null);
 		}
 
 		if(idx_p !is null)
 		{
-			list_iterator = idx_p.get(cast(char*) p, null, null, false);
-			if(list_iterator !is null)
-			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-					if(cast(uint*) (*list_iterator) == removed_triple)
-					{
-						//						Stdout.format("removeTriple from P, removed_triple={:X4}", removed_triple).newline;
-						*list_iterator = 0;
-					}
-
-					next_element0 = *(list_iterator + 1);
-					list_iterator = cast(uint*) next_element0;
-				}
-			}
+		  idx_p.remove_triple_from_list(removed_triple,  p, null, null);
 		}
 
 		if(idx_o !is null)
 		{
-			list_iterator = idx_o.get(cast(char*) o, null, null, false);
-			if(list_iterator !is null)
-			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-					if(cast(uint*) (*list_iterator) == removed_triple)
-					{
-						//						Stdout.format("removeTriple from O, removed_triple={:X4}", removed_triple).newline;
-						*list_iterator = 0;
-					}
-
-					next_element0 = *(list_iterator + 1);
-					list_iterator = cast(uint*) next_element0;
-				}
-			}
+		  idx_o.remove_triple_from_list(removed_triple,  o, null, null);
 		}
 
 		if(idx_sp !is null)
 		{
-			list_iterator = idx_sp.get(cast(char*) s, cast(char*) p, null, false);
-			if(list_iterator !is null)
-			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-					if(cast(uint*) (*list_iterator) == removed_triple)
-					{
-						//						Stdout.format("removeTriple from SP, removed_triple={:X4}", removed_triple).newline;
-						*list_iterator = 0;
-					}
-
-					next_element0 = *(list_iterator + 1);
-					list_iterator = cast(uint*) next_element0;
-				}
-			}
+		  idx_sp.remove_triple_from_list(removed_triple,  s,  p, null);
 		}
 
 		if(idx_po !is null)
 		{
-			list_iterator = idx_po.get(cast(char*) p, cast(char*) o, null, false);
-			if(list_iterator !is null)
-			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-					if(cast(uint*) (*list_iterator) == removed_triple)
-					{
-						//						Stdout.format("removeTriple from PO, removed_triple={:X4}", removed_triple).newline;
-						*list_iterator = 0;
-					}
-
-					next_element0 = *(list_iterator + 1);
-					list_iterator = cast(uint*) next_element0;
-				}
-			}
+		  idx_po.remove_triple_from_list(removed_triple,  p,  o, null);
 		}
 
 		if(idx_so !is null)
 		{
-			list_iterator = idx_so.get(cast(char*) s, cast(char*) o, null, false);
-			if(list_iterator !is null)
-			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0)
-				{
-					if(cast(uint*) (*list_iterator) == removed_triple)
-					{
-						//						Stdout.format("removeTriple from SO, removed_triple={:X4}", removed_triple).newline;
-						*list_iterator = 0;
-					}
-
-					next_element0 = *(list_iterator + 1);
-					list_iterator = cast(uint*) next_element0;
-				}
-			}
+		  idx_so.remove_triple_from_list(removed_triple,  s,  o, null);
 		}
+
+		//do_things(o);
+
 		return true;
 	}
 
-	public bool removeTriple(char[] s, char[] p, char[] o)
+  /*	public bool removeTriple(char[] s, char[] p, char[] o)
 	{
-		if(s.length == 0 && p.length == 0 && o.length == 0)
-			return false;
 
-		return removeTriple(cast(char*) s, cast(char*) p, cast(char*) o);
-	}
+		return removeTriple(s, p, o);
+		}*/
 
-	public bool addTriple(char[] s, char[] p, char[] o)
+	public int addTriple(char[] s, char[] p, char[] o)
 	{
 		synchronized
 		{
 		  
+		  //do_things(o.ptr);
+
 
 
 		  //		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
 			void* triple;
 
 			if(s.length == 0 && p.length == 0 && o.length == 0)
-				return false;
+				return -1;
 
 
 
@@ -373,9 +295,34 @@ class TripleStorage
 		  //log.trace("addTriple #1");
 			if(list !is null)
 			{
+
+			  /*	uint next_element1 = 0xFF;
+	while(next_element1 > 0)
+	  {
+	    if(list !is null) {
+	      byte* triple2 = cast(byte*) *list;
+	      if(triple2 !is null)
+		{
+		  char* ss = cast(char*) triple2 + 6;
+		
+		  char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+		
+		  char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+		
+		  if (ss !is null || pp !is null || oo !is null)
+		    return -2;
+
+		}
+	    }
+	    next_element1 = *(list + 1);
+	    list = cast(uint*) next_element1;
+	    log.trace("!!!!!!!!!!!!!!!!!!22");
+	    }*/
+			  return -2;
+
 				//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
 				//		        throw new Exception ("addTriple: triple already exist");
-				return false;
+
 			}
 
 			//		log.trace("addTriple:add index spo");
@@ -389,6 +336,8 @@ class TripleStorage
 				throw new Exception("addTriple: not found triple in index spo");
 
 			triple = cast(void*) *list;
+
+			//log.trace("!!!!!!!!!!!!!!!!!!11");
 
 			//		log.trace("addTriple:3 addr={:X4}", triple);
 			//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, _toString(cast(char*) (triple + 6)));
@@ -468,7 +417,7 @@ class TripleStorage
 					}
 					else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
 					{
-					  //					log.trace ("#5");
+					  					//log.trace ("#5");
 						// 1. найдем o1 и o2, для этого просмотрим все факты у которых subject = s  
 
 						// !!! НЕ РАССМОТРЕНЫ ВАРИАНТЫ КОГДА store_predicate_in_list_on_idx_s1ppoo[i] встречается раньше чем p1 или p2  
@@ -540,8 +489,9 @@ class TripleStorage
 				}
 
 			}
+			//do_things(o.ptr);
 
-			return true;
+			return 0;
 		}
 	}
 
@@ -561,9 +511,40 @@ class TripleStorage
 				stat__idx_spo__reads);
 	}
 
+public void do_things(char* ooo) {
+  if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0) {
+    uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr, true);
+    
+    if(list_facts !is null)
+      {
+	uint next_element1 = 0xFF;
+	while(next_element1 > 0)
+	  {
+	    if(list_facts !is null) {
+	    byte* triple = cast(byte*) *list_facts;
+	    log.trace("list_fact {:X4}", list_facts);
+	    if(triple !is null)
+	      {
+		char* s = cast(char*) triple + 6;
+		
+		char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+		
+		char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+		
+		log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
+	      }
+	    }
+	    next_element1 = *(list_facts + 1);
+	    list_facts = cast(uint*) next_element1;
+	  }
+      }
+  }
+}
+
 }
 
 private static char[] _toString(char* s)
 {
 	return s ? s[0 .. strlen(s)] : cast(char[]) null;
 }
+

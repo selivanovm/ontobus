@@ -339,7 +339,10 @@ class HashMap
 				}
 
 				// в короткой очереди сохраним ссылку на новый ключ-список
-				reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
+				if(triple is null)
+				  reducer_area_ptr[next_short_order_conflict_keys] = 0;
+				else
+				  reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
 
 				// устанавливаем новую позицию 
 				key_2_list_triples_area__last = ptr;
@@ -411,7 +414,7 @@ class HashMap
 	{
 		uint* res = null;
 
-		version(trace)
+		version (trace)
 		{
 			log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*) this, _toString(key1),
 					_toString(key2), _toString(key3));
@@ -419,18 +422,18 @@ class HashMap
 
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 
-		version(trace)
+		version (trace)
 		{
 			log.trace("get:1 hash= {:X}", hash);
 		}
 
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
-		if(debug_info)
+		version (trace)
 			dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
 
 		// хэш нас привел к очереди конфликтующих ключей
-		version(trace)
+		version (trace)
 		{
 			log.trace("get:2 short_order_conflict_key={:X}", short_order_conflict_keys);
 			log.trace("get:4 *short_order_conflict_keys={:X}", reducer_area_ptr[short_order_conflict_keys]);
@@ -457,7 +460,7 @@ class HashMap
 			uint keys_of_hash_in_reducer;
 			uint list_elements = 0;
 
-			version(trace)
+			version (trace)
 			{
 				log.trace(
 						"get:7 начинаем сравнение нашего ключа среди короткой очереди ключей, next_short_order_conflict_keys={:X4}",
@@ -466,14 +469,14 @@ class HashMap
 
 			for(byte i = max_size_short_order; i > 0; i--)
 			{
-				version(trace)
+				version (trace)
 				{
 					log.trace("get:6 i={}", i);
 				}
 
 				keys_of_hash_in_reducer = reducer_area_ptr[next_short_order_conflict_keys];
 
-				version(trace)
+				version (trace)
 				{
 					log.trace("get:9 keys_of_hash_in_reducer={:X}", keys_of_hash_in_reducer);
 				}
@@ -493,7 +496,7 @@ class HashMap
 					uint
 							key3_length = (key_2_list_triples_area[keys_and_triplets_list + 8] << 8) + key_2_list_triples_area[keys_and_triplets_list + 9];
 
-					version(trace)
+					version (trace)
 					{
 						log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length,
 								key2_length, key3_length, key_ptr);
@@ -502,20 +505,20 @@ class HashMap
 					char[] keys = cast(char[]) key_2_list_triples_area;
 					if(key1 !is null)
 					{
-						version(trace)
+						version (trace)
 						{
 							log.trace("get:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
 						}
 
 						if(_strcmp(keys, key_ptr, key1) == true)
 						{
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
 							}
 							isKeyExist = true;
 
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:11 key_ptr={:X4}", key_ptr);
 							}
@@ -524,7 +527,7 @@ class HashMap
 
 							list_elements = key_ptr;
 
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:11 key_ptr={:X4}", key_ptr);
 								log.trace("get:12 key2={:X4} key3={:X}", key2, key3);
@@ -539,28 +542,28 @@ class HashMap
 					if(key2 !is null && (key1 is null || key1 !is null && isKeyExist == true))
 					{
 						isKeyExist = false;
-						version(trace)
+						version (trace)
 						{
 							log.trace("get:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
 						}
 
 						if(_strcmp(keys, key_ptr, key2) == true)
 						{
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
 							}
 
 							isKeyExist = true;
 
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:12 key_ptr={:X4}", key_ptr);
 							}
 
 							key_ptr += key2_length + 1;
 
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:12  key_ptr={:X4}", key_ptr);
 							}
@@ -576,14 +579,14 @@ class HashMap
 					// 
 					if(key3 !is null && ((key1 is null || key1 !is null && isKeyExist == true) || (key2 is null || key2 !is null && isKeyExist == true)))
 					{
-						version(trace)
+						version (trace)
 						{
 							log.trace("get:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
 						}
 						isKeyExist = false;
 						if(_strcmp(keys, key_ptr, key3) == true)
 						{
-							version(trace)
+							version (trace)
 							{
 								log.trace("get:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
 							}
@@ -611,16 +614,47 @@ class HashMap
 				//				 log.trace("get:8 ключ найден, list_elements={:X4}", list_elements);
 				//								dump_mem(key_2_list_triples_area);
 
-				res = cast(uint*) (key_2_list_triples_area.ptr + list_elements);
+			  res = cast(uint*) (key_2_list_triples_area.ptr + list_elements);
 			}
 		}
 
-		//		log.trace("get:10 iterator={:X4}", res);
+		version (trace) {		log.trace("get:10 iterator={:X4}", res);}
 		//		if (res !is null)
 		//		log.trace("get:10 *iterator={:X4}", *res);
 		//		print_triple_list(res);
 		return res;
 	}
+
+  public void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o)
+  {
+    uint* list = get(s.ptr,  p.ptr,  o.ptr, false);
+
+    uint* prev_list_element = null;
+
+    if(list !is null)
+      {
+	uint next_element1 = 0xFF;
+	while(next_element1 > 0)
+	  {
+	    if(removed_triple == cast(uint*)*list)
+	      {
+		if(prev_list_element !is null)
+		  {
+		    prev_list_element = cast(uint*)*(list + 1);
+		    break;
+		  }
+		else
+		  {
+		    put(s, p, o, null);
+		  }
+	      }
+	    prev_list_element = list;
+	    next_element1 = *(list + 1);
+	    list = cast(uint*) next_element1;
+	  }
+      }
+  }
+    
 
 	private void dump_mem(ubyte[] mem, uint ptr)
 	{

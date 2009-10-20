@@ -212,9 +212,24 @@ void get_message(byte* message, ulong message_size)
 				 <85f3><magnet-ontology/transport#argument>"2014a".
 				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
 				 */
-				log.trace("function get: query={} ", getString(fact_o[arg_id]));
+			  int i = 0;
+				for(; i < count_facts; i++)
+				{
+				  if(is_fact_in_object[i] == arg_id)
+				    break;
+				}
+				      
+				//log.trace("function get: query={} ", getString(fact_o[arg_id]));
+				log.trace("query s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 
-				uint* list_facts = az.getTripleStorage.getTriples(fact_s[arg_id], fact_p[arg_id], fact_o[arg_id], false);
+				char* ss = strlen(fact_s[i]) == 0 ? null : fact_s[i];
+				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
+				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
+
+				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo, false);
+				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
+
+
 
 				if(list_facts !is null)
 				{
@@ -222,6 +237,7 @@ void get_message(byte* message, ulong message_size)
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *list_facts;
+						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
 							char* s = cast(char*) triple + 6;
@@ -230,7 +246,7 @@ void get_message(byte* message, ulong message_size)
 
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-							log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(p));
+							log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
 						}
 						next_element1 = *(list_facts + 1);
 						list_facts = cast(uint*) next_element1;
@@ -274,7 +290,7 @@ void get_message(byte* message, ulong message_size)
 
 							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
 
-							az.getTripleStorage.removeTriple(s, p, o);
+							az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
 							az.logginTriple('D', getString(s), getString(p), getString(o));
 
 						}
@@ -365,7 +381,7 @@ void get_message(byte* message, ulong message_size)
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
-										az.getTripleStorage.removeTriple(s, p, o);
+										az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
 										az.logginTriple('D', getString(s), getString(p), getString(o));
 
 									}
