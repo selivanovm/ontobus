@@ -305,10 +305,8 @@ void get_message(byte* message, ulong message_size)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-				result_ptr += 48;
-
-				strcpy(result_ptr, "\".\0");
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+				result_ptr += 47;
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -412,7 +410,8 @@ void get_message(byte* message, ulong message_size)
 
 				int reply_to_id = 0;
 
-				ulong uuid = getUUID();
+				char* uuid = cast(char*) new char[16];
+				longToHex(getUUID(), uuid);
 
 				for(int i = 0; i < count_facts; i++)
 				{
@@ -423,12 +422,10 @@ void get_message(byte* message, ulong message_size)
 					else if(is_fact_in_object[i] == arg_id)
 					{
 						if(strlen(fact_s[i]) == 0)
-						{
-							fact_s[i] = cast(char*) new char[16];
-							longToHex(uuid, fact_s[i]);
-						}
-						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-								cast(char*) fact_o[i]));
+							fact_s[i] = uuid;
+
+						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+							  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 					}
@@ -443,8 +440,20 @@ void get_message(byte* message, ulong message_size)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-				result_ptr += 48;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok");
+				result_ptr += 44;
+
+				if(uuid !is null)
+				{
+					strcpy(result_ptr, "\".<");
+					result_ptr += 3;
+					strcpy(result_ptr, command_uid);
+					result_ptr += strlen(command_uid);
+					strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+					result_ptr += 41;
+					strcpy(result_ptr, uuid);
+					result_ptr += 16;
+				}
 
 				strcpy(result_ptr, "\".\0");
 
@@ -656,7 +665,7 @@ void get_message(byte* message, ulong message_size)
 				strcpy(result_ptr, command_uid);
 				result_ptr += strlen(command_uid);
 				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-				result_ptr += 48;
+				result_ptr += 47;
 
 				time = elapsed.stop;
 

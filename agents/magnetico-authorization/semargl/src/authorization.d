@@ -238,6 +238,14 @@ class Authorization
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
+		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
+			return scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+
+		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && 
+		   strcmp(authorizedElementCategory, "DOCUMENT") == 0)
+			if(scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts))
+				return false;
+
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
 				authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
 
@@ -250,6 +258,7 @@ class Authorization
 			//log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
+
 
 		if(calculatedRight == false)
 		{

@@ -9,39 +9,27 @@ private import tango.stdc.string;
 
 public bool isInDocFlow(char* elementId, TripleStorage ts)
 {
-	//		 Stdout.format("isInDocFlow, elementId={}", elementId).newline;
+	//log.trace("isInDocFlow, elementId={}", getString(elementId));
 	// найдем субьекта ACL записи по <magnet-ontology#elementId>=elementId
-	uint* iterator0 = ts.getTriples(null, "magnet-ontology#elementId", elementId, false);
+	uint* iterator0 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId, false);
 	char* ACL_subject;
 
 	if(iterator0 !is null)
 	{
 		byte* triple0 = cast(byte*) *iterator0;
 		ACL_subject = cast(char*) triple0 + 6;
-		//		 Stdout.format("isInDocFlow #1 ACL Subject {}", str_2_chararray(ACL_subject)).newline;
+		//log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
 
 		// найдем автора 
-		iterator0 = ts.getTriples(ACL_subject, "magnet-ontology#author", null, false);
-
-		char* autor_in_acl;
+		iterator0 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW", false);
+		
 		if(iterator0 !is null)
 		{
-			triple0 = cast(byte*) *iterator0;
-			autor_in_acl = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-			//		 Stdout.format("isInDocFlow #2 autor in acl {}", str_2_chararray(autor_in_acl)).newline;
-
-			// найдем для этого автора группу
-
-			iterator0 = ts.getTriples(autor_in_acl, "magnet-ontology#group", "DOCFLOW", false);
-
-			if(iterator0 !is null)
-			{
-				Stdout.format("да, документ в документообороте {}", getString(elementId)).newline;
-				return true;
-			}
+			//log.trace("да, документ в документообороте {}", getString(elementId));
+			return true;
 		}
-	}
 
+	}
 	return false;
 }
 

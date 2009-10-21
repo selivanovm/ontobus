@@ -10,8 +10,6 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
 	// Stdout.format("rightType = {}", rightType).newline;
 	// Если документ хотят редактировать или удалять
-	if((rightType == RightType.WRITE) || (rightType == RightType.DELETE))
-	{
 		// Но он находится в документообороте
 		if(isInDocFlow(elementId, ts))
 		{
@@ -19,7 +17,6 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 			return true;
 		}
 
-	}
 	return false;
 
 }
