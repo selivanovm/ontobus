@@ -355,10 +355,31 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 			if(get_id >= 0 && arg_id > 0)
 			{
-
 				log.trace("function get: query={} ", getString(fact_o[arg_id]));
+				 
+				// <2014a><magnet-ontology#subject><magnet-ontology#get>.
+				// <2014a><magnet-ontology/transport#argument>
+				// {<><predicate1>"object1".}.
+				// <85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
+				// <85f3><magnet-ontology/transport#argument>"2014a".
+				// <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
 
-				uint* list_facts = az.getTripleStorage.getTriples(fact_s[arg_id], fact_p[arg_id], fact_o[arg_id], false);
+				int i = 0;
+				for(; i < count_facts; i++)
+				{
+					if(is_fact_in_object[i] == arg_id)
+						break;
+				}
+
+				//log.trace("function get: query={} ", getString(fact_o[arg_id]));
+				log.trace("query s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+
+				char* ss = strlen(fact_s[i]) == 0 ? null : fact_s[i];
+				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
+				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
+
+				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo, false);
+				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
 				if(list_facts !is null)
 				{
@@ -366,6 +387,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *list_facts;
+						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
 							char* s = cast(char*) triple + 6;
@@ -374,7 +396,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-							log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(p));
+							log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
 						}
 						next_element1 = *(list_facts + 1);
 						list_facts = cast(uint*) next_element1;
@@ -418,7 +440,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
 
-							az.getTripleStorage.removeTriple(s, p, o);
+							az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
 							az.logginTriple('D', getString(s), getString(p), getString(o));
 
 						}
@@ -435,10 +457,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-				result_ptr += 48;
-
-				strcpy(result_ptr, "\".\0");
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+				result_ptr += 47;
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -509,7 +529,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
-										az.getTripleStorage.removeTriple(s, p, o);
+										az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
 										az.logginTriple('D', getString(s), getString(p), getString(o));
 
 									}
@@ -542,23 +562,22 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 				int reply_to_id = 0;
 
-				ulong uuid = getUUID();
+				char* uuid = cast(char*) new char[16];
+				longToHex(getUUID(), uuid);
 
 				for(int i = 0; i < count_facts; i++)
 				{
-				  if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-					  {
+					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+					{
 						reply_to_id = i;
-					  }
+					}
 					else if(is_fact_in_object[i] == arg_id)
 					{
 						if(strlen(fact_s[i]) == 0)
-						{
-							fact_s[i] = cast(char*) new char[16];
-							longToHex(uuid, fact_s[i]);
-						}
-						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-								cast(char*) fact_o[i]));
+							fact_s[i] = uuid;
+
+						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+							  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 					}
@@ -573,8 +592,20 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-				result_ptr += 48;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok");
+				result_ptr += 44;
+
+				if(uuid !is null)
+				{
+					strcpy(result_ptr, "\".<");
+					result_ptr += 3;
+					strcpy(result_ptr, command_uid);
+					result_ptr += strlen(command_uid);
+					strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+					result_ptr += 41;
+					strcpy(result_ptr, uuid);
+					result_ptr += 16;
+				}
 
 				strcpy(result_ptr, "\".\0");
 
@@ -772,7 +803,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				strcpy(result_ptr, command_uid);
 				result_ptr += strlen(command_uid);
 				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-				result_ptr += 48;
+				result_ptr += 47;
 
 				time = elapsed.stop;
 
@@ -787,7 +818,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				log.trace("result:{}", getString(result_buffer));
 
 				elapsed.start;
-				
+
 				client.send(queue_name, result_buffer);
 
 				time = elapsed.stop;

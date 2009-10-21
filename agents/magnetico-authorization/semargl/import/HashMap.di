@@ -44,6 +44,10 @@ class HashMap
 {
     uint* get(char* key1, char* key2, char* key3, bool debug_info);
 }
+    public
+{
+    void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o);
+}
     private
 {
     void dump_mem(ubyte[] mem, uint ptr);

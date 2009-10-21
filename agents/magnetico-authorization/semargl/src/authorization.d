@@ -238,29 +238,38 @@ class Authorization
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
-		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || 
-		    (*authorizedElementId == '*' && (strcmp(authorizedElementCategory,"DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
+		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
+			return scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+
+		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && 
+		   strcmp(authorizedElementCategory, "DOCUMENT") == 0)
+			if(scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts))
+				return false;
+
+		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
+				authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
 
 		{
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts);
-		//			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			//log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 		if(calculatedRight == true)
 		{
-			//			log.trace("autorize end#1, return:[{}]", calculatedRight);
+			//log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
+
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
-		//			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
-		//			log.trace("authorize:S05InDocFlow res={}", calculatedRight);
+			//log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		}
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null, false);
@@ -268,32 +277,32 @@ class Authorization
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-			//			log.trace("autorize end#2, return:[false]");
+			//log.trace("autorize end#2, return:[false]");
 			return false;
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+			//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
+			//log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
+			//log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
-		//			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
@@ -301,7 +310,7 @@ class Authorization
 			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
 		}
 
-		//		log.trace("autorize end#3, return:[{}]", calculatedRight);
+		//log.trace("autorize end#3, return:[{}]", calculatedRight);
 		return calculatedRight;
 	}
 
@@ -335,8 +344,8 @@ class Authorization
 		{
 			if(strlen(fact_o[i]) > 0)
 			{
-				//log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]),
-				//								strlen(fact_o[i]));
+				log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]), strlen(
+						fact_o[i]));
 				if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
 				{
 					from_id = i;
@@ -384,6 +393,7 @@ class Authorization
 		byte start_set_marker = 0;
 		if(elements_id > 0)
 		{
+			log.trace("object = {}", getString(fact_o[elements_id]));
 			start_facts_set = ts.getTriples(null, null, fact_o[elements_id], false);
 		}
 		else if(author_subsystem_element_id > 0)
@@ -422,11 +432,11 @@ class Authorization
 			start_facts_set = ts.getTriples(null, null, fact_o[target_system_id], false);
 		}
 
-		//				log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id,
-		//	author_subsystem_element_id, target_subsystem_element_id);
-		//				log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}",
-		//	category_id, author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
-		//				log.trace("start_set_marker = {}", start_set_marker);
+		log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id, author_subsystem_element_id,
+				target_subsystem_element_id);
+		log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}", category_id,
+				author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
+		log.trace("start_set_marker = {}", start_set_marker);
 
 		strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -504,15 +514,15 @@ class Authorization
 
 						if(is_match)
 						{
-							// log.trace("found match");
+							log.trace("found match");
 							next_element1 = 0xFF;
 							while(next_element1 > 0)
 							{
 								byte* triple1 = cast(byte*) *founded_facts_copy;
-								//										log.trace("#3");
+								log.trace("#3");
 								if(triple1 !is null)
 								{
-									//  log.trace("...not null");
+									log.trace("...not null");
 									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
 									char*
 											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
@@ -575,65 +585,63 @@ class Authorization
 
 	}
 
-  public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
-				       librabbitmq_client client)
-  {
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
+			librabbitmq_client client)
+	{
 
+		log.trace("команда на выборку делегировавших");
 
-    log.trace("команда на выборку делегировавших");
+		auto elapsed = new StopWatch();
+		elapsed.start;
 
-    auto elapsed = new StopWatch();
-    elapsed.start;
+		int reply_to_id = 0;
+		for(int i = 0; i < count_facts; i++)
+		{
+			if(strlen(fact_o[i]) > 0)
+			{
+				if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+				{
+					reply_to_id = i;
+				}
+			}
+		}
 
-    int reply_to_id = 0;
-    for(int i = 0; i < count_facts; i++)
-      {
-	if(strlen(fact_o[i]) > 0)
-	  {
-	    if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
-	      {
-		reply_to_id = i;
-	      }
-	  }
-      }
-    
-    char* queue_name = cast(char*) (new char[40]);
-    strcpy(queue_name, fact_o[reply_to_id]);
-    
-    //log.trace("#1 gda");
-    
-    char* result_ptr = cast(char*) result_buffer;
-    char* command_uid = fact_s[0];
-    strcpy(queue_name, fact_o[reply_to_id]);
-    
-    *result_ptr = '<';
-    strcpy(result_ptr + 1, command_uid);
-    result_ptr += strlen(command_uid) + 1;
-    strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
-    result_ptr += 41;
+		char* queue_name = cast(char*) (new char[40]);
+		strcpy(queue_name, fact_o[reply_to_id]);
 
-    void put_in_result(char* founded_delegate)
-    {
-      strcpy(result_ptr++, ",");
-      strcpy(result_ptr, founded_delegate);
-      result_ptr += strlen(founded_delegate);
-    }
-    
-    getDelegateAssignersForDelegate(fact_o[arg_id], ts, &put_in_result);
+		//log.trace("#1 gda");
 
-    strcpy(result_ptr, "\".<");
-    result_ptr += 3;
-    strcpy(result_ptr, command_uid);
-    result_ptr += strlen(command_uid);
-    strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-    
-    client.send(queue_name, result_buffer);
-    
-    double time = elapsed.stop;
-    log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-    log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
-    
-  }
+		char* result_ptr = cast(char*) result_buffer;
+		char* command_uid = fact_s[0];
+		strcpy(queue_name, fact_o[reply_to_id]);
 
-  
+		*result_ptr = '<';
+		strcpy(result_ptr + 1, command_uid);
+		result_ptr += strlen(command_uid) + 1;
+		strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+		result_ptr += 41;
+
+		void put_in_result(char* founded_delegate)
+		{
+			strcpy(result_ptr++, ",");
+			strcpy(result_ptr, founded_delegate);
+			result_ptr += strlen(founded_delegate);
+		}
+
+		getDelegateAssignersForDelegate(fact_o[arg_id], ts, &put_in_result);
+
+		strcpy(result_ptr, "\".<");
+		result_ptr += 3;
+		strcpy(result_ptr, command_uid);
+		result_ptr += strlen(command_uid);
+		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+
+		client.send(queue_name, result_buffer);
+
+		double time = elapsed.stop;
+		log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+		log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
+
+	}
+
 }

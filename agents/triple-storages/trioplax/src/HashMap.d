@@ -26,7 +26,7 @@ class HashMap
 	ubyte[] key_2_list_triples_area;
 	uint key_2_list_triples_area__last;
 	uint key_2_list_triples_area__right;
-	
+
 	char[] hashName;
 
 	// область длинных списков конфликтующих ключей
@@ -49,7 +49,8 @@ class HashMap
 		hashName = _hashName;
 		max_size_short_order = _max_size_short_order;
 		max_count_elements = _max_count_elements;
-		log.trace("*** create HashMap[name={}, max_count_elements={}, triple_area_length={}, max_size_short_order={} ... start", hashName, _triple_area_length, _max_count_elements, max_size_short_order);
+		log.trace("*** create HashMap[name={}, max_count_elements={}, triple_area_length={}, max_size_short_order={} ... start", hashName,
+				_triple_area_length, _max_count_elements, max_size_short_order);
 
 		// область маппинга ключей, 
 		// содержит короткую очередь из [max_size_short_order] элементов в формате [ссылка на ключ 4b][ссылка на список триплетов ключа 4b] 
@@ -149,7 +150,7 @@ class HashMap
 			// это длинная очередь, следующие 4 байта будут содержать ссылку на длинную очередь
 			Stdout.format("put *4 это длинная очередь, следующие 4 байта будут содержать ссылку на длинную очередь").newline;
 
-		// длинная очередь устроена иначе чем короткая
+			// длинная очередь устроена иначе чем короткая
 		}
 		else
 		{
@@ -263,10 +264,10 @@ class HashMap
 				// last_element_of_list установлен в позицию последнего элемента очереди !!!
 
 				end_element__triples_list = ptr_from_mem(key_2_list_triples_area, keys_and_triplets_list);
-			//				log.trace("put:[{:X}] 10 end_element__triples_list={:X}", cast(void*) this,
-			//						end_element__triples_list);
+				//				log.trace("put:[{:X}] 10 end_element__triples_list={:X}", cast(void*) this,
+				//						end_element__triples_list);
 
-			//				dump_mem(key_2_list_triples_area);
+				//				dump_mem(key_2_list_triples_area);
 			}
 			else
 			{
@@ -293,7 +294,7 @@ class HashMap
 				if(key1 !is null && key2 !is null && key3 !is null)
 				{
 					triple = cast(void*) key_2_list_triples_area.ptr + key_2_list_triples_area__last + 4;
-				//					log.trace("put:[{:X4}] 12.1 все ключи !=null triple={:X4}", cast(void*) this, triple);
+					//					log.trace("put:[{:X4}] 12.1 все ключи !=null triple={:X4}", cast(void*) this, triple);
 				}
 
 				if(key1 !is null)
@@ -339,7 +340,10 @@ class HashMap
 				}
 
 				// в короткой очереди сохраним ссылку на новый ключ-список
-				reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
+				if(triple is null)
+					reducer_area_ptr[next_short_order_conflict_keys] = 0;
+				else
+					reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
 
 				// устанавливаем новую позицию 
 				key_2_list_triples_area__last = ptr;
@@ -362,8 +366,7 @@ class HashMap
 
 			// сохраним в заголовке списка ссылку на последний элемент
 			//			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, list_of_triples, cast(uint) key_2_list_triples_area__last);
-			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list,
-					cast(uint) new_list_elements);
+			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
 
 			//			dump_mem(key_2_list_triples_area);
 
@@ -374,7 +377,8 @@ class HashMap
 			key_2_list_triples_area__last += 8;
 			if(key_2_list_triples_area__last > key_2_list_triples_area__right)
 			{
-				log.trace ("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName, key_2_list_triples_area__last, key_2_list_triples_area__right);
+				log.trace("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName,
+						key_2_list_triples_area__last, key_2_list_triples_area__right);
 				throw new Exception("key_2_list_triples_area__last > key_2_list_triples_area__right");
 			}
 			// log.trace("put:23 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);
@@ -401,10 +405,10 @@ class HashMap
 				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, end_element__triples_list + 4,
 						cast(uint) (key_2_list_triples_area.ptr + new_list_elements));
 			}
-		// log.trace("put:[{:X}] 27", cast(void*) this);
+			// log.trace("put:[{:X}] 27", cast(void*) this);
 
 		}
-	//		dump_mem(key_2_list_triples_area);
+		//		dump_mem(key_2_list_triples_area);
 	}
 
 	public uint* get(char* key1, char* key2, char* key3, bool debug_info)
@@ -413,8 +417,7 @@ class HashMap
 
 		version(trace)
 		{
-			log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*) this, _toString(key1),
-					_toString(key2), _toString(key3));
+			log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*) this, _toString(key1), _toString(key2), _toString(key3));
 		}
 
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
@@ -426,7 +429,7 @@ class HashMap
 
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
-		if(debug_info)
+		version(trace)
 			dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
 
 		// хэш нас привел к очереди конфликтующих ключей
@@ -459,8 +462,7 @@ class HashMap
 
 			version(trace)
 			{
-				log.trace(
-						"get:7 начинаем сравнение нашего ключа среди короткой очереди ключей, next_short_order_conflict_keys={:X4}",
+				log.trace("get:7 начинаем сравнение нашего ключа среди короткой очереди ключей, next_short_order_conflict_keys={:X4}",
 						next_short_order_conflict_keys);
 			}
 
@@ -495,8 +497,8 @@ class HashMap
 
 					version(trace)
 					{
-						log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length,
-								key2_length, key3_length, key_ptr);
+						log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length, key2_length, key3_length,
+								key_ptr);
 					}
 
 					char[] keys = cast(char[]) key_2_list_triples_area;
@@ -615,11 +617,44 @@ class HashMap
 			}
 		}
 
-		//		log.trace("get:10 iterator={:X4}", res);
+		version(trace)
+		{
+			log.trace("get:10 iterator={:X4}", res);
+		}
 		//		if (res !is null)
 		//		log.trace("get:10 *iterator={:X4}", *res);
 		//		print_triple_list(res);
 		return res;
+	}
+
+	public void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o)
+	{
+		uint* list = get(s.ptr, p.ptr, o.ptr, false);
+
+		uint* prev_list_element = null;
+
+		if(list !is null)
+		{
+			uint next_element1 = 0xFF;
+			while(next_element1 > 0)
+			{
+				if(removed_triple == cast(uint*) *list)
+				{
+					if(prev_list_element !is null)
+					{
+						prev_list_element = cast(uint*) *(list + 1);
+						break;
+					}
+					else
+					{
+						put(s, p, o, null);
+					}
+				}
+				prev_list_element = list;
+				next_element1 = *(list + 1);
+				list = cast(uint*) next_element1;
+			}
+		}
 	}
 
 	private void dump_mem(ubyte[] mem, uint ptr)
@@ -629,18 +664,14 @@ class HashMap
 		{
 			log.trace(
 					"{:X8}  {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2}  {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2} {:X2}   {:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}{:C1}",
-					row * 16, mem[ptr + row * 16 + 0], mem[ptr + row * 16 + 1], mem[ptr + row * 16 + 2],
-					mem[ptr + row * 16 + 3], mem[ptr + row * 16 + 4], mem[ptr + row * 16 + 5], mem[ptr + row * 16 + 6],
-					mem[ptr + row * 16 + 7], mem[ptr + row * 16 + 8], mem[ptr + row * 16 + 9],
-					mem[ptr + row * 16 + 10], mem[ptr + row * 16 + 11], mem[ptr + row * 16 + 12],
-					mem[ptr + row * 16 + 13], mem[ptr + row * 16 + 14], mem[ptr + row * 16 + 15],
-					cast(char) mem[ptr + row * 16 + 0], cast(char) mem[ptr + row * 16 + 1],
-					cast(char) mem[ptr + row * 16 + 2], cast(char) mem[ptr + row * 16 + 3],
-					cast(char) mem[ptr + row * 16 + 4], cast(char) mem[ptr + row * 16 + 5],
-					cast(char) mem[ptr + row * 16 + 6], cast(char) mem[ptr + row * 16 + 7],
-					cast(char) mem[ptr + row * 16 + 8], cast(char) mem[ptr + row * 16 + 9],
-					cast(char) mem[ptr + row * 16 + 10], cast(char) mem[ptr + row * 16 + 11],
-					cast(char) mem[ptr + row * 16 + 12], cast(char) mem[ptr + row * 16 + 13],
+					row * 16, mem[ptr + row * 16 + 0], mem[ptr + row * 16 + 1], mem[ptr + row * 16 + 2], mem[ptr + row * 16 + 3],
+					mem[ptr + row * 16 + 4], mem[ptr + row * 16 + 5], mem[ptr + row * 16 + 6], mem[ptr + row * 16 + 7], mem[ptr + row * 16 + 8],
+					mem[ptr + row * 16 + 9], mem[ptr + row * 16 + 10], mem[ptr + row * 16 + 11], mem[ptr + row * 16 + 12], mem[ptr + row * 16 + 13],
+					mem[ptr + row * 16 + 14], mem[ptr + row * 16 + 15], cast(char) mem[ptr + row * 16 + 0], cast(char) mem[ptr + row * 16 + 1],
+					cast(char) mem[ptr + row * 16 + 2], cast(char) mem[ptr + row * 16 + 3], cast(char) mem[ptr + row * 16 + 4],
+					cast(char) mem[ptr + row * 16 + 5], cast(char) mem[ptr + row * 16 + 6], cast(char) mem[ptr + row * 16 + 7],
+					cast(char) mem[ptr + row * 16 + 8], cast(char) mem[ptr + row * 16 + 9], cast(char) mem[ptr + row * 16 + 10],
+					cast(char) mem[ptr + row * 16 + 11], cast(char) mem[ptr + row * 16 + 12], cast(char) mem[ptr + row * 16 + 13],
 					cast(char) mem[ptr + row * 16 + 14], cast(char) mem[ptr + row * 16 + 15]);
 		}
 	}
@@ -728,8 +759,7 @@ private void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr)
 		{
 
 			log.trace("ptr_to_mem:0 ptr={:X}, addr={:X}        {:X},{:X},{:X},{:X}", ptr, addr, b1, b2, b3, b4);
-			log.trace("ptr_to_mem ptr={:X4}  addr={:X4} {:X2},{:X2},{:X2},{:X2}", ptr, addr, mem[ptr + 0],
-					mem[ptr + 1], mem[ptr + 2], mem[ptr + 3]);
+			log.trace("ptr_to_mem ptr={:X4}  addr={:X4} {:X2},{:X2},{:X2},{:X2}", ptr, addr, mem[ptr + 0], mem[ptr + 1], mem[ptr + 2], mem[ptr + 3]);
 		}
 
 	}

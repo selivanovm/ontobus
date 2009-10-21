@@ -46,8 +46,8 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	// найдем все ACL записи для заданных user и elementId 
 	uint* iterator1 = ts.getTriples(cast(char*) pp, user, elementId, idx_name.S1PPOO);
 
-//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
-//	print_list_triple(iterator1);
+	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
+	//	print_list_triple(iterator1);
 
 	if(lookRightOfIterator(iterator1, rt_symbols + rightType, ts) == true)
 		return true;
@@ -57,8 +57,8 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	{
 		uint* iterator2 = ts.getTriples(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
 
-//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
-//		print_list_triple(iterator2);
+		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
+		//		print_list_triple(iterator2);
 
 		if(lookRightOfIterator(iterator2, rt_symbols + rightType, ts) == true)
 			return true;
@@ -67,7 +67,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	return false;
 }
 
-bool lookRightOfIterator(uint* iterator3, char *rightType, TripleStorage ts)
+bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts)
 {
 
 	//		log.trace("checkRight query: p1={}, p2={}, o1={}, o2={}", "magnet-ontology/authorization/acl#targetSubsystemElement",
@@ -94,10 +94,10 @@ bool lookRightOfIterator(uint* iterator3, char *rightType, TripleStorage ts)
 
 					while(*triple2_o != 0)
 					{
-					  //					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
-					  if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
-					    return true;
-					  triple2_o++;
+						//					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
+						if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
+							return true;
+						triple2_o++;
 					}
 				}
 			}

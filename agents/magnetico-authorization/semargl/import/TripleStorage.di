@@ -20,6 +20,7 @@ private
 {
     import tango.util.container.HashMap;
 }
+import tango.stdc.stringz;
 enum idx_name 
 {
 S = 1 << 0,
@@ -149,15 +150,11 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    bool removeTriple(char* s, char* p, char* o);
-}
-    public
-{
     bool removeTriple(char[] s, char[] p, char[] o);
 }
     public
 {
-    bool addTriple(char[] s, char[] p, char[] o);
+    int addTriple(char[] s, char[] p, char[] o);
 }
     public
 {
@@ -165,6 +162,10 @@ count_look_predicate_on_idx_s1ppoo++;
 {
 log.trace("*** statistic read *** \x0aindex s={} reads \x0aindex p={} reads \x0aindex o={} reads \x0aindex sp={} reads \x0aindex po={} reads \x0aindex so={} reads \x0aindex spo={} reads \x0a",stat__idx_s__reads,stat__idx_p__reads,stat__idx_o__reads,stat__idx_sp__reads,stat__idx_po__reads,stat__idx_so__reads,stat__idx_spo__reads);
 }
+}
+    public
+{
+    void do_things(char* ooo);
 }
 }
 private
