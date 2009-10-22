@@ -183,8 +183,6 @@ class Authorization
 
 		log.trace("authorization init ... ok");
 		Stdout.format("authorization init.. ok").newline;
-
-		ts.print_stat();
 	}
 
 	public void logginTriple(char command, char[] s, char[] p, char[] o)
@@ -241,8 +239,8 @@ class Authorization
 		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
 			return scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 
-		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && 
-		   strcmp(authorizedElementCategory, "DOCUMENT") == 0)
+		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
+				authorizedElementCategory, "DOCUMENT") == 0)
 			if(scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts))
 				return false;
 
@@ -253,12 +251,12 @@ class Authorization
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts);
 			//log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
+		
 		if(calculatedRight == true)
 		{
 			//log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
-
 
 		if(calculatedRight == false)
 		{
@@ -272,7 +270,7 @@ class Authorization
 			//log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		}
 
-		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null, false);
+		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
@@ -394,42 +392,42 @@ class Authorization
 		if(elements_id > 0)
 		{
 			log.trace("object = {}", getString(fact_o[elements_id]));
-			start_facts_set = ts.getTriples(null, null, fact_o[elements_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[elements_id]);
 		}
 		else if(author_subsystem_element_id > 0)
 		{
 			start_set_marker = 1;
-			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_element_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_element_id]);
 		}
 		else if(target_subsystem_element_id > 0)
 		{
 			start_set_marker = 2;
-			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_element_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_element_id]);
 		}
 		else if(category_id > 0)
 		{
 			start_set_marker = 3;
-			start_facts_set = ts.getTriples(null, null, fact_o[category_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[category_id]);
 		}
 		else if(author_subsystem_id > 0)
 		{
 			start_set_marker = 4;
-			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_id]);
 		}
 		else if(target_subsystem_id > 0)
 		{
 			start_set_marker = 5;
-			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_id]);
 		}
 		else if(author_system_id > 0)
 		{
 			start_set_marker = 6;
-			start_facts_set = ts.getTriples(null, null, fact_o[author_system_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[author_system_id]);
 		}
 		else if(target_system_id > 0)
 		{
 			start_set_marker = 7;
-			start_facts_set = ts.getTriples(null, null, fact_o[target_system_id], false);
+			start_facts_set = ts.getTriples(null, null, fact_o[target_system_id]);
 		}
 
 		log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id, author_subsystem_element_id,
@@ -456,7 +454,7 @@ class Authorization
 				{
 					char* s = cast(char*) triple + 6;
 
-					uint* founded_facts = ts.getTriples(s, null, null, false);
+					uint* founded_facts = ts.getTriples(s, null, null);
 					uint* founded_facts_copy = founded_facts;
 					if(founded_facts !is null)
 					{

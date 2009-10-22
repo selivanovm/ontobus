@@ -10,12 +10,12 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
 	// Stdout.format("rightType = {}", rightType).newline;
 	// Если документ хотят редактировать или удалять
-		// Но он находится в документообороте
-		if(isInDocFlow(elementId, ts))
-		{
-			//  			   log.debug('Документ находится в документообороте. Доступ для модификации запрещён.')
-			return true;
-		}
+	// Но он находится в документообороте
+	if(isInDocFlow(elementId, ts))
+	{
+		//  			   log.debug('Документ находится в документообороте. Доступ для модификации запрещён.')
+		return true;
+	}
 
 	return false;
 

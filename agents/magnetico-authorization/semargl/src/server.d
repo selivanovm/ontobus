@@ -226,7 +226,7 @@ void get_message(byte* message, ulong message_size)
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
 
-				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo, false);
+				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
 				if(list_facts !is null)
@@ -268,7 +268,7 @@ void get_message(byte* message, ulong message_size)
 					}
 				}
 
-				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
+				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null);
 
 				if(removed_facts !is null)
 				{
@@ -341,7 +341,7 @@ void get_message(byte* message, ulong message_size)
 				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
 						getString(arg_o));
 
-				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o, false);
+				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o);
 
 				if(removed_subjects !is null)
 				{
@@ -356,7 +356,7 @@ void get_message(byte* message, ulong message_size)
 							char* s = cast(char*) triple + 6;
 							log.trace("removed_subjects <{}>", getString(s));
 
-							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null, false);
+							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
 							if(removed_facts !is null)
 							{

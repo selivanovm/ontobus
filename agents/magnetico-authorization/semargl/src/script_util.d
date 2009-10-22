@@ -11,7 +11,7 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 {
 	//log.trace("isInDocFlow, elementId={}", getString(elementId));
 	// найдем субьекта ACL записи по <magnet-ontology#elementId>=elementId
-	uint* iterator0 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId, false);
+	uint* iterator0 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId);
 	char* ACL_subject;
 
 	if(iterator0 !is null)
@@ -21,8 +21,8 @@ public bool isInDocFlow(char* elementId, TripleStorage ts)
 		//log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
 
 		// найдем автора 
-		iterator0 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW", false);
-		
+		iterator0 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
+
 		if(iterator0 !is null)
 		{
 			//log.trace("да, документ в документообороте {}", getString(elementId));
@@ -47,7 +47,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
-	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null, false);
+	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null);
 
 	//	print_list_triple(iterator0);
 
@@ -65,7 +65,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 		while(next_branch !is null)
 		{
-			uint* iterator1 = ts.getTriples(null, "magnet-ontology#hasPart", next_branch, false);
+			uint* iterator1 = ts.getTriples(null, "magnet-ontology#hasPart", next_branch);
 			next_branch = null;
 			if(iterator1 !is null)
 			{
@@ -112,7 +112,7 @@ public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts
 public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
 {
 
-	uint* delegates_facts = ts.getTriples(null, "magnet-ontology/authorization/acl#delegate", delegate_id, false);
+	uint* delegates_facts = ts.getTriples(null, "magnet-ontology/authorization/acl#delegate", delegate_id);
 
 	if(delegates_facts !is null)
 	{
@@ -125,7 +125,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 			if(de_legate !is null)
 			{
 				char* subject = cast(char*) de_legate + 6;
-				uint* owners_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#owner", null, false);
+				uint* owners_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#owner", null);
 
 				if(owners_facts !is null)
 				{
@@ -146,7 +146,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							 result_ptr += strlen(object);*/
 							process_delegate(object);
 
-							uint* with_tree_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#withTree", null, false);
+							uint* with_tree_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#withTree", null);
 							if(with_tree_facts !is null)
 							{
 								uint next_with_tree = 0xFF;

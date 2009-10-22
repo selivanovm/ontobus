@@ -38,7 +38,7 @@ private
 
 		log = Log.getLogger("trace");
 
-		_logFile = new AppendFile("hashMap.log", new VerySimpleLayout);
+		_logFile = new AppendFile("trioplax.log", new VerySimpleLayout);
 		log.add(_logFile);
 	}
 

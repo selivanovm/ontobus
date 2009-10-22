@@ -44,7 +44,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
 	// найдем все ACL записи для заданных user и elementId 
-	uint* iterator1 = ts.getTriples(cast(char*) pp, user, elementId, idx_name.S1PPOO);
+	uint* iterator1 = ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
 
 	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
@@ -55,7 +55,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
 	for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
 	{
-		uint* iterator2 = ts.getTriples(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
+		uint* iterator2 = ts.getTriplesUseIndex(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
 
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);

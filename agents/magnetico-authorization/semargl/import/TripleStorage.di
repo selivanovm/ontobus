@@ -18,9 +18,8 @@ private
 }
 private
 {
-    import tango.util.container.HashMap;
+    import tango.stdc.stringz;
 }
-import tango.stdc.stringz;
 enum idx_name 
 {
 S = 1 << 0,
@@ -92,31 +91,7 @@ class TripleStorage
 }
     private
 {
-    ulong stat__idx_s__reads = 0;
-}
-    private
-{
-    ulong stat__idx_p__reads = 0;
-}
-    private
-{
-    ulong stat__idx_o__reads = 0;
-}
-    private
-{
-    ulong stat__idx_sp__reads = 0;
-}
-    private
-{
-    ulong stat__idx_po__reads = 0;
-}
-    private
-{
-    ulong stat__idx_so__reads = 0;
-}
-    private
-{
-    ulong stat__idx_spo__reads = 0;
+    bool log_stat_info = false;
 }
     uint max_count_element = 100000;
     uint max_length_order = 4;
@@ -131,6 +106,13 @@ class TripleStorage
     this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length);
     public
 {
+    void set_stat_info_logging(bool flag)
+{
+log_stat_info = flag;
+}
+}
+    public
+{
     void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 {
 look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
@@ -142,11 +124,11 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    uint* getTriples(char* s, char* p, char* o, ubyte useindex);
+    uint* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
 }
     public
 {
-    uint* getTriples(char* s, char* p, char* o, bool debug_info);
+    uint* getTriples(char* s, char* p, char* o);
 }
     public
 {
@@ -158,23 +140,6 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    void print_stat()
-{
-log.trace("*** statistic read *** \x0aindex s={} reads \x0aindex p={} reads \x0aindex o={} reads \x0aindex sp={} reads \x0aindex po={} reads \x0aindex so={} reads \x0aindex spo={} reads \x0a",stat__idx_s__reads,stat__idx_p__reads,stat__idx_o__reads,stat__idx_sp__reads,stat__idx_po__reads,stat__idx_so__reads,stat__idx_spo__reads);
-}
-}
-    public
-{
     void do_things(char* ooo);
-}
-}
-private
-{
-    static 
-{
-    char[] _toString(char* s)
-{
-return s ? s[0..strlen(s)] : cast(char[])null;
-}
 }
 }
