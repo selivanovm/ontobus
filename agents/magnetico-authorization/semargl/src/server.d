@@ -122,6 +122,7 @@ void get_message(byte* message, ulong message_size)
 			int get_authorization_rights_records_id = -1;
 			int add_delegates_id = -1;
 			int get_delegate_assigners_tree_id = -1;
+			int agent_function_id = -1;
 
 			for(int i = 0; i < count_facts; i++)
 			{
@@ -188,6 +189,15 @@ void get_message(byte* message, ulong message_size)
 												get_delegate_assigners_tree_id = i;
 												//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 											}
+											else
+											{
+												if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0 && strcmp(fact_p[i],
+														"magnet-ontology#subject") == 0)
+												{
+													agent_function_id = i;
+												}
+											}
+
 										}
 									}
 								}
@@ -200,6 +210,34 @@ void get_message(byte* message, ulong message_size)
 			}
 
 			log.trace("разбор сообщения закончен");
+
+			if(agent_function_id >= 0 && arg_id > 0)
+			{
+				/* пример сообщения: установить в модуле trioplax флаг set_stat_info_logging = true
+				 
+				 <2014a><magnet-ontology#subject><magnet-ontology#agent_function>.
+				 <2014a><magnet-ontology/transport#argument>
+				 {<trioplax><set_stat_info_logging>"true".}.
+				 <85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
+				 <85f3><magnet-ontology/transport#argument>"2014a".
+				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
+				 */
+				int i = 0;
+				for(; i < count_facts; i++)
+				{
+					if(is_fact_in_object[i] == arg_id)
+						break;
+				}
+				log.trace("agent_function s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+
+				if(strcmp(fact_s[i], "trioplax") == 0 && strcmp(fact_p[i], "set_stat_info_logging"))
+				{
+					if(strcmp(fact_o[i], "true") == 0)
+						az.getTripleStorage.set_stat_info_logging(true);
+					else
+						az.getTripleStorage.set_stat_info_logging(false);
+				}
+			}
 
 			if(get_id >= 0 && arg_id > 0)
 			{
@@ -424,8 +462,8 @@ void get_message(byte* message, ulong message_size)
 						if(strlen(fact_s[i]) == 0)
 							fact_s[i] = uuid;
 
-						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-							  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+								cast(char*) fact_o[i]));
 						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 					}
