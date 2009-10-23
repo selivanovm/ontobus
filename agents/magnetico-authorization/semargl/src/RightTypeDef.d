@@ -1,5 +1,7 @@
 module RightTypeDef;
 
+public static char* rt_symbols = "crwud";
+
 enum RightType
 {
 	CREATE = 0,

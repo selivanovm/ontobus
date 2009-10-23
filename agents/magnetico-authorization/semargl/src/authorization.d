@@ -241,8 +241,18 @@ class Authorization
 
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
 				authorizedElementCategory, "DOCUMENT") == 0)
-			if(scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts))
+		{
+			int result = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
+			switch(result)
+			{
+			case 0:
 				return false;
+			case 1:
+				return true;
+			default:
+				break;
+			}
+		}
 
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
 				authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
@@ -264,11 +274,11 @@ class Authorization
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
-		{
-			calculatedRight = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
+		//		if(calculatedRight == false)
+		//		{
+		//			calculatedRight = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
 			//log.trace("authorize:S05InDocFlow res={}", calculatedRight);
-		}
+		//		}
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 

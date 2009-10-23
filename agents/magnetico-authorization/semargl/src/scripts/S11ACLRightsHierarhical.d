@@ -10,7 +10,7 @@ private import tango.stdc.posix.stdio;
 private import fact_tools;
 private import Log;
 
-public static char* rt_symbols = "crwud";
+
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
 		char[] pp)
