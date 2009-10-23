@@ -246,11 +246,11 @@ class Authorization
 			switch(result)
 			{
 			case 0:
-				return false;
+			  return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
 			case 1:
-				return true;
+			  return true;
 			default:
-				break;
+			  break;
 			}
 		}
 
