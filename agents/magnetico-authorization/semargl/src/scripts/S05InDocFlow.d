@@ -2,6 +2,7 @@ module scripts.S05InDocFlow;
 
 import RightTypeDef;
 import TripleStorage;
+import tango.stdc.stringz;
 private import tango.io.Stdout;
 //import str_tool;
 import script_util;
@@ -17,25 +18,25 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 	if(df_right !is null)
 	{
 
-	  log.trace("isInDocFlow #1"):
+	  log.trace("isInDocFlow #1");
 
 		uint* iterator = ts.getTriples(df_right, "magnet-ontology/authorization/acl#targetSubsystemElement", user);
 		if(iterator !is null)
 		{
 
-		log.trace("isInDocFlow #2"):
+		  log.trace("isInDocFlow #2");
 
 			iterator = ts.getTriples(df_right, "magnet-ontology/authorization/acl#rights", null);
 			if(iterator !is null)
 			{
 
-			log.trace("isInDocFlow #3"):
+			  log.trace("isInDocFlow #3");
 
 				byte* triple = cast(byte*) *iterator;
 				if(triple !is null)
 				{
 
-				log.trace("isInDocFlow #4"):
+				  log.trace("isInDocFlow #4");
 
 					// проверим, есть ли тут требуемуе нами право
 					char* triple2_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) 
