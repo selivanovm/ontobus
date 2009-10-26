@@ -239,25 +239,22 @@ class Authorization
 		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
 			return scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 
+		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
 				authorizedElementCategory, "DOCUMENT") == 0)
 		{
-			int result = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
-			switch(result)
-			{
-			case 0:
-			  return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
-			case 1:
-			  return true;
-			default:
-			  break;
-			}
+			is_in_docflow = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
+			if(is_in_docflow == 1)
+				return true;
+			else if(is_in_docflow == 0)
+				return false;
 		}
 
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
 				authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
 
 		{
+
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts);
 			//log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}

@@ -30,25 +30,34 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 		if(iterator1 !is null) // если не null, значит право с найденным субъектом создал документооборот
 		  {
 		    
-		    log.trace("isInDocFlow : subject = {}", fromStringz(ACL_subject));
-		    
+			  char* subject1 = cast(char*) triple + 6;
+
+			  log.trace("isInDocFlow : subject = {} | s1", fromStringz(ACL_subject), fromStringz(subject1));
+
+			  is_in_docflow = true;			  
+
 		    uint* iterator2 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#targetSubsystemElement", user);
 		    if(iterator2 !is null) // если не null, значит target для права это наш user
 		      {
+
+			subject1 = cast(char*) triple + 6;
 			
-			log.trace("isInDocFlow #2");
-			is_in_docflow = true;
+			log.trace("isInDocFlow #2 {}", fromStringz(subject1));
+
+
 			uint* iterator3 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#rights", null);
 			if(iterator3 !is null) 
 			  {
 			    
-			    log.trace("isInDocFlow #3");
+				  subject1 = cast(char*) triple + 6;
+
+				  log.trace("isInDocFlow #3 | {}", subject1);
 			    
 			    triple = cast(byte*) *iterator3;
 			    if(triple !is null)
 			      {
-				
-				log.trace("isInDocFlow #4");
+				  subject1 = cast(char*) triple + 6;				
+				  log.trace("isInDocFlow #4 | {}", subject1);
 				
 				// проверим, есть ли тут требуемуе нами право
 				char* triple2_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) 
