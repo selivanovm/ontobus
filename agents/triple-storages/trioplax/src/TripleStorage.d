@@ -312,7 +312,7 @@ class TripleStorage
 			}
 
 			//		log.trace("addTriple:add index spo");
-			idx_spo.put(s, p, o, null);
+			idx_spo.put(s, p, o, null, false);
 			//log.trace("addTriple #2");
 			//		log.trace("addTriple:get this index as triple");
 			list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
@@ -329,25 +329,25 @@ class TripleStorage
 			//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, fromStringz(cast(char*) (triple + 6)));
 
 			if(idx_s !is null)
-				idx_s.put(s, null, null, triple);
+				idx_s.put(s, null, null, triple, false);
 			//log.trace("addTriple #4");
 			if(idx_p !is null)
-				idx_p.put(p, null, null, triple);
+				idx_p.put(p, null, null, triple, false);
 			//log.trace("addTriple #5");
 			if(idx_o !is null)
-				idx_o.put(o, null, null, triple);
+				idx_o.put(o, null, null, triple, false);
 			//log.trace("addTriple #6");
 			if(idx_sp !is null)
-				idx_sp.put(s, p, null, triple);
+				idx_sp.put(s, p, null, triple, false);
 			//log.trace("addTriple #7");
 			if(idx_po !is null)
 			{
 				//			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, fromStringz(cast(char*)triple));
-				idx_po.put(p, o, null, triple);
+				idx_po.put(p, o, null, triple, false);
 			}
 			//log.trace("addTriple #8");
 			if(idx_so !is null)
-				idx_so.put(s, o, null, triple);
+				idx_so.put(s, o, null, triple, false);
 			//log.trace("addTriple #9");
 			/* 
 			 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
@@ -376,7 +376,7 @@ class TripleStorage
 
 							//							log.trace("add A: p1 = {}, p2 = {}", p1, p2);
 							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-							idx_s1ppoo.put(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, triple);
+							idx_s1ppoo.put(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, triple, false);
 						}
 
 					}
@@ -397,7 +397,7 @@ class TripleStorage
 
 							//							log.trace("add B: p1 = {}, p2 = {}", p1, p2);
 							// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-							idx_s1ppoo.put(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, triple);
+							idx_s1ppoo.put(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, triple, false);
 						}
 
 					}

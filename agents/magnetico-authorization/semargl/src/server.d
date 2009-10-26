@@ -40,7 +40,7 @@ void main(char[][] args)
 {
 	az = new Authorization();
 
-	result_buffer = cast(char*) new char[10 * 1024];
+	result_buffer = cast(char*) new char[200 * 1024];
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
@@ -196,6 +196,7 @@ void get_message(byte* message, ulong message_size)
 												{
 													agent_function_id = i;
 												}
+
 											}
 
 										}
@@ -250,6 +251,19 @@ void get_message(byte* message, ulong message_size)
 				 <85f3><magnet-ontology/transport#argument>"2014a".
 				 <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
 				 */
+
+				int reply_to_id = 0;
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(strlen(fact_o[i]) > 0)
+					{
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
+					}
+				}
+
 				int i = 0;
 				for(; i < count_facts; i++)
 				{
@@ -267,6 +281,16 @@ void get_message(byte* message, ulong message_size)
 				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+				result_ptr += 41;
+
 				if(list_facts !is null)
 				{
 					uint next_element1 = 0xFF;
@@ -282,11 +306,50 @@ void get_message(byte* message, ulong message_size)
 
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-							log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
+							//log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
+							
+							strcpy(result_ptr++, "<");
+							strcpy(result_ptr, s);
+							result_ptr += strlen(s);
+							strcpy(result_ptr, "><");
+							result_ptr += 2;
+							strcpy(result_ptr, p);
+							result_ptr += strlen(p);
+							strcpy(result_ptr, "><");
+							result_ptr += 2;
+							strcpy(result_ptr, o);
+							result_ptr += strlen(o);
+							strcpy(result_ptr, ">.");
+							result_ptr += 2;
 						}
 						next_element1 = *(list_facts + 1);
 						list_facts = cast(uint*) next_element1;
 					}
+
+
+					time = elapsed.stop;
+					log.trace("get triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+				
+					strcpy(result_ptr, "\".<");
+					result_ptr += 3;
+					strcpy(result_ptr, command_uid);
+					result_ptr += strlen(command_uid);
+					strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
+					result_ptr += 46;
+
+					strcpy(queue_name, fact_o[reply_to_id]);
+
+					log.trace("queue_name:{}", getString(queue_name));
+					log.trace("result:{}", getString(result_buffer));
+
+					elapsed.start;
+
+					client.send(queue_name, result_buffer);
+
+					time = elapsed.stop;
+
+					log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
 				}
 			}
 
@@ -637,31 +700,46 @@ void get_message(byte* message, ulong message_size)
 
 				for(uint i = 0; true; i++)
 				{
+					//log.trace("#1");
+
 					char prev_state_byte = *(autz_elements + i);
 
-					//								log.trace("this request on authorization #1.2, {} {}", i, *(autz_elements + i));
+					//					log.trace("this request on authorization #1.2, {} {}", i, *(autz_elements + i));
 
 					if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 					{
+
+						//log.trace("#2");
+
 						*(autz_elements + i) = 0;
 
+						//log.trace("#21");
+
 						docId = cast(char*) (autz_elements + doc_pos);
+
+						//log.trace("#22");
 
 						count_prepared_elements++;
 						bool calculatedRight;
 						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
-						//					log.trace("right = {}", calculatedRight);
+						//log.trace("right = {}", calculatedRight);
+
+						//log.trace("#23");
 
 						if(calculatedRight == false)
 						{
 							for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 							{
+								//log.trace("#3");
 								calculatedRight = az.authorize(fact_o[category_id], docId, hierarhical_delegates[ii], targetRightType,
 										hierarhical_departments_of_delegate[ii]);
 								if(calculatedRight == true)
 									break;
 							}
 						}
+
+
+						//log.trace("#4");
 
 						if(calculatedRight == false)
 						{
@@ -682,7 +760,9 @@ void get_message(byte* message, ulong message_size)
 							//							strcpy(result_ptr, docId);
 							//							result_ptr += strlen(docId);
 
-							//						log.trace("this request on authorization #1.4 true");
+							//log.trace("#5");
+							
+							//						//log.trace("this request on authorization #1.4 true");
 							count_authorized_doc++;
 						}
 
@@ -694,7 +774,11 @@ void get_message(byte* message, ulong message_size)
 						*(autz_elements + i) = 0;
 						break;
 					}
+					//log.trace("#6");
 				}
+
+
+				//log.trace("#7");
 
 				double total_time_calculate_right = time_calculate_right.stop;
 
