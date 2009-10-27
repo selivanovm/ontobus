@@ -322,19 +322,19 @@ public int cmp_date_with_tm(char* date, tm* timeinfo)
 
 public bool is_today_in_interval(char* from, char* to)
 {
-	log.trace("#itii 11");
+	//log.trace("#itii 11");
 
 	tm* timeinfo = get_local_time();
 
 	if(from !is null && strlen(from) == 10 && cmp_date_with_tm(from, timeinfo) > 0)
 		return false;
 
-	log.trace("#itii 22");
+	//log.trace("#itii 22");
 
 	if(to !is null && strlen(to) == 10 && cmp_date_with_tm(to, timeinfo) < 0)
 		return false;
 
-	log.trace("#itii 33");
+	//log.trace("#itii 33");
 	return true;
 }
 
