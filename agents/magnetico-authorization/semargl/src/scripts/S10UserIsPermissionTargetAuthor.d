@@ -14,7 +14,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	 * If elementId !contains @ => somebody asks "Can I update/delete right record with id == elementId" 
 	 */
 
-	log.trace("S10UserIsPermissionTargetAuthor #START");
+	//log.trace("S10UserIsPermissionTargetAuthor #START");
 
 	// do you see any dogs right here?
 	char* at = null;
@@ -28,50 +28,49 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		}
 	}
 
-	log.trace("S10UserIsPermissionTargetAuthor #1");
+	//log.trace("S10UserIsPermissionTargetAuthor #1");
 	char* author = null;
 	if(at is null)
 	// elementId - id of existing right record?
 	{
-		log.trace("S10UserIsPermissionTargetAuthor #2");
+		//log.trace("S10UserIsPermissionTargetAuthor #2");
 		author = getRightRecordAuthor(elementId, ts);
 	}
 	else
 	// elementId - object id
 	{
-		log.trace("S10UserIsPermissionTargetAuthor #3");
+		//log.trace("S10UserIsPermissionTargetAuthor #3");
 		author = getObjectAuthor(at, ts);
 	}
 
-	log.trace("S10UserIsPermissionTargetAuthor #4 author = {}, user = {}", fromStringz(author), fromStringz(user));
+	//log.trace("S10UserIsPermissionTargetAuthor #4 author = {}, user = {}", fromStringz(author), fromStringz(user));
 	return (author !is null && strcmp(user, author) == 0);
 
 }
 
 private char* getObjectAuthor(char* elementId, TripleStorage ts)
 {
-	log.trace("getObjectAuthor #START elementId = {}", fromStringz(elementId));
+	//log.trace("getObjectAuthor #START elementId = {}", fromStringz(elementId));
 	uint* iterator_facts_of_document = ts.getTriples(elementId, null, null);
-	log.trace("getObjectAuthor #1");
+	//log.trace("getObjectAuthor #1");
 	if(iterator_facts_of_document !is null)
 	{
 		uint next_element0 = 0xFF;
 		while(next_element0 > 0)
 		{
-			log.trace("getObjectAuthor #2");
+			//log.trace("getObjectAuthor #2");
 			byte* triple0 = cast(byte*) *iterator_facts_of_document;
-			log.trace("getObjectAuthor #3");
+			//log.trace("getObjectAuthor #3");
 			if(triple0 !is null)
 			{
-				log.trace("getObjectAuthor #4");
+				//log.trace("getObjectAuthor #4");
 				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-				log.trace("getObjectAuthor #5");
+				//log.trace("getObjectAuthor #5");
 				if(strcmp(triple0_p, "http://purl.org/dc/elements/1.1/creator") == 0)
 				{
-					log.trace("getObjectAuthor #6");
-					char*
-							result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-					log.trace("getObjectAuthor #1 {}", fromStringz(result));
+					//log.trace("getObjectAuthor #6");
+					char* result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+					//log.trace("getObjectAuthor #1 {}", fromStringz(result));
 					return result;
 				}
 			}
@@ -84,27 +83,26 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 
 private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 {
-	log.trace("getRightRecordAuthor #START");
+	//	log.trace("getRightRecordAuthor #START");
 	uint* iterator_facts_of_document = ts.getTriples(elementId, null, null);
-	log.trace("getRightRecordAuthor #1");
+	//	log.trace("getRightRecordAuthor #1");
 	if(iterator_facts_of_document !is null)
 	{
 		uint next_element0 = 0xFF;
 		while(next_element0 > 0)
 		{
-			log.trace("getRightRecordAuthor #2");
+			//			log.trace("getRightRecordAuthor #2");
 			byte* triple0 = cast(byte*) *iterator_facts_of_document;
-			log.trace("getRightRecordAuthor #3");
+			//			log.trace("getRightRecordAuthor #3");
 			if(triple0 !is null)
 			{
-				log.trace("getRightRecordAuthor #4");
+				//		log.trace("getRightRecordAuthor #4");
 				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-				log.trace("getRightRecordAuthor #5");
+				//				log.trace("getRightRecordAuthor #5");
 				if(strcmp(triple0_p, "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
 				{
-					char*
-							result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-					log.trace("getRightRecordAuthor #RESULT {}", fromStringz(result));
+					char* result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+					//					log.trace("getRightRecordAuthor #RESULT {}", fromStringz(result));
 					return result;
 				}
 			}

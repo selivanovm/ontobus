@@ -83,20 +83,28 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts)
 
 			if(triple3 !is null)
 			{
+				char* s = cast(char*) triple3 + 6;
 				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
 
 				if(strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
 				{
 					// проверим, есть ли тут требуемуе нами право
-					char*
-							triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
+					char* triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
 					//		log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
 
+					bool is_actual = false;
 					while(*triple2_o != 0)
 					{
 						//					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
 						if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
-							return true;
+						{
+							if(!is_actual)
+								is_actual = is_right_actual(s, ts);
+							if(is_actual)
+								return true;
+							else
+								break;
+						}
 						triple2_o++;
 					}
 				}

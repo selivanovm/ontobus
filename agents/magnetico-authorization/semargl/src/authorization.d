@@ -237,7 +237,8 @@ class Authorization
 		bool calculatedRight;
 
 		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
-			return scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts) || 
+				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 
 		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
@@ -477,8 +478,8 @@ class Authorization
 							{
 
 								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-								char*
-								o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+								char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + 
+											*(triple1 + 3) + 1);
 
 								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
 								                                                                     "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)

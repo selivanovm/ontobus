@@ -123,6 +123,7 @@ void get_message(byte* message, ulong message_size)
 			int add_delegates_id = -1;
 			int get_delegate_assigners_tree_id = -1;
 			int agent_function_id = -1;
+			int create_id = -1;
 
 			for(int i = 0; i < count_facts; i++)
 			{
@@ -196,6 +197,18 @@ void get_message(byte* message, ulong message_size)
 												{
 													agent_function_id = i;
 												}
+												else
+												{
+													if(put_id < 0 && 
+													   strcmp(fact_o[i], 
+														  "magnet-ontology/authorization/functions#create") == 0 && 
+													   strcmp(fact_p[i], "magnet-ontology#subject") == 0)
+													{
+														create_id = i;
+														put_id = i;
+													}
+												}
+
 
 											}
 
@@ -325,32 +338,31 @@ void get_message(byte* message, ulong message_size)
 						next_element1 = *(list_facts + 1);
 						list_facts = cast(uint*) next_element1;
 					}
-
-
-					time = elapsed.stop;
-					log.trace("get triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-				
-					strcpy(result_ptr, "\".<");
-					result_ptr += 3;
-					strcpy(result_ptr, command_uid);
-					result_ptr += strlen(command_uid);
-					strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-					result_ptr += 46;
-
-					strcpy(queue_name, fact_o[reply_to_id]);
-
-					log.trace("queue_name:{}", getString(queue_name));
-					log.trace("result:{}", getString(result_buffer));
-
-					elapsed.start;
-
-					client.send(queue_name, result_buffer);
-
-					time = elapsed.stop;
-
-					log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
 				}
+
+				time = elapsed.stop;
+				log.trace("get triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+				
+				strcpy(result_ptr, "\".<");
+				result_ptr += 3;
+				strcpy(result_ptr, command_uid);
+				result_ptr += strlen(command_uid);
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
+				result_ptr += 46;
+
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				log.trace("queue_name:{}", getString(queue_name));
+				log.trace("result:{}", getString(result_buffer));
+
+				elapsed.start;
+
+				client.send(queue_name, result_buffer);
+
+				time = elapsed.stop;
+
+				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
 			}
 
 			if(delete_subjects_id >= 0 && arg_id > 0)
@@ -473,8 +485,8 @@ void get_message(byte* message, ulong message_size)
 
 										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char*
-												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+										char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
+												       (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -514,22 +526,162 @@ void get_message(byte* message, ulong message_size)
 				char* uuid = cast(char*) new char[16];
 				longToHex(getUUID(), uuid);
 
+				// найдем триплет с elementId
+				int element_id = -1;
 				for(int i = 0; i < count_facts; i++)
 				{
-					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+					if(strcmp("magnet-ontology/authorization/acl#elementId", fact_p[i]) == 0)
 					{
-						reply_to_id = i;
+						element_id = i;
+						break;
 					}
-					else if(is_fact_in_object[i] == arg_id)
+				}
+				
+				// проверим есть ли такая запись в хранилище
+				bool is_exists = false;
+				if(create_id >= 0)
+				{
+					is_exists = true;
+					if(element_id >= 0)
 					{
-						if(strlen(fact_s[i]) == 0)
-							fact_s[i] = uuid;
+						log.trace("check for elementId = {}", getString(fact_o[element_id]));
+						uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[element_id]);
+						if(founded_facts !is null)
+						{
+							bool is_exists_not_null = false;
+							uint next_element = 0xFF;
+							while(next_element > 0 && is_exists)
+							{
+								byte* triple = cast(byte*) *founded_facts;
+								if(triple !is null)
+								{
+									is_exists_not_null = true;
+									char* s = cast(char*) triple + 6;
+									log.trace("check right record with subject = {}", getString(s));
+									for(int i = 0; i < count_facts; i++)
+									{
+										if(i != element_id && is_fact_in_object[i] == arg_id)
+										{
+											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
+											if(founded_facts2 is null)
+											{
+												is_exists = false;
+												break;
+											}
+											else
+											{
+												bool is_exists_not_null2 = false;
+												uint next_element2 = 0xFF;
+												while(next_element2 > 0 && is_exists)
+												{
+													byte* triple2 = cast(byte*) *founded_facts2;
+													if(triple2 !is null)
+													{
+														is_exists_not_null2 = true;
+														char* o = cast(char*) 
+															(triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
+															 (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-								cast(char*) fact_o[i]));
-						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+														if(strcmp(o, fact_o[i]) != 0)
+														{
+															is_exists = false;
+															break;
+														}
+															
+													}
+													next_element2 = *(founded_facts2 + 1);
+													founded_facts2 = cast(uint*) next_element2;
+												}
+												is_exists = is_exists_not_null2 && is_exists;
+											}
+										}
+									}
+
+
+								}
+								next_element = *(founded_facts + 1);
+								founded_facts = cast(uint*) next_element;
+							}
+							is_exists = is_exists_not_null && is_exists;
+						} 
+						else
+						{
+							log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
+							is_exists = false;
+						}
 					}
+					else
+					{
+						log.trace("elementId isn't present");
+					}
+
+					log.trace("is_exists = {}", is_exists);
+				}
+
+				if(!is_exists)
+				{
+					for(int i = 0; i < count_facts; i++)
+					{
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
+						else if(is_fact_in_object[i] == arg_id)
+						{
+							if(strlen(fact_s[i]) == 0)
+								fact_s[i] = uuid;
+							else
+							{
+								uuid = fact_s[i];
+								if(create_id >= 0)
+								{
+
+									uint* facts_to_remove = az.getTripleStorage.getTriples(fact_s[i], null, null);
+
+									if(facts_to_remove !is null)
+									{
+										uint next_element1 = 0xFF;
+										while(next_element1 > 0)
+										{
+											byte* triple = cast(byte*) *facts_to_remove;
+
+											if(triple !is null)
+											{
+
+												char* s = cast(char*) triple + 6;
+
+												char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+												char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+												log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
+
+												az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
+												az.logginTriple('D', getString(s), getString(p), getString(o));
+
+											}
+
+											next_element1 = *(facts_to_remove + 1);
+											facts_to_remove = cast(uint*) next_element1;
+										}
+
+									}
+
+									log.trace("removed record '{}'", getString(fact_s[i]));
+									create_id = -1;
+								}
+							}
+							
+							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+								  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+						}
+					}
+				}
+				else
+				{
+					log.trace("record already exists");
 				}
 
 				time = elapsed.stop;

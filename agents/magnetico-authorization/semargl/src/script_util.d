@@ -5,7 +5,10 @@ private import TripleStorage;
 private import tango.io.Stdout;
 private import fact_tools;
 private import Log;
+private import tango.text.convert.Integer;
 private import tango.stdc.string;
+private import tango.stdc.stringz;
+private import tango.stdc.time;
 
 public char* isInDocFlow(char* elementId, TripleStorage ts)
 {
@@ -190,4 +193,170 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 			delegates_facts = cast(uint*) next_delegate;
 		}
 	}
+}
+
+public bool is_right_actual(char* subject, TripleStorage ts)
+{
+	char* from;
+	char* to;
+
+	uint* from_iter = ts.getTriples(subject, "magnet-ontology/authorization/acl#dateFrom", null);
+
+	// log.trace("#1");
+
+	if(from_iter !is null)
+	{
+		uint next_el = 0xFF;
+		while(next_el > 0)
+		{
+			byte* el = cast(byte*) *from_iter;
+			if(el !is null)
+			{
+				from = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
+				if(el !is null)
+					break;
+				else
+					from = null;
+			}
+			next_el = *(from_iter + 1);
+			from_iter = cast(uint*) next_el;
+		}
+	}
+
+	//	log.trace("#10");
+
+	uint* to_iter = ts.getTriples(subject, "magnet-ontology/authorization/acl#dateTo", null);
+	if(to_iter !is null)
+	{
+		uint next_el = 0xFF;
+		while(next_el > 0)
+		{
+			byte* el = cast(byte*) *to_iter;
+			if(el !is null)
+			{
+				to = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
+				if(el !is null)
+					break;
+				else
+					to = null;
+			}
+			next_el = *(to_iter + 1);
+			to_iter = cast(uint*) next_el;
+		}
+	}
+
+	//	log.trace("#20");	
+
+	return is_today_in_interval(from, to);
+}
+
+public tm* get_local_time()
+{
+	time_t rawtime;
+	tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	return timeinfo;
+}
+
+public char[] get_year(tm* timeinfo)
+{
+	char[] lt = new char[4];
+	itoa(lt, cast(uint)timeinfo.tm_year + 1900);
+	return lt;
+}
+
+public char[] get_month(tm* timeinfo)
+{
+	char[] lt = new char[2];
+	itoa(lt, cast(uint)timeinfo.tm_mon + 1);
+	if(timeinfo.tm_mon < 9)
+		lt[0] = '0';
+	return lt;
+}
+
+public char[] get_day(tm* timeinfo)
+{
+	char[] lt = new char[2];
+	itoa(lt, cast(uint)timeinfo.tm_mday);
+	if(timeinfo.tm_mday < 10)
+		lt[0] = '0';
+	return lt;
+}
+
+public int cmp_date_with_tm(char* date, tm* timeinfo)
+{
+	
+	assert(strlen(date) == 10);
+
+	char[] today_y = get_year(timeinfo);
+	char[] today_m = get_month(timeinfo);
+	char[] today_d = get_day(timeinfo);
+
+	for(int i = 0; i < 4; i++)
+	{
+		if(*(date + i + 6) > today_y[i])
+			return 1;
+		else if(*(date + i + 6) < today_y[i])
+			return -1;
+	}
+
+	for(int i = 0; i < 2; i++)
+	{
+		if(*(date + i + 3) > today_m[i])
+			return 1;
+		else if(*(date + i + 3) < today_m[i])
+			return -1;
+	}
+
+	for(int i = 0; i < 2; i++)
+		if(*(date + i) > today_d[i])
+			return 1;
+		else if(*(date + i) < today_d[i])
+			return -1;
+
+	return 0;
+}
+
+public bool is_today_in_interval(char* from, char* to)
+{
+	log.trace("#itii 11");
+
+	tm* timeinfo = get_local_time();
+
+	if(from !is null && strlen(from) == 10 && cmp_date_with_tm(from, timeinfo) > 0)
+		return false;
+
+	log.trace("#itii 22");
+
+	if(to !is null && strlen(to) == 10 && cmp_date_with_tm(to, timeinfo) < 0)
+		return false;
+
+	log.trace("#itii 33");
+	return true;
+}
+
+unittest 
+{
+	
+	Stdout.format("\n ::: TESTS START ::: ").newline;
+
+	tm* timeinfo = get_local_time();
+	Stdout.format("\nLocal time : {}.{}.{}", get_day(timeinfo), get_month(timeinfo), get_year(timeinfo)).newline;
+
+	timeinfo.tm_year = 45;
+	timeinfo.tm_mon = 8;
+	timeinfo.tm_mday = 5;
+
+	char[] date = "05.09.1945";
+
+	Stdout.format("\n{} == {}.{}.{}?\n", date, get_day(timeinfo), get_month(timeinfo), get_year(timeinfo)).newline;
+
+	assert(cmp_date_with_tm(date.ptr, timeinfo) == 0);
+	assert(!is_today_in_interval("10.10.1990".ptr, "10.10.2000".ptr));
+	assert(is_today_in_interval("10.10.1990".ptr, "10.10.2200".ptr));
+
+	Stdout.format(" ::: TESTS FINISH ::: \n").newline;
 }

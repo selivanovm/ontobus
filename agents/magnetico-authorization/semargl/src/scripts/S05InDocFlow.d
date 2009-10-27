@@ -63,13 +63,21 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 				char* triple2_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) 
 							       + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 				
+				bool is_actual = false;
 				while(*triple2_o != 0)
-				  {
+				{
 				    log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), rightType);
 				    if(*triple2_o == *(rt_symbols + rightType) || *(triple2_o + 1) == *(rt_symbols + rightType))
-				      return 1;
+				    {
+					    if(!is_actual)
+						    is_actual = is_right_actual(ACL_subject, ts);
+					    if(is_actual)
+						    return 1;
+					    else
+						    break;
+				    }
 				    triple2_o++;
-				  }
+				}
 			      }
 			    
 			  }
