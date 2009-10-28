@@ -36,6 +36,8 @@ private char* result_buffer = null;
 private char* queue_name = null;
 private char* user = null;
 
+private bool logging_io_messages = true;
+
 void main(char[][] args)
 {
 	az = new Authorization();
@@ -72,8 +74,10 @@ void get_message(byte* message, ulong message_size)
 
 		*(message + message_size) = 0;
 
-		//		Stdout.format ("{}", message);
-		log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
+		if(logging_io_messages == true)
+		{
+			log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
+		}
 
 		auto elapsed = new StopWatch();
 		auto time_calculate_right = new StopWatch();
@@ -199,16 +203,13 @@ void get_message(byte* message, ulong message_size)
 												}
 												else
 												{
-													if(put_id < 0 && 
-													   strcmp(fact_o[i], 
-														  "magnet-ontology/authorization/functions#create") == 0 && 
-													   strcmp(fact_p[i], "magnet-ontology#subject") == 0)
+													if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#create") == 0 && strcmp(
+															fact_p[i], "magnet-ontology#subject") == 0)
 													{
 														create_id = i;
 														put_id = i;
 													}
 												}
-
 
 											}
 
@@ -250,6 +251,13 @@ void get_message(byte* message, ulong message_size)
 						az.getTripleStorage.set_stat_info_logging(true);
 					else
 						az.getTripleStorage.set_stat_info_logging(false);
+				}
+				if(strcmp(fact_s[i], "semargl") == 0 && strcmp(fact_p[i], "set_logging_io_messages"))
+				{
+					if(strcmp(fact_o[i], "true") == 0)
+						logging_io_messages = true;
+					else
+						logging_io_messages = false;
 				}
 			}
 
@@ -294,7 +302,6 @@ void get_message(byte* message, ulong message_size)
 				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
-
 				char* result_ptr = cast(char*) result_buffer;
 				char* command_uid = fact_s[0];
 
@@ -320,7 +327,7 @@ void get_message(byte* message, ulong message_size)
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 							//log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
-							
+
 							strcpy(result_ptr++, "<");
 							strcpy(result_ptr, s);
 							result_ptr += strlen(s);
@@ -342,7 +349,7 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 				log.trace("get triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-				
+
 				strcpy(result_ptr, "\".<");
 				result_ptr += 3;
 				strcpy(result_ptr, command_uid);
@@ -353,8 +360,10 @@ void get_message(byte* message, ulong message_size)
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
-
+				if(logging_io_messages == true)
+				{
+					log.trace("result:{}", getString(result_buffer));
+				}
 				elapsed.start;
 
 				client.send(queue_name, result_buffer);
@@ -424,8 +433,10 @@ void get_message(byte* message, ulong message_size)
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
-
+				if(logging_io_messages == true)
+				{
+					log.trace("result:{}", getString(result_buffer));
+				}
 				elapsed.start;
 
 				client.send(queue_name, result_buffer);
@@ -485,8 +496,8 @@ void get_message(byte* message, ulong message_size)
 
 										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
-												       (*(triple + 2) << 8) + *(triple + 3) + 1);
+										char*
+												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -536,7 +547,7 @@ void get_message(byte* message, ulong message_size)
 						break;
 					}
 				}
-				
+
 				// проверим есть ли такая запись в хранилище
 				bool is_exists = false;
 				if(create_id >= 0)
@@ -578,16 +589,15 @@ void get_message(byte* message, ulong message_size)
 													if(triple2 !is null)
 													{
 														is_exists_not_null2 = true;
-														char* o = cast(char*) 
-															(triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
-															 (*(triple + 2) << 8) + *(triple + 3) + 1);
+														char*
+																o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 														if(strcmp(o, fact_o[i]) != 0)
 														{
 															is_exists = false;
 															break;
 														}
-															
+
 													}
 													next_element2 = *(founded_facts2 + 1);
 													founded_facts2 = cast(uint*) next_element2;
@@ -597,13 +607,12 @@ void get_message(byte* message, ulong message_size)
 										}
 									}
 
-
 								}
 								next_element = *(founded_facts + 1);
 								founded_facts = cast(uint*) next_element;
 							}
 							is_exists = is_exists_not_null && is_exists;
-						} 
+						}
 						else
 						{
 							log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
@@ -652,7 +661,8 @@ void get_message(byte* message, ulong message_size)
 
 												char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-												char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+												char*
+														o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 												log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
 
@@ -671,9 +681,9 @@ void get_message(byte* message, ulong message_size)
 									create_id = -1;
 								}
 							}
-							
-							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-								  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+
+							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+									cast(char*) fact_o[i]));
 							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						}
@@ -713,8 +723,10 @@ void get_message(byte* message, ulong message_size)
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
-
+				if(logging_io_messages == true)
+				{
+					log.trace("result:{}", getString(result_buffer));
+				}
 				elapsed.start;
 
 				client.send(queue_name, result_buffer);
@@ -890,7 +902,6 @@ void get_message(byte* message, ulong message_size)
 							}
 						}
 
-
 						//log.trace("#4");
 
 						if(calculatedRight == false)
@@ -913,7 +924,7 @@ void get_message(byte* message, ulong message_size)
 							//							result_ptr += strlen(docId);
 
 							//log.trace("#5");
-							
+
 							//						//log.trace("this request on authorization #1.4 true");
 							count_authorized_doc++;
 						}
@@ -928,7 +939,6 @@ void get_message(byte* message, ulong message_size)
 					}
 					//log.trace("#6");
 				}
-
 
 				//log.trace("#7");
 
@@ -951,8 +961,11 @@ void get_message(byte* message, ulong message_size)
 						count_prepared_elements / total_time_calculate_right);
 
 				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
 
+				if(logging_io_messages == true)
+				{
+					log.trace("result:{}", getString(result_buffer));
+				}
 				elapsed.start;
 
 				client.send(queue_name, result_buffer);
@@ -971,6 +984,7 @@ void get_message(byte* message, ulong message_size)
 		//	printf("!!!! list_docid=%s\n", list_docid);
 
 		//	log.trace("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length));
+
 		log.trace("message successful prepared");
 	}
 }
