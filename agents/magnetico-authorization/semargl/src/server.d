@@ -43,7 +43,7 @@ private bool logging_io_messages = true;
 private Locale layout;
 
 void main(char[][] args)
-{	
+{
 	az = new Authorization();
 
 	result_buffer = cast(char*) new char[200 * 1024];
@@ -82,20 +82,23 @@ void get_message(byte* message, ulong message_size)
 		time = elapsed.stop;
 		log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
-		elapsed.start;
-		
-		auto tm = WallClock.now;
-		auto dt = Clock.toDate(tm);
-		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
-		File.append("io_messages.log", fromStringz(result_buffer));
-		File.append("io_messages.log", "\r\n\r\n\r\n");
+		if(logging_io_messages)
+		{
+			elapsed.start;
 
-		time = elapsed.stop;
-		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+			auto tm = WallClock.now;
+			auto dt = Clock.toDate(tm);
+			File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
+			File.append("io_messages.log", fromStringz(result_buffer));
+			File.append("io_messages.log", "\r\n\r\n\r\n");
+
+			time = elapsed.stop;
+			log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+		}
 	}
 
 	synchronized
-	{		
+	{
 		if(*(message + message_size - 1) != '.')
 		{
 			log.trace("invalid message");
@@ -108,18 +111,20 @@ void get_message(byte* message, ulong message_size)
 		auto time_calculate_right = new StopWatch();
 		double time;
 
-		elapsed.start;
-		char[] message_buffer = fromStringz(cast(char*)message);
-		auto tm = WallClock.now;
-		auto dt = Clock.toDate(tm);
-		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
-		File.append("io_messages.log", message_buffer);
-		File.append("io_messages.log", "\r\n\r\n");
-		time = elapsed.stop;
-		log.trace("logging input message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-		
-		elapsed.start;
+		if(logging_io_messages == true)
+		{
+			elapsed.start;
+			char[] message_buffer = fromStringz(cast(char*) message);
+			auto tm = WallClock.now;
+			auto dt = Clock.toDate(tm);
+			File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
+			File.append("io_messages.log", message_buffer);
+			File.append("io_messages.log", "\r\n\r\n");
+			time = elapsed.stop;
+			log.trace("logging input message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+		}
 
+		elapsed.start;
 
 		//	char check_right = 0;
 
@@ -353,7 +358,7 @@ void get_message(byte* message, ulong message_size)
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *list_facts;
-//						log.trace("list_fact {:X4}", list_facts);
+						//						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
 							char* s = cast(char*) triple + 6;
