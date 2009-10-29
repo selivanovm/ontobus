@@ -17,6 +17,8 @@ private import Integer = tango.text.convert.Integer;
 private import tango.io.Stdout;
 private import Text = tango.text.Util;
 private import tango.time.StopWatch;
+private import tango.time.WallClock;
+private import tango.time.Clock;
 
 private import HashMap;
 private import TripleStorage;
@@ -27,6 +29,7 @@ private import librabbitmq_client;
 private import script_util;
 private import RightTypeDef;
 private import fact_tools;
+private import tango.text.locale.Locale;
 
 private librabbitmq_client client = null;
 
@@ -37,9 +40,10 @@ private char* queue_name = null;
 private char* user = null;
 
 private bool logging_io_messages = true;
+private Locale layout;
 
 void main(char[][] args)
-{
+{	
 	az = new Authorization();
 
 	result_buffer = cast(char*) new char[200 * 1024];
@@ -60,6 +64,8 @@ void main(char[][] args)
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
+
+	layout = new Locale;
 }
 
 void get_message(byte* message, ulong message_size)
@@ -77,7 +83,10 @@ void get_message(byte* message, ulong message_size)
 		log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 
 		elapsed.start;
-
+		
+		auto tm = WallClock.now;
+		auto dt = Clock.toDate(tm);
+		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
 		File.append("io_messages.log", fromStringz(result_buffer));
 		File.append("io_messages.log", "\r\n\r\n\r\n");
 
@@ -101,6 +110,9 @@ void get_message(byte* message, ulong message_size)
 
 		elapsed.start;
 		char[] message_buffer = fromStringz(cast(char*)message);
+		auto tm = WallClock.now;
+		auto dt = Clock.toDate(tm);
+		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
 		File.append("io_messages.log", message_buffer);
 		File.append("io_messages.log", "\r\n\r\n");
 		time = elapsed.stop;

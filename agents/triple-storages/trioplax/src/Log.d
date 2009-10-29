@@ -10,10 +10,11 @@ module Log;
 
 private import tango.util.log.Log;
 
-private
-	import tango.time.Clock, tango.time.WallClock,
-
-	tango.util.log.AppendFile, tango.util.log.AppendConsole, tango.text.convert.Layout;
+private import tango.time.Clock;
+private import tango.time.WallClock;
+private import tango.util.log.AppendFile;
+private import tango.util.log.AppendConsole;
+private import tango.text.convert.Layout;
 
 package
 {
@@ -32,7 +33,8 @@ private
 		//-------------------- log -------------------------------------------------
 
 		// all loggers, as children of root, print also to console by default
-		Log.root.add(new AppendConsole(new VerySimpleLayout));
+		//                Log.root.add( new AppendConsole( new VerySimpleLayout ) );
+
 		// trace is the lowest level, so all levels are logged
 		Log.root.level(Logger.Level.Trace);
 
@@ -75,7 +77,7 @@ private
 				auto tm = event.time;
 				auto dt = (localTime) ? WallClock.toDate(tm) : Clock.toDate(tm);
 
-				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.day), convert(tmp[2 .. 4], dt.date.month), convert(tmp[4 .. 6],
+				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.month), convert(tmp[2 .. 4], dt.date.day), convert(tmp[4 .. 6],
 						dt.time.hours), convert(tmp[6 .. 8], dt.time.minutes), convert(tmp[8 .. 10], dt.time.seconds), convert(tmp[10 .. 13],
 						dt.time.millis), event.toString));
 			}
@@ -91,7 +93,7 @@ private
 				auto tm = event.time;
 				auto dt = (localTime) ? WallClock.toDate(tm) : Clock.toDate(tm);
 
-				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.day), convert(tmp[2 .. 4], dt.date.month), convert(tmp[4 .. 6],
+				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.month), convert(tmp[2 .. 4], dt.date.day), convert(tmp[4 .. 6],
 						dt.time.hours), convert(tmp[6 .. 8], dt.time.minutes), convert(tmp[8 .. 10], dt.time.seconds), convert(tmp[10 .. 13],
 						dt.time.millis), event.toString));
 			}
