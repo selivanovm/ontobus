@@ -58,59 +58,59 @@ class Authorization
 		uint d = 0;
 
 		// общая онтология
-		i_know_predicates[d++] = "magnet-ontology#put";                                                      //
-		i_know_predicates[d++] = "magnet-ontology#get";                                                      //
-		i_know_predicates[d++] = "magnet-ontology#delete";                                                   //
+		i_know_predicates[d++] = "magnet-ontology#put"; //
+		i_know_predicates[d++] = "magnet-ontology#get"; //
+		i_know_predicates[d++] = "magnet-ontology#delete"; //
 		i_know_predicates[d++] = "magnet-ontology#delete_by_subject";
 		i_know_predicates[d++] = "magnet-ontology#delete_subjects_by_predicate";
 
-		i_know_predicates[d++] = "magnet-ontology/subject";                                                  //
-		i_know_predicates[d++] = "magnet-ontology/argument";                                                 //
-		i_know_predicates[d++] = "magnet-ontology/result";                                                   //
-		i_know_predicates[d++] = "magnet-ontology/state";                                                    //
-		i_know_predicates[d++] = "magnet-ontology/data";                                                     //
-		i_know_predicates[d++] = "magnet-ontology/transport#set_from";                                       //
-		i_know_predicates[d++] = "magnet-ontology/transport/message#reply_to";                               // имя очереди для ответа на сообщение
+		i_know_predicates[d++] = "magnet-ontology/subject"; //
+		i_know_predicates[d++] = "magnet-ontology/argument"; //
+		i_know_predicates[d++] = "magnet-ontology/result"; //
+		i_know_predicates[d++] = "magnet-ontology/state"; //
+		i_know_predicates[d++] = "magnet-ontology/data"; //
+		i_know_predicates[d++] = "magnet-ontology/transport#set_from"; //
+		i_know_predicates[d++] = "magnet-ontology/transport/message#reply_to"; // имя очереди для ответа на сообщение
 
 		// онтология authorization
 
 		//		 функции авторизации
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#create";                           //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#update";                           //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#create"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#update"; //
 		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_authorization_rights_records"; //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#is_in_docflow";                    //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#is_admin";                         //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners";           //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners_tree";      //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#authorize";                        //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#is_in_docflow"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#is_admin"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners_tree"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#authorize"; //
 
 		//		 функции делегирования
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#remove_delegate";                  //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#add_delegates";                    //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners";           //
-		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners_tree";      //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#remove_delegate"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#add_delegates"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners"; //
+		i_know_predicates[d++] = "magnet-ontology/authorization/functions#get_delegate_assigners_tree"; //
 
 		//		 запись о праве, данная часть ACL требует переработки!
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSystem";                           //                         - система выдающая право, "BA"/"DOCFLOW"
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystem";                        //                 - "user"/routeName
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystemElement";                 // - id user or id route.
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSystem"; //                         - система выдающая право, "BA"/"DOCFLOW"
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystem"; //                 - "user"/routeName
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystemElement"; // - id user or id route.
 		//?		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; //                   - система, для которой выдали права, "BA"/"DOCFLOW".
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystem";                        //                 - "user"/"department".
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystemElement";                 // - user id or department id.
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystem"; //                 - "user"/"department".
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystemElement"; // - user id or department id.
 
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#category";                               //                                 - категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateFrom";                               //                                 - период действия прав (до (с возможностью указания открытых интервалов значение null)).
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateTo";                                 //                                 - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#elementId";                              //                                 - идентификатор элемента, на который выдаются права.
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rights";                                 //                                 - "c|r|u|d"
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#category"; //                                 - категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateFrom"; //                                 - период действия прав (до (с возможностью указания открытых интервалов значение null)).
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#dateTo"; //                                 - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#elementId"; //                                 - идентификатор элемента, на который выдаются права.
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#rights"; //                                 - "c|r|u|d"
 
 		//		 запись о делегировании
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#delegate";                               // - кому делегируют
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#owner";                                  // - кто делегирует
-		i_know_predicates[d++] = "magnet-ontology/authorization/acl#withTree";                               // - делегировать с учетом дерева делегатов
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#delegate"; // - кому делегируют
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#owner"; // - кто делегирует
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#withTree"; // - делегировать с учетом дерева делегатов
 
 		// document
-		i_know_predicates[d++] = "http://purl.org/dc/elements/1.1/creator";                                  // - создатель объекта(документа, типа документа, справочника)
+		i_know_predicates[d++] = "http://purl.org/dc/elements/1.1/creator"; // - создатель объекта(документа, типа документа, справочника)
 		i_know_predicates[d++] = "magnet-ontology#subject";
 		i_know_predicates[d++] = "magnet-ontology#typeName";
 
@@ -137,7 +137,7 @@ class Authorization
 		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
-		                         "magnet-ontology/authorization/acl#rights");
+				"magnet-ontology/authorization/acl#rights");
 
 		pp = "magnet-ontology/authorization/acl#targetSubsystemElement" ~ "magnet-ontology/authorization/acl#elementId";
 		//
@@ -200,24 +200,24 @@ class Authorization
 		if(command == 'A')
 		{
 			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 A <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6],
-			                                                                                                                      dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
-			                       convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
+					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
+					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
 			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 		else if(command == 'U')
 		{
 			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 U <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6],
-			                                                                                                                      dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
-			                       convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
+					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
+					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
 			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
 		else if(command == 'D')
 		{
 			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 D <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(tmp[4 .. 6],
-			                                                                                                                      dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
-			                       convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
+					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
+					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
 			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
 		}
@@ -230,19 +230,19 @@ class Authorization
 
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для заданного пользователя
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
-	                      char*[] hierarhical_departments)
+			char*[] hierarhical_departments)
 	{
 		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(authorizedElementCategory), getString(
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
 		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
-			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts) || 
-				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts) || scripts.S10UserIsPermissionTargetAuthor.calculate(
+					User, authorizedElementId, targetRightType, ts);
 
 		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
-		           authorizedElementCategory, "DOCUMENT") == 0)
+				authorizedElementCategory, "DOCUMENT") == 0)
 		{
 			is_in_docflow = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
 			if(is_in_docflow == 1)
@@ -252,7 +252,7 @@ class Authorization
 		}
 
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
-		                                                                                                                                          authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
+				authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
 
 		{
 
@@ -321,7 +321,7 @@ class Authorization
 	}
 
 	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer,
-	                                         librabbitmq_client client)
+			librabbitmq_client client)
 	{
 
 		log.trace("запрос на выборку записей прав");
@@ -351,7 +351,7 @@ class Authorization
 			if(strlen(fact_o[i]) > 0)
 			{
 				log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]), strlen(
-				                  fact_o[i]));
+						fact_o[i]));
 				if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
 				{
 					from_id = i;
@@ -439,9 +439,9 @@ class Authorization
 		}
 
 		log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id, author_subsystem_element_id,
-		          target_subsystem_element_id);
+				target_subsystem_element_id);
 		log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}", category_id,
-		          author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
+				author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
 		log.trace("start_set_marker = {}", start_set_marker);
 
 		strcpy(queue_name, fact_o[reply_to_id]);
@@ -478,16 +478,16 @@ class Authorization
 							{
 
 								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-								char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + 
-											*(triple1 + 3) + 1);
+								char*
+										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
-								                                                                     "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
+										"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
 								{
 									is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
 								}
 								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1,
-								                                                                     "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
+										"magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
 								{
 									is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
 								}
@@ -531,7 +531,7 @@ class Authorization
 									log.trace("...not null");
 									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
 									char*
-									o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 									strcpy(result_ptr++, "<");
 									strcpy(result_ptr, s);
@@ -592,7 +592,7 @@ class Authorization
 	}
 
 	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
-	                                     librabbitmq_client client)
+			librabbitmq_client client)
 	{
 
 		log.trace("команда на выборку делегировавших");
