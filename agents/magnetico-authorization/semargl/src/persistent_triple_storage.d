@@ -30,12 +30,14 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 	foreach(line; Text.lines(content))
 	{
+//		log.trace("line {}", line);
+		
 		char[] s, p, o;
 		char[] element;
 		int idx = 0;
 		char command = 'A';
 
-		uint b_pos = 0;
+		int b_pos = 0;
 		uint e_pos = 0;
 		for(uint i = 0; i < line.length; i++)
 		{
@@ -78,7 +80,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 
 		}
 
-		//	log.trace("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
+//			log.trace("persistent_triple_storage: add triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
 
 		if(s.length == 0 && p.length == 0 && o.length == 0)
 			continue;

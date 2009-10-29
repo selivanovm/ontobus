@@ -4,8 +4,8 @@ private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
 private import tango.stdc.stdlib;
-//private import std.string;
 private import tango.stdc.posix.stdio;
+private import tango.stdc.stringz;
 private import Log;
 
 private import tango.io.FileScan;
@@ -64,8 +64,29 @@ void main(char[][] args)
 
 void get_message(byte* message, ulong message_size)
 {
-	synchronized
+	void send_result_and_logging_messages(char[] message_buffer, char* result_buffer)
 	{
+		auto elapsed = new StopWatch();
+		double time;
+
+		log.trace("queue_name:{}", getString(queue_name));
+		elapsed.start;
+		client.send(queue_name, result_buffer);
+
+		time = elapsed.stop;
+		log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+		elapsed.start;
+
+		File.append("io_messages.log", fromStringz(result_buffer));
+		File.append("io_messages.log", "\r\n\r\n\r\n");
+
+		time = elapsed.stop;
+		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+	}
+
+	synchronized
+	{		
 		if(*(message + message_size - 1) != '.')
 		{
 			log.trace("invalid message");
@@ -74,16 +95,19 @@ void get_message(byte* message, ulong message_size)
 
 		*(message + message_size) = 0;
 
-		if(logging_io_messages == true)
-		{
-			log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
-		}
-
 		auto elapsed = new StopWatch();
 		auto time_calculate_right = new StopWatch();
+		double time;
+
+		elapsed.start;
+		char[] message_buffer = fromStringz(cast(char*)message);
+		File.append("io_messages.log", message_buffer);
+		File.append("io_messages.log", "\r\n\r\n");
+		time = elapsed.stop;
+		log.trace("logging input message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+		
 		elapsed.start;
 
-		double time;
 
 		//	char check_right = 0;
 
@@ -317,7 +341,7 @@ void get_message(byte* message, ulong message_size)
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *list_facts;
-						log.trace("list_fact {:X4}", list_facts);
+//						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
 							char* s = cast(char*) triple + 6;
@@ -359,19 +383,7 @@ void get_message(byte* message, ulong message_size)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				log.trace("queue_name:{}", getString(queue_name));
-				if(logging_io_messages == true)
-				{
-					log.trace("result:{}", getString(result_buffer));
-				}
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
+				send_result_and_logging_messages(message_buffer, result_buffer);
 			}
 
 			if(delete_subjects_id >= 0 && arg_id > 0)
@@ -432,19 +444,7 @@ void get_message(byte* message, ulong message_size)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				log.trace("queue_name:{}", getString(queue_name));
-				if(logging_io_messages == true)
-				{
-					log.trace("result:{}", getString(result_buffer));
-				}
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
+				send_result_and_logging_messages(message_buffer, result_buffer);
 			}
 
 			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
@@ -722,19 +722,7 @@ void get_message(byte* message, ulong message_size)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				log.trace("queue_name:{}", getString(queue_name));
-				if(logging_io_messages == true)
-				{
-					log.trace("result:{}", getString(result_buffer));
-				}
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
+				send_result_and_logging_messages(message_buffer, result_buffer);
 			}
 
 			// GET_DELEGATE_ASSIGNERS
@@ -960,22 +948,7 @@ void get_message(byte* message, ulong message_size)
 				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
 						count_prepared_elements / total_time_calculate_right);
 
-				log.trace("queue_name:{}", getString(queue_name));
-
-				if(logging_io_messages == true)
-				{
-					log.trace("result:{}", getString(result_buffer));
-				}
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
-				//			az.getTripleStorage().print_stat();
-
+				send_result_and_logging_messages(message_buffer, result_buffer);
 			}
 		}
 
@@ -985,8 +958,9 @@ void get_message(byte* message, ulong message_size)
 
 		//	log.trace("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length));
 
-		log.trace("message successful prepared");
+		log.trace("message successful prepared\r\n");
 	}
+
 }
 
 // Loads server properties
