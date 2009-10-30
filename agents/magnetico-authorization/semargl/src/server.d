@@ -567,7 +567,7 @@ void get_message(byte* message, ulong message_size)
 
 				// проверим есть ли такая запись в хранилище
 				bool is_exists = false;
-				if(create_id >= 0)
+				if(create_id >= 0 && strlen(fact_o[element_id]) > 0)
 				{
 					is_exists = true;
 					if(element_id >= 0)
