@@ -347,6 +347,8 @@ class Authorization
 
 		char* result_ptr = cast(char*) result_buffer;
 		char* command_uid = fact_s[0];
+		
+		byte patterns_cnt = 0;
 
 		for(int i = 0; i < count_facts; i++)
 		{
@@ -360,34 +362,42 @@ class Authorization
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0)
 				{
+					patterns_cnt++;
 					author_system_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystem") == 0)
 				{
+					patterns_cnt++;
 					author_subsystem_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
 				{
+					patterns_cnt++;
 					author_subsystem_element_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSystem") == 0)
 				{
+					patterns_cnt++;
 					target_system_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystem") == 0)
 				{
+					patterns_cnt++;
 					target_subsystem_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
 				{
+					patterns_cnt++;
 					target_subsystem_element_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0)
 				{
+					patterns_cnt++;
 					category_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
 				{
+					patterns_cnt++;
 					elements_id = i;
 				}
 				else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
@@ -470,6 +480,7 @@ class Authorization
 					{
 						uint next_element1 = 0xFF;
 						bool is_match = true;
+						byte checked_patterns_cnt = 1;
 						while(next_element1 > 0)
 
 						{
@@ -480,37 +491,43 @@ class Authorization
 							{
 
 								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-								char*
-										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+								char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
 										"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
 								}
 								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1,
 										"magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
 								}
 								if(start_set_marker < 3 && category_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[category_id]) == 0;
 								}
 								if(start_set_marker < 4 && author_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSubsystem") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[author_subsystem_id]) == 0;
 								}
 								if(start_set_marker < 5 && target_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSubsystem") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[target_subsystem_id]) == 0;
 								}
 								if(start_set_marker < 6 && author_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSystem") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[author_system_id]) == 0;
 								}
 								if(start_set_marker < 7 && target_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSystem") == 0)
 								{
+									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[target_system_id]) == 0;
 								}
 
@@ -520,7 +537,9 @@ class Authorization
 
 						}
 
-						if(is_match)
+						log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
+
+						if(is_match && checked_patterns_cnt == patterns_cnt)
 						{
 							log.trace("found match");
 							next_element1 = 0xFF;
