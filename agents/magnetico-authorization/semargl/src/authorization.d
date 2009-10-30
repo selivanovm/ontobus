@@ -46,6 +46,8 @@ private import TripleStorage;
 
 private import librabbitmq_client;
 
+private import server;
+
 class Authorization
 {
 	private char[][] i_know_predicates;
@@ -557,6 +559,8 @@ class Authorization
 						{
 							strcpy(result_ptr, "}.\0");
 
+							send_result_and_logging_messages(queue_name, result_buffer);
+							
 							client.send(queue_name, result_buffer);
 
 							result_ptr = cast(char*) result_buffer;

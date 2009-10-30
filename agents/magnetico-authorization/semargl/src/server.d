@@ -68,35 +68,35 @@ void main(char[][] args)
 	layout = new Locale;
 }
 
-void get_message(byte* message, ulong message_size)
+void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 {
-	void send_result_and_logging_messages(char[] message_buffer, char* result_buffer)
-	{
-		auto elapsed = new StopWatch();
-		double time;
+	auto elapsed = new StopWatch();
+	double time;
 
-		log.trace("queue_name:{}", getString(queue_name));
+	log.trace("queue_name:{}", getString(queue_name));
+	elapsed.start;
+	client.send(queue_name, result_buffer);
+
+	time = elapsed.stop;
+	log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+	if(logging_io_messages)
+	{
 		elapsed.start;
-		client.send(queue_name, result_buffer);
+
+		auto tm = WallClock.now;
+		auto dt = Clock.toDate(tm);
+		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
+		File.append("io_messages.log", fromStringz(result_buffer));
+		File.append("io_messages.log", "\r\n\r\n\r\n");
 
 		time = elapsed.stop;
-		log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
-		if(logging_io_messages)
-		{
-			elapsed.start;
-
-			auto tm = WallClock.now;
-			auto dt = Clock.toDate(tm);
-			File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
-			File.append("io_messages.log", fromStringz(result_buffer));
-			File.append("io_messages.log", "\r\n\r\n\r\n");
-
-			time = elapsed.stop;
-			log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-		}
+		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 	}
+}
 
+void get_message(byte* message, ulong message_size)
+{
 	synchronized
 	{
 		if(*(message + message_size - 1) != '.')
@@ -400,7 +400,7 @@ void get_message(byte* message, ulong message_size)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(message_buffer, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer);
 			}
 
 			if(delete_subjects_id >= 0 && arg_id > 0)
@@ -461,7 +461,7 @@ void get_message(byte* message, ulong message_size)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(message_buffer, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer);
 			}
 
 			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
@@ -699,10 +699,18 @@ void get_message(byte* message, ulong message_size)
 								}
 							}
 
-							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-									cast(char*) fact_o[i]));
-							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							try
+							{
+								log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+										cast(char*) fact_o[i]));
+								az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+								az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							}
+							catch(Exception ex)
+							{
+								log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]),
+										getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+							}
 						}
 					}
 				}
@@ -739,7 +747,7 @@ void get_message(byte* message, ulong message_size)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(message_buffer, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer);
 			}
 
 			// GET_DELEGATE_ASSIGNERS
@@ -965,7 +973,7 @@ void get_message(byte* message, ulong message_size)
 				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
 						count_prepared_elements / total_time_calculate_right);
 
-				send_result_and_logging_messages(message_buffer, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer);
 			}
 		}
 

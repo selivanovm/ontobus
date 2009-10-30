@@ -116,7 +116,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 			}
 			if(command == 'D')
 			{
-				log.trace("persistent_triple_storage: remove triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
+//				log.trace("persistent_triple_storage: remove triple [{}] <{}><{}><{}>", count_add_triple, s, p, o);
 				ts.removeTriple(s, p, o);
 			}
 
