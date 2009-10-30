@@ -537,16 +537,16 @@ class Authorization
 
 						}
 
-						log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
+						//log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
 
 						if(is_match && checked_patterns_cnt == patterns_cnt)
 						{
-							log.trace("found match");
+							//log.trace("found match");
 							next_element1 = 0xFF;
 							while(next_element1 > 0)
 							{
 								byte* triple1 = cast(byte*) *founded_facts_copy;
-								log.trace("#3");
+								//log.trace("#3");
 								if(triple1 !is null)
 								{
 									log.trace("...not null");
