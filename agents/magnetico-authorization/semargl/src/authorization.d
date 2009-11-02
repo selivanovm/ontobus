@@ -548,8 +548,8 @@ class Authorization
 								byte* triple1 = cast(byte*) *founded_facts_copy;
 								//log.trace("#3");
 								if(triple1 !is null)
-								{
-									log.trace("...not null");
+									{
+										//log.trace("...not null");
 									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
 									char*
 											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);

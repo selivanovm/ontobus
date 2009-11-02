@@ -437,7 +437,7 @@ void get_message(byte* message, ulong message_size)
 
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
+							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
 							az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
 							az.logginTriple('D', getString(s), getString(p), getString(o));
@@ -513,8 +513,7 @@ void get_message(byte* message, ulong message_size)
 
 										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char*
-												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+										char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -572,7 +571,7 @@ void get_message(byte* message, ulong message_size)
 					is_exists = true;
 					if(element_id >= 0)
 					{
-						log.trace("check for elementId = {}", getString(fact_o[element_id]));
+						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
 						uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[element_id]);
 						if(founded_facts !is null)
 						{
@@ -590,28 +589,30 @@ void get_message(byte* message, ulong message_size)
 									{
 										if(i != element_id && is_fact_in_object[i] == arg_id)
 										{
+											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
+											//  getString(fact_o[i]));
 											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
 											if(founded_facts2 is null)
 											{
+												// log.trace("#444");
 												is_exists = false;
 												break;
 											}
 											else
 											{
-												bool is_exists_not_null2 = false;
+												// log.trace("#555");
 												uint next_element2 = 0xFF;
+												bool is_exists2 = false;
 												while(next_element2 > 0 && is_exists)
 												{
 													byte* triple2 = cast(byte*) *founded_facts2;
 													if(triple2 !is null)
 													{
-														is_exists_not_null2 = true;
-														char*
-																o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+														char* o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
-														if(strcmp(o, fact_o[i]) != 0)
+														if(strcmp(o, fact_o[i]) == 0)
 														{
-															is_exists = false;
+															is_exists2 = true;
 															break;
 														}
 
@@ -619,9 +620,45 @@ void get_message(byte* message, ulong message_size)
 													next_element2 = *(founded_facts2 + 1);
 													founded_facts2 = cast(uint*) next_element2;
 												}
-												is_exists = is_exists_not_null2 && is_exists;
+												// log.trace("#666 {} {}", is_exists, is_exists2);
+												is_exists = is_exists2 && is_exists;
 											}
 										}
+									}
+									if(is_exists)
+									{
+
+										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+
+										if(removed_facts !is null)
+										{
+											uint next_element1 = 0xFF;
+											while(next_element1 > 0)
+											{
+												byte* triple2 = cast(byte*) *removed_facts;
+
+												if(triple2 !is null)
+												{
+
+													char* ss = cast(char*) triple2 + 6;
+
+													char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+
+													char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+
+													log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
+
+													az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
+													az.logginTriple('D', getString(ss), getString(pp), getString(oo));
+
+												}
+
+												next_element1 = *(removed_facts + 1);
+												removed_facts = cast(uint*) next_element1;
+											}
+
+										}
+
 									}
 
 								}
@@ -632,91 +669,44 @@ void get_message(byte* message, ulong message_size)
 						}
 						else
 						{
-							log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
+							//log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
 							is_exists = false;
 						}
 					}
 					else
 					{
-						log.trace("elementId isn't present");
+						//log.trace("elementId isn't present");
 					}
 
 					log.trace("is_exists = {}", is_exists);
 				}
 
-				if(!is_exists)
+				for(int i = 0; i < count_facts; i++)
 				{
-					for(int i = 0; i < count_facts; i++)
+					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
 					{
-						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						reply_to_id = i;
+					}
+					else if(is_fact_in_object[i] == arg_id)
+					{
+						if(strlen(fact_s[i]) == 0)
+							fact_s[i] = uuid;
+						else
+							uuid = fact_s[i];
+
+						try
 						{
-							reply_to_id = i;
+							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+																					   cast(char*) fact_o[i]));
+							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						}
-						else if(is_fact_in_object[i] == arg_id)
+						catch(Exception ex)
 						{
-							if(strlen(fact_s[i]) == 0)
-								fact_s[i] = uuid;
-							else
-							{
-								uuid = fact_s[i];
-								if(create_id >= 0)
-								{
-
-									uint* facts_to_remove = az.getTripleStorage.getTriples(fact_s[i], null, null);
-
-									if(facts_to_remove !is null)
-									{
-										uint next_element1 = 0xFF;
-										while(next_element1 > 0)
-										{
-											byte* triple = cast(byte*) *facts_to_remove;
-
-											if(triple !is null)
-											{
-
-												char* s = cast(char*) triple + 6;
-
-												char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-
-												char*
-														o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-
-												log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
-
-												az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
-												az.logginTriple('D', getString(s), getString(p), getString(o));
-
-											}
-
-											next_element1 = *(facts_to_remove + 1);
-											facts_to_remove = cast(uint*) next_element1;
-										}
-
-									}
-
-									log.trace("removed record '{}'", getString(fact_s[i]));
-									create_id = -1;
-								}
-							}
-
-							try
-							{
-								log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-										cast(char*) fact_o[i]));
-								az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-								az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-							}
-							catch(Exception ex)
-							{
-								log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]),
-										getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
-							}
+							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]),
+								  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 						}
 					}
-				}
-				else
-				{
-					log.trace("record already exists");
 				}
 
 				time = elapsed.stop;
