@@ -5,32 +5,45 @@ private import TripleStorage;
 private import tango.io.Stdout;
 private import fact_tools;
 private import Log;
+private import tango.text.convert.Integer;
 private import tango.stdc.string;
+private import tango.stdc.stringz;
+private import tango.stdc.time;
 
-public bool isInDocFlow(char* elementId, TripleStorage ts)
+public char* isInDocFlow(char* elementId, TripleStorage ts)
 {
 	//log.trace("isInDocFlow, elementId={}", getString(elementId));
 	// найдем субьекта ACL записи по <magnet-ontology#elementId>=elementId
-	uint* iterator0 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId, false);
+	uint* iterator0 = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId);
 	char* ACL_subject;
 
-	if(iterator0 !is null)
+	if(iterator0 !is null) // таких записей может быть несколько, но с DOCFLOW одна
 	{
+	  
+	  uint next_element = 0xFF;
+	  while(next_element > 0)
+	  {
 		byte* triple0 = cast(byte*) *iterator0;
-		ACL_subject = cast(char*) triple0 + 6;
-		//log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
 
-		// найдем автора 
-		iterator0 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW", false);
-		
-		if(iterator0 !is null)
+		if(triple0 !is null)
 		{
-			//log.trace("да, документ в документообороте {}", getString(elementId));
-			return true;
+		  ACL_subject = cast(char*) triple0 + 6;
+		  //log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
+
+		  // найдем автора 
+		  iterator0 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
+
+		  if(iterator0 !is null)
+		  {
+		    return ACL_subject;
+		  }
 		}
+		next_element = *(iterator0 + 1);
+		iterator0 = cast(uint*) next_element;
+	  }
 
 	}
-	return false;
+	return null;
 }
 
 /*
@@ -47,7 +60,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
-	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null, false);
+	iterator0 = ts.getTriples(user, "magnet-ontology#memberOf", null);
 
 	//	print_list_triple(iterator0);
 
@@ -65,7 +78,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 		while(next_branch !is null)
 		{
-			uint* iterator1 = ts.getTriples(null, "magnet-ontology#hasPart", next_branch, false);
+			uint* iterator1 = ts.getTriples(null, "magnet-ontology#hasPart", next_branch);
 			next_branch = null;
 			if(iterator1 !is null)
 			{
@@ -112,7 +125,7 @@ public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts
 public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
 {
 
-	uint* delegates_facts = ts.getTriples(null, "magnet-ontology/authorization/acl#delegate", delegate_id, false);
+	uint* delegates_facts = ts.getTriples(null, "magnet-ontology/authorization/acl#delegate", delegate_id);
 
 	if(delegates_facts !is null)
 	{
@@ -125,7 +138,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 			if(de_legate !is null)
 			{
 				char* subject = cast(char*) de_legate + 6;
-				uint* owners_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#owner", null, false);
+				uint* owners_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#owner", null);
 
 				if(owners_facts !is null)
 				{
@@ -146,7 +159,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							 result_ptr += strlen(object);*/
 							process_delegate(object);
 
-							uint* with_tree_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#withTree", null, false);
+							uint* with_tree_facts = ts.getTriples(subject, "magnet-ontology/authorization/acl#withTree", null);
 							if(with_tree_facts !is null)
 							{
 								uint next_with_tree = 0xFF;
@@ -180,4 +193,170 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 			delegates_facts = cast(uint*) next_delegate;
 		}
 	}
+}
+
+public bool is_right_actual(char* subject, TripleStorage ts)
+{
+	char* from;
+	char* to;
+
+	uint* from_iter = ts.getTriples(subject, "magnet-ontology/authorization/acl#dateFrom", null);
+
+	// log.trace("#1");
+
+	if(from_iter !is null)
+	{
+		uint next_el = 0xFF;
+		while(next_el > 0)
+		{
+			byte* el = cast(byte*) *from_iter;
+			if(el !is null)
+			{
+				from = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
+				if(el !is null)
+					break;
+				else
+					from = null;
+			}
+			next_el = *(from_iter + 1);
+			from_iter = cast(uint*) next_el;
+		}
+	}
+
+	//	log.trace("#10");
+
+	uint* to_iter = ts.getTriples(subject, "magnet-ontology/authorization/acl#dateTo", null);
+	if(to_iter !is null)
+	{
+		uint next_el = 0xFF;
+		while(next_el > 0)
+		{
+			byte* el = cast(byte*) *to_iter;
+			if(el !is null)
+			{
+				to = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
+				if(el !is null)
+					break;
+				else
+					to = null;
+			}
+			next_el = *(to_iter + 1);
+			to_iter = cast(uint*) next_el;
+		}
+	}
+
+	//	log.trace("#20");	
+
+	return is_today_in_interval(from, to);
+}
+
+public tm* get_local_time()
+{
+	time_t rawtime;
+	tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	return timeinfo;
+}
+
+public char[] get_year(tm* timeinfo)
+{
+	char[] lt = new char[4];
+	itoa(lt, cast(uint)timeinfo.tm_year + 1900);
+	return lt;
+}
+
+public char[] get_month(tm* timeinfo)
+{
+	char[] lt = new char[2];
+	itoa(lt, cast(uint)timeinfo.tm_mon + 1);
+	if(timeinfo.tm_mon < 9)
+		lt[0] = '0';
+	return lt;
+}
+
+public char[] get_day(tm* timeinfo)
+{
+	char[] lt = new char[2];
+	itoa(lt, cast(uint)timeinfo.tm_mday);
+	if(timeinfo.tm_mday < 10)
+		lt[0] = '0';
+	return lt;
+}
+
+public int cmp_date_with_tm(char* date, tm* timeinfo)
+{
+	
+	assert(strlen(date) == 10);
+
+	char[] today_y = get_year(timeinfo);
+	char[] today_m = get_month(timeinfo);
+	char[] today_d = get_day(timeinfo);
+
+	for(int i = 0; i < 4; i++)
+	{
+		if(*(date + i + 6) > today_y[i])
+			return 1;
+		else if(*(date + i + 6) < today_y[i])
+			return -1;
+	}
+
+	for(int i = 0; i < 2; i++)
+	{
+		if(*(date + i + 3) > today_m[i])
+			return 1;
+		else if(*(date + i + 3) < today_m[i])
+			return -1;
+	}
+
+	for(int i = 0; i < 2; i++)
+		if(*(date + i) > today_d[i])
+			return 1;
+		else if(*(date + i) < today_d[i])
+			return -1;
+
+	return 0;
+}
+
+public bool is_today_in_interval(char* from, char* to)
+{
+	//log.trace("#itii 11");
+
+	tm* timeinfo = get_local_time();
+
+	if(from !is null && strlen(from) == 10 && cmp_date_with_tm(from, timeinfo) > 0)
+		return false;
+
+	//log.trace("#itii 22");
+
+	if(to !is null && strlen(to) == 10 && cmp_date_with_tm(to, timeinfo) < 0)
+		return false;
+
+	//log.trace("#itii 33");
+	return true;
+}
+
+unittest 
+{
+	
+	Stdout.format("\n ::: TESTS START ::: ").newline;
+
+	tm* timeinfo = get_local_time();
+	Stdout.format("\nLocal time : {}.{}.{}", get_day(timeinfo), get_month(timeinfo), get_year(timeinfo)).newline;
+
+	timeinfo.tm_year = 45;
+	timeinfo.tm_mon = 8;
+	timeinfo.tm_mday = 5;
+
+	char[] date = "05.09.1945";
+
+	Stdout.format("\n{} == {}.{}.{}?\n", date, get_day(timeinfo), get_month(timeinfo), get_year(timeinfo)).newline;
+
+	assert(cmp_date_with_tm(date.ptr, timeinfo) == 0);
+	assert(!is_today_in_interval("10.10.1990".ptr, "10.10.2000".ptr));
+	assert(is_today_in_interval("10.10.1990".ptr, "10.10.2200".ptr));
+
+	Stdout.format(" ::: TESTS FINISH ::: \n").newline;
 }

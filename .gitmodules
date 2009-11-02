@@ -1,0 +1,3 @@
+[submodule "agents/connectors/amqp-d-client"]
+	path = agents/connectors/amqp-d-client
+	url = git@github.com:ValeriyBushenev/ontobus-agents-connectors-d-amqp-client.git

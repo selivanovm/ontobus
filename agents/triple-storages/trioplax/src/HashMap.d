@@ -110,7 +110,7 @@ class HashMap
 		log.trace("*** create object HashMap... ok");
 	}
 
-	public void put(char[] key1, char[] key2, char[] key3, void* triple)
+	public void put(char[] key1, char[] key2, char[] key3, void* triple, bool is_delete)
 	{
 		// если идет запись с установленными тремя ключами то triple считается началом записи ключей
 
@@ -340,10 +340,7 @@ class HashMap
 				}
 
 				// в короткой очереди сохраним ссылку на новый ключ-список
-				if(triple is null)
-					reducer_area_ptr[next_short_order_conflict_keys] = 0;
-				else
-					reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
+				reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
 
 				// устанавливаем новую позицию 
 				key_2_list_triples_area__last = ptr;
@@ -353,6 +350,25 @@ class HashMap
 
 				end_element__triples_list = 0;
 			}
+
+			if(is_delete)
+			{
+				//				reducer_area_ptr[next_short_order_conflict_keys] = 0;
+				uint i = next_short_order_conflict_keys;
+				for(;i > 0; i--)
+					if(reducer_area_ptr[i] == 0)
+						break;
+				i++;
+				if(i < next_short_order_conflict_keys)
+				{
+					reducer_area_ptr[next_short_order_conflict_keys] = reducer_area_ptr[i];
+					reducer_area_ptr[i] = 0;
+				} else
+					reducer_area_ptr[next_short_order_conflict_keys] = 0;
+
+			}
+			else
+			{
 
 			// теперь добавим в очередь триплетов новый триплет
 			uint new_list_elements = key_2_list_triples_area__last;
@@ -406,7 +422,7 @@ class HashMap
 						cast(uint) (key_2_list_triples_area.ptr + new_list_elements));
 			}
 			// log.trace("put:[{:X}] 27", cast(void*) this);
-
+			}
 		}
 		//		dump_mem(key_2_list_triples_area);
 	}
@@ -647,7 +663,7 @@ class HashMap
 					}
 					else
 					{
-						put(s, p, o, null);
+						put(s, p, o, null, true);
 					}
 				}
 				prev_list_element = list;

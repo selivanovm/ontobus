@@ -4,8 +4,8 @@ private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
 private import tango.stdc.stdlib;
-//private import std.string;
 private import tango.stdc.posix.stdio;
+private import tango.stdc.stringz;
 private import Log;
 
 private import tango.io.FileScan;
@@ -17,6 +17,8 @@ private import Integer = tango.text.convert.Integer;
 private import tango.io.Stdout;
 private import Text = tango.text.Util;
 private import tango.time.StopWatch;
+private import tango.time.WallClock;
+private import tango.time.Clock;
 
 private import HashMap;
 private import TripleStorage;
@@ -27,6 +29,7 @@ private import librabbitmq_client;
 private import script_util;
 private import RightTypeDef;
 private import fact_tools;
+private import tango.text.locale.Locale;
 
 private librabbitmq_client client = null;
 
@@ -66,6 +69,9 @@ uint[] reply_to_l;
 char*[] reply_to_uids;
 uint[] reply_to_uids_l;
 
+private bool logging_io_messages = true;
+private Locale layout;
+
 void main(char[][] args_str)
 {
 
@@ -93,7 +99,7 @@ void main(char[][] args_str)
 
 	az = new Authorization();
 
-	result_buffer = cast(char*) new char[10 * 1024];
+	result_buffer = cast(char*) new char[200 * 1024];
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
@@ -111,6 +117,35 @@ void main(char[][] args_str)
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
+
+	layout = new Locale;
+}
+
+void send_result_and_logging_messages(char* queue_name, char* result_buffer)
+{
+	auto elapsed = new StopWatch();
+	double time;
+
+	log.trace("queue_name:{}", getString(queue_name));
+	elapsed.start;
+	client.send(queue_name, result_buffer);
+
+	time = elapsed.stop;
+	log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+	if(logging_io_messages)
+	{
+		elapsed.start;
+
+		auto tm = WallClock.now;
+		auto dt = Clock.toDate(tm);
+		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
+		File.append("io_messages.log", fromStringz(result_buffer));
+		File.append("io_messages.log", "\r\n\r\n\r\n");
+
+		time = elapsed.stop;
+		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+	}
 }
 
 void get_message(byte* message, ulong message_size)
@@ -125,14 +160,24 @@ void get_message(byte* message, ulong message_size)
 
 		*(message + message_size) = 0;
 
-		//		Stdout.format ("{}", message);
-		log.trace("\n\nget new message, message_size={} \n{}...", message_size, getString(cast(char*) message));
-
 		auto elapsed = new StopWatch();
 		auto time_calculate_right = new StopWatch();
-		elapsed.start;
-
 		double time;
+
+		if(logging_io_messages == true)
+		{
+			elapsed.start;
+			char[] message_buffer = fromStringz(cast(char*) message);
+			auto tm = WallClock.now;
+			auto dt = Clock.toDate(tm);
+			File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
+			File.append("io_messages.log", message_buffer);
+			File.append("io_messages.log", "\r\n\r\n");
+			time = elapsed.stop;
+			log.trace("logging input message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+		}
+
+		elapsed.start;
 
 		//	char check_right = 0;
 
@@ -180,6 +225,8 @@ void get_message(byte* message, ulong message_size)
   fn_cnt = 0;
   args_cnt = 0;
   reply_to_cnt = 0;
+  int agent_function_id = -1;
+  int create_id = -1;
 
 void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
 {
@@ -340,6 +387,25 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 												get_delegate_assigners_tree_id = i;
 												//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 											}
+											else
+											{
+												if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0 && strcmp(fact_p[i],
+														"magnet-ontology#subject") == 0)
+												{
+													agent_function_id = i;
+												}
+												else
+												{
+													if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#create") == 0 && strcmp(
+															fact_p[i], "magnet-ontology#subject") == 0)
+													{
+														create_id = i;
+														put_id = i;
+													}
+												}
+
+											}
+
 										}
 									}
 								}
@@ -353,6 +419,39 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
   /*			log.trace("разбор сообщения закончен");
 
+			if(agent_function_id >= 0 && arg_id > 0)
+			{
+				// пример сообщения: установить в модуле trioplax флаг set_stat_info_logging = true
+				// <2014a><magnet-ontology#subject><magnet-ontology#agent_function>.
+				// <2014a><magnet-ontology/transport#argument>
+				// {<trioplax><set_stat_info_logging>"true".}.
+				// <85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
+				// <85f3><magnet-ontology/transport#argument>"2014a".
+				// <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
+				int i = 0;
+				for(; i < count_facts; i++)
+				{
+					if(is_fact_in_object[i] == arg_id)
+						break;
+				}
+				log.trace("agent_function s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+
+				if(strcmp(fact_s[i], "trioplax") == 0 && strcmp(fact_p[i], "set_stat_info_logging"))
+				{
+					if(strcmp(fact_o[i], "true") == 0)
+						az.getTripleStorage.set_stat_info_logging(true);
+					else
+						az.getTripleStorage.set_stat_info_logging(false);
+				}
+				if(strcmp(fact_s[i], "semargl") == 0 && strcmp(fact_p[i], "set_logging_io_messages"))
+				{
+					if(strcmp(fact_o[i], "true") == 0)
+						logging_io_messages = true;
+					else
+						logging_io_messages = false;
+				}
+			}
+
 			if(get_id >= 0 && arg_id > 0)
 			{
 				log.trace("function get: query={} ", getString(fact_o[arg_id]));
@@ -363,6 +462,18 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				// <85f3><magnet-ontology#subject><magnet-ontology/transport#set_from>.
 				// <85f3><magnet-ontology/transport#argument>"2014a".
 				// <2014a><magnet-ontology/transport/message#reply_to>"client-2014a".  
+
+				int reply_to_id = 0;
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(strlen(fact_o[i]) > 0)
+					{
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
+					}
+				}
 
 				int i = 0;
 				for(; i < count_facts; i++)
@@ -378,8 +489,17 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
 
-				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo, false);
+				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
+				result_ptr += 41;
 
 				if(list_facts !is null)
 				{
@@ -387,7 +507,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 					while(next_element1 > 0)
 					{
 						byte* triple = cast(byte*) *list_facts;
-						log.trace("list_fact {:X4}", list_facts);
+						//						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
 							char* s = cast(char*) triple + 6;
@@ -396,12 +516,40 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-							log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
+							//log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
+
+							strcpy(result_ptr++, "<");
+							strcpy(result_ptr, s);
+							result_ptr += strlen(s);
+							strcpy(result_ptr, "><");
+							result_ptr += 2;
+							strcpy(result_ptr, p);
+							result_ptr += strlen(p);
+							strcpy(result_ptr, "><");
+							result_ptr += 2;
+							strcpy(result_ptr, o);
+							result_ptr += strlen(o);
+							strcpy(result_ptr, ">.");
+							result_ptr += 2;
 						}
 						next_element1 = *(list_facts + 1);
 						list_facts = cast(uint*) next_element1;
 					}
 				}
+
+				time = elapsed.stop;
+				log.trace("get triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+				strcpy(result_ptr, "\".<");
+				result_ptr += 3;
+				strcpy(result_ptr, command_uid);
+				result_ptr += strlen(command_uid);
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
+				result_ptr += 46;
+
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				send_result_and_logging_messages(queue_name, result_buffer);
 			}*/
 
   /*			if(delete_subjects_id >= 0 && arg_id > 0)
@@ -420,7 +568,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 					}
 				}
 
-				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null, false);
+				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null);
 
 				if(removed_facts !is null)
 				{
@@ -438,7 +586,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(p));
+							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
 							az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
 							az.logginTriple('D', getString(s), getString(p), getString(o));
@@ -462,17 +610,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
-
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
+				send_result_and_logging_messages(queue_name, result_buffer);
 				}*/
 
   /*			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
@@ -493,7 +631,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
 						getString(arg_o));
 
-				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o, false);
+				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o);
 
 				if(removed_subjects !is null)
 				{
@@ -508,7 +646,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 							char* s = cast(char*) triple + 6;
 							log.trace("removed_subjects <{}>", getString(s));
 
-							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null, false);
+							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
 							if(removed_facts !is null)
 							{
@@ -524,8 +662,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char*
-												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+										char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -565,6 +702,134 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				char* uuid = cast(char*) new char[16];
 				longToHex(getUUID(), uuid);
 
+				// найдем триплет с elementId
+				int element_id = -1;
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(strcmp("magnet-ontology/authorization/acl#elementId", fact_p[i]) == 0)
+					{
+						element_id = i;
+						break;
+					}
+				}
+
+				// проверим есть ли такая запись в хранилище
+				bool is_exists = false;
+				if(create_id >= 0 && strlen(fact_o[element_id]) > 0)
+				{
+					is_exists = true;
+					if(element_id >= 0)
+					{
+						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
+						uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[element_id]);
+						if(founded_facts !is null)
+						{
+							bool is_exists_not_null = false;
+							uint next_element = 0xFF;
+							while(next_element > 0 && is_exists)
+							{
+								byte* triple = cast(byte*) *founded_facts;
+								if(triple !is null)
+								{
+									is_exists_not_null = true;
+									char* s = cast(char*) triple + 6;
+									log.trace("check right record with subject = {}", getString(s));
+									for(int i = 0; i < count_facts; i++)
+									{
+										if(i != element_id && is_fact_in_object[i] == arg_id)
+										{
+											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
+											//  getString(fact_o[i]));
+											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
+											if(founded_facts2 is null)
+											{
+												// log.trace("#444");
+												is_exists = false;
+												break;
+											}
+											else
+											{
+												// log.trace("#555");
+												uint next_element2 = 0xFF;
+												bool is_exists2 = false;
+												while(next_element2 > 0 && is_exists)
+												{
+													byte* triple2 = cast(byte*) *founded_facts2;
+													if(triple2 !is null)
+													{
+														char* o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+
+														if(strcmp(o, fact_o[i]) == 0)
+														{
+															is_exists2 = true;
+															break;
+														}
+
+													}
+													next_element2 = *(founded_facts2 + 1);
+													founded_facts2 = cast(uint*) next_element2;
+												}
+												// log.trace("#666 {} {}", is_exists, is_exists2);
+												is_exists = is_exists2 && is_exists;
+											}
+										}
+									}
+									if(is_exists)
+									{
+
+										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+
+										if(removed_facts !is null)
+										{
+											uint next_element1 = 0xFF;
+											while(next_element1 > 0)
+											{
+												byte* triple2 = cast(byte*) *removed_facts;
+
+												if(triple2 !is null)
+												{
+
+													char* ss = cast(char*) triple2 + 6;
+
+													char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+
+													char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+
+													log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
+
+													az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
+													az.logginTriple('D', getString(ss), getString(pp), getString(oo));
+
+												}
+
+												next_element1 = *(removed_facts + 1);
+												removed_facts = cast(uint*) next_element1;
+											}
+
+										}
+
+									}
+
+								}
+								next_element = *(founded_facts + 1);
+								founded_facts = cast(uint*) next_element;
+							}
+							is_exists = is_exists_not_null && is_exists;
+						}
+						else
+						{
+							//log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
+							is_exists = false;
+						}
+					}
+					else
+					{
+						//log.trace("elementId isn't present");
+					}
+
+					log.trace("is_exists = {}", is_exists);
+				}
+
 				for(int i = 0; i < count_facts; i++)
 				{
 					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
@@ -575,11 +840,21 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 					{
 						if(strlen(fact_s[i]) == 0)
 							fact_s[i] = uuid;
+						else
+							uuid = fact_s[i];
 
-						log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-							  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
-						az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-						az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+						try
+						{
+							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+																					   cast(char*) fact_o[i]));
+							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+						}
+						catch(Exception ex)
+						{
+							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]),
+								  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+						}
 					}
 				}
 
@@ -611,17 +886,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
-
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
+				send_result_and_logging_messages(queue_name, result_buffer);
 				}*/
 
   /*			// GET_DELEGATE_ASSIGNERS
@@ -737,31 +1002,45 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 				for(uint i = 0; true; i++)
 				{
+					//log.trace("#1");
+
 					char prev_state_byte = *(autz_elements + i);
 
-					//								log.trace("this request on authorization #1.2, {} {}", i, *(autz_elements + i));
+					//					log.trace("this request on authorization #1.2, {} {}", i, *(autz_elements + i));
 
 					if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 					{
+
+						//log.trace("#2");
+
 						*(autz_elements + i) = 0;
 
+						//log.trace("#21");
+
 						docId = cast(char*) (autz_elements + doc_pos);
+
+						//log.trace("#22");
 
 						count_prepared_elements++;
 						bool calculatedRight;
 						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
-						//					log.trace("right = {}", calculatedRight);
+						//log.trace("right = {}", calculatedRight);
+
+						//log.trace("#23");
 
 						if(calculatedRight == false)
 						{
 							for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 							{
+								//log.trace("#3");
 								calculatedRight = az.authorize(fact_o[category_id], docId, hierarhical_delegates[ii], targetRightType,
 										hierarhical_departments_of_delegate[ii]);
 								if(calculatedRight == true)
 									break;
 							}
 						}
+
+						//log.trace("#4");
 
 						if(calculatedRight == false)
 						{
@@ -782,7 +1061,9 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 							//							strcpy(result_ptr, docId);
 							//							result_ptr += strlen(docId);
 
-							//						log.trace("this request on authorization #1.4 true");
+							//log.trace("#5");
+
+							//						//log.trace("this request on authorization #1.4 true");
 							count_authorized_doc++;
 						}
 
@@ -794,7 +1075,10 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 						*(autz_elements + i) = 0;
 						break;
 					}
+					//log.trace("#6");
 				}
+
+				//log.trace("#7");
 
 				double total_time_calculate_right = time_calculate_right.stop;
 
@@ -814,20 +1098,9 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
 						count_prepared_elements / total_time_calculate_right);
 
-				log.trace("queue_name:{}", getString(queue_name));
-				log.trace("result:{}", getString(result_buffer));
+				send_result_and_logging_messages(queue_name, result_buffer);
+				}*/
 
-				elapsed.start;
-
-				client.send(queue_name, result_buffer);
-
-				time = elapsed.stop;
-
-				log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-
-				//			az.getTripleStorage().print_stat();
-
-			}*/
 		}
 
 		//	printf("!!!! queue_name=%s\n", queue_name);
@@ -835,8 +1108,10 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 		//	printf("!!!! list_docid=%s\n", list_docid);
 
 		//	log.trace("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length));
-		log.trace("message successful prepared");
+
+		log.trace("message successful prepared\r\n");
 	}
+
 }
 
 // Loads server properties

@@ -10,7 +10,7 @@ private import tango.stdc.posix.stdio;
 private import fact_tools;
 private import Log;
 
-public static char* rt_symbols = "crwud";
+
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
 		char[] pp)
@@ -44,7 +44,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
 	// найдем все ACL записи для заданных user и elementId 
-	uint* iterator1 = ts.getTriples(cast(char*) pp, user, elementId, idx_name.S1PPOO);
+	uint* iterator1 = ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
 
 	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
@@ -55,7 +55,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
 	for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
 	{
-		uint* iterator2 = ts.getTriples(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
+		uint* iterator2 = ts.getTriplesUseIndex(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
 
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);
@@ -83,20 +83,28 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts)
 
 			if(triple3 !is null)
 			{
+				char* s = cast(char*) triple3 + 6;
 				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
 
 				if(strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
 				{
 					// проверим, есть ли тут требуемуе нами право
-					char*
-							triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
+					char* triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
 					//		log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
 
+					bool is_actual = false;
 					while(*triple2_o != 0)
 					{
 						//					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
 						if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
-							return true;
+						{
+							if(!is_actual)
+								is_actual = is_right_actual(s, ts);
+							if(is_actual)
+								return true;
+							else
+								break;
+						}
 						triple2_o++;
 					}
 				}

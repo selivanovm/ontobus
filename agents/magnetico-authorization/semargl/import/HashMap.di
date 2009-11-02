@@ -38,7 +38,7 @@ class HashMap
     this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
     public
 {
-    void put(char[] key1, char[] key2, char[] key3, void* triple);
+    void put(char[] key1, char[] key2, char[] key3, void* triple, bool is_delete);
 }
     public
 {

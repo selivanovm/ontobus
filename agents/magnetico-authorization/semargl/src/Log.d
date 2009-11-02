@@ -77,7 +77,7 @@ private
 				auto tm = event.time;
 				auto dt = (localTime) ? WallClock.toDate(tm) : Clock.toDate(tm);
 
-				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.day), convert(tmp[2 .. 4], dt.date.month), convert(tmp[4 .. 6],
+				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.month), convert(tmp[2 .. 4], dt.date.day), convert(tmp[4 .. 6],
 						dt.time.hours), convert(tmp[6 .. 8], dt.time.minutes), convert(tmp[8 .. 10], dt.time.seconds), convert(tmp[10 .. 13],
 						dt.time.millis), event.toString));
 			}
@@ -93,7 +93,7 @@ private
 				auto tm = event.time;
 				auto dt = (localTime) ? WallClock.toDate(tm) : Clock.toDate(tm);
 
-				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.day), convert(tmp[2 .. 4], dt.date.month), convert(tmp[4 .. 6],
+				dg(_layout("{}.{} {}:{}:{},{} ---> {}", convert(tmp[0 .. 2], dt.date.month), convert(tmp[2 .. 4], dt.date.day), convert(tmp[4 .. 6],
 						dt.time.hours), convert(tmp[6 .. 8], dt.time.minutes), convert(tmp[8 .. 10], dt.time.seconds), convert(tmp[10 .. 13],
 						dt.time.millis), event.toString));
 			}
