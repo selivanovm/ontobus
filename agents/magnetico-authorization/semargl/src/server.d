@@ -30,8 +30,9 @@ private import script_util;
 private import RightTypeDef;
 private import fact_tools;
 private import tango.text.locale.Locale;
+private import autotest;
 
-private librabbitmq_client client = null;
+private mom_client client = null;
 
 private Authorization az = null;
 
@@ -44,23 +45,45 @@ private Locale layout;
 
 void main(char[][] args)
 {
-	az = new Authorization();
+	char[] autotest_file = null;
+
+	if(args.length > 0)
+	{
+		for(int i = 0; i < args.length; i++)
+		{
+			if(args[i] == "-autotest")
+			{
+				log.trace("autotest mode");
+				autotest_file = args[i + 1];
+				log.trace("autotest file = {}", autotest_file);
+			}
+		}
+	}
 
 	result_buffer = cast(char*) new char[200 * 1024];
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
-	char[][char[]] props = load_props;
-	char[] hostname = props["amqp_server_address"] ~ "\0";
-	int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
-	char[] vhost = props["amqp_server_vhost"] ~ "\0";
-	char[] login = props["amqp_server_login"] ~ "\0";
-	char[] passw = props["amqp_server_password"] ~ "\0";
-	char[] queue = props["amqp_server_queue"] ~ "\0";
+	if(autotest_file is null)
+	{
+		char[][char[]] props = load_props();
+		char[] hostname = props["amqp_server_address"] ~ "\0";
+		int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
+		char[] vhost = props["amqp_server_vhost"] ~ "\0";
+		char[] login = props["amqp_server_login"] ~ "\0";
+		char[] passw = props["amqp_server_password"] ~ "\0";
+		char[] queue = props["amqp_server_queue"] ~ "\0";
 
-	Stdout.format("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
-	client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
-	client.set_callback(&get_message);
+		log.trace("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
+		client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
+		client.set_callback(&get_message);
+	}
+	else
+	{
+		client = new autotest();
+	}
+
+	az = new Authorization();
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
@@ -513,7 +536,8 @@ void get_message(byte* message, ulong message_size)
 
 										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+										char*
+												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -608,7 +632,8 @@ void get_message(byte* message, ulong message_size)
 													byte* triple2 = cast(byte*) *founded_facts2;
 													if(triple2 !is null)
 													{
-														char* o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+														char*
+																o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
 														if(strcmp(o, fact_o[i]) == 0)
 														{
@@ -644,7 +669,8 @@ void get_message(byte* message, ulong message_size)
 
 													char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
 
-													char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+													char*
+															oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
 													log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
 
@@ -697,14 +723,14 @@ void get_message(byte* message, ulong message_size)
 						try
 						{
 							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-																					   cast(char*) fact_o[i]));
+									cast(char*) fact_o[i]));
 							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						}
 						catch(Exception ex)
 						{
-							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]),
-								  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
+									getString(cast(char*) fact_o[i]));
 						}
 					}
 				}

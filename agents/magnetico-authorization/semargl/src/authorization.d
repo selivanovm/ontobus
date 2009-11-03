@@ -44,7 +44,7 @@ private import Log;
 private import HashMap;
 private import TripleStorage;
 
-private import librabbitmq_client;
+private import mom_client;
 
 private import server;
 
@@ -322,8 +322,7 @@ class Authorization
 		return calculatedRight;
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer,
-			librabbitmq_client client)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer, mom_client client)
 	{
 
 		log.trace("запрос на выборку записей прав");
@@ -347,7 +346,7 @@ class Authorization
 
 		char* result_ptr = cast(char*) result_buffer;
 		char* command_uid = fact_s[0];
-		
+
 		byte patterns_cnt = 0;
 
 		for(int i = 0; i < count_facts; i++)
@@ -491,7 +490,8 @@ class Authorization
 							{
 
 								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-								char* o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+								char*
+										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
 								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
 										"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
@@ -548,8 +548,8 @@ class Authorization
 								byte* triple1 = cast(byte*) *founded_facts_copy;
 								//log.trace("#3");
 								if(triple1 !is null)
-									{
-										//log.trace("...not null");
+								{
+									//log.trace("...not null");
 									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
 									char*
 											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
@@ -579,7 +579,7 @@ class Authorization
 							strcpy(result_ptr, "}.\0");
 
 							send_result_and_logging_messages(queue_name, result_buffer);
-							
+
 							client.send(queue_name, result_buffer);
 
 							result_ptr = cast(char*) result_buffer;
@@ -615,7 +615,7 @@ class Authorization
 	}
 
 	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
-			librabbitmq_client client)
+			mom_client client)
 	{
 
 		log.trace("команда на выборку делегировавших");
