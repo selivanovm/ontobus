@@ -80,7 +80,7 @@ void main(char[][] args)
 	}
 	else
 	{
-		client = new autotest();
+		client = new autotest(autotest_file);
 	}
 
 	az = new Authorization();
@@ -564,7 +564,7 @@ void get_message(byte* message, ulong message_size)
 			// GET_AUTHORIZATION_RIGHTS_RECORDS
 			if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 			{
-				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, client);
+				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer);//, client);
 			}
 
 			// PUT
@@ -769,7 +769,7 @@ void get_message(byte* message, ulong message_size)
 			// GET_DELEGATE_ASSIGNERS
 			if(get_delegate_assigners_tree_id >= 0 && arg_id > 0)
 			{
-				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, client);
+				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer);//, client);
 			}
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 

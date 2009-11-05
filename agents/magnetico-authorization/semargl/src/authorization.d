@@ -44,7 +44,7 @@ private import Log;
 private import HashMap;
 private import TripleStorage;
 
-private import mom_client;
+//private import mom_client;
 
 private import server;
 
@@ -322,7 +322,7 @@ class Authorization
 		return calculatedRight;
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer, mom_client client)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)//, mom_client client)
 	{
 
 		log.trace("запрос на выборку записей прав");
@@ -580,7 +580,7 @@ class Authorization
 
 							send_result_and_logging_messages(queue_name, result_buffer);
 
-							client.send(queue_name, result_buffer);
+//							client.send(queue_name, result_buffer);
 
 							result_ptr = cast(char*) result_buffer;
 
@@ -606,7 +606,10 @@ class Authorization
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
 		strcpy(queue_name, fact_o[reply_to_id]);
-		client.send(queue_name, result_buffer);
+		
+		send_result_and_logging_messages(queue_name, result_buffer);
+		
+//		client.send(queue_name, result_buffer);
 
 		double time = elapsed.stop;
 		log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -614,8 +617,8 @@ class Authorization
 
 	}
 
-	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
-			mom_client client)
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)//,
+//			mom_client client)
 	{
 
 		log.trace("команда на выборку делегировавших");
@@ -665,7 +668,8 @@ class Authorization
 		result_ptr += strlen(command_uid);
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
-		client.send(queue_name, result_buffer);
+//		client.send(queue_name, result_buffer);
+		send_result_and_logging_messages(queue_name, result_buffer);
 
 		double time = elapsed.stop;
 		log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
