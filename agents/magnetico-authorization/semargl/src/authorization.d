@@ -136,7 +136,7 @@ class Authorization
 		log.trace("authorization init..");
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 10, 1024 * 1024 * 60);
+		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 				"magnet-ontology/authorization/acl#rights");
