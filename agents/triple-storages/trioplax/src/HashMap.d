@@ -58,6 +58,11 @@ class HashMap
 
 		reducer_area_ptr = new uint[reducer_area_length];
 
+		// инициализируем в reducer_area_ptr первые позиции коротких очередей 
+		// это понадобится для функции выдачи всех фактов по данному HashMap
+		for(uint i = 0; i < reducer_area_length; i += max_size_short_order)
+			reducer_area_ptr[i] = 0;
+
 		reducer_area_right = reducer_area_length;
 
 		// область ключей и списков триплетов
@@ -355,7 +360,7 @@ class HashMap
 			{
 				//				reducer_area_ptr[next_short_order_conflict_keys] = 0;
 				uint i = next_short_order_conflict_keys;
-				for(;i > 0; i--)
+				for(; i > 0; i--)
 					if(reducer_area_ptr[i] == 0)
 						break;
 				i++;
@@ -363,68 +368,87 @@ class HashMap
 				{
 					reducer_area_ptr[next_short_order_conflict_keys] = reducer_area_ptr[i];
 					reducer_area_ptr[i] = 0;
-				} else
+				}
+				else
 					reducer_area_ptr[next_short_order_conflict_keys] = 0;
 
 			}
 			else
 			{
 
-			// теперь добавим в очередь триплетов новый триплет
-			uint new_list_elements = key_2_list_triples_area__last;
+				// теперь добавим в очередь триплетов новый триплет
+				uint new_list_elements = key_2_list_triples_area__last;
 
-			//			log.trace("put:[{:X}] 19 new_list_elements={:X}", cast(void*) this, new_list_elements);
+				//			log.trace("put:[{:X}] 19 new_list_elements={:X}", cast(void*) this, new_list_elements);
 
-			//			dump_mem(key_2_list_triples_area);
+				//			dump_mem(key_2_list_triples_area);
 
-			// log.trace("put:[{:X}] 21 сохраним в заголовке списка ссылку на последний элемент",
-			//		cast(void*) this);
+				// log.trace("put:[{:X}] 21 сохраним в заголовке списка ссылку на последний элемент",
+				//		cast(void*) this);
 
-			// сохраним в заголовке списка ссылку на последний элемент
-			//			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, list_of_triples, cast(uint) key_2_list_triples_area__last);
-			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
+				// сохраним в заголовке списка ссылку на последний элемент
+				//			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, list_of_triples, cast(uint) key_2_list_triples_area__last);
+				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
 
-			//			dump_mem(key_2_list_triples_area);
+				//			dump_mem(key_2_list_triples_area);
 
-			// log.trace("put:[{:X}] 21 key_2_list_triples_area__last={:X}", cast(void*) this,
-			//		key_2_list_triples_area__last);
+				// log.trace("put:[{:X}] 21 key_2_list_triples_area__last={:X}", cast(void*) this,
+				//		key_2_list_triples_area__last);
 
-			// резервируем меcто для двух ссылок
-			key_2_list_triples_area__last += 8;
-			if(key_2_list_triples_area__last > key_2_list_triples_area__right)
-			{
-				log.trace("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName,
-						key_2_list_triples_area__last, key_2_list_triples_area__right);
-				throw new Exception("key_2_list_triples_area__last > key_2_list_triples_area__right");
-			}
-			// log.trace("put:23 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);
+				// резервируем меcто для двух ссылок
+				key_2_list_triples_area__last += 8;
+				if(key_2_list_triples_area__last > key_2_list_triples_area__right)
+				{
+					log.trace("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName,
+							key_2_list_triples_area__last, key_2_list_triples_area__right);
+					throw new Exception("key_2_list_triples_area__last > key_2_list_triples_area__right");
+				}
+				// log.trace("put:23 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);
 
-			// log.trace("put:24 new_list_elements={:X}", new_list_elements);
+				// log.trace("put:24 new_list_elements={:X}", new_list_elements);
 
-			// log.trace("put:[{:X}] 25 end_element__triples_list={:X}", cast(void*) this,
-			//		end_element__triples_list);
+				// log.trace("put:[{:X}] 25 end_element__triples_list={:X}", cast(void*) this,
+				//		end_element__triples_list);
 
-			// log.trace("put:[{:X}] 25.1 сохраняем сам элемент", cast(void*) this);
+				// log.trace("put:[{:X}] 25.1 сохраняем сам элемент", cast(void*) this);
 
-			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, new_list_elements, cast(uint) triple);
+				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, new_list_elements, cast(uint) triple);
 
-			//			dump_mem(key_2_list_triples_area);
+				//			dump_mem(key_2_list_triples_area);
 
-			//			log.trace(
-			//					"put:[{:X}] 26 key_2_list_triples_area={:X}, end_element__triples_list+4={:X}, new_list_elements={:X} ",
-			//					cast(void*) this, key_2_list_triples_area.ptr,
-			//					end_element__triples_list + 4, new_list_elements);
+				//			log.trace(
+				//					"put:[{:X}] 26 key_2_list_triples_area={:X}, end_element__triples_list+4={:X}, new_list_elements={:X} ",
+				//					cast(void*) this, key_2_list_triples_area.ptr,
+				//					end_element__triples_list + 4, new_list_elements);
 
-			if(end_element__triples_list != 0)
-			{
-				//				log.trace("сохраним в предыдущем элементе {:X4} ссылку на новый элемент {:X}", end_element__triples_list, cast(uint)(key_2_list_triples_area.ptr + new_list_elements));
-				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, end_element__triples_list + 4,
-						cast(uint) (key_2_list_triples_area.ptr + new_list_elements));
-			}
-			// log.trace("put:[{:X}] 27", cast(void*) this);
+				if(end_element__triples_list != 0)
+				{
+					//				log.trace("сохраним в предыдущем элементе {:X4} ссылку на новый элемент {:X}", end_element__triples_list, cast(uint)(key_2_list_triples_area.ptr + new_list_elements));
+					ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, end_element__triples_list + 4,
+							cast(uint) (key_2_list_triples_area.ptr + new_list_elements));
+				}
+				// log.trace("put:[{:X}] 27", cast(void*) this);
 			}
 		}
 		//		dump_mem(key_2_list_triples_area);
+	}
+
+	public uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
+	{
+		// set iterator V+H in next position 
+		if(current_list_of_list_H_iterator < max_size_short_order)
+			max_size_short_order++;
+		else
+			max_size_short_order = 0;
+
+		if(current_list_of_list_V_iterator < max_count_elements)
+			current_list_of_list_V_iterator += max_size_short_order;
+		
+		// TODO 
+		// 1. skip SPO keys values
+		// 2. return list of facts
+		
+		return null;
 	}
 
 	public uint* get(char* key1, char* key2, char* key3, bool debug_info)

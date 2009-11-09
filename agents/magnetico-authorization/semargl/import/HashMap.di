@@ -42,6 +42,19 @@ class HashMap
 }
     public
 {
+    uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
+{
+if (current_list_of_list_H_iterator < max_size_short_order)
+max_size_short_order++;
+else
+max_size_short_order = 0;
+if (current_list_of_list_V_iterator < max_count_elements)
+current_list_of_list_V_iterator += max_size_short_order;
+return null;
+}
+}
+    public
+{
     uint* get(char* key1, char* key2, char* key3, bool debug_info);
 }
     public

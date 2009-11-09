@@ -30,8 +30,9 @@ private import script_util;
 private import RightTypeDef;
 private import fact_tools;
 private import tango.text.locale.Locale;
+private import autotest;
 
-private librabbitmq_client client = null;
+private mom_client client = null;
 
 private Authorization az = null;
 
@@ -96,24 +97,45 @@ void main(char[][] args_str)
   reply_to_uids = new char*[1000];
   reply_to_uids_l = new uint[1000];
 
+	char[] autotest_file = null;
 
-	az = new Authorization();
+	if(args_str.length > 0)
+	{
+		for(int i = 0; i < args_str.length; i++)
+		{
+			if(args_str[i] == "-autotest")
+			{
+				log.trace("autotest mode");
+				autotest_file = args_str[i + 1];
+				log.trace("autotest file = {}", autotest_file);
+			}
+		}
+	}
 
 	result_buffer = cast(char*) new char[200 * 1024];
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
-	char[][char[]] props = load_props;
-	char[] hostname = props["amqp_server_address"] ~ "\0";
-	int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
-	char[] vhost = props["amqp_server_vhost"] ~ "\0";
-	char[] login = props["amqp_server_login"] ~ "\0";
-	char[] passw = props["amqp_server_password"] ~ "\0";
-	char[] queue = props["amqp_server_queue"] ~ "\0";
+	if(autotest_file is null)
+	{
+		char[][char[]] props = load_props();
+		char[] hostname = props["amqp_server_address"] ~ "\0";
+		int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
+		char[] vhost = props["amqp_server_vhost"] ~ "\0";
+		char[] login = props["amqp_server_login"] ~ "\0";
+		char[] passw = props["amqp_server_password"] ~ "\0";
+		char[] queue = props["amqp_server_queue"] ~ "\0";
 
-	Stdout.format("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
-	client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
-	client.set_callback(&get_message);
+		log.trace("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
+		client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
+		client.set_callback(&get_message);
+	}
+	else
+	{
+		client = new autotest(autotest_file);
+	}
+
+	az = new Authorization();
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
@@ -662,7 +684,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+										char*
+												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -689,7 +712,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
   /*			// GET_AUTHORIZATION_RIGHTS_RECORDS
 			if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 			{
-				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, client);
+				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer);//, client);
 			}*/
 
   /*			// PUT
@@ -757,7 +780,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 													byte* triple2 = cast(byte*) *founded_facts2;
 													if(triple2 !is null)
 													{
-														char* o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+														char*
+																o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
 														if(strcmp(o, fact_o[i]) == 0)
 														{
@@ -793,7 +817,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 
 													char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
 
-													char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+													char*
+															oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
 													log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
 
@@ -846,14 +871,14 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 						try
 						{
 							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-																					   cast(char*) fact_o[i]));
+									cast(char*) fact_o[i]));
 							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 						}
 						catch(Exception ex)
 						{
-							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]),
-								  getString(cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
+									getString(cast(char*) fact_o[i]));
 						}
 					}
 				}
@@ -892,8 +917,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
   /*			// GET_DELEGATE_ASSIGNERS
 			if(get_delegate_assigners_tree_id >= 0 && arg_id > 0)
 			{
-				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, client);
-				}*/
+				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer);//, client);
+			}*/
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
   /*			// AUTHORIZE
