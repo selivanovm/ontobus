@@ -51,7 +51,7 @@ void main(char[][] args)
 	{
 		for(int i = 0; i < args.length; i++)
 		{
-			if(args[i] == "-autotest")
+			if(args[i] == "-autotest" || args[i] == "-a")
 			{
 				log.trace("autotest mode");
 				autotest_file = args[i + 1];
