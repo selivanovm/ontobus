@@ -1,16 +1,19 @@
-module scripts.S20UserIsInOUP;
+module scripts.S50UserOfTORO;
 
 import TripleStorage;
+
 import RightTypeDef;
+
 private import Log;
 private import tango.stdc.string;
 
-static char* oupDepId = "f8c51331-b1d8-48ac-ae69-91af741f6320";
-static char*[] documentTypeNames = [ "Инвестиционная заявка", "Инвестиционный проект", "Запрос на изменение Инвестиционного проекта" ];
+static char* depId = "92e57b6d-83e3-485f-8885-0bade363f759";
+static char*[] documentTypeNames = [ "Комплект чертежей", "Конструкторский проект", "Чертеж", "Чертеж ТОРО", 
+		    "Ведомость дефектов", "Отчет о ремонте", "Протокол измерений", "Техническая документация", "Паспорт", "Эскиз" ];
+
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
 {
-
         bool result = false;
 
 	if(rightType != RightType.READ)
@@ -22,17 +25,17 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		return false;
 	}
 
-	bool is_user_in_oup = false;
-	if(strcmp(oupDepId, user) == 0)
-		is_user_in_oup = true;
+	bool is_user_in_dep = false;
+	if(strcmp(depId, user) == 0)
+		is_user_in_dep = true;
 	else
 		for(uint i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
 		{
-			if (strcmp(iterator_on_targets_of_hierarhical_departments[i], oupDepId) == 0)
-				is_user_in_oup = true;
+			if (strcmp(iterator_on_targets_of_hierarhical_departments[i], depId) == 0)
+				is_user_in_dep = true;
 		}
 	
-	if(is_user_in_oup)
+	if(is_user_in_dep)
 	{
 		bool is_element_a_document = false;
 		uint* facts = ts.getTriples(elementId, "magnet-ontology/authorization/acl#category", "DOCUMENT");
@@ -74,7 +77,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 			
 	} else
-		log.trace("Пользователь не в ОУП!");
+		log.trace("Пользователь не находится  в подразделении {}!", depId);
 	
 	return result;
 

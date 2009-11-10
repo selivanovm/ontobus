@@ -312,7 +312,13 @@ class Authorization
 
 		if(calculatedRight == false && is_doc_or_draft)
 		{
-			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
+			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+		}
+
+		if(calculatedRight == false && is_doc_or_draft)
+		{
+			calculatedRight = scripts.S50UserOfTORO.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
