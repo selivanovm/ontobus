@@ -93,8 +93,6 @@ class TripleStorage
 {
     bool log_stat_info = false;
 }
-    uint max_count_element = 100000;
-    uint max_length_order = 4;
     private
 {
     char[] cat_buff1;
@@ -103,7 +101,16 @@ class TripleStorage
 {
     char[] cat_buff2;
 }
-    this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length);
+    this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+{
+cat_buff1 = new char[](64 * 1024);
+cat_buff2 = new char[](64 * 1024);
+idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_length_order);
+}
+    public
+{
+    void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length);
+}
     public
 {
     void set_stat_info_logging(bool flag)

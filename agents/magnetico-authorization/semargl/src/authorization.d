@@ -138,7 +138,13 @@ class Authorization
 		log.trace("authorization init..");
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
+		//		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
+		ts = new TripleStorage(2_000_000, 9, 1024 * 1024 * 150);
+		ts.set_new_index(idx_name.S, 500_000, 9, 1024 * 1024 * 40);
+		ts.set_new_index(idx_name.O, 500_000, 6, 1024 * 1024 * 20);
+		ts.set_new_index(idx_name.PO, 1_000_000, 9, 1024 * 1024 * 40);
+		ts.set_new_index(idx_name.SP, 2_000_000, 9, 1024 * 1024 * 150);
+		ts.set_new_index(idx_name.S1PPOO, 500_000, 6, 1024 * 1024 * 40);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 				"magnet-ontology/authorization/acl#rights");
@@ -331,7 +337,8 @@ class Authorization
 		return calculatedRight;
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)//, mom_client client)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)
+	//, mom_client client)
 	{
 
 		log.trace("запрос на выборку записей прав");
@@ -589,7 +596,7 @@ class Authorization
 
 							send_result_and_logging_messages(queue_name, result_buffer);
 
-//							client.send(queue_name, result_buffer);
+							//							client.send(queue_name, result_buffer);
 
 							result_ptr = cast(char*) result_buffer;
 
@@ -615,10 +622,10 @@ class Authorization
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
 		strcpy(queue_name, fact_o[reply_to_id]);
-		
+
 		send_result_and_logging_messages(queue_name, result_buffer);
-		
-//		client.send(queue_name, result_buffer);
+
+		//		client.send(queue_name, result_buffer);
 
 		double time = elapsed.stop;
 		log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -626,8 +633,9 @@ class Authorization
 
 	}
 
-	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)//,
-//			mom_client client)
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)
+	//,
+	//			mom_client client)
 	{
 
 		log.trace("команда на выборку делегировавших");
@@ -677,7 +685,7 @@ class Authorization
 		result_ptr += strlen(command_uid);
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
-//		client.send(queue_name, result_buffer);
+		//		client.send(queue_name, result_buffer);
 		send_result_and_logging_messages(queue_name, result_buffer);
 
 		double time = elapsed.stop;

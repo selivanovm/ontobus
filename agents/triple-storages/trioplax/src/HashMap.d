@@ -14,20 +14,20 @@ class HashMap
 {
 	private uint max_count_elements = 1_000;
 
-	uint max_size_short_order = 8;
+	private uint max_size_short_order = 8;
 
 	// в таблице соответствия первые четыре элемента содержат ссылки на ключи, короткие списки конфликтующих ключей содержатся в reducer_area
-	uint reducer_area_length;
-	uint[] reducer_area_ptr;
-	uint reducer_area_right;
+	private uint reducer_area_length;
+	private uint[] reducer_area_ptr;
+	private uint reducer_area_right;
 
 	// область связки ключей и списков триплетов
-	uint key_2_list_triples_area__length;
-	ubyte[] key_2_list_triples_area;
-	uint key_2_list_triples_area__last;
-	uint key_2_list_triples_area__right;
+	private uint key_2_list_triples_area__length;
+	private ubyte[] key_2_list_triples_area;
+	private uint key_2_list_triples_area__last = 0;
+	private uint key_2_list_triples_area__right = 0;
 
-	char[] hashName;
+	private char[] hashName;
 
 	// область длинных списков конфликтующих ключей
 	//	uint long_list_length;
@@ -49,12 +49,13 @@ class HashMap
 		hashName = _hashName;
 		max_size_short_order = _max_size_short_order;
 		max_count_elements = _max_count_elements;
-		log.trace("*** create HashMap[name={}, max_count_elements={}, triple_area_length={}, max_size_short_order={} ... start", hashName,
-				_triple_area_length, _max_count_elements, max_size_short_order);
+		log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start", hashName,
+				_max_count_elements, max_size_short_order, _triple_area_length);
 
 		// область маппинга ключей, 
 		// содержит короткую очередь из [max_size_short_order] элементов в формате [ссылка на ключ 4b][ссылка на список триплетов ключа 4b] 
 		reducer_area_length = max_count_elements * max_size_short_order;
+		log.trace("*** HashMap[name={}, reducer_area_length={}", hashName, reducer_area_length);
 
 		reducer_area_ptr = new uint[reducer_area_length];
 
@@ -81,6 +82,7 @@ class HashMap
 		key_2_list_triples_area__last = 1;
 
 		key_2_list_triples_area__right = key_2_list_triples_area__length;
+		log.trace("*** HashMap[name={}, key_2_list_triples_area__right={}", hashName, key_2_list_triples_area__right);
 		//		log.trace(
 		//				"область связки ключей и списков триплетов, length={}, start_addr={:X}, end_addr={:X}",
 		//				key_2_list_triples_area__length, key_2_list_triples_area,
@@ -138,8 +140,8 @@ class HashMap
 
 		if(short_order_conflict_keys > reducer_area_right)
 		{
-			log.trace("put:1 short_order_conflict_keys > reducer_area_right");
-			throw new Exception("short_order_conflict_keys > reducer_area_right");
+			log.trace("put:{} short_order_conflict_keys > reducer_area_right", hashName);
+			throw new Exception("put:" ~ hashName ~ " short_order_conflict_keys > reducer_area_right");
 		}
 
 		// хэш нас привел к очереди конфликтующих ключей
@@ -278,7 +280,7 @@ class HashMap
 			{
 				if(pos_in_order == 0)
 				{
-					throw new Exception("put: short order is full");
+					throw new Exception("put: " ~ hashName ~ " short order is full");
 				}
 				//				 log.trace("put:[{:X4}] 11 ключи не найдены, нужно завести новую очередь, {:X4}",
 				//						cast(void*) this, key_2_list_triples_area__last);
@@ -401,7 +403,7 @@ class HashMap
 				{
 					log.trace("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName,
 							key_2_list_triples_area__last, key_2_list_triples_area__right);
-					throw new Exception("key_2_list_triples_area__last > key_2_list_triples_area__right");
+					throw new Exception("hashName=" ~ hashName ~ ", key_2_list_triples_area__last > key_2_list_triples_area__right");
 				}
 				// log.trace("put:23 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);
 
@@ -443,11 +445,11 @@ class HashMap
 
 		if(current_list_of_list_V_iterator < max_count_elements)
 			current_list_of_list_V_iterator += max_size_short_order;
-		
+
 		// TODO 
 		// 1. skip SPO keys values
 		// 2. return list of facts
-		
+
 		return null;
 	}
 

@@ -28,8 +28,8 @@ class TripleStorage
 	private HashMap idx_po = null;
 	private HashMap idx_so = null;
 	private HashMap idx_spo = null;
-
 	private HashMap idx_s1ppoo = null;
+
 	private char[][16] look_predicate_p1_on_idx_s1ppoo;
 	private char[][16] look_predicate_p2_on_idx_s1ppoo;
 	private char[][16] look_predicate_pp_on_idx_s1ppoo;
@@ -40,57 +40,72 @@ class TripleStorage
 
 	private bool log_stat_info = false;
 
-	uint max_count_element = 100_000;
-	uint max_length_order = 4;
 	private char[] cat_buff1;
 	private char[] cat_buff2;
 
-	this(ubyte useindex, uint _max_count_element, uint _max_length_order, uint inital_triple_area_length)
+	this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 	{
 		cat_buff1 = new char[64 * 1024];
 		cat_buff2 = new char[64 * 1024];
 
-		max_count_element = _max_count_element;
-		max_length_order = _max_length_order;
-		//		Stdout.format("TripleStorage:use_index={:X1}", useindex).newline;
-
-		if(useindex & idx_name.S)
-		{
-			idx_s = new HashMap("S", max_count_element, inital_triple_area_length, max_length_order);
-		}
-
-		if(useindex & idx_name.P)
-		{
-			idx_p = new HashMap("P", 1000, inital_triple_area_length, 3);
-		}
-
-		if(useindex & idx_name.O)
-		{
-			idx_o = new HashMap("O", max_count_element, inital_triple_area_length, max_length_order);
-		}
-
-		if(useindex & idx_name.SP || useindex & idx_name.S1PPOO)
-		{
-			idx_sp = new HashMap("SP", max_count_element, inital_triple_area_length * 2, max_length_order);
-		}
-
-		if(useindex & idx_name.PO)
-		{
-			idx_po = new HashMap("PO", max_count_element, inital_triple_area_length * 2, max_length_order);
-		}
-
-		if(useindex & idx_name.SO)
-		{
-			idx_so = new HashMap("SO", max_count_element, inital_triple_area_length * 2, max_length_order);
-		}
-
-		if(useindex & idx_name.S1PPOO)
-		{
-			idx_s1ppoo = new HashMap("S1PPOO", max_count_element, inital_triple_area_length, max_length_order);
-		}
-
 		// создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
-		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length * 3, max_length_order);
+		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length, max_length_order);
+	}
+
+	public void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+	{
+		if(index & idx_name.S)
+		{
+			if(idx_s is null)
+				idx_s = new HashMap("S", max_count_element, inital_triple_area_length, max_length_order);
+			return;
+		}
+
+		if(index & idx_name.P)
+		{
+			if(idx_p is null)
+				idx_p = new HashMap("P", max_count_element, inital_triple_area_length, max_length_order);
+			return;
+		}
+
+		if(index & idx_name.O)
+		{
+			if(idx_o is null)
+				idx_o = new HashMap("O", max_count_element, inital_triple_area_length, max_length_order);
+			return;
+		}
+
+		if(index & idx_name.SP)
+		{
+			if(idx_sp is null)
+				idx_sp = new HashMap("SP", max_count_element, inital_triple_area_length, max_length_order);
+			return;
+		}
+
+		if(index & idx_name.PO)
+		{
+			if(idx_po is null)
+				idx_po = new HashMap("PO", max_count_element, inital_triple_area_length, max_length_order);
+			return;
+		}
+
+		if(index & idx_name.SO)
+		{
+			if(idx_so is null)
+				idx_so = new HashMap("SO", max_count_element, inital_triple_area_length, max_length_order);
+			return;
+		}
+
+		if(index & idx_name.S1PPOO)
+		{
+			if(idx_s1ppoo is null && idx_sp !is null)
+				idx_s1ppoo = new HashMap("S1PPOO", max_count_element, inital_triple_area_length, max_length_order);
+
+			if(idx_sp is null)
+				log.trace("for index S1PPOO need index SP");
+
+			return;
+		}
 
 	}
 

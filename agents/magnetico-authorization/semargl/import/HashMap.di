@@ -26,15 +26,42 @@ class HashMap
 {
     uint max_count_elements = 1000;
 }
+    private
+{
     uint max_size_short_order = 8;
+}
+    private
+{
     uint reducer_area_length;
+}
+    private
+{
     uint[] reducer_area_ptr;
+}
+    private
+{
     uint reducer_area_right;
+}
+    private
+{
     uint key_2_list_triples_area__length;
+}
+    private
+{
     ubyte[] key_2_list_triples_area;
+}
+    private
+{
     uint key_2_list_triples_area__last;
+}
+    private
+{
     uint key_2_list_triples_area__right;
+}
+    private
+{
     char[] hashName;
+}
     this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
     public
 {
