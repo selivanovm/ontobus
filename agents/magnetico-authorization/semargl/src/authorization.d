@@ -55,7 +55,7 @@ class Authorization
 
 	this()
 	{
-		i_know_predicates = new char[][47];
+		i_know_predicates = new char[][48];
 
 		uint d = 0;
 
@@ -120,6 +120,8 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology#hasPart";
 		i_know_predicates[d++] = "magnet-ontology#memberOf";
 		i_know_predicates[d++] = "magnet-ontology#loginName";
+
+		i_know_predicates[d++] = "magnet-ontology/documents#type_name";
 
 		init();
 	}
@@ -295,19 +297,20 @@ class Authorization
 			//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
+		bool is_doc_or_draft = (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory, "DOCUMENT_DRAFT") == 0);
+		if(calculatedRight == false && is_doc_or_draft)
 		{
-			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			//log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
+		if(calculatedRight == false && is_doc_or_draft)
 		{
-			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			//log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
+		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
 			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
