@@ -80,15 +80,17 @@ void main(char[][] args)
 	}
 	else
 	{
+		log.trace("use direct send command");
 		client = new autotest(autotest_file);
+		client.set_callback(&get_message);
 	}
+
+	layout = new Locale;
 
 	az = new Authorization();
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
-
-	layout = new Locale;
 }
 
 void send_result_and_logging_messages(char* queue_name, char* result_buffer)
@@ -120,6 +122,8 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 void get_message(byte* message, ulong message_size)
 {
+	//	printf ("\nget message !%s!\n", message);
+
 	synchronized
 	{
 		if(*(message + message_size - 1) != '.')
@@ -149,10 +153,6 @@ void get_message(byte* message, ulong message_size)
 
 		elapsed.start;
 
-		//	char check_right = 0;
-
-		//	char* user_id;
-		//	char* queue_name;
 		char* list_docid;
 		char* docId;
 		uint targetRightType = RightType.READ;

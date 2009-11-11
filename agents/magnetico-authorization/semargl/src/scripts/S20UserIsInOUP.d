@@ -98,11 +98,15 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 			}
 		}
 		else
-			log.trace("Документ в состоянии черновика!");
+		{
+		//	log.trace("Документ в состоянии черновика!");
+		}
 
 			
 	} else
-		log.trace("Пользователь не в ОУП!");
+	{
+	//	log.trace("Пользователь не в ОУП!");
+	}
 	
 	return result;
 

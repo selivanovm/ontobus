@@ -75,11 +75,15 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 			}
 		}
 		else
-			log.trace("Документ в состоянии черновика!");
+		{
+		//	log.trace("Документ в состоянии черновика!");
+		}
 
 			
 	} else
-		log.trace("Пользователь не находится  в подразделении {}!", depId);
+	{
+	//	log.trace("Пользователь не находится  в подразделении {}!", depId);
+	}
 	
 	return result;
 

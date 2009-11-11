@@ -4,7 +4,6 @@ private import HashMap;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import Log;
-//private import tango.util.container.HashMap;
 private import tango.stdc.stringz;
 
 enum idx_name
@@ -272,10 +271,10 @@ class TripleStorage
 			// проверим удаляемую запись на соответствие установленных предикатов для индекса sppoo [setPredicatesToS1PPOO]					
 			for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
 			{
-				log.trace("remove from index sppoo ?:[{}]?[{}]", p, look_predicate_p1_on_idx_s1ppoo[i]);
+				//				log.trace("remove from index sppoo ?:[{}]?[{}]", p, look_predicate_p1_on_idx_s1ppoo[i]);
 				if(p == look_predicate_p1_on_idx_s1ppoo[i])
 				{
-					log.trace("remove from index sppoo A:[{}]", p);
+					//					log.trace("remove from index sppoo A:[{}]", p);
 					//log.trace ("#3");
 					char[] o1 = o;
 					char[] p1 = p;
@@ -288,7 +287,7 @@ class TripleStorage
 						char[] o2 = fromStringz(
 								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
-						log.trace("remove from index sppoo A: p1 = {}, p2 = {}", p1, p2);
+						//						log.trace("remove from index sppoo A: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
 						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 					}
@@ -296,7 +295,7 @@ class TripleStorage
 				}
 				else if(p == look_predicate_p2_on_idx_s1ppoo[i])
 				{
-					log.trace("remove from index sppoo B:[{}]", p);
+					//					log.trace("remove from index sppoo B:[{}]", p);
 					char[] o2 = o;
 					char[] p2 = p;
 					char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
@@ -308,7 +307,7 @@ class TripleStorage
 						char[] o1 = fromStringz(
 								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
-						log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
+						//						log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
 						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 					}
