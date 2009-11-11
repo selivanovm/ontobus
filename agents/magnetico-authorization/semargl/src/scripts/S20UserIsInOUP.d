@@ -11,10 +11,16 @@ static char*[] documentTypeNames = [ "Инвестиционная заявка"
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
 {
 
+	//log.trace("#1");
+	
+
         bool result = false;
 
 	if(rightType != RightType.READ)
 		return false;
+
+	//log.trace("#2");
+
 
 	if(elementId is null || *elementId == '*')
 	{
@@ -22,15 +28,28 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		return false;
 	}
 
+	//log.trace("#3");
+
 	bool is_user_in_oup = false;
-	if(strcmp(oupDepId, user) == 0)
+	if(strcmp(oupDepId, user) == 0) 
+	{
+		//log.trace("#31");
 		is_user_in_oup = true;
-	else
-		for(uint i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
-		{
-			if (strcmp(iterator_on_targets_of_hierarhical_departments[i], oupDepId) == 0)
-				is_user_in_oup = true;
+	}
+	else {
+		//log.trace("#32 {:X4} {}", iterator_on_targets_of_hierarhical_departments, iterator_on_targets_of_hierarhical_departments.length);
+		if (iterator_on_targets_of_hierarhical_departments !is null && iterator_on_targets_of_hierarhical_departments.length > 0) {
+			for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
+			{
+				//log.trace("#33 {}", i);
+				if (strcmp(iterator_on_targets_of_hierarhical_departments[i], oupDepId) == 0) {
+					//log.trace("#34");
+					is_user_in_oup = true;
+				}
+			}
 		}
+	}
+	//log.trace("#4");
 	
 	if(is_user_in_oup)
 	{
@@ -42,18 +61,27 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 			if(triple !is null)
 				is_element_a_document = true;
 		}
+		//log.trace("#5");
 		
 		if (is_element_a_document)
 		{
+			//log.trace("#6");
+			
 			facts = ts.getTriples(elementId, "magnet-ontology/documents#type_name", null);
 			if(facts !is null)
 			{
+				//log.trace("#7");
+				
 				uint next_element0 = 0xFF;
 				while(next_element0 > 0 && !result)
 				{
+					//log.trace("#8");
+					
 					byte* triple = cast(byte*) *facts;
 					if(triple !is null)
 					{
+						//log.trace("#8");
+						
 						char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
 								       (*(triple + 2) << 8) + *(triple + 3) + 1);
 						for(uint i = 0; i < documentTypeNames.length; i++)

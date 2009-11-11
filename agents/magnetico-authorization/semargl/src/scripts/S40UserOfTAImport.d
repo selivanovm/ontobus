@@ -28,10 +28,12 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	if(strcmp(depId, user) == 0)
 		is_user_in_dep = true;
 	else
-		for(uint i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
-		{
-			if (strcmp(iterator_on_targets_of_hierarhical_departments[i], depId) == 0)
-				is_user_in_dep = true;
+		if (iterator_on_targets_of_hierarhical_departments !is null && iterator_on_targets_of_hierarhical_departments.length > 0) {
+			for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
+				{
+					if (strcmp(iterator_on_targets_of_hierarhical_departments[i], depId) == 0)
+						is_user_in_dep = true;
+				}
 		}
 	
 	if(is_user_in_dep)
