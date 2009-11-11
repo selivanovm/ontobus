@@ -4,9 +4,12 @@ private import tango.io.File;
 private import Text = tango.text.Util;
 private import portions_read;
 private import tango.stdc.string;
+private import tango.stdc.stringz;
 private import tango.stdc.stdio;
 
 void function(byte* txt, ulong size) message_acceptor;
+
+        char* output_data = null;
 
 class autotest: mom_client
 {
@@ -26,7 +29,13 @@ class autotest: mom_client
 
 	int send(char* routingkey, char* messagebody)
 	{
-		return 0;
+	if (strcmp (messagebody, output_data) != 0)
+	{
+	log.trace ("out messages[{}] not compare with original [{}]", fromStringz (messagebody), fromStringz (output_data));
+	     throw new Exception ("out messages not compare with original");
+	     
+	}
+	   return 0;
 	}
 
 	void listener()
@@ -51,7 +60,7 @@ void prepare_block(char* line, ulong line_length)
 		input_data += 7;
 	}
 
-	char* output_data = strstr(line, "OUTPUT");
+	output_data = strstr(line, "OUTPUT");
 
 	if(output_data !is null)
 	{
