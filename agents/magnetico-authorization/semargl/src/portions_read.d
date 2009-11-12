@@ -51,8 +51,8 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 
 			// недообработанный хвост
 
-			log.trace("BL-OCK[{}]", tail[0 .. tail_size] ~ content[0 .. start_pos - 1]);
-			_block_acceptor((tail[0 .. tail_size] ~ content[0 .. start_pos - 1]).ptr, tail_size + start_pos - 1);
+			log.trace("BL-OCK[{}]", tail[0 .. tail_size] ~ content[0 .. start_pos]);
+			_block_acceptor((tail[0 .. tail_size] ~ content[0 .. start_pos]).ptr, tail_size + start_pos);
 
 			tail_size = 0;
 		}
@@ -105,7 +105,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 			////
 			if(found_tail == true)
 			{
-				tail_size = content_size - block_end_pos - 1;
+				tail_size = content_size - block_end_pos - end_block_marker.length;
 				if(tail_size > 0)
 				{
 					log.trace("#!!! 5 копируем хвост content_size={}, block_end_pos={}, tail_size = {}", content_size, block_end_pos, tail_size);
