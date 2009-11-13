@@ -13,13 +13,17 @@ void function(byte* txt, ulong size) message_acceptor;
 
 private char* output_data = null;
 private int count_commands = 0;
+private long count_repeat;
+private bool nocompare;
 
 class autotest: mom_client
 {	
 	char[] message_log_file_name;
 
-	this(char[] _message_log_file_name)
+	this(char[] _message_log_file_name, long _count_repeat, bool _nocompare)
 	{
+	        count_repeat = _count_repeat;
+	        nocompare = _nocompare;
 		message_log_file_name = _message_log_file_name;
 		log.trace("open message_log file [{}]", message_log_file_name);
 
@@ -34,7 +38,7 @@ class autotest: mom_client
 	{
 		//		printf("\nOUTPUT: %s\n", output_data);
 
-		if(strcmp(messagebody, output_data) != 0)
+		if(nocompare == false && strcmp(messagebody, output_data) != 0)
 		{
 			log.trace("out messages\r\n[{}]", fromStringz(messagebody));
 			log.trace("not compare with original \r\n[{}]", fromStringz(output_data));
@@ -48,8 +52,11 @@ class autotest: mom_client
 	{
 		log.trace("autotest listen!");
 
-		parse_file(message_log_file_name, "\r", "\r\n\r\n\r\n", &prepare_block);
-
+                for (long i = 0; i < count_repeat; i++)
+                {
+		  parse_file(message_log_file_name, "\r", "\r\n\r\n\r\n", &prepare_block);
+                }
+                
 		log.trace("autotest listen end, count commands: {}", count_commands);
 	}
 

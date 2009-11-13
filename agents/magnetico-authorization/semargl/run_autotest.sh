@@ -1,2 +1,2 @@
-./Semargl.test -autotest io_messages_log
+./Semargl.test -autotest io_messages_log -nocompare -repeat 100 
 
