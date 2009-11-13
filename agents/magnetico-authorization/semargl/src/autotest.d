@@ -12,9 +12,10 @@ private import tango.stdc.stdio;
 void function(byte* txt, ulong size) message_acceptor;
 
 private char* output_data = null;
+private int count_commands = 0;
 
 class autotest: mom_client
-{
+{	
 	char[] message_log_file_name;
 
 	this(char[] _message_log_file_name)
@@ -35,7 +36,8 @@ class autotest: mom_client
 
 		if(strcmp(messagebody, output_data) != 0)
 		{
-			log.trace("out messages\r\n[{}] not compare with original \r\n[{}]", fromStringz(messagebody), fromStringz(output_data));
+			log.trace("out messages\r\n[{}]", fromStringz(messagebody));
+			log.trace("not compare with original \r\n[{}]", fromStringz(output_data));
 			throw new Exception("out messages not compare with original");
 
 		}
@@ -48,7 +50,7 @@ class autotest: mom_client
 
 		parse_file(message_log_file_name, "\r", "\r\n\r\n\r\n", &prepare_block);
 
-		log.trace("autotest listen stop");
+		log.trace("autotest listen end, count commands: {}", count_commands);
 	}
 
 }
@@ -87,9 +89,9 @@ void prepare_block(char* line, ulong line_length)
 
 	if(strstr(input_data, "magnet-ontology/authorization/functions#create") !is null && strstr(input_data, "<>") !is null)
 	{
-		printf("\nINPUT %d: %s\n", size, input_data);
+//		printf("\nINPUT %d: %s\n", size, input_data);
 
-		printf("\nOUTPUT: %s\n", output_data);
+//		printf("\nOUTPUT: %s\n", output_data);
 
 		// это команда на создание записи авторизации
 
@@ -116,8 +118,9 @@ void prepare_block(char* line, ulong line_length)
 		input_data = toStringz(input_data_text.toString());
 		size = strlen(input_data);
 
-		printf("\nresult: %s\n", input_data);
+//		printf("\nresult: %s\n", input_data);
 	}
 
 	message_acceptor(cast(byte*) input_data, size);
+	count_commands++;
 }
