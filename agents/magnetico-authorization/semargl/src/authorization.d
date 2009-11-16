@@ -247,7 +247,7 @@ class Authorization
 		bool calculatedRight;
 
 		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
-			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts) || scripts.S10UserIsPermissionTargetAuthor.calculate(
+			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || scripts.S10UserIsPermissionTargetAuthor.calculate(
 					User, authorizedElementId, targetRightType, ts);
 
 		int is_in_docflow = -1;
@@ -258,7 +258,7 @@ class Authorization
 			if(is_in_docflow == 1)
 				return true;
 			else if(is_in_docflow == 0)
-				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
+				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
@@ -325,12 +325,12 @@ class Authorization
 		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S50UserOfTORO.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+			//log.trace("authorize:S50UserOfTORO res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
+			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
 		//log.trace("autorize end#3, return:[{}]", calculatedRight);
