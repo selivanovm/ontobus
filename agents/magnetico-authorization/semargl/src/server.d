@@ -30,6 +30,8 @@ private import script_util;
 private import RightTypeDef;
 private import fact_tools;
 private import tango.text.locale.Locale;
+//private import tango.text.convert.Integer;
+
 private import autotest;
 
 private mom_client client = null;
@@ -46,6 +48,8 @@ private Locale layout;
 void main(char[][] args)
 {
 	char[] autotest_file = null;
+        long count_repeat = 1;
+        bool nocompare = false;
 
 	if(args.length > 0)
 	{
@@ -56,6 +60,16 @@ void main(char[][] args)
 				log.trace("autotest mode");
 				autotest_file = args[i + 1];
 				log.trace("autotest file = {}", autotest_file);
+			}
+			if(args[i] == "-repeat" || args[i] == "-r")
+			{
+				count_repeat = atoll (toStringz (args[i + 1]));				
+				log.trace("repeat = {}", count_repeat);
+			}
+			if(args[i] == "-nocompare" || args[i] == "-n")
+			{
+				nocompare = true;
+				log.trace("no compare");
 			}
 		}
 	}
@@ -81,7 +95,7 @@ void main(char[][] args)
 	else
 	{
 		log.trace("use direct send command");
-		client = new autotest(autotest_file);
+		client = new autotest(autotest_file, count_repeat, nocompare);
 		client.set_callback(&get_message);
 	}
 
