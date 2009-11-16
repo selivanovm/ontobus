@@ -48,8 +48,8 @@ private Locale layout;
 void main(char[][] args)
 {
 	char[] autotest_file = null;
-        long count_repeat = 1;
-        bool nocompare = false;
+	long count_repeat = 1;
+	bool nocompare = false;
 
 	if(args.length > 0)
 	{
@@ -63,7 +63,7 @@ void main(char[][] args)
 			}
 			if(args[i] == "-repeat" || args[i] == "-r")
 			{
-				count_repeat = atoll (toStringz (args[i + 1]));				
+				count_repeat = atoll(toStringz(args[i + 1]));
 				log.trace("repeat = {}", count_repeat);
 			}
 			if(args[i] == "-nocompare" || args[i] == "-n")
@@ -136,8 +136,8 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 void get_message(byte* message, ulong message_size)
 {
-	char* msg = cast (char*)message;
-//	log.trace("get message {}", msg[0 .. message_size]);
+	char* msg = cast(char*) message;
+	//	log.trace("get message {}", msg[0 .. message_size]);
 	//	printf ("\nget message !%s!\n", message);
 
 	synchronized
