@@ -52,11 +52,11 @@ class HashMap
 }
     private
 {
-    uint key_2_list_triples_area__last;
+    uint key_2_list_triples_area__last = 0;
 }
     private
 {
-    uint key_2_list_triples_area__right;
+    uint key_2_list_triples_area__right = 0;
 }
     private
 {

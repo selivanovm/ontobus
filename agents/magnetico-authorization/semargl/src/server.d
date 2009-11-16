@@ -136,6 +136,8 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 void get_message(byte* message, ulong message_size)
 {
+	char* msg = cast (char*)message;
+//	log.trace("get message {}", msg[0 .. message_size]);
 	//	printf ("\nget message !%s!\n", message);
 
 	synchronized
@@ -321,16 +323,19 @@ void get_message(byte* message, ulong message_size)
 					if(is_fact_in_object[i] == arg_id)
 						break;
 				}
-				log.trace("agent_function s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+				log.trace("agent_function s = {}, p = {}, o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 
-				if(strcmp(fact_s[i], "trioplax") == 0 && strcmp(fact_p[i], "set_stat_info_logging"))
+				if(strcmp(fact_s[i], "trioplax") == 0 && strcmp(fact_p[i], "set_stat_info_logging") == 0)
 				{
 					if(strcmp(fact_o[i], "true") == 0)
+					{
+						log.trace("az.getTripleStorage.set_stat_info_logging(true)");
 						az.getTripleStorage.set_stat_info_logging(true);
+					}
 					else
 						az.getTripleStorage.set_stat_info_logging(false);
 				}
-				if(strcmp(fact_s[i], "semargl") == 0 && strcmp(fact_p[i], "set_logging_io_messages"))
+				if(strcmp(fact_s[i], "semargl") == 0 && strcmp(fact_p[i], "set_logging_io_messages") == 0)
 				{
 					if(strcmp(fact_o[i], "true") == 0)
 						logging_io_messages = true;

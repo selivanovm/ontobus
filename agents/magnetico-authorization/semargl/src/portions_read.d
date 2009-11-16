@@ -51,7 +51,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 
 			// недообработанный хвост
 
-			log.trace("BL-OCK[{}]", tail[0 .. tail_size] ~ content[0 .. start_pos]);
+			//			log.trace("BL-OCK[{}]", tail[0 .. tail_size] ~ content[0 .. start_pos]);
 			_block_acceptor((tail[0 .. tail_size] ~ content[0 .. start_pos]).ptr, tail_size + start_pos);
 
 			tail_size = 0;
@@ -66,7 +66,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 
 		if(content_size < file.length)
 		{
-			log.trace("#2.5 подравняем буфер сзади до начала маркера сигнализирующего о конце искомого блока");
+			//			log.trace("#2.5 подравняем буфер сзади до начала маркера сигнализирующего о конце искомого блока");
 			// подравняем буфер сзади до начала маркера сигнализирующего о конце искомого блока
 			bool found_tail = false;
 
@@ -100,7 +100,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 				block_end_pos--;
 			}
 
-			log.trace("#2.5 found_tail={}, block_end_pos={}", found_tail, block_end_pos);
+			//			log.trace("#2.5 found_tail={}, block_end_pos={}", found_tail, block_end_pos);
 
 			////
 			if(found_tail == true)
@@ -108,7 +108,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 				tail_size = content_size - block_end_pos - end_block_marker.length;
 				if(tail_size > 0)
 				{
-					log.trace("#!!! 5 копируем хвост content_size={}, block_end_pos={}, tail_size = {}", content_size, block_end_pos, tail_size);
+					//					log.trace("#!!! 5 копируем хвост content_size={}, block_end_pos={}, tail_size = {}", content_size, block_end_pos, tail_size);
 					// копируем хвост
 					strncpy(tail.ptr, content.ptr + block_end_pos + end_block_marker.length, tail_size);
 
@@ -119,7 +119,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 			}
 		}
 
-		log.trace("#!!!");
+		//		log.trace("#!!!");
 		// маркер конца блока найден, размер блока = block_end_pos + end_block_marker.length 
 		// сохраним хвост этого буфера, в дальнейшем он станет началом для последующего чтения буфера
 
@@ -132,7 +132,7 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 
 		while(end_pos < block_end_pos)
 		{
-			log.trace("#!!! 2");
+			//			log.trace("#!!! 2");
 
 			// найдем в этом блоке маркер конца
 			ubyte ii = 0;
@@ -145,12 +145,12 @@ void parse_file(char[] file_name, char[] begin_block_marker, char[] end_block_ma
 
 				end_pos++;
 			}
-			log.trace("#!!! 3");
+			//			log.trace("#!!! 3");
 
 			if(ii == end_block_marker.length && end_pos > start_pos)
 			{
 
-				log.trace("#start_pos={}, end_pos={}", start_pos, end_pos);
+				//				log.trace("#start_pos={}, end_pos={}", start_pos, end_pos);
 				//				log.trace("{}", content[start_pos .. end_pos]);
 				_block_acceptor(content.ptr + start_pos, end_pos - start_pos);
 				//				log.trace("#!!! 6 start_pos={}, end_pos={}", start_pos, end_pos);

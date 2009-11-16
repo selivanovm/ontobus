@@ -17,13 +17,13 @@ private long count_repeat;
 private bool nocompare;
 
 class autotest: mom_client
-{	
+{
 	char[] message_log_file_name;
 
 	this(char[] _message_log_file_name, long _count_repeat, bool _nocompare)
 	{
-	        count_repeat = _count_repeat;
-	        nocompare = _nocompare;
+		count_repeat = _count_repeat;
+		nocompare = _nocompare;
 		message_log_file_name = _message_log_file_name;
 		log.trace("open message_log file [{}]", message_log_file_name);
 
@@ -52,11 +52,11 @@ class autotest: mom_client
 	{
 		log.trace("autotest listen!");
 
-                for (long i = 0; i < count_repeat; i++)
-                {
-		  parse_file(message_log_file_name, "\r", "\r\n\r\n\r\n", &prepare_block);
-                }
-                
+		for(long i = 0; i < count_repeat; i++)
+		{
+			parse_file(message_log_file_name, "\r", "\r\n\r\n\r\n", &prepare_block);
+		}
+
 		log.trace("autotest listen end, count commands: {}", count_commands);
 	}
 
@@ -96,9 +96,9 @@ void prepare_block(char* line, ulong line_length)
 
 	if(strstr(input_data, "magnet-ontology/authorization/functions#create") !is null && strstr(input_data, "<>") !is null)
 	{
-//		printf("\nINPUT %d: %s\n", size, input_data);
+		//		printf("\nINPUT %d: %s\n", size, input_data);
 
-//		printf("\nOUTPUT: %s\n", output_data);
+		//		printf("\nOUTPUT: %s\n", output_data);
 
 		// это команда на создание записи авторизации
 
@@ -125,7 +125,7 @@ void prepare_block(char* line, ulong line_length)
 		input_data = toStringz(input_data_text.toString());
 		size = strlen(input_data);
 
-//		printf("\nresult: %s\n", input_data);
+		//		printf("\nresult: %s\n", input_data);
 	}
 
 	message_acceptor(cast(byte*) input_data, size);

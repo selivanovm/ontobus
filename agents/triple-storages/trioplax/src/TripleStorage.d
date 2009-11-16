@@ -139,7 +139,21 @@ class TripleStorage
 
 		if(log_stat_info == true)
 		{
-			log.trace("get: s={}, p={}, o={}", fromStringz(s), fromStringz(p), fromStringz(o));
+			char[] a_s = "";
+			char[] a_p = "";
+			char[] a_o = "";
+			
+			if (s != null)
+				a_s = "S";
+			
+			if (p  != null)
+				a_p = "P";
+						
+			if (o  != null)
+				a_o = "O";
+			
+			log.trace("A get from index {}{}{}: s={}, p={}, o={},", a_s, a_p, a_o, fromStringz(s), fromStringz(p), fromStringz(o));
+			log.trace("B get from index {}{}{}: p={}", a_s, a_p, a_o, fromStringz(p));
 		}
 
 		//log.trace("### getTriples2");
