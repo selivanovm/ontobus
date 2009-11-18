@@ -30,6 +30,8 @@ private import script_util;
 private import RightTypeDef;
 private import fact_tools;
 private import tango.text.locale.Locale;
+//private import tango.text.convert.Integer;
+
 private import autotest;
 
 private mom_client client = null;
@@ -118,16 +120,28 @@ void main(char[][] args_str)
   tmp_obj_l = new uint[10000];
 
 	char[] autotest_file = null;
+	long count_repeat = 1;
+	bool nocompare = false;
 
 	if(args_str.length > 0)
 	{
 		for(int i = 0; i < args_str.length; i++)
 		{
-			if(args_str[i] == "-autotest")
+			if(args_str[i] == "-autotest" || args[i] == "-a")
 			{
 				log.trace("autotest mode");
 				autotest_file = args_str[i + 1];
 				log.trace("autotest file = {}", autotest_file);
+			}
+			if(args_str[i] == "-repeat" || args_str[i] == "-r")
+			{
+				count_repeat = atoll(toStringz(args_str[i + 1]));
+				log.trace("repeat = {}", count_repeat);
+			}
+			if(args_str[i] == "-nocompare" || args_str[i] == "-n")
+			{
+				nocompare = true;
+				log.trace("no compare");
 			}
 		}
 	}
@@ -152,15 +166,17 @@ void main(char[][] args_str)
 	}
 	else
 	{
-		client = new autotest(autotest_file);
+		log.trace("use direct send command");
+		client = new autotest(autotest_file, count_repeat, nocompare);
+		client.set_callback(&get_message);
 	}
+
+	layout = new Locale;
 
 	az = new Authorization();
 
 	(new Thread(&client.listener)).start;
 	Thread.sleep(0.250);
-
-	layout = new Locale;
 }
 
 void send_result_and_logging_messages(char* queue_name, char* result_buffer)
@@ -192,6 +208,10 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 void get_message(byte* message, ulong message_size)
 {
+	char* msg = cast(char*) message;
+	//	log.trace("get message {}", msg[0 .. message_size]);
+	//	printf ("\nget message !%s!\n", message);
+
 	synchronized
 	{
 		if(*(message + message_size - 1) != '.')
@@ -221,10 +241,6 @@ void get_message(byte* message, ulong message_size)
 
 		elapsed.start;
 
-		//	char check_right = 0;
-
-		//	char* user_id;
-		//	char* queue_name;
 		char* list_docid;
 		char* docId;
 		uint targetRightType = RightType.READ;
@@ -478,16 +494,19 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 					if(is_fact_in_object[i] == arg_id)
 						break;
 				}
-				log.trace("agent_function s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+				log.trace("agent_function s = {}, p = {}, o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 
-				if(strcmp(fact_s[i], "trioplax") == 0 && strcmp(fact_p[i], "set_stat_info_logging"))
+				if(strcmp(fact_s[i], "trioplax") == 0 && strcmp(fact_p[i], "set_stat_info_logging") == 0)
 				{
 					if(strcmp(fact_o[i], "true") == 0)
+					{
+						log.trace("az.getTripleStorage.set_stat_info_logging(true)");
 						az.getTripleStorage.set_stat_info_logging(true);
+					}
 					else
 						az.getTripleStorage.set_stat_info_logging(false);
 				}
-				if(strcmp(fact_s[i], "semargl") == 0 && strcmp(fact_p[i], "set_logging_io_messages"))
+				if(strcmp(fact_s[i], "semargl") == 0 && strcmp(fact_p[i], "set_logging_io_messages") == 0)
 				{
 					if(strcmp(fact_o[i], "true") == 0)
 						logging_io_messages = true;

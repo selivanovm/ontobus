@@ -1,4 +1,4 @@
-module scripts.S40UsersOfTAImport;
+module scripts.S50UserOfTORO;
 
 import TripleStorage;
 
@@ -8,7 +8,8 @@ private import Log;
 private import tango.stdc.string;
 
 static char* depId = "92e57b6d-83e3-485f-8885-0bade363f759";
-static char*[] documentTypeNames = [ "Чертеж-IMPORT", "Конструкторский проект-IMPORT" ];
+static char*[] documentTypeNames = [ "Комплект чертежей", "Конструкторский проект", "Чертеж", "Чертеж ТОРО", 
+		    "Ведомость дефектов", "Отчет о ремонте", "Протокол измерений", "Техническая документация", "Паспорт", "Эскиз" ];
 
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
@@ -30,10 +31,10 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	else
 		if (iterator_on_targets_of_hierarhical_departments !is null && iterator_on_targets_of_hierarhical_departments.length > 0) {
 			for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
-				{
-					if (strcmp(iterator_on_targets_of_hierarhical_departments[i], depId) == 0)
-						is_user_in_dep = true;
-				}
+			{
+				if (strcmp(iterator_on_targets_of_hierarhical_departments[i], depId) == 0)
+					is_user_in_dep = true;
+			}
 		}
 	
 	if(is_user_in_dep)
@@ -75,7 +76,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		}
 		else
 		{
-			//log.trace("Документ в состоянии черновика!");
+		//	log.trace("Документ в состоянии черновика!");
 		}
 
 			

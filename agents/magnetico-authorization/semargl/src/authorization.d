@@ -55,7 +55,7 @@ class Authorization
 
 	this()
 	{
-		i_know_predicates = new char[][47];
+		i_know_predicates = new char[][48];
 
 		uint d = 0;
 
@@ -121,6 +121,8 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology#memberOf";
 		i_know_predicates[d++] = "magnet-ontology#loginName";
 
+		i_know_predicates[d++] = "magnet-ontology/documents#type_name";
+
 		init();
 	}
 
@@ -136,7 +138,13 @@ class Authorization
 		log.trace("authorization init..");
 		Stdout.format("authorization init..").newline;
 
-		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
+		//		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
+		ts = new TripleStorage(2_000_000, 9, 1024 * 1024 * 150);
+		ts.set_new_index(idx_name.S, 500_000, 6, 1024 * 1024 * 40);
+		ts.set_new_index(idx_name.O, 500_000, 6, 1024 * 1024 * 20);
+		ts.set_new_index(idx_name.PO, 1_000_000, 9, 1024 * 1024 * 40);
+		ts.set_new_index(idx_name.SP, 2_000_000, 9, 1024 * 1024 * 150);
+		ts.set_new_index(idx_name.S1PPOO, 500_000, 6, 1024 * 1024 * 40);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 				"magnet-ontology/authorization/acl#rights");
@@ -239,7 +247,7 @@ class Authorization
 		bool calculatedRight;
 
 		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
-			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts) || scripts.S10UserIsPermissionTargetAuthor.calculate(
+			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || scripts.S10UserIsPermissionTargetAuthor.calculate(
 					User, authorizedElementId, targetRightType, ts);
 
 		int is_in_docflow = -1;
@@ -250,7 +258,7 @@ class Authorization
 			if(is_in_docflow == 1)
 				return true;
 			else if(is_in_docflow == 0)
-				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
+				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
 		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
@@ -295,34 +303,42 @@ class Authorization
 			//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
+		bool is_doc_or_draft = (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory, "DOCUMENT_DRAFT") == 0);
+		if(calculatedRight == false && is_doc_or_draft)
 		{
-			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			//log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
+		if(calculatedRight == false && is_doc_or_draft)
 		{
-			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			//log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
-		if(calculatedRight == false)
+		if(calculatedRight == false && is_doc_or_draft)
 		{
-			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
+			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+		}
+
+		if(calculatedRight == false && is_doc_or_draft)
+		{
+			calculatedRight = scripts.S50UserOfTORO.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
+			//log.trace("authorize:S50UserOfTORO res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts);
+			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
 		//log.trace("autorize end#3, return:[{}]", calculatedRight);
 		return calculatedRight;
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)//, mom_client client)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)
+	//, mom_client client)
 	{
 
 		log.trace("запрос на выборку записей прав");
@@ -580,7 +596,7 @@ class Authorization
 
 							send_result_and_logging_messages(queue_name, result_buffer);
 
-//							client.send(queue_name, result_buffer);
+							//							client.send(queue_name, result_buffer);
 
 							result_ptr = cast(char*) result_buffer;
 
@@ -606,10 +622,10 @@ class Authorization
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
 		strcpy(queue_name, fact_o[reply_to_id]);
-		
+
 		send_result_and_logging_messages(queue_name, result_buffer);
-		
-//		client.send(queue_name, result_buffer);
+
+		//		client.send(queue_name, result_buffer);
 
 		double time = elapsed.stop;
 		log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -617,8 +633,9 @@ class Authorization
 
 	}
 
-	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)//,
-//			mom_client client)
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)
+	//,
+	//			mom_client client)
 	{
 
 		log.trace("команда на выборку делегировавших");
@@ -668,7 +685,7 @@ class Authorization
 		result_ptr += strlen(command_uid);
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
-//		client.send(queue_name, result_buffer);
+		//		client.send(queue_name, result_buffer);
 		send_result_and_logging_messages(queue_name, result_buffer);
 
 		double time = elapsed.stop;
