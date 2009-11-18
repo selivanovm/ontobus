@@ -265,11 +265,6 @@ class TripleStorage
 			idx_o.remove_triple_from_list(removed_triple, o, null, null);
 		}
 
-		if(idx_sp !is null)
-		{
-			idx_sp.remove_triple_from_list(removed_triple, s, p, null);
-		}
-
 		if(idx_po !is null)
 		{
 			idx_po.remove_triple_from_list(removed_triple, p, o, null);
@@ -285,11 +280,10 @@ class TripleStorage
 			// проверим удаляемую запись на соответствие установленных предикатов для индекса sppoo [setPredicatesToS1PPOO]					
 			for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
 			{
-				//				log.trace("remove from index sppoo ?:[{}]?[{}]", p, look_predicate_p1_on_idx_s1ppoo[i]);
+								//log.trace("remove from index sppoo ?:[{}]?[{}]", p, look_predicate_p1_on_idx_s1ppoo[i]);
 				if(p == look_predicate_p1_on_idx_s1ppoo[i])
 				{
-					//					log.trace("remove from index sppoo A:[{}]", p);
-					//log.trace ("#3");
+										//log.trace("remove from index sppoo A:[{}]", p);
 					char[] o1 = o;
 					char[] p1 = p;
 					char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
@@ -301,15 +295,49 @@ class TripleStorage
 						char[] o2 = fromStringz(
 								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
-						//						log.trace("remove from index sppoo A: p1 = {}, p2 = {}", p1, p2);
+						//log.trace("remove from index sppoo A: p1 = {}, p2 = {}", p1, p2);
+						//log.trace("### [{}] [{}] [{}]", look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
+						
+						listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);
+						//log.trace("#111");
+						
+						byte* triple1 = null;
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
-						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
+						if(listS !is null)
+						{						
+							uint next_element1 = 0xFF;
+							while(next_element1 > 0)
+							{
+								triple1 = cast(byte*) *listS;
+								if(triple1 !is null)
+								{
+									char* sss = cast(char*) triple1 + 6;
+									if(strcmp(s.ptr, sss) == 0) 
+									{
+										break;
+									}
+									//log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
+								}
+								next_element1 = *(listS + 1);
+								listS = cast(uint*) next_element1;
+							}
+						}
+						//print_list_triple(listS);
+
+						if(triple1 !is null)
+						{
+							idx_s1ppoo.remove_triple_from_list(cast(uint*)triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
+							//log.trace("#333");
+						//						listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);						
+							listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);
+							//print_list_triple(listS);
+						}
 					}
 
 				}
 				else if(p == look_predicate_p2_on_idx_s1ppoo[i])
 				{
-					//					log.trace("remove from index sppoo B:[{}]", p);
+										//log.trace("remove from index sppoo B:[{}]", p);
 					char[] o2 = o;
 					char[] p2 = p;
 					char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
@@ -321,7 +349,7 @@ class TripleStorage
 						char[] o1 = fromStringz(
 								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
-						//						log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
+												//log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
 						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 					}
@@ -329,6 +357,12 @@ class TripleStorage
 				}
 
 			}
+		if(idx_sp !is null)
+		{
+			idx_sp.remove_triple_from_list(removed_triple, s, p, null);
+		}
+
+
 
 		}
 		idx_spo.remove_triple_from_list(removed_triple, s, p, o);
@@ -347,230 +381,200 @@ class TripleStorage
 	{
 		synchronized
 		{
-			try
+
+			//do_things(o.ptr);
+
+			//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
+			void* triple;
+
+			if(s.length == 0 && p.length == 0 && o.length == 0)
+				return -1;
+
+			uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+			//log.trace("addTriple #1");
+			if(list !is null)
 			{
-				//do_things(o.ptr);
 
-				//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
-				void* triple;
-
-				if(s.length == 0 && p.length == 0 && o.length == 0)
-					return -1;
-
-				uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-				//log.trace("addTriple #1");
-				if(list !is null)
-				{
-
-					/*	uint next_element1 = 0xFF;
-					 while(next_element1 > 0)
-					 {
-					 if(list !is null) {
-					 byte* triple2 = cast(byte*) *list;
-					 if(triple2 !is null)
-					 {
-					 char* ss = cast(char*) triple2 + 6;
+				/*	uint next_element1 = 0xFF;
+					while(next_element1 > 0)
+					{
+					if(list !is null) {
+					byte* triple2 = cast(byte*) *list;
+					if(triple2 !is null)
+					{
+					char* ss = cast(char*) triple2 + 6;
 					 
-					 char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+					char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
 					 
-					 char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+					char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 					 
-					 if (ss !is null || pp !is null || oo !is null)
-					 return -2;
-
-					 }
-					 }
-					 next_element1 = *(list + 1);
-					 list = cast(uint*) next_element1;
-					 log.trace("!!!!!!!!!!!!!!!!!!22");
-					 }*/
+					if (ss !is null || pp !is null || oo !is null)
 					return -2;
 
-					//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
-					//		        throw new Exception ("addTriple: triple already exist");
+					}
+					}
+					next_element1 = *(list + 1);
+					list = cast(uint*) next_element1;
+					log.trace("!!!!!!!!!!!!!!!!!!22");
+					}*/
+				return -2;
 
-				}
+				//			log.trace("addTriple:2 triple <{}><{}><{}> already exist", s, p, o);
+				//		        throw new Exception ("addTriple: triple already exist");
 
-				//		log.trace("addTriple:add index spo");
-				idx_spo.put(s, p, o, null, false);
-				//log.trace("addTriple #2");
-				//		log.trace("addTriple:get this index as triple");
-				list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-				//		log.trace("addTriple:ok, list={:X4}", list);
-				//log.trace("addTriple #3");
-				if(list is null)
-					throw new Exception("addTriple: not found triple in index spo");
+			}
 
-				triple = cast(void*) *list;
+			//		log.trace("addTriple:add index spo");
+			idx_spo.put(s, p, o, null, false);
+			//log.trace("addTriple #2");
+			//		log.trace("addTriple:get this index as triple");
+			list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+			//		log.trace("addTriple:ok, list={:X4}", list);
+			//log.trace("addTriple #3");
+			if(list is null)
+				throw new Exception("addTriple: not found triple in index spo");
 
-				//log.trace("!!!!!!!!!!!!!!!!!!11");
+			triple = cast(void*) *list;
 
-				//		log.trace("addTriple:3 addr={:X4}", triple);
-				//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, fromStringz(cast(char*) (triple + 6)));
+			//log.trace("!!!!!!!!!!!!!!!!!!11");
 
-				if(idx_s !is null)
-					idx_s.put(s, null, null, triple, false);
-				//log.trace("addTriple #4");
-				if(idx_p !is null)
-					idx_p.put(p, null, null, triple, false);
-				//log.trace("addTriple #5");
-				if(idx_o !is null)
-					idx_o.put(o, null, null, triple, false);
-				//log.trace("addTriple #6");
-				if(idx_sp !is null)
-					idx_sp.put(s, p, null, triple, false);
-				//log.trace("addTriple #7");
-				if(idx_po !is null)
+			//		log.trace("addTriple:3 addr={:X4}", triple);
+			//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, fromStringz(cast(char*) (triple + 6)));
+
+			if(idx_s !is null)
+				idx_s.put(s, null, null, triple, false);
+			//log.trace("addTriple #4");
+			if(idx_p !is null)
+				idx_p.put(p, null, null, triple, false);
+			//log.trace("addTriple #5");
+			if(idx_o !is null)
+				idx_o.put(o, null, null, triple, false);
+			//log.trace("addTriple #6");
+			if(idx_sp !is null)
+				idx_sp.put(s, p, null, triple, false);
+			//log.trace("addTriple #7");
+			if(idx_po !is null)
+			{
+				//			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, fromStringz(cast(char*)triple));
+				idx_po.put(p, o, null, triple, false);
+			}
+			//log.trace("addTriple #8");
+			if(idx_so !is null)
+				idx_so.put(s, o, null, triple, false);
+			//log.trace("addTriple #9");
+			/* 
+			 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
+			 */
+
+			if(idx_s1ppoo !is null)
+			{
+
+				char[] p1;
+				char[] p2;
+				char[] p3;
+
+				char[] o1;
+				char[] o2;
+				// проверим запись на соответствие установленных предикатов для индекса sppoo [setPredicatesToS1PPOO]					
+				for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
 				{
-					//			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, fromStringz(cast(char*)triple));
-					idx_po.put(p, o, null, triple, false);
-				}
-				//log.trace("addTriple #8");
-				if(idx_so !is null)
-					idx_so.put(s, o, null, triple, false);
-				//log.trace("addTriple #9");
-				/* 
-				 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
-				 */
-
-				if(idx_s1ppoo !is null)
-				{
-
-					// проверим удаляемую запись на соответствие установленных предикатов для индекса sppoo [setPredicatesToS1PPOO]					
-					for(int i = 0; i < count_look_predicate_on_idx_s1ppoo; i++)
+					//log.trace ("#2_");
+					if(p == look_predicate_p1_on_idx_s1ppoo[i])
 					{
-						//log.trace ("#2_");
-						if(p == look_predicate_p1_on_idx_s1ppoo[i])
+						//log.trace ("#3");
+						p1 = p;
+						p2 = look_predicate_p2_on_idx_s1ppoo[i];
+						p3 = store_predicate_in_list_on_idx_s1ppoo[i];
+
+						o1 = o;
+						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+							
+						if(listS !is null)
 						{
-							//log.trace ("#3");
-							char[] o1 = o;
-							char[] p1 = p;
-							char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
-
-							uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
-							if(listS !is null)
-							{
-								byte* tripleS = cast(byte*) *listS;
-								char[]
-										o2 = fromStringz(
-												cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
-
-								//							log.trace("add A: p1 = {}, p2 = {}", p1, p2);
-								// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-								idx_s1ppoo.put(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, triple, false);
-							}
-
+							byte* tripleS = cast(byte*) *listS;
+							o2 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
+										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 						}
-						else if(p == look_predicate_p2_on_idx_s1ppoo[i])
+
+					}
+					else if(p == look_predicate_p2_on_idx_s1ppoo[i])
+					{
+						//log.trace ("#4");
+						p1 = look_predicate_p1_on_idx_s1ppoo[i];
+						p2 = p;
+						p3 = store_predicate_in_list_on_idx_s1ppoo[i];
+
+						o2 = o;
+						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
+							
+						if(listS !is null)
 						{
-							//log.trace ("#4");
-							char[] o2 = o;
-							char[] p2 = p;
-							char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
-
-							uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
-							if(listS !is null)
-							{
-								byte* tripleS = cast(byte*) *listS;
-								char[]
-										o1 = fromStringz(
-												cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
-
-								//							log.trace("add B: p1 = {}, p2 = {}", p1, p2);
-								// вторая часть p2 для этого субьекта успешно была найдена, переходим к созданию индекса
-								idx_s1ppoo.put(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, triple, false);
-							}
-
+							byte* tripleS = cast(byte*) *listS;
+							o1 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
+										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 						}
-						else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
+
+					} 
+					else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
+					{
+						//log.trace ("#4");
+						p1 = look_predicate_p1_on_idx_s1ppoo[i];
+						p2 = look_predicate_p2_on_idx_s1ppoo[i];
+						p3 = p;
+
+						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
+						if(listS !is null)
 						{
-							//log.trace ("#5");
-							// 1. найдем o1 и o2, для этого просмотрим все факты у которых subject = s  
-
-							// !!! НЕ РАССМОТРЕНЫ ВАРИАНТЫ КОГДА store_predicate_in_list_on_idx_s1ppoo[i] встречается раньше чем p1 или p2  
-							uint* list_iterator = idx_s.get(cast(char*) s, null, null, false);
-
-							char* o1 = null;
-							char* o2 = null;
-							char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
-							char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
-
-							if(list_iterator !is null)
-							{
-								uint next_element0 = 0xFF;
-								while(next_element0 > 0)
-								{
-									byte* triple0 = cast(byte*) *list_iterator;
-
-									//								log.trace("### {:X4}", triple0);
-
-									if(triple0 !is null)
-									{
-
-										char* p_of_s = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-
-										if(strcmp(p_of_s, cast(char*) p1) == 0)
-										{
-											o1 = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-										}
-										else if(strcmp(p_of_s, cast(char*) p2) == 0)
-										{
-											o2 = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-										}
-
-										if(o1 !is null && o2 !is null)
-										{
-											list_iterator = idx_s1ppoo.get(cast(char*) look_predicate_pp_on_idx_s1ppoo[i], o1, o2, false);
-											if(list_iterator !is null)
-											{
-												//										log.trace ("#2 pp={}, o1={}, o2={} => {}", look_predicate_pp_on_idx_s1ppoo[i], fromStringz(o1), fromStringz(o2), cast(uint) triple);
-												*list_iterator = cast(uint) triple;
-											}
-											else
-												log.trace("!!! idx_s1ppoo EX0000");
-
-											break;
-										}
-
-									}
-
-									next_element0 = *(list_iterator + 1);
-									list_iterator = cast(uint*) next_element0;
-								}
-							}
-
-							/*											
-							 if(o1 !is null && o2 !is null)
-							 {
-							 ////							log.trace ("#3 p={}", store_predicate_in_list_on_idx_s1ppoo[i]);
-							 //							// оба предиката уже существуют, 
-							 //							// значит для данного s индекс s1ppoo уже заполнялся и можно добавить к нему в список данный триплет 
-							 //
-							 idx_s1ppoo.put(p1 ~ p2, fromStringz(o1) ~ fromStringz(o2), null, triple);
-							 }
-							 */
+							byte* tripleS = cast(byte*) *listS;
+							o1 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
+										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 						}
-						//					log.trace ("#END");
+
+						listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+						if(listS !is null)
+						{
+							byte* tripleS = cast(byte*) *listS;
+							o2 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
+										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+						}
 
 					}
 
 				}
-				//do_things(o.ptr);
 
-				return 0;
+
+				if(p1 !is null && p2 !is null && p3 !is null && o1 !is null && o2 !is null)
+				{
+					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p3, null, false);					
+					if(listS !is null)
+					{
+						//log.trace("#SPPOO_ADD 0");
+						//print_list_triple(listS);
+						char[] p1p2 = p1 ~ p2;
+						//log.trace ("#SPPOO_ADD 1 {} {} {} {} {} {}", p1 , p2 , p3 , o1 , o2, p1p2);
+						void* tripleS = cast(void*) *listS;
+						idx_s1ppoo.put(p1p2, o1, o2, tripleS, false);
+						
+						listS = idx_s1ppoo.get(p1p2.ptr, o1.ptr, o2.ptr, false);					
+						//log.trace("#SPPOO_ADD 2");
+						//print_list_triple(listS);
+						
+					}
+				}
+					
 			}
-			catch(Exception ex)
-			{
-				throw ex;
-			}
+			//					log.trace ("#END");
+
 		}
+	return 0;
 	}
+	//do_things(o.ptr);
 
-	public void do_things(char* ooo)
+public void do_things(char* ooo)
+{
+	if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0)
 	{
-		if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0)
-		{
-			uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr);
+		uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr);
 
 			if(list_facts !is null)
 			{
@@ -599,4 +603,40 @@ class TripleStorage
 		}
 	}
 
+public void print_list_triple(uint* list_iterator)
+{
+	byte* triple;
+	if(list_iterator !is null)
+	{
+		uint next_element0 = 0xFF;
+		while(next_element0 > 0)
+		{
+			log.trace("#KKK {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
+			
+			triple = cast(byte*) *list_iterator;
+			if (triple !is null)
+			  print_triple(triple);
+			
+			next_element0 = *(list_iterator + 1);
+			list_iterator = cast(uint*) next_element0;
+		}
+	}
 }
+
+public void print_triple(byte* triple)
+{
+	if(triple is null)
+		return;
+
+	char* s = cast(char*) triple + 6;
+
+	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+	log.trace("triple: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
+}
+
+
+}
+

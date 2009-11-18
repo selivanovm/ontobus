@@ -3,6 +3,7 @@ module HashMap;
 //private import tango.stdc.stdlib: alloca;
 //private import tango.stdc.stdlib: malloc;
 private import tango.stdc.string;
+private import tango.stdc.stringz;
 private import tango.io.Stdout;
 private import Integer = tango.text.convert.Integer;
 
@@ -673,31 +674,72 @@ class HashMap
 	{
 		uint* list = get(s.ptr, p.ptr, o.ptr, false);
 
-		uint* prev_list_element = null;
-
 		if(list !is null)
 		{
+			int i = 0;
 			uint next_element1 = 0xFF;
+			uint* prev_element = null;
 			while(next_element1 > 0)
 			{
+				//				log.trace("#rtf1");
+				
 				if(removed_triple == cast(uint*) *list)
 				{
-					if(prev_list_element !is null)
+					//log.trace("#rtf2");
+					
+					if(*(list + 1) == 0)
 					{
-						prev_list_element = cast(uint*) *(list + 1);
-						break;
+						if(i == 0)
+						{
+							//log.trace("#rtf3");
+						
+							put(s, p, o, null, true);
+							break;
+						}
+						else
+						{
+							//log.trace("#rtf4");
+						
+							*(prev_element + 1) = 0;
+							break;
+						}
 					}
 					else
 					{
-						put(s, p, o, null, true);
+						//log.trace("#rtf5 {:X4} {:X4} {:X4}", list, list + 1, prev_element);
+						if(prev_element !is null)
+						{
+							*(prev_element + 1) = *(list + 1);
+							break;
+						}
+						else
+						{
+							//log.trace("#rtf6 {:X4} {:X4} ", (cast(uint*)*(list + 1)) + 1, cast(uint*)*(list + 1));
+							//print_triple(cast(byte*)*(list));
+							//print_triple(cast(byte*)*(cast(uint*)*(list + 1)));
+
+							*list = *(cast(uint*)*(list + 1));
+							//print_list_triple(list);
+
+							*(list + 1) = *((cast(uint*)*(list + 1)) + 1);
+							//print_list_triple(list);
+
+							break;
+						}
+
 					}
 				}
-				prev_list_element = list;
+				prev_element = list;
 				next_element1 = *(list + 1);
 				list = cast(uint*) next_element1;
+				i++;
+
 			}
 		}
+			
 	}
+
+
 
 	private void dump_mem(ubyte[] mem, uint ptr)
 	{
@@ -814,4 +856,38 @@ private void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr)
 private static char[] _toString(char* s)
 {
 	return s ? s[0 .. strlen(s)] : cast(char[]) null;
+}
+
+public void print_triple(byte* triple)
+{
+	if(triple is null)
+		return;
+
+	char* s = cast(char*) triple + 6;
+
+	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+	log.trace("triple: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
+}
+
+public void print_list_triple(uint* list_iterator)
+{
+	byte* triple;
+	if(list_iterator !is null)
+	{
+		uint next_element0 = 0xFF;
+		while(next_element0 > 0)
+		{
+			log.trace("#YYY {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
+			
+			triple = cast(byte*) *list_iterator;
+			if (triple !is null)
+			  print_triple(triple);
+			
+			next_element0 = *(list_iterator + 1);
+			list_iterator = cast(uint*) next_element0;
+		}
+	}
 }
