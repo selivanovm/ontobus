@@ -299,7 +299,7 @@ class HashMap
 				// log.trace("put:[{:X4}] 12 сохраняем тексты ключей по адресу={:X4}",
 				//						cast(void*) this, ptr);
 
-				if(key1 !is null && key2 !is null && key3 !is null)
+				if(key1 !is null && key2 !is null && key3 !is null && triple is null)
 				{
 					triple = cast(void*) key_2_list_triples_area.ptr + key_2_list_triples_area__last + 4;
 					//					log.trace("put:[{:X4}] 12.1 все ключи !=null triple={:X4}", cast(void*) this, triple);
