@@ -555,7 +555,7 @@ class TripleStorage
 						void* tripleS = cast(void*) *listS;
 						idx_s1ppoo.put(p1p2, o1, o2, tripleS, false);
 						
-						listS = idx_s1ppoo.get(p1p2.ptr, o1.ptr, o2.ptr, false);					
+						//listS = idx_s1ppoo.get(p1p2.ptr, o1.ptr, o2.ptr, false);					
 						//log.trace("#SPPOO_ADD 2");
 						//print_list_triple(listS);
 						
