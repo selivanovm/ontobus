@@ -267,19 +267,19 @@ class Authorization
 		{
 
 			calculatedRight = scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts);
-			log.trace("autorize end#0, return:[{}]", calculatedRight);
+			//log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
 		if(calculatedRight == true)
 		{
-			log.trace("autorize end#1, return:[{}]", calculatedRight);
+			//log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
-			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
 		//		if(calculatedRight == false)
@@ -293,39 +293,39 @@ class Authorization
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-			log.trace("autorize end#2, return:[false]");
+			//log.trace("autorize end#2, return:[false]");
 			return false;
 		}
 
 		if(calculatedRight == false)
 		{
 			calculatedRight = scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document);
-			log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+			//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
 		bool is_doc_or_draft = (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory, "DOCUMENT_DRAFT") == 0);
 		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
+			//log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
+			//log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
+			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S50UserOfTORO.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			log.trace("authorize:S50UserOfTORO res={}", calculatedRight);
+			//log.trace("authorize:S50UserOfTORO res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
@@ -333,7 +333,7 @@ class Authorization
 			calculatedRight = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
-		log.trace("autorize end#3, return:[{}]", calculatedRight);
+		//log.trace("autorize end#3, return:[{}]", calculatedRight);
 		return calculatedRight;
 	}
 
