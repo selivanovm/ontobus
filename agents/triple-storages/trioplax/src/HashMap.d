@@ -11,6 +11,26 @@ private import Hash;
 
 private import Log;
 
+struct triple
+{
+	char[] s;
+	char[] p;
+	char[] o;
+}
+
+struct triple_list_element 
+{
+	triple* triple_ptr;
+	triple_list_element* next_triple_list_element;
+}
+
+struct triple_list_header
+{
+	triple_list_element* last_element;
+	triple* keys;
+	triple_list_element* first_element;
+}
+
 class HashMap
 {
 	private uint max_count_elements = 1_000;
@@ -20,6 +40,9 @@ class HashMap
 	// в таблице соответствия первые четыре элемента содержат ссылки на ключи, короткие списки конфликтующих ключей содержатся в reducer_area
 	private uint reducer_area_length;
 	private uint[] reducer_area_ptr;
+	
+	private triple_list_header*[][] reducer;
+	
 	private uint reducer_area_right;
 
 	// область связки ключей и списков триплетов
@@ -59,13 +82,16 @@ class HashMap
 		log.trace("*** HashMap[name={}, reducer_area_length={}", hashName, reducer_area_length);
 
 		reducer_area_ptr = new uint[reducer_area_length];
+		
 
 		// инициализируем в reducer_area_ptr первые позиции коротких очередей 
 		// это понадобится для функции выдачи всех фактов по данному HashMap
 		for(uint i = 0; i < reducer_area_length; i += max_size_short_order)
-			reducer_area_ptr[i] = 0;
+				reducer_area_ptr[i] = 0;
 
 		reducer_area_right = reducer_area_length;
+
+		reducer.length = max_count_elements;
 
 		// область ключей и списков триплетов
 		// формат:
@@ -118,9 +144,9 @@ class HashMap
 		log.trace("*** create object HashMap... ok");
 	}
 
-	public void put(char[] key1, char[] key2, char[] key3, void* triple, bool is_delete)
+
+	public void put(char[] key1, char[] key2, char[] key3, triple* triple_ptr, bool is_delete)
 	{
-		// если идет запись с установленными тремя ключами то triple считается началом записи ключей
 
 		if(key1 is null && key2 is null && key3 is null)
 			return;
@@ -134,332 +160,72 @@ class HashMap
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 
 		//		 log.trace("put:[{:X}] 0 hash= {:X}", cast(void*) this, hash);
+		
 
-		uint short_order_conflict_keys = hash * max_size_short_order;
+		triple_list_header header;
+		triple_list_element last_element;
+		triple_list_element new_element;
 
-		//		dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
-
-		if(short_order_conflict_keys > reducer_area_right)
+		if(reducer[hash] is null)
 		{
-			log.trace("put:{} short_order_conflict_keys > reducer_area_right", hashName);
-			throw new Exception("put:" ~ hashName ~ " short_order_conflict_keys > reducer_area_right");
-		}
+			reducer[hash].length = max_size_short_order;
+			
+			header = *(reducer[hash][0]);
 
-		// хэш нас привел к очереди конфликтующих ключей
+			triple keyz;
+			keyz.s = key1;
+			keyz.p = key2;
+			keyz.o = key3;
+			header.keys = &keyz;
 
-		// log.trace("put:[{:X}] 2 short_order_conflict_key={:X}", cast(void*) this, short_order_conflict_keys);
-
-		// log.trace("put:3 выясним, короткая это очередь или длинная");
-
-		// выясним, короткая это очередь или длинная
-
-		if(reducer_area_ptr[short_order_conflict_keys] == 0xFFFFFFFF)
-		{
-			// это длинная очередь, следующие 4 байта будут содержать ссылку на длинную очередь
-			Stdout.format("put *4 это длинная очередь, следующие 4 байта будут содержать ссылку на длинную очередь").newline;
-
-			// длинная очередь устроена иначе чем короткая
+			if(triple_ptr is null)
+			{
+				new_element.triple_ptr = &keyz;
+			}
+			header.first_element = &new_element;
 		}
 		else
 		{
-			// это короткая очередь
-			// делаем сравнение ключей короткой очереди
-
-			uint next_short_order_conflict_keys = short_order_conflict_keys;
-
-			bool isKeyExist = false;
-			uint keys_of_hash_in_reducer = 0;
-
-			uint keys_and_triplets_list = 0;
-
-			byte pos_in_order = max_size_short_order;
-			
-			for(; pos_in_order > 0; pos_in_order--)
+			bool isKeyExists = false;			
+			int i = 0;
+			triple keyz;
+			while(i < max_size_short_order && reducer[hash][i] !is null)
 			{
-				log.trace("#pos_in_order = {}", pos_in_order);
 				
-				// log.trace("put:[{:X}] 4  i={}", cast(void*) this, pos_in_order);
+				header = *(reducer[hash][i]);
+				
+				isKeyExists = false;
 
-				keys_of_hash_in_reducer = reducer_area_ptr[next_short_order_conflict_keys];
-				//				log.trace("put:[{:X}] 5  keys_of_hash_in_reducer={:X}", cast(void*) this,
-				//						keys_of_hash_in_reducer);
+				keyz = *(header.keys);
+				
+				if(key1 !is null && keyz.s == key1)
+					isKeyExists = true;
 
-				if(keys_of_hash_in_reducer != 0)
-				{
-					//					log.trace(
-					//							"put:[{:X}] в этой позиции есть уже ссылка на ключ, сравним с нашим ключем",
-					//							cast(void*) this);
+				if(isKeyExists && key2 !is null)
+					isKeyExists = keyz.p == key2;
 
-					keys_and_triplets_list = keys_of_hash_in_reducer;
-					//					log.trace("put:5 keys_and_triplets_list={:X}", keys_and_triplets_list);
+				if(isKeyExists && key3 !is null)
+					isKeyExists = keyz.o == key3;
 
-					uint key_ptr = keys_and_triplets_list + 10;
-
-					char[] keys = cast(char[]) key_2_list_triples_area;
-					if(key1 !is null)
-					{
-						// log.trace("put:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
-
-						if(_strcmp(keys, key_ptr, key1) == true)
-						{
-							// log.trace("put:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
-							isKeyExist = true;
-
-							if(key2 is null && key3 is null)
-								break;
-
-							key_ptr += key1.length + 1;
-						}
-					}
-					if(key2 !is null && (key1 is null || key1 !is null && isKeyExist == true))
-					{
-						isKeyExist = false;
-						// log.trace("put:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
-
-						if(_strcmp(keys, key_ptr, key2) == true)
-						{
-							// log.trace("put:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
-
-							isKeyExist = true;
-
-							if(key3 is null)
-								break;
-
-							key_ptr += key2.length + 1;
-						}
-
-					}
-
-					if(key3 !is null && ((key1 is null || key1 !is null && isKeyExist == true) || (key2 is null || key2 !is null && isKeyExist == true)))
-					{
-						isKeyExist = false;
-						// log.trace("put:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
-						if(_strcmp(keys, key_ptr, key3) == true)
-						{
-							// log.trace("put:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
-							isKeyExist = true;
-							key_ptr += key3.length + 1;
-							break;
-						}
-
-					}
-
-					next_short_order_conflict_keys++;
-				}
-				else
-				{
-					//					log.trace(
-					//							"put:[{:X}] если в этой позиции ключа 0, то очевидно дальше искать нет смысла",
-					//							cast(void*) this);
-					//					if(pos_in_order < 4)
-					//					{
-					//						// log.trace("put:8 i={}, keys_of_hash_in_reducer={}", pos_in_order,
-					//								keys_of_hash_in_reducer);
-					//					}
-					// если в этой позиции ключа 0, то очевидно дальше искать нет смысла
+				if(isKeyExists)
 					break;
-				}
-
+				i++;
 			}
 
-			//			dump_mem(key_2_list_triples_area);
-			uint end_element__triples_list = 0;
-
-			if(isKeyExist == true)
+			if(triple_ptr is null)
 			{
-				//				 log.trace("put:[{:X}] 9 ключи ранее были и совпали, keys_and_triplets_list={:X}",
-				//						cast(void*) this, keys_and_triplets_list);
-
-				// ключи совпали
-				// позиция next_short_order_conflict_keys содержит ссылку в очереди на совпавший ключ при isKeyExist == true
-				// last_element_of_list установлен в позицию последнего элемента очереди !!!
-
-				end_element__triples_list = ptr_from_mem(key_2_list_triples_area, keys_and_triplets_list);
-				//				log.trace("put:[{:X}] 10 end_element__triples_list={:X}", cast(void*) this,
-				//						end_element__triples_list);
-
-				//				dump_mem(key_2_list_triples_area);
-			}
-			else
-			{
-				if(pos_in_order == 0)
-				{
-					throw new Exception("put: " ~ hashName ~ " short order is full");
-				}
-				//				 log.trace("put:[{:X4}] 11 ключи не найдены, нужно завести новую очередь, {:X4}",
-				//						cast(void*) this, key_2_list_triples_area__last);
-
-				// ключи НЕ совпали 
-				// нужно завести новую очередь
-
-				char[] keys = cast(char[]) key_2_list_triples_area;
-				// сохраняем ключ в key_2_list_triples	(+6 = указатель на голову очереди + длинна ключей	
-
-				keys_and_triplets_list = key_2_list_triples_area__last;
-				uint ptr = key_2_list_triples_area__last + 10;
-				//				log.trace("put:[{:X4}] 12 keys_and_triplets_list={:X4}",	cast(void*) this, keys_and_triplets_list);
-
-				// log.trace("put:[{:X4}] 12 сохраняем тексты ключей по адресу={:X4}",
-				//						cast(void*) this, ptr);
-
-				if(key1 !is null && key2 !is null && key3 !is null && triple is null)
-				{
-					triple = cast(void*) key_2_list_triples_area.ptr + key_2_list_triples_area__last + 4;
-					//					log.trace("put:[{:X4}] 12.1 все ключи !=null triple={:X4}", cast(void*) this, triple);
-				}
-
-				if(key1 !is null)
-				{
-					key_2_list_triples_area[key_2_list_triples_area__last + 4] = (key1.length & 0x0000FF00) >> 8;
-					key_2_list_triples_area[key_2_list_triples_area__last + 5] = (key1.length & 0x000000FF);
-
-					for(int i = 0; i < key1.length; i++)
-					{
-						keys[ptr] = key1[i];
-						ptr++;
-					}
-					key_2_list_triples_area[ptr] = 0;
-					ptr++;
-				}
-
-				if(key2 !is null)
-				{
-					key_2_list_triples_area[key_2_list_triples_area__last + 6] = (key2.length & 0x0000FF00) >> 8;
-					key_2_list_triples_area[key_2_list_triples_area__last + 7] = (key2.length & 0x000000FF);
-
-					for(int i = 0; i < key2.length; i++)
-					{
-						keys[ptr] = key2[i];
-						ptr++;
-					}
-					key_2_list_triples_area[ptr] = 0;
-					ptr++;
-				}
-
-				if(key3 !is null)
-				{
-					key_2_list_triples_area[key_2_list_triples_area__last + 8] = (key3.length & 0x0000FF00) >> 8;
-					key_2_list_triples_area[key_2_list_triples_area__last + 9] = (key3.length & 0x000000FF);
-
-					for(int i = 0; i < key3.length; i++)
-					{
-						keys[ptr] = key3[i];
-						ptr++;
-					}
-					key_2_list_triples_area[ptr] = 0;
-					ptr++;
-				}
-
-				// в короткой очереди сохраним ссылку на новый ключ-список
-				reducer_area_ptr[next_short_order_conflict_keys] = cast(int) keys_and_triplets_list;
-
-				// устанавливаем новую позицию 
-				key_2_list_triples_area__last = ptr;
-
-				// здесь начинается список очереди
-				// log.trace("put:18 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);
-
-				end_element__triples_list = 0;
+				new_element.triple_ptr = &keyz;
 			}
 
-			if(isKeyExist && is_delete)
-			{
-
-				//log.trace("#REMOVE ALL");
-				
-				//				reducer_area_ptr[next_short_order_conflict_keys] = 0;
-				//int i = next_short_order_conflict_keys;
-				uint pos_to_delete = next_short_order_conflict_keys;
-				for(; pos_in_order > 0; pos_in_order--) 
-				{
-					if(reducer_area_ptr[next_short_order_conflict_keys] == 0)
-					{
-						next_short_order_conflict_keys--;
-						break;
-					}
-					next_short_order_conflict_keys++;
-				}
-
-				log.trace("#RL {} {} {}", pos_in_order, pos_to_delete, max_size_short_order);
-				
-				if(pos_to_delete < next_short_order_conflict_keys)
-				{
-					//log.trace("#RA1");
-					
-					reducer_area_ptr[pos_to_delete] = reducer_area_ptr[next_short_order_conflict_keys];
-					reducer_area_ptr[next_short_order_conflict_keys] = 0;
-				}
-				else
-				{
-					//log.trace("#RA2");
-					//					if(pos_in_order > max_size_short_order) 
-						
-					reducer_area_ptr[next_short_order_conflict_keys] = 0;
-				}
-				return;
-			}
-			else
-			{
-
-				log.trace("#ADDING IN HASHMAP");
-				
-
-				// теперь добавим в очередь триплетов новый триплет
-				uint new_list_elements = key_2_list_triples_area__last;
-
-				//			log.trace("put:[{:X}] 19 new_list_elements={:X}", cast(void*) this, new_list_elements);
-
-				//			dump_mem(key_2_list_triples_area);
-
-				// log.trace("put:[{:X}] 21 сохраним в заголовке списка ссылку на последний элемент",
-				//		cast(void*) this);
-
-				// сохраним в заголовке списка ссылку на последний элемент
-				//			ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, list_of_triples, cast(uint) key_2_list_triples_area__last);
-				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
-
-				//			dump_mem(key_2_list_triples_area);
-
-				// log.trace("put:[{:X}] 21 key_2_list_triples_area__last={:X}", cast(void*) this,
-				//		key_2_list_triples_area__last);
-
-				// резервируем меcто для двух ссылок
-				key_2_list_triples_area__last += 8;
-				if(key_2_list_triples_area__last > key_2_list_triples_area__right)
-				{
-					log.trace("hashName={}, key_2_list_triples_area__last = {}, key_2_list_triples_area__right = {}", hashName,
-							key_2_list_triples_area__last, key_2_list_triples_area__right);
-					throw new Exception("hashName=" ~ hashName ~ ", key_2_list_triples_area__last > key_2_list_triples_area__right");
-				}
-				// log.trace("put:23 key_2_list_triples_area__last = {:X}", key_2_list_triples_area__last);
-
-				// log.trace("put:24 new_list_elements={:X}", new_list_elements);
-
-				// log.trace("put:[{:X}] 25 end_element__triples_list={:X}", cast(void*) this,
-				//		end_element__triples_list);
-
-				// log.trace("put:[{:X}] 25.1 сохраняем сам элемент", cast(void*) this);
-
-				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, new_list_elements, cast(uint) triple);
-
-				//			dump_mem(key_2_list_triples_area);
-
-				//			log.trace(
-				//					"put:[{:X}] 26 key_2_list_triples_area={:X}, end_element__triples_list+4={:X}, new_list_elements={:X} ",
-				//					cast(void*) this, key_2_list_triples_area.ptr,
-				//					end_element__triples_list + 4, new_list_elements);
-
-				if(end_element__triples_list != 0)
-				{
-					//				log.trace("сохраним в предыдущем элементе {:X4} ссылку на новый элемент {:X}", end_element__triples_list, cast(uint)(key_2_list_triples_area.ptr + new_list_elements));
-					ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, end_element__triples_list + 4,
-							cast(uint) (key_2_list_triples_area.ptr + new_list_elements));
-				}
-				// log.trace("put:[{:X}] 27", cast(void*) this);
-			}
+			last_element = *(reducer[hash][i].last_element);			
 		}
-		//		dump_mem(key_2_list_triples_area);
+		
+		header.last_element = &new_element;
+
 	}
+
+
+	public uint get(char* key1, char* key2, char* key3, bool debug_info)
 
 	public uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
 	{
@@ -479,224 +245,6 @@ class HashMap
 		return null;
 	}
 
-	public uint* get(char* key1, char* key2, char* key3, bool debug_info)
-	{
-		uint* res = null;
-
-		version(trace)
-		{
-			log.trace("get:[{:X}] 0 of key1[{}], key2[{}], key3[{}]", cast(void*) this, _toString(key1), _toString(key2), _toString(key3));
-		}
-
-		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
-
-		version(trace)
-		{
-			log.trace("get:1 hash= {:X}", hash);
-		}
-
-		uint short_order_conflict_keys = hash * max_size_short_order;
-
-		log.trace("#short_order {:X4}", short_order_conflict_keys);
-		
-
-		version(trace)
-			dump_mem(key_2_list_triples_area, reducer_area_ptr[short_order_conflict_keys]);
-
-		// хэш нас привел к очереди конфликтующих ключей
-		version(trace)
-		{
-			log.trace("get:2 short_order_conflict_key={:X}", short_order_conflict_keys);
-			log.trace("get:4 *short_order_conflict_keys={:X}", reducer_area_ptr[short_order_conflict_keys]);
-		}
-
-		// выясним, короткая это очередь или длинная
-		if(reducer_area_ptr[short_order_conflict_keys] == 0xFFFFFFFF)
-		{
-			// это длинная очередь, следующие 4 байта будут содержать ссылку на длинную очередь
-			//			Stdout.format(
-			//					"get *5 это длинная очередь, следующие 4 байта будут содержать ссылку на длинную очередь").newline;
-
-			// длинная очередь устроена иначе чем короткая
-		}
-		else
-		{
-			// это короткая очередь
-
-			// делаем сравнение ключей короткой очереди
-			uint next_short_order_conflict_keys = short_order_conflict_keys;
-
-			bool isKeyExist = false;
-			uint last_element_of_list = 0;
-			uint keys_of_hash_in_reducer;
-			uint list_elements = 0;
-
-			version(trace)
-			{
-				log.trace("get:7 начинаем сравнение нашего ключа среди короткой очереди ключей, next_short_order_conflict_keys={:X4}",
-						next_short_order_conflict_keys);
-			}
-
-			for(byte i = max_size_short_order; i > 0; i--)
-			{
-				version(trace)
-				{
-					log.trace("get:6 i={}", i);
-				}
-
-				keys_of_hash_in_reducer = reducer_area_ptr[next_short_order_conflict_keys];
-
-				version(trace)
-				{
-					log.trace("get:9 keys_of_hash_in_reducer={:X}", keys_of_hash_in_reducer);
-				}
-
-				if(keys_of_hash_in_reducer != 0)
-				{
-					// в этой позиции есть уже ссылка на ключ, сравним с нашим ключем
-
-					uint keys_and_triplets_list = keys_of_hash_in_reducer;
-
-					uint key_ptr = keys_and_triplets_list + 10;
-
-					uint
-							key1_length = (key_2_list_triples_area[keys_and_triplets_list + 4] << 8) + key_2_list_triples_area[keys_and_triplets_list + 5];
-					uint
-							key2_length = (key_2_list_triples_area[keys_and_triplets_list + 6] << 8) + key_2_list_triples_area[keys_and_triplets_list + 7];
-					uint
-							key3_length = (key_2_list_triples_area[keys_and_triplets_list + 8] << 8) + key_2_list_triples_area[keys_and_triplets_list + 9];
-
-					version(trace)
-					{
-						log.trace("get:11 key1_length={}, key2_length={}, key3_length={}, key_ptr={:X4}", key1_length, key2_length, key3_length,
-								key_ptr);
-					}
-
-					char[] keys = cast(char[]) key_2_list_triples_area;
-					if(key1 !is null)
-					{
-						version(trace)
-						{
-							log.trace("get:[{:X}] 7.1 сравниваем key1={}", cast(void*) this, key1);
-						}
-
-						if(_strcmp(keys, key_ptr, key1) == true)
-						{
-							version(trace)
-							{
-								log.trace("get:[{:X}] 7.1 key1={} совпал", cast(void*) this, key1);
-							}
-							isKeyExist = true;
-
-							version(trace)
-							{
-								log.trace("get:11 key_ptr={:X4}", key_ptr);
-							}
-
-							key_ptr += key1_length + 1;
-
-							list_elements = key_ptr;
-
-							version(trace)
-							{
-								log.trace("get:11 key_ptr={:X4}", key_ptr);
-								log.trace("get:12 key2={:X4} key3={:X}", key2, key3);
-							}
-
-							if(key2 is null && key3 is null)
-								break;
-
-						}
-					}
-
-					if(key2 !is null && (key1 is null || key1 !is null && isKeyExist == true))
-					{
-						isKeyExist = false;
-						version(trace)
-						{
-							log.trace("get:[{:X}] 7.2 сравниваем key2={}", cast(void*) this, key2);
-						}
-
-						if(_strcmp(keys, key_ptr, key2) == true)
-						{
-							version(trace)
-							{
-								log.trace("get:[{:X}] 7.2 key2={} совпал", cast(void*) this, key2);
-							}
-
-							isKeyExist = true;
-
-							version(trace)
-							{
-								log.trace("get:12 key_ptr={:X4}", key_ptr);
-							}
-
-							key_ptr += key2_length + 1;
-
-							version(trace)
-							{
-								log.trace("get:12  key_ptr={:X4}", key_ptr);
-							}
-
-							list_elements = key_ptr;
-
-							if(key3 is null)
-								break;
-
-						}
-
-					}
-					// 
-					if(key3 !is null && ((key1 is null || key1 !is null && isKeyExist == true) || (key2 is null || key2 !is null && isKeyExist == true)))
-					{
-						version(trace)
-						{
-							log.trace("get:[{:X}] 7.3 сравниваем key3={}", cast(void*) this, key3);
-						}
-						isKeyExist = false;
-						if(_strcmp(keys, key_ptr, key3) == true)
-						{
-							version(trace)
-							{
-								log.trace("get:[{:X}] 7.3 key3={} совпал", cast(void*) this, key3);
-							}
-							isKeyExist = true;
-							key_ptr += key3_length + 1;
-							list_elements = key_ptr;
-							break;
-						}
-
-					}
-
-				}
-				else
-				{
-					// если в этой позиции ключа 0, то очевидно дальше искать нет смысла
-					break;
-				}
-				//				log.trace("get:[{:X}] 7.4 next_short_order_conflict_keys++ = {:X4}", cast(void*) this, next_short_order_conflict_keys);
-				next_short_order_conflict_keys++;
-
-			}
-
-			if(isKeyExist)
-			{
-				//				 log.trace("get:8 ключ найден, list_elements={:X4}", list_elements);
-				//								dump_mem(key_2_list_triples_area);
-
-				res = cast(uint*) (key_2_list_triples_area.ptr + list_elements);
-			}
-		}
-
-		version(trace)
-		{
-			log.trace("get:10 iterator={:X4}", res);
-		}
-		//		if (res !is null)
-		//		log.trace("get:10 *iterator={:X4}", *res);
-		//		print_triple_list(res);
-		return res;
-	}
 
 	public void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o)
 	{
@@ -726,8 +274,11 @@ class HashMap
 						}
 						else
 						{
-							log.trace("#rtf4 {:X4}", prev_element);
-						
+							uint list_header = get_triples_list_header_which_points_to_tail_of_list(s.ptr, p.ptr, o.ptr, false);
+							log.trace("#rtf4 {:X4} {:X4}", prev_element, list_header);
+							//*(key_2_list_triples_area + list_header) = prev_element;
+							ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, list_header, cast(uint) prev_element);
+
 							*(prev_element + 1) = 0;
 							break;
 						}
@@ -828,6 +379,8 @@ class HashMap
 
 			uint keys_and_triplets_list;
 
+			uint key_ptr_start;
+
 			for(byte i = max_size_short_order; i > 0; i--)
 			{
 				version(trace)
@@ -848,8 +401,11 @@ class HashMap
 
 					keys_and_triplets_list = keys_of_hash_in_reducer;
 
-					uint key_ptr = keys_and_triplets_list + 10;
 
+					uint key_ptr = keys_and_triplets_list + 10;
+					key_ptr_start = key_ptr;
+
+					log.trace("#gtt key_ptr = {:X4}", key_ptr);
 					uint
 							key1_length = (key_2_list_triples_area[keys_and_triplets_list + 4] << 8) + key_2_list_triples_area[keys_and_triplets_list + 5];
 					uint
@@ -975,7 +531,7 @@ class HashMap
 				//				 log.trace("get:8 ключ найден, list_elements={:X4}", list_elements);
 				//								dump_mem(key_2_list_triples_area);
 
-				res = keys_and_triplets_list;
+				res = key_ptr_start;
 			}
 		}
 
@@ -1076,7 +632,10 @@ private uint ptr_from_mem(ubyte[] mem, uint ptr)
 
 private void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr)
 {
-	if(max_size_mem < ptr + 4)
+
+	//	log.trace("#ptr_to_mem {:X4}", ptr);
+
+	if(max_size_mem < ptr + 4) 
 		throw new Exception("ptr_to_mem max_size_mem < ptr + 4");
 
 	try
@@ -1107,23 +666,23 @@ private static char[] _toString(char* s)
 	return s ? s[0 .. strlen(s)] : cast(char[]) null;
 }
 
-public void print_triple(byte* triple)
+public void print_triple_ptr(byte* triple_ptr)
 {
-	if(triple is null)
+	if(triple_ptr is null)
 		return;
 
-	char* s = cast(char*) triple + 6;
+	char* s = cast(char*) triple_ptr + 6;
 
-	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+	char* p = cast(char*) (triple_ptr + 6 + (*(triple_ptr + 0) << 8) + *(triple_ptr + 1) + 1);
 
-	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+	char* o = cast(char*) (triple_ptr + 6 + (*(triple_ptr + 0) << 8) + *(triple_ptr + 1) + 1 + (*(triple_ptr + 2) << 8) + *(triple_ptr + 3) + 1);
 
-	log.trace("triple: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
+	log.trace("triple_ptr: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
 }
 
 public void print_list_triple(uint* list_iterator)
 {
-	byte* triple;
+	byte* triple_ptr;
 	if(list_iterator !is null)
 	{
 		uint next_element0 = 0xFF;
@@ -1131,9 +690,9 @@ public void print_list_triple(uint* list_iterator)
 		{
 			log.trace("#YYY {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
 			
-			triple = cast(byte*) *list_iterator;
-			if (triple !is null)
-			  print_triple(triple);
+			triple_ptr = cast(byte*) *list_iterator;
+			if (triple_ptr !is null)
+			  print_triple_ptr(triple_ptr);
 			
 			next_element0 = *(list_iterator + 1);
 			list_iterator = cast(uint*) next_element0;

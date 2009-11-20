@@ -721,8 +721,8 @@ void get_message(byte* message, ulong message_size)
 						}
 						catch(Exception ex)
 						{
-							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
-									getString(cast(char*) fact_o[i]));
+							log.trace("failed command add triple <{}><{}><{}> \n {}", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
+								  getString(cast(char*) fact_o[i]), ex);
 						}
 					}
 				}

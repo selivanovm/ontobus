@@ -385,7 +385,8 @@ class TripleStorage
 			//do_things(o.ptr);
 
 			//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
-			void* triple;
+			triple new_triple;
+			triple* new_triple_ptr = &new_triple;
 
 			if(s.length == 0 && p.length == 0 && o.length == 0)
 				return -1;
@@ -434,7 +435,7 @@ class TripleStorage
 			if(list is null)
 				throw new Exception("addTriple: not found triple in index spo");
 
-			triple = cast(void*) *list;
+			//triple = cast(void*) *list;
 
 			//log.trace("!!!!!!!!!!!!!!!!!!11");
 
@@ -442,25 +443,25 @@ class TripleStorage
 			//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, fromStringz(cast(char*) (triple + 6)));
 
 			if(idx_s !is null)
-				idx_s.put(s, null, null, triple, false);
+				idx_s.put(s, null, null, new_triple_ptr, false);
 			//log.trace("addTriple #4");
 			if(idx_p !is null)
-				idx_p.put(p, null, null, triple, false);
+				idx_p.put(p, null, null, new_triple_ptr, false);
 			//log.trace("addTriple #5");
 			if(idx_o !is null)
-				idx_o.put(o, null, null, triple, false);
+				idx_o.put(o, null, null, new_triple_ptr, false);
 			//log.trace("addTriple #6");
 			if(idx_sp !is null)
-				idx_sp.put(s, p, null, triple, false);
+				idx_sp.put(s, p, null, new_triple_ptr, false);
 			//log.trace("addTriple #7");
 			if(idx_po !is null)
 			{
 				//			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, fromStringz(cast(char*)triple));
-				idx_po.put(p, o, null, triple, false);
+				idx_po.put(p, o, null, new_triple_ptr, false);
 			}
 			//log.trace("addTriple #8");
 			if(idx_so !is null)
-				idx_so.put(s, o, null, triple, false);
+				idx_so.put(s, o, null, new_triple_ptr, false);
 			//log.trace("addTriple #9");
 			/* 
 			 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
@@ -552,8 +553,8 @@ class TripleStorage
 						//print_list_triple(listS);
 						char[] p1p2 = p1 ~ p2;
 						//log.trace ("#SPPOO_ADD 1 {} {} {} {} {} {}", p1 , p2 , p3 , o1 , o2, p1p2);
-						void* tripleS = cast(void*) *listS;
-						idx_s1ppoo.put(p1p2, o1, o2, tripleS, false);
+						//void* tripleS = cast(void*) *listS;
+						//idx_s1ppoo.put(p1p2, o1, o2, tripleS, false);
 						
 						//listS = idx_s1ppoo.get(p1p2.ptr, o1.ptr, o2.ptr, false);					
 						//log.trace("#SPPOO_ADD 2");
@@ -566,15 +567,15 @@ class TripleStorage
 			//					log.trace ("#END");
 
 		}
-	return 0;
+		return 0;
 	}
 	//do_things(o.ptr);
 
-public void do_things(char* ooo)
-{
-	if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0)
+	public void do_things(char* ooo)
 	{
-		uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr);
+		if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0)
+		{
+			uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr);
 
 			if(list_facts !is null)
 			{
@@ -603,39 +604,39 @@ public void do_things(char* ooo)
 		}
 	}
 
-public void print_list_triple(uint* list_iterator)
-{
-	byte* triple;
-	if(list_iterator !is null)
+	public void print_list_triple(uint* list_iterator)
 	{
-		uint next_element0 = 0xFF;
-		while(next_element0 > 0)
+		byte* triple;
+		if(list_iterator !is null)
 		{
-			log.trace("#KKK {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
+			uint next_element0 = 0xFF;
+			while(next_element0 > 0)
+			{
+				log.trace("#KKK {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
 			
-			triple = cast(byte*) *list_iterator;
-			if (triple !is null)
-			  print_triple(triple);
+				triple = cast(byte*) *list_iterator;
+				if (triple !is null)
+					print_triple(triple);
 			
-			next_element0 = *(list_iterator + 1);
-			list_iterator = cast(uint*) next_element0;
+				next_element0 = *(list_iterator + 1);
+				list_iterator = cast(uint*) next_element0;
+			}
 		}
 	}
-}
 
-public void print_triple(byte* triple)
-{
-	if(triple is null)
-		return;
+	public void print_triple(byte* triple)
+	{
+		if(triple is null)
+			return;
 
-	char* s = cast(char*) triple + 6;
+		char* s = cast(char*) triple + 6;
 
-	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+		char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+		char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-	log.trace("triple: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
-}
+		log.trace("triple: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
+	}
 
 
 }
