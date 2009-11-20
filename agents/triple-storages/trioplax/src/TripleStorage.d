@@ -123,7 +123,7 @@ class TripleStorage
 		count_look_predicate_on_idx_s1ppoo++;
 	}
 
-	public uint* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex)
+	public triple_list_element* getTriplesUseIndex(char[] s, char[] p, char[] o, ubyte useindex)
 
 	{
 		//log.trace("### getTriples1");
@@ -133,7 +133,7 @@ class TripleStorage
 		}
 	}
 
-	public uint* getTriples(char* s, char* p, char* o)
+	public triple_list_element* getTriples(char[] s, char[] p, char[] o)
 	{
 		bool debug_info = false;
 
@@ -152,12 +152,12 @@ class TripleStorage
 			if(o != null)
 				a_o = "O";
 
-			log.trace("A get from index {}{}{}: s={}, p={}, o={},", a_s, a_p, a_o, fromStringz(s), fromStringz(p), fromStringz(o));
-			log.trace("B get from index {}{}{}: p={}", a_s, a_p, a_o, fromStringz(p));
+			log.trace("A get from index {}{}{}: s={}, p={}, o={},", a_s, a_p, a_o, s, p, o);
+			log.trace("B get from index {}{}{}: p={}", a_s, a_p, a_o, p);
 		}
 
 		//log.trace("### getTriples2");
-		uint* list = null;
+		triple_list_element* list = null;
 
 		if(s != null)
 		{
@@ -240,14 +240,9 @@ class TripleStorage
 		if(s is null && p is null && o is null)
 			return false;
 
-		uint* removed_triple;
+		triple_list_element* removed_triple = idx_spo.get(s, p, o, false);
 
-		uint* list_iterator = idx_spo.get(s.ptr, p.ptr, o.ptr, false);
-		if(list_iterator !is null)
-		{
-			removed_triple = cast(uint*) (*list_iterator);
-		}
-		else
+		if(removed_triple is null)
 			return false;
 
 		if(idx_s !is null)
@@ -288,48 +283,37 @@ class TripleStorage
 					char[] p1 = p;
 					char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
 
-					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+					triple_list_element* listS = idx_sp.get(s, p2, null, false);
 					if(listS !is null)
 					{
-						byte* tripleS = cast(byte*) *listS;
-						char[] o2 = fromStringz(
-								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+						char[] o2 = (*listS.triple_ptr).o;
 
 						//log.trace("remove from index sppoo A: p1 = {}, p2 = {}", p1, p2);
 						//log.trace("### [{}] [{}] [{}]", look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 						
-						listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);
+						listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i], o1, o2, false);
 						//log.trace("#111");
 						
-						byte* triple1 = null;
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
-						if(listS !is null)
-						{						
-							uint next_element1 = 0xFF;
-							while(next_element1 > 0)
+						while(listS !is null)
+						{
+							
+							if(listS.triple_ptr !is null)
 							{
-								triple1 = cast(byte*) *listS;
-								if(triple1 !is null)
-								{
-									char* sss = cast(char*) triple1 + 6;
-									if(strcmp(s.ptr, sss) == 0) 
-									{
-										break;
-									}
-									//log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
-								}
-								next_element1 = *(listS + 1);
-								listS = cast(uint*) next_element1;
+								if(s == (*listS.triple_ptr).s) 
+									break;
+								//log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
 							}
+							listS = listS.next_triple_list_element;
 						}
 						//print_list_triple(listS);
 
-						if(triple1 !is null)
+						if(listS !is null)
 						{
-							idx_s1ppoo.remove_triple_from_list(cast(uint*)triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
+							idx_s1ppoo.remove_triple_from_list(listS, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 							//log.trace("#333");
 						//						listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);						
-							listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);
+							//listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);
 							//print_list_triple(listS);
 						}
 					}
@@ -342,12 +326,10 @@ class TripleStorage
 					char[] p2 = p;
 					char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
 
-					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
+					triple_list_element* listS = idx_sp.get(s, p1, null, false);
 					if(listS !is null)
 					{
-						byte* tripleS = cast(byte*) *listS;
-						char[] o1 = fromStringz(
-								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+						char[] o1 = (*listS.triple_ptr).o;
 
 												//log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
@@ -382,8 +364,6 @@ class TripleStorage
 		synchronized
 		{
 
-			//do_things(o.ptr);
-
 			//		log.trace("addTriple:1 add triple <{}>,<{}>,<{}>", s, p, o);
 			triple new_triple;
 			triple* new_triple_ptr = &new_triple;
@@ -391,8 +371,8 @@ class TripleStorage
 			if(s.length == 0 && p.length == 0 && o.length == 0)
 				return -1;
 
-			uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
-			//log.trace("addTriple #1");
+			triple_list_element* list = idx_spo.get(s, p, o, false);
+			log.trace("addTriple #1");
 			if(list !is null)
 			{
 
@@ -427,11 +407,11 @@ class TripleStorage
 
 			//		log.trace("addTriple:add index spo");
 			idx_spo.put(s, p, o, null, false);
-			//log.trace("addTriple #2");
+			log.trace("addTriple #2");
 			//		log.trace("addTriple:get this index as triple");
-			list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, false);
+			list = idx_spo.get(s, p, o, false);
 			//		log.trace("addTriple:ok, list={:X4}", list);
-			//log.trace("addTriple #3");
+			log.trace("addTriple #3");
 			if(list is null)
 				throw new Exception("addTriple: not found triple in index spo");
 
@@ -444,16 +424,16 @@ class TripleStorage
 
 			if(idx_s !is null)
 				idx_s.put(s, null, null, new_triple_ptr, false);
-			//log.trace("addTriple #4");
+			log.trace("addTriple #4");
 			if(idx_p !is null)
 				idx_p.put(p, null, null, new_triple_ptr, false);
-			//log.trace("addTriple #5");
+			log.trace("addTriple #5");
 			if(idx_o !is null)
 				idx_o.put(o, null, null, new_triple_ptr, false);
-			//log.trace("addTriple #6");
+			log.trace("addTriple #6");
 			if(idx_sp !is null)
 				idx_sp.put(s, p, null, new_triple_ptr, false);
-			//log.trace("addTriple #7");
+			log.trace("addTriple #7");
 			if(idx_po !is null)
 			{
 				//			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, fromStringz(cast(char*)triple));
@@ -488,13 +468,11 @@ class TripleStorage
 						p3 = store_predicate_in_list_on_idx_s1ppoo[i];
 
 						o1 = o;
-						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+						triple_list_element* listS = idx_sp.get(s, p2, null, false);
 							
 						if(listS !is null)
 						{
-							byte* tripleS = cast(byte*) *listS;
-							o2 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
-										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
+							o2 = (*listS.triple_ptr).o;
 						}
 
 					}
@@ -506,14 +484,10 @@ class TripleStorage
 						p3 = store_predicate_in_list_on_idx_s1ppoo[i];
 
 						o2 = o;
-						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
+						triple_list_element* listS = idx_sp.get(s, p1, null, false);
 							
 						if(listS !is null)
-						{
-							byte* tripleS = cast(byte*) *listS;
-							o1 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
-										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
-						}
+							o1 = (*listS.triple_ptr).o;
 
 					} 
 					else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
@@ -523,21 +497,13 @@ class TripleStorage
 						p2 = look_predicate_p2_on_idx_s1ppoo[i];
 						p3 = p;
 
-						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, false);
+						triple_list_element* listS = idx_sp.get(s, p1, null, false);
 						if(listS !is null)
-						{
-							byte* tripleS = cast(byte*) *listS;
-							o1 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
-										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
-						}
+							o1 = (*listS.triple_ptr).o; 
 
-						listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, false);
+						listS = idx_sp.get(s, p2, null, false);
 						if(listS !is null)
-						{
-							byte* tripleS = cast(byte*) *listS;
-							o2 = fromStringz(cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + 
-										      (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
-						}
+							o2 = (*listS.triple_ptr).o;
 
 					}
 
@@ -546,7 +512,7 @@ class TripleStorage
 
 				if(p1 !is null && p2 !is null && p3 !is null && o1 !is null && o2 !is null)
 				{
-					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p3, null, false);					
+					triple_list_element* listS = idx_sp.get(s, p3, null, false);					
 					if(listS !is null)
 					{
 						//log.trace("#SPPOO_ADD 0");
@@ -568,40 +534,6 @@ class TripleStorage
 
 		}
 		return 0;
-	}
-	//do_things(o.ptr);
-
-	public void do_things(char* ooo)
-	{
-		if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0)
-		{
-			uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr);
-
-			if(list_facts !is null)
-			{
-				uint next_element1 = 0xFF;
-				while(next_element1 > 0)
-				{
-					if(list_facts !is null)
-					{
-						byte* triple = cast(byte*) *list_facts;
-						log.trace("list_fact {:X4}", list_facts);
-						if(triple !is null)
-						{
-							char* s = cast(char*) triple + 6;
-
-							char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-
-							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-
-							log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
-						}
-					}
-					next_element1 = *(list_facts + 1);
-					list_facts = cast(uint*) next_element1;
-				}
-			}
-		}
 	}
 
 	public void print_list_triple(uint* list_iterator)

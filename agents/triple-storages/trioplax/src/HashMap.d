@@ -154,12 +154,9 @@ class HashMap
 		if(key1.length == 0 && key2.length == 0 && key3.length == 0)
 			return;
 
-		//		log.trace("put in hash[{:X}] map key1[{}], key2[{}], key3[{}], triple={:X4}",
-		//				cast(void*) this, key1, key2, key3, triple);
-
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 
-		//		 log.trace("put:[{:X}] 0 hash= {:X}", cast(void*) this, hash);
+		log.trace("put #1 hash = {:X4}", hash);
 		
 
 		triple_list_header header;
@@ -168,36 +165,156 @@ class HashMap
 
 		if(reducer[hash] is null)
 		{
+
+			log.trace("put #2");
+
 			reducer[hash].length = max_size_short_order;
-			
+
+			log.trace("put #3");
+
+			reducer[hash][0] = new triple_list_header;
+
+			log.trace("put #4");
+
 			header = *(reducer[hash][0]);
 
-			triple keyz;
-			keyz.s = key1;
-			keyz.p = key2;
-			keyz.o = key3;
-			header.keys = &keyz;
+			log.trace("put #5");
 
-			if(triple_ptr is null)
-			{
-				new_element.triple_ptr = &keyz;
-			}
-			header.first_element = &new_element;
+			//			log.trace("put #8");
+
 		}
-		else
-		{
+		
+
+		
+			log.trace("put #10");
 			bool isKeyExists = false;			
 			int i = 0;
-			triple keyz;
+			triple* keyz;
 			while(i < max_size_short_order && reducer[hash][i] !is null)
 			{
+				
+				log.trace("put #15");
 				
 				header = *(reducer[hash][i]);
 				
 				isKeyExists = false;
 
-				keyz = *(header.keys);
+				log.trace("put #17 header = {:X4}", &header);
+
+				keyz = header.keys;
 				
+
+				log.trace("put #18 keyz = {:X4}", keyz);
+
+				if(keyz !is null)
+				{
+				
+				if(key1 !is null && keyz.s == key1)
+					isKeyExists = true;
+
+				if(isKeyExists && key2 !is null)
+					isKeyExists = keyz.p == key2;
+
+				if(isKeyExists && key3 !is null)
+					isKeyExists = keyz.o == key3;
+
+				}
+
+				i++;
+
+				if(isKeyExists)
+					break;
+
+
+			}
+			i--;
+
+			log.trace("put #20");
+
+			if(!isKeyExists)
+			{
+
+				log.trace("put #21");
+
+				header =*(new triple_list_header);
+				log.trace("put #22");
+				reducer[hash][i] = &header;
+				log.trace("put #23");
+				header.first_element = &new_element;
+				log.trace("put #24");
+			
+				keyz = new triple;
+				keyz.s = key1;
+				log.trace("put #25");
+				keyz.p = key2;
+				keyz.o = key3;
+				header.keys = keyz;
+
+				triple_ptr = keyz;
+
+			}
+			
+			last_element = *(reducer[hash][i].last_element);			
+			
+		
+		//		if(header.first_element is null)
+		//header.first_element = &new_element;
+
+		if(triple_ptr is null)
+			new_element.triple_ptr = keyz;
+		
+		log.trace("put #100 | reducer = {:X4}", reducer[hash]);
+		
+		header.last_element = &new_element;
+
+	}
+
+
+	public triple_list_element* get(char[] key1, char[] key2, char[] key3, bool debug_info)
+	{
+		
+		log.trace("get #1");
+		
+		if(key1 is null && key2 is null && key3 is null)
+			return null;
+
+		
+		if(key1.length == 0 && key2.length == 0 && key3.length == 0)
+			return null;
+
+		//		log.trace("put in hash[{:X}] map key1[{}], key2[{}], key3[{}], triple={:X4}",
+		//				cast(void*) this, key1, key2, key3, triple);
+
+		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
+		triple_list_header* header;
+
+		log.trace("get #2 hash = {:X4}", hash);
+
+		if(reducer[hash] is null)
+			return null;
+		else
+		{
+		log.trace("get #4");
+			bool isKeyExists = false;			
+			int i = 0;
+			triple* keyz;
+			while(i < max_size_short_order)
+			{
+				log.trace("get #5");
+				
+				header = reducer[hash][i];
+
+				if(header is null)
+					break;
+
+				isKeyExists = false;
+
+				log.trace("get #6 {:X4} {:X4}", header, header.keys);
+
+				keyz = header.keys;
+
+				log.trace("get #7 keyz = {:X4}", keyz);				
+
 				if(key1 !is null && keyz.s == key1)
 					isKeyExists = true;
 
@@ -211,21 +328,12 @@ class HashMap
 					break;
 				i++;
 			}
-
-			if(triple_ptr is null)
-			{
-				new_element.triple_ptr = &keyz;
-			}
-
-			last_element = *(reducer[hash][i].last_element);			
+			log.trace("get #100");
+			return (reducer[hash][i].first_element);			
 		}
 		
-		header.last_element = &new_element;
-
 	}
 
-
-	public uint get(char* key1, char* key2, char* key3, bool debug_info)
 
 	public uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
 	{
@@ -246,76 +354,113 @@ class HashMap
 	}
 
 
-	public void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o)
+	public void remove_triple_from_list(triple_list_element* removed_triple, char[] s, char[] p, char[] o)
 	{
-		uint* list = get(s.ptr, p.ptr, o.ptr, false);
+		triple_list_element* list = get(s, p, o, false);
 
-		if(list !is null)
+		triple_list_element* prev_element = null;
+
+		int i = 0;
+		while(list !is null)
 		{
-			int i = 0;
-			uint next_element1 = 0xFF;
-			uint* prev_element = null;
-			while(next_element1 > 0)
-			{
-				//				log.trace("#rtf1");
+			//				log.trace("#rtf1");
 				
-				if(removed_triple == cast(uint*) *list)
-				{
-					//log.trace("#rtf2");
+			if(removed_triple == list)
+			{
+				//log.trace("#rtf2");
 					
-					if(*(list + 1) == 0)
+				if(list.next_triple_list_element is null)
+				{
+					if(i == 0)
 					{
-						if(i == 0)
-						{
-							//log.trace("#rtf3 {} {} {}", s, p, o);
-						
-							put(s, p, o, null, true);
-							break;
-						}
-						else
-						{
-							uint list_header = get_triples_list_header_which_points_to_tail_of_list(s.ptr, p.ptr, o.ptr, false);
-							log.trace("#rtf4 {:X4} {:X4}", prev_element, list_header);
-							//*(key_2_list_triples_area + list_header) = prev_element;
-							ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, list_header, cast(uint) prev_element);
+						//log.trace("#rtf3 {} {} {}", s, p, o);
 
-							*(prev_element + 1) = 0;
-							break;
+						uint hash = (getHash(s, p, o) & 0x7FFFFFFF) % max_count_elements;
+
+						triple_list_header header;
+						triple_list_element last_element;
+						triple_list_element new_element;
+
+						if(reducer[hash] !is null)
+						{
+							bool isKeyExists = false;			
+							int l = 0;
+							triple keyz;
+							while(l < max_size_short_order && reducer[hash][l] !is null)
+							{
+				
+								header = *(reducer[hash][l]);
+				
+								isKeyExists = false;
+
+								keyz = *(header.keys);
+				
+								if(s !is null && keyz.s == s)
+									isKeyExists = true;
+
+								if(isKeyExists && p !is null)
+									isKeyExists = keyz.p == p;
+
+								if(isKeyExists && o !is null)
+									isKeyExists = keyz.o == o;
+
+								if(isKeyExists)
+									break;
+								l++;
+							}
+
+							if(isKeyExists)
+							{
+								int k = l;
+								while(reducer[hash][l] !is null)
+								{
+									k++;
+								}
+								if(k > l)
+								{
+									reducer[hash][l] = reducer[hash][k];
+									reducer[hash][k] = null;
+								}
+								else
+									reducer[hash][l] = null;
+							}
 						}
+
+						break;
 					}
 					else
 					{
-						//log.trace("#rtf5 {:X4} {:X4} {:X4}", list, list + 1, prev_element);
-						if(prev_element !is null)
-						{
-							*(prev_element + 1) = *(list + 1);
-							break;
-						}
-						else
-						{
-							//log.trace("#rtf6 {:X4} {:X4} ", (cast(uint*)*(list + 1)) + 1, cast(uint*)*(list + 1));
-							//print_triple(cast(byte*)*(list));
-							//print_triple(cast(byte*)*(cast(uint*)*(list + 1)));
-
-							*list = *(cast(uint*)*(list + 1));
-							//print_list_triple(list);
-
-							*(list + 1) = *((cast(uint*)*(list + 1)) + 1);
-							//print_list_triple(list);
-
-							break;
-						}
-
+						prev_element.next_triple_list_element = null;
+						break;
 					}
 				}
-				prev_element = list;
-				next_element1 = *(list + 1);
-				list = cast(uint*) next_element1;
-				i++;
+				else
+				{
+					//log.trace("#rtf5 {:X4} {:X4} {:X4}", list, list + 1, prev_element);
+					if(prev_element !is null)
+					{
+						prev_element.next_triple_list_element = list.next_triple_list_element;
+						break;
+					}
+					else
+					{
+						//log.trace("#rtf6 {:X4} {:X4} ", (cast(uint*)*(list + 1)) + 1, cast(uint*)*(list + 1));
+						//print_triple(cast(byte*)*(list));
+						//print_triple(cast(byte*)*(cast(uint*)*(list + 1)));
 
+						*list = *list.next_triple_list_element;
+						//print_list_triple(list);
+
+						break;
+					}
+
+				}
 			}
+			prev_element = list;
+			list = list.next_triple_list_element;
+			i++;
+
 		}
-			
 	}
 
 
