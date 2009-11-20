@@ -768,7 +768,7 @@ class HashMap
 	}
 
 
-	public uint get_triples_list_header_ptr_in_reducer(char* key1, char* key2, char* key3, bool debug_info)
+	public uint get_triples_list_header_which_points_to_tail_of_list(char* key1, char* key2, char* key3, bool debug_info)
 	{
 		uint res = 0;
 
@@ -826,6 +826,8 @@ class HashMap
 						next_short_order_conflict_keys);
 			}
 
+			uint keys_and_triplets_list;
+
 			for(byte i = max_size_short_order; i > 0; i--)
 			{
 				version(trace)
@@ -844,7 +846,7 @@ class HashMap
 				{
 					// в этой позиции есть уже ссылка на ключ, сравним с нашим ключем
 
-					uint keys_and_triplets_list = keys_of_hash_in_reducer;
+					keys_and_triplets_list = keys_of_hash_in_reducer;
 
 					uint key_ptr = keys_and_triplets_list + 10;
 
@@ -973,7 +975,7 @@ class HashMap
 				//				 log.trace("get:8 ключ найден, list_elements={:X4}", list_elements);
 				//								dump_mem(key_2_list_triples_area);
 
-				res = next_short_order_conflict_keys;
+				res = keys_and_triplets_list;
 			}
 		}
 
