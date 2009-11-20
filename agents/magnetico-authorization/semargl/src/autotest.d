@@ -3,6 +3,7 @@ private import Log;
 private import tango.io.File;
 //private import Text = tango.text.Util;
 private import tango.text.Text;
+private import tango.io.Stdout;
 //private import tango.text.Regex;
 private import portions_read;
 private import tango.stdc.string;
@@ -41,7 +42,9 @@ class autotest: mom_client
 		if(nocompare == false && strcmp(messagebody, output_data) != 0)
 		{
 			log.trace("out messages\r\n[{}]", fromStringz(messagebody));
+			Stdout.format("out messages\r\n[{}]", fromStringz(messagebody));
 			log.trace("not compare with original \r\n[{}]", fromStringz(output_data));
+			Stdout.format("not compare with original \r\n[{}]", fromStringz(output_data));
 			throw new Exception("out messages not compare with original");
 
 		}
