@@ -91,7 +91,7 @@ class HashMap
 
 		reducer_area_right = reducer_area_length;
 
-		reducer.length = max_count_elements;
+		reducer = new triple_list_header*[][max_count_elements];
 
 		// область ключей и списков триплетов
 		// формат:
@@ -170,8 +170,11 @@ class HashMap
 
 			log.trace("put #2");
 
-			reducer[hash].length = max_size_short_order;
+			reducer[hash] = new triple_list_header*[max_size_short_order];
 
+			/*			for(int i = 0; i < max_size_short_order; i++)
+						log.trace("# reducer init : element {} = {:X4}", i, reducer[hash][i]);*/
+				
 			log.trace("put #3");
 
 			reducer[hash][0] = new triple_list_header;
