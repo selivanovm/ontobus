@@ -6,6 +6,10 @@ private
 }
 private
 {
+    import tango.stdc.stringz;
+}
+private
+{
     import tango.io.Stdout;
 }
 private
@@ -122,4 +126,12 @@ private
 return s ? s[0..strlen(s)] : cast(char[])null;
 }
 }
+}
+public
+{
+    void print_triple(byte* triple);
+}
+public
+{
+    void print_list_triple(uint* list_iterator);
 }

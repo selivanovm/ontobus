@@ -149,4 +149,12 @@ count_look_predicate_on_idx_s1ppoo++;
 {
     void do_things(char* ooo);
 }
+    public
+{
+    void print_list_triple(uint* list_iterator);
+}
+    public
+{
+    void print_triple(byte* triple);
+}
 }
