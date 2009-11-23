@@ -22,7 +22,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 		triple* triple_ptr = iterator.triple_ptr;
 	    if(triple_ptr !is null)
 	      {
-		      ACL_subject = triple_ptr.s;
+		      ACL_subject = *triple_ptr.s;
 		      triple_list_element* iterator1 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
 
 		      if(iterator1 !is null) // если не null, значит право с найденным субъектом создал документооборот
@@ -52,7 +52,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 						      for(int i = 0; i < triple_ptr.o.length; i++)
 						      {
 							      log.trace("lookRightOfIterator ('{}' == '{}' ?)", triple_ptr.o[i], rightType);
-							      if(triple_ptr.o[i] == *(rt_symbols + rightType))
+							      if(*triple_ptr.o[i] == *(rt_symbols + rightType))
 							      {
 								      if(!is_actual)
 									      is_actual = is_right_actual(ACL_subject.ptr, ts);

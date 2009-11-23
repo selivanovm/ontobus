@@ -526,7 +526,7 @@ void get_message(byte* message, ulong message_size)
 
 						log.trace("removed_subjects <{}>", triple_ptr.s);
 
-						remove_subject(triple_ptr.s);
+						remove_subject(*triple_ptr.s);
 
 						/*							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
@@ -624,7 +624,7 @@ void get_message(byte* message, ulong message_size)
 										log.trace("check for existance <{}> <{}> <{}>", triple_ptr.s, getString(fact_p[i]), 
 											  getString(fact_o[i]));
 										triple_list_element* founded_facts2 = 
-											az.getTripleStorage.getTriples(triple_ptr.s, fromStringz(fact_p[i]), 
+											az.getTripleStorage.getTriples(*triple_ptr.s, fromStringz(fact_p[i]), 
 														       fromStringz(fact_o[i]));
 										if(founded_facts2 is null)
 										{
@@ -657,7 +657,7 @@ void get_message(byte* message, ulong message_size)
 								}
 								if(is_exists)
 								{
-									remove_subject(triple_ptr.s);
+									remove_subject(*triple_ptr.s);
 								}
 								founded_facts = founded_facts.next_triple_list_element;
 							}
@@ -811,6 +811,8 @@ void get_message(byte* message, ulong message_size)
 					}
 				}
 
+				log.trace("# 1");
+
 				char* autz_elements;
 
 				if(elements_id != 0)
@@ -841,15 +843,19 @@ void get_message(byte* message, ulong message_size)
 				char*[] hierarhical_delegates = null;
 				hierarhical_delegates = getDelegateAssignersTreeArray(user, az.getTripleStorage());
 
+				log.trace("#5 hierarhical_delegates = {:X4}", hierarhical_delegates);
+				
 				char*[][] hierarhical_departments_of_delegate = new char*[][hierarhical_delegates.length];
 				for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 				{
+					log.trace("#51");
 					hierarhical_departments_of_delegate[ii] = getDepartmentTreePathOfUser(hierarhical_delegates[ii], az.getTripleStorage());
+					log.trace("#52");
 				}
 
 				char*[] hierarhical_departments = null;
 				hierarhical_departments = getDepartmentTreePathOfUser(user, az.getTripleStorage());
-				// log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
+				log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
 
 				uint count_prepared_elements = 0;
 				uint count_authorized_doc = 0;
@@ -999,9 +1005,9 @@ private void remove_subject(char[] s)
 			if(triple_ptr !is null)
 			{
 
-				s_a[cnt] = triple_ptr.s;
-				p_a[cnt] = triple_ptr.p;
-				o_a[cnt] = triple_ptr.o;
+				s_a[cnt] = *triple_ptr.s;
+				p_a[cnt] = *triple_ptr.p;
+				o_a[cnt] = *triple_ptr.o;
 				log.trace("remove triple2 <{}><{}><{}>", s_a[cnt], p_a[cnt], o_a[cnt]);
 
 			}

@@ -65,7 +65,7 @@ private char[] getObjectAuthor(char* elementId, TripleStorage ts)
 			if(strcmp(triple0.p.ptr, "http://purl.org/dc/elements/1.1/creator") == 0)
 			{
 				//log.trace("getObjectAuthor #6");
-				return triple0.o;
+				return *triple0.o;
 			}
 		}
 		iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;

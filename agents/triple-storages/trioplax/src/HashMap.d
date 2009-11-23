@@ -14,9 +14,9 @@ private import tango.core.Thread;
 
 struct triple
 {
-	char[] s;
-	char[] p;
-	char[] o;
+	char[] *s;
+	char[] *p;
+	char[] *o;
 }
 
 public struct triple_list_element 
@@ -43,6 +43,15 @@ class HashMap
 
 	private char[] hashName;
 
+	private byte[] triples_list_elements;
+	private uint triples_list_elements_tail = 0;
+
+	private byte[] triples_area;
+	private uint triples_area_tail = 0;
+
+	private byte[] list_headers_area;
+	private uint list_headers_area_tail = 0;
+
 	this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 	{
 		hashName = _hashName;
@@ -51,8 +60,14 @@ class HashMap
 		log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start", hashName,
 				_max_count_elements, max_size_short_order, _triple_area_length);
 
+		
+		triples_list_elements = new byte[_triple_area_length];
+
 		reducer = new triple_list_header*[][max_count_elements];
 
+		triples_area = new byte[_max_count_elements * 100];
+		list_headers_area = new byte[_max_count_elements * triple_list_header.sizeof];
+		
 		log.trace("*** create object HashMap... ok");
 	}
 
@@ -74,7 +89,10 @@ class HashMap
 		triple_list_element* last_element;
 		triple_list_element* new_element;
 
-		new_element = new triple_list_element;
+		new_element = cast(triple_list_element*)&triples_list_elements[triples_list_elements_tail];
+		triples_list_elements_tail += triple_list_element.sizeof;
+
+			//new triple_list_element;
 
 		if(reducer[hash] is null)
 		{
@@ -103,14 +121,14 @@ class HashMap
 			{
 //				log.trace("put #10 keyz = {:X4}, <{}><{}><{}>", keyz, keyz.s, keyz.p, keyz.o);
 
-				if(key1 !is null && keyz.s == key1)
+				if(key1 !is null && *keyz.s == key1)
 					isKeyExists = true;
 
 				if(isKeyExists && key2 !is null)
-					isKeyExists = keyz.p == key2;
+					isKeyExists = *keyz.p == key2;
 
 				if(isKeyExists && key3 !is null)
-					isKeyExists = keyz.o == key3;
+					isKeyExists = *keyz.o == key3;
 
 			}
 
@@ -128,7 +146,9 @@ class HashMap
 			// ключ по данному хешу не был найден, создаем новый
 //			log.trace("put #21");
 
-			header = new triple_list_header;
+			header = cast(triple_list_header*)&list_headers_area[list_headers_area_tail];
+			list_headers_area_tail += triple_list_header.sizeof;
+				//new triple_list_header;
 
 			try
 			{
@@ -144,10 +164,39 @@ class HashMap
 			header.first_element = new_element;
 //			log.trace("put #24 header.first_element={:X4}", header.first_element);
 
-			keyz = new triple;
-			keyz.s = key1;
-			keyz.p = key2;
-			keyz.o = key3;
+
+
+			
+
+			keyz = cast(triple*)&triples_area[triples_area_tail];
+			triples_area_tail += triple.sizeof;
+			if(key1 !is null)
+			{
+				keyz.s = cast(char[]*)new char[key1.length];
+					//cast(char[]*)&triples_area[triples_area_tail];
+				char[] k = *keyz.s;
+				k = key1;
+				//				triples_area_tail += key1.length + (char[]).sizeof;
+			}
+
+			if(key2 !is null)
+			{
+				keyz.p = cast(char[]*)new char[key2.length];
+					//cast(char[]*)&triples_area[triples_area_tail];
+				char[] k = *keyz.p;
+				k = key2;
+				//				triples_area_tail += key2.length + (char[]).sizeof;
+			}
+
+			if(key3 !is null)
+			{
+				keyz.o = cast(char[]*)new char[key3.length];
+					//cast(char[]*)&triples_area[triples_area_tail];
+				char[] k = *keyz.o;
+				k = key3;
+				//				triples_area_tail += key3.length + (char[]).sizeof;
+			}
+
 			header.keys = keyz;
 //			log.trace("put #26 header.keys={:X4}", header.keys);
 		}
@@ -211,14 +260,14 @@ class HashMap
 
 				//log.trace("get #7 keyz = {:X4}", keyz);
 
-				if(key1 !is null && keyz.s == key1)
+				if(key1 !is null && *keyz.s == key1)
 					isKeyExists = true;
 
 				if(isKeyExists && key2 !is null)
-					isKeyExists = keyz.p == key2;
+					isKeyExists = *keyz.p == key2;
 
 				if(isKeyExists && key3 !is null)
-					isKeyExists = keyz.o == key3;
+					isKeyExists = *keyz.o == key3;
 
 				if(isKeyExists)
 					break;
@@ -296,14 +345,14 @@ class HashMap
 
 								keyz = *(header.keys);
 
-								if(s !is null && keyz.s == s)
+								if(s !is null && *keyz.s == s)
 									isKeyExists = true;
 
 								if(isKeyExists && p !is null)
-									isKeyExists = keyz.p == p;
+									isKeyExists = *keyz.p == p;
 
 								if(isKeyExists && o !is null)
-									isKeyExists = keyz.o == o;
+									isKeyExists = *keyz.o == o;
 
 								if(isKeyExists)
 									break;

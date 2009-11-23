@@ -487,7 +487,7 @@ class Authorization
 			
 			if(tr !is null)
 			{
-				triple_list_element* founded_facts = ts.getTriples(tr.s, null, null);
+				triple_list_element* founded_facts = ts.getTriples(*tr.s, null, null);
 				triple_list_element* founded_facts_copy = founded_facts;
 				bool is_match = true;
 				byte checked_patterns_cnt = 1;

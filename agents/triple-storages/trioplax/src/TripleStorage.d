@@ -286,7 +286,7 @@ class TripleStorage
 					triple_list_element* listS = idx_sp.get(s, p2, null, false);
 					if(listS !is null)
 					{
-						char[] o2 = (*listS.triple_ptr).o;
+						char[] o2 = *(*listS.triple_ptr).o;
 
 						//log.trace("remove from index sppoo A: p1 = {}, p2 = {}", p1, p2);
 						//log.trace("### [{}] [{}] [{}]", look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
@@ -300,7 +300,7 @@ class TripleStorage
 
 							if(listS.triple_ptr !is null)
 							{
-								if(s == (*listS.triple_ptr).s)
+								if(s == *(*listS.triple_ptr).s)
 									break;
 								//log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
 							}
@@ -329,7 +329,7 @@ class TripleStorage
 					triple_list_element* listS = idx_sp.get(s, p1, null, false);
 					if(listS !is null)
 					{
-						char[] o1 = (*listS.triple_ptr).o;
+						char[] o1 = *(*listS.triple_ptr).o;
 
 						//log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
@@ -470,7 +470,7 @@ class TripleStorage
 
 						if(listS !is null)
 						{
-							o2 = (*listS.triple_ptr).o;
+							o2 = *(*listS.triple_ptr).o;
 						}
 
 					}
@@ -485,7 +485,7 @@ class TripleStorage
 						triple_list_element* listS = idx_sp.get(s, p1, null, false);
 
 						if(listS !is null)
-							o1 = (*listS.triple_ptr).o;
+							o1 = *(*listS.triple_ptr).o;
 
 					}
 					else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
@@ -497,11 +497,11 @@ class TripleStorage
 
 						triple_list_element* listS = idx_sp.get(s, p1, null, false);
 						if(listS !is null)
-							o1 = (*listS.triple_ptr).o;
+							o1 = *(*listS.triple_ptr).o;
 
 						listS = idx_sp.get(s, p2, null, false);
 						if(listS !is null)
-							o2 = (*listS.triple_ptr).o;
+							o2 = *(*listS.triple_ptr).o;
 
 					}
 

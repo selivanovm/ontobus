@@ -89,7 +89,7 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 				for(int i = 0; i < triple3.o.length; i++)
 				{
 						//					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
-					if(triple3.o[i] == *rightType)
+					if(*triple3.o[i] == *rightType)
 					{
 						if(!is_actual)
 							is_actual = is_right_actual(triple3.s.ptr, ts);

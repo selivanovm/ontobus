@@ -24,11 +24,15 @@ private
 {
     import Log;
 }
+private
+{
+    import tango.core.Thread;
+}
 struct triple
 {
-    char[] s;
-    char[] p;
-    char[] o;
+    char[]* s;
+    char[]* p;
+    char[]* o;
 }
 public
 {
@@ -56,41 +60,48 @@ class HashMap
 }
     private
 {
-    uint reducer_area_length;
-}
-    private
-{
-    uint[] reducer_area_ptr;
-}
-    private
-{
     triple_list_header*[][] reducer;
-}
-    private
-{
-    uint reducer_area_right;
-}
-    private
-{
-    uint key_2_list_triples_area__length;
-}
-    private
-{
-    ubyte[] key_2_list_triples_area;
-}
-    private
-{
-    uint key_2_list_triples_area__last = 0;
-}
-    private
-{
-    uint key_2_list_triples_area__right = 0;
 }
     private
 {
     char[] hashName;
 }
-    this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
+    private
+{
+    byte[] triples_list_elements;
+}
+    private
+{
+    uint triples_list_elements_tail = 0;
+}
+    private
+{
+    byte[] triples_area;
+}
+    private
+{
+    uint triples_area_tail = 0;
+}
+    private
+{
+    byte[] list_headers_area;
+}
+    private
+{
+    uint list_headers_area_tail = 0;
+}
+    this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
+{
+hashName = _hashName;
+max_size_short_order = _max_size_short_order;
+max_count_elements = _max_count_elements;
+log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start",hashName,_max_count_elements,max_size_short_order,_triple_area_length);
+triples_list_elements = new byte[](_triple_area_length);
+reducer = new triple_list_header*[][](max_count_elements);
+triples_area = new byte[](_max_count_elements * 100);
+list_headers_area = new byte[](_max_count_elements * triple_list_header.sizeof);
+log.trace("*** create object HashMap... ok");
+}
     public
 {
     triple* put(char[] key1, char[] key2, char[] key3, triple* triple_ptr, bool is_delete);
@@ -101,54 +112,6 @@ class HashMap
 }
     public
 {
-    uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
-{
-if (current_list_of_list_H_iterator < max_size_short_order)
-max_size_short_order++;
-else
-max_size_short_order = 0;
-if (current_list_of_list_V_iterator < max_count_elements)
-current_list_of_list_V_iterator += max_size_short_order;
-return null;
-}
-}
-    public
-{
     void remove_triple_from_list(triple_list_element* removed_triple, char[] s, char[] p, char[] o);
 }
-    private
-{
-    void dump_mem(ubyte[] mem, uint ptr);
 }
-}
-private
-{
-    bool _strcmp(char[] mem, uint ptr, char[] key);
-}
-private
-{
-    bool _strcmp(char[] mem, uint ptr, char* key);
-}
-private
-{
-    char[] mem_to_char(ubyte[] mem, uint ptr, int length);
-}
-private
-{
-    uint ptr_from_mem(ubyte[] mem, uint ptr);
-}
-private
-{
-    void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr);
-}
-private
-{
-    static 
-{
-    char[] _toString(char* s)
-{
-return s ? s[0..strlen(s)] : cast(char[])null;
-}
-}
-}
-void main(char[][] args);

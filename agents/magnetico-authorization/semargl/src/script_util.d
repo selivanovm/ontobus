@@ -25,11 +25,11 @@ public char[] isInDocFlow(char* elementId, TripleStorage ts)
 		{
 
 			// найдем автора 
-			triple_list_element *iterator1 = ts.getTriples(triple0.s, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
+			triple_list_element *iterator1 = ts.getTriples(*triple0.s, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
 
 			if(iterator1 !is null)
 			{
-				return triple0.s;
+				return *triple0.s;
 			}
 		}
 		iterator0 = iterator0.next_triple_list_element;
@@ -60,7 +60,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 	if(iterator0 !is null)
 	{
 
-		char[] next_branch = iterator0.triple_ptr.o;
+		char[] next_branch = *iterator0.triple_ptr.o;
 
 		if(next_branch !is null)
 		{
@@ -77,7 +77,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 			{
 				result[count_result] = (*iterator1.triple_ptr).s.ptr;
 				count_result++;
-				next_branch = (*iterator1.triple_ptr).s;
+				next_branch = *(*iterator1.triple_ptr).s;
 			}
 
 		}
@@ -119,7 +119,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 		while(delegates_facts !is null)
 		{
 			//log.trace("#3 gda");
-			triple_list_element* owners_facts = ts.getTriples(delegates_facts.triple_ptr.s, "magnet-ontology/authorization/acl#owner", null);
+			triple_list_element* owners_facts = ts.getTriples(*delegates_facts.triple_ptr.s, "magnet-ontology/authorization/acl#owner", null);
 			
 			while(owners_facts !is null)
 			{
@@ -133,9 +133,9 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 						/*			  strcpy(result_ptr++, ",");
 									  strcpy(result_ptr, object);
 									  result_ptr += strlen(object);*/
-					process_delegate(owner.o);
+					process_delegate(*owner.o);
 						
-					triple_list_element* with_tree_facts = ts.getTriples(owner.o, "magnet-ontology/authorization/acl#withTree", null);
+					triple_list_element* with_tree_facts = ts.getTriples(*owner.o, "magnet-ontology/authorization/acl#withTree", null);
 					while(with_tree_facts !is null)
 					{
 						if(with_tree_facts.triple_ptr !is null)
