@@ -10,6 +10,7 @@ private import Integer = tango.text.convert.Integer;
 private import Hash;
 
 private import Log;
+private import tango.core.Thread;
 
 struct triple
 {
@@ -38,35 +39,9 @@ class HashMap
 	private uint max_size_short_order = 8;
 
 	// в таблице соответствия первые четыре элемента содержат ссылки на ключи, короткие списки конфликтующих ключей содержатся в reducer_area
-	private uint reducer_area_length;
-	private uint[] reducer_area_ptr;
-
 	private triple_list_header*[][] reducer;
 
-	private uint reducer_area_right;
-
-	// область связки ключей и списков триплетов
-	private uint key_2_list_triples_area__length;
-	private ubyte[] key_2_list_triples_area;
-	private uint key_2_list_triples_area__last = 0;
-	private uint key_2_list_triples_area__right = 0;
-
 	private char[] hashName;
-
-	// область длинных списков конфликтующих ключей
-	//	uint long_list_length;
-	//	byte* long_list_ptr;
-	//	uint next_ptr_in_long_list;
-
-	// область списков триплетов 
-	//	uint list_triples_area__length;
-	//	int* list_triples_area;
-	//	int* list_triples_area__last_used_list;
-
-	// область хранения триплетов 
-	//	uint triples_area__length;
-	//	int* triples_area__ptr;
-	//	uint triples_area__last_used;
 
 	this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 	{
@@ -76,70 +51,8 @@ class HashMap
 		log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start", hashName,
 				_max_count_elements, max_size_short_order, _triple_area_length);
 
-		// область маппинга ключей, 
-		// содержит короткую очередь из [max_size_short_order] элементов в формате [ссылка на ключ 4b][ссылка на список триплетов ключа 4b] 
-		reducer_area_length = max_count_elements * max_size_short_order;
-		log.trace("*** HashMap[name={}, reducer_area_length={}", hashName, reducer_area_length);
-
-		reducer_area_ptr = new uint[reducer_area_length];
-
-		// инициализируем в reducer_area_ptr первые позиции коротких очередей 
-		// это понадобится для функции выдачи всех фактов по данному HashMap
-		for(uint i = 0; i < reducer_area_length; i += max_size_short_order)
-			reducer_area_ptr[i] = 0;
-
-		reducer_area_right = reducer_area_length;
-
 		reducer = new triple_list_header*[][max_count_elements];
 
-		// область ключей и списков триплетов
-		// формат:
-		// [ссылка на последний элемент очереди 4b]
-		// [позиция следующего ключа 2b] 
-		// [позиция следующего ключа 2b] 
-		// [тело ключа][0][тело ключа][0]
-		// -- элемент списка триплетов этого ключа --
-		// [ссылка на триплет 4b]
-		// [ссылка на следующий элемент 4b]				
-		key_2_list_triples_area__length = _triple_area_length;
-
-		key_2_list_triples_area = new ubyte[key_2_list_triples_area__length + 1];
-
-		key_2_list_triples_area__last = 1;
-
-		key_2_list_triples_area__right = key_2_list_triples_area__length;
-		log.trace("*** HashMap[name={}, key_2_list_triples_area__right={}", hashName, key_2_list_triples_area__right);
-		//		log.trace(
-		//				"область связки ключей и списков триплетов, length={}, start_addr={:X}, end_addr={:X}",
-		//				key_2_list_triples_area__length, key_2_list_triples_area,
-		//				key_2_list_triples_area__right);
-
-		// область длинных списков конфликтующих ключей
-		//		long_list_length = max_count_elements;
-		//		long_list_ptr = cast(byte*) alloca(long_list_length);
-		//		next_ptr_in_long_list = 0;
-		//		Stdout.format("*3** область длинных списков конфликтующих ключей:{:X}", long_list_ptr).newline;
-
-		//область триплетов		
-		//		triples_area__length = max_count_elements * 16;
-		//		triples_area__ptr = cast(int*) alloca(triples_area__length);
-		//		triples_area__last_used = 0;
-		//		Stdout.format("*5** область триплетов:{:X}", triples_area__ptr).newline;
-
-		//		log.trace("область маппинга ключей - oчистка, max_element={}", reducer_area_length);
-
-		uint i = 0;
-		for(i = 0; i < reducer_area_length; i++)
-		{
-			//@			*(reducer_area_ptr + i) = 0;
-			reducer_area_ptr[i] = 0;
-		}
-
-		//		Stdout.format("*7** область длинных списков конфликтующих ключей - очистка").newline;
-		//		for(uint i = 0; i < list_triples_area__length; i++)
-		//		{
-		//			*(i + list_triples_area) = 0;
-		//		}
 		log.trace("*** create object HashMap... ok");
 	}
 
@@ -269,13 +182,10 @@ class HashMap
 		if(key1.length == 0 && key2.length == 0 && key3.length == 0)
 			return null;
 
-		//		log.trace("put in hash[{:X}] map key1[{}], key2[{}], key3[{}], triple={:X4}",
-		//				cast(void*) this, key1, key2, key3, triple);
-
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 		triple_list_header* header;
 
-//		log.trace("get #2 hash = {:X4}", hash);
+		//		log.trace("get #2 hash = {:X4}", hash);
 
 		if(reducer[hash] is null)
 			return null;
@@ -286,18 +196,20 @@ class HashMap
 			triple* keyz;
 			while(i < max_size_short_order)
 			{
+
 				header = reducer[hash][i];
+
+				//				Thread.sleep(1);
+				isKeyExists = false;
 
 				if(header is null)
 					break;
 
-				isKeyExists = false;
-
-//				log.trace("get #6 {:X4} {:X4}", header, header.keys);
+				//				log.trace("get #6 {:X4} {:X4}", header, header.keys);
 
 				keyz = header.keys;
 
-//				log.trace("get #7 keyz = {:X4}", keyz);
+				//log.trace("get #7 keyz = {:X4}", keyz);
 
 				if(key1 !is null && keyz.s == key1)
 					isKeyExists = true;
@@ -316,9 +228,9 @@ class HashMap
 			if(isKeyExists == false)
 				return null;
 
-//			log.trace("get #100 reducer[{:X4}][{}].first_element={:X4}", hash, i, reducer[hash][i].first_element);
+			//			log.trace("get #100 reducer[{:X4}][{}].first_element={:X4}", hash, i, reducer[hash][i].first_element);
 			triple_list_element* ftl = reducer[hash][i].first_element;
-//			log.trace("get #110 first_element.triple_ptr={:X4}", ftl);
+			//			log.trace("get #110 first_element.triple_ptr={:X4}", ftl);
 
 			return (reducer[hash][i].first_element);
 		}

@@ -370,7 +370,7 @@ class TripleStorage
 				return -1;
 
 			triple_list_element* list = idx_spo.get(s, p, o, false);
-			log.trace("addTriple #1");
+			//			log.trace("addTriple #1");
 			if(list !is null)
 			{
 
@@ -405,11 +405,11 @@ class TripleStorage
 
 			//		log.trace("addTriple:add index spo");
 			idx_spo.put(s, p, o, null, false);
-			log.trace("addTriple #2");
+			//			log.trace("addTriple #2");
 			//		log.trace("addTriple:get this index as triple");
 			list = idx_spo.get(s, p, o, false);
 			//		log.trace("addTriple:ok, list={:X4}", list);
-			log.trace("addTriple #3");
+			//			log.trace("addTriple #3");
 			if(list is null)
 				throw new Exception("addTriple: not found triple in index spo");
 
@@ -422,16 +422,16 @@ class TripleStorage
 
 			if(idx_s !is null)
 				idx_s.put(s, null, null, new_triple_ptr, false);
-			log.trace("addTriple #4");
+			//			log.trace("addTriple #4");
 			if(idx_p !is null)
 				idx_p.put(p, null, null, new_triple_ptr, false);
-			log.trace("addTriple #5");
+			//			log.trace("addTriple #5");
 			if(idx_o !is null)
 				idx_o.put(o, null, null, new_triple_ptr, false);
-			log.trace("addTriple #6");
+			//			log.trace("addTriple #6");
 			if(idx_sp !is null)
 				idx_sp.put(s, p, null, new_triple_ptr, false);
-			log.trace("addTriple #7");
+			//			log.trace("addTriple #7");
 			if(idx_po !is null)
 			{
 				//			    log.trace("addTriple #7 \n {} \n {} \n {}", p, o, fromStringz(cast(char*)triple));
