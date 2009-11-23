@@ -6,10 +6,12 @@ private import tango.io.Stdout;
 private import script_util;
 private import tango.stdc.string;
 private import tango.stdc.posix.stdio;
+private import tango.stdc.stringz;
 
 private import fact_tools;
 private import Log;
 
+private import HashMap;
 
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
@@ -44,7 +46,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
 	// найдем все ACL записи для заданных user и elementId 
-	uint* iterator1 = ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
+	triple_list_element* iterator1 = ts.getTriplesUseIndex(pp, fromStringz(user), fromStringz(elementId), idx_name.S1PPOO);
 
 	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
@@ -55,7 +57,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
 	for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
 	{
-		uint* iterator2 = ts.getTriplesUseIndex(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
+		triple_list_element* iterator2 = ts.getTriplesUseIndex(pp, fromStringz(iterator_on_targets_of_hierarhical_departments[i]), fromStringz(elementId), idx_name.S1PPOO);
 
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);
@@ -67,50 +69,38 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	return false;
 }
 
-bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts)
+bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, TripleStorage ts)
 {
 
 	//		log.trace("checkRight query: p1={}, p2={}, o1={}, o2={}", "magnet-ontology/authorization/acl#targetSubsystemElement",
 	//				"magnet-ontology/authorization/acl#elementId", getString(user), getString(elementId));
 	//		print_list_triple(iterator1);
 
-	if(iterator3 !is null)
+	while(iterator3 !is null)
 	{
-		uint next_element3 = 0xFF;
-		while(next_element3 > 0)
+		triple *triple3 = iterator3.triple_ptr;
+		
+		if(triple3 !is null)
 		{
-			byte* triple3 = cast(byte*) *iterator3;
-
-			if(triple3 !is null)
+			if(strcmp(triple3.p.ptr, "magnet-ontology/authorization/acl#rights") == 0)
 			{
-				char* s = cast(char*) triple3 + 6;
-				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
-
-				if(strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
+				// проверим, есть ли тут требуемуе нами право
+				bool is_actual = false;
+				for(int i = 0; i < triple3.o.length; i++)
 				{
-					// проверим, есть ли тут требуемуе нами право
-					char* triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
-					//		log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
-
-					bool is_actual = false;
-					while(*triple2_o != 0)
-					{
 						//					  log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), *rightType);
-						if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
-						{
-							if(!is_actual)
-								is_actual = is_right_actual(s, ts);
-							if(is_actual)
-								return true;
-							else
-								break;
-						}
-						triple2_o++;
+					if(triple3.o[i] == *rightType)
+					{
+						if(!is_actual)
+							is_actual = is_right_actual(triple3.s.ptr, ts);
+						if(is_actual)
+							return true;
+						else
+							break;
 					}
 				}
 			}
-			next_element3 = *(iterator3 + 1);
-			iterator3 = cast(uint*) next_element3;
+			iterator3 = iterator3.next_triple_list_element;
 		}
 	}
 

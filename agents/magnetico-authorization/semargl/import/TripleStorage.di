@@ -131,11 +131,11 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    uint* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
+    triple_list_element* getTriplesUseIndex(char[] s, char[] p, char[] o, ubyte useindex);
 }
     public
 {
-    uint* getTriples(char* s, char* p, char* o);
+    triple_list_element* getTriples(char[] s, char[] p, char[] o);
 }
     public
 {
@@ -147,6 +147,10 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    void do_things(char* ooo);
+    void print_list_triple(uint* list_iterator);
+}
+    public
+{
+    void print_triple(byte* triple);
 }
 }

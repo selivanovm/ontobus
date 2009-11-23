@@ -4,6 +4,8 @@ import TripleStorage;
 import RightTypeDef;
 private import Log;
 private import tango.stdc.string;
+private import HashMap;
+private import tango.stdc.stringz;
 
 static char* oupDepId = "f8c51331-b1d8-48ac-ae69-91af741f6320";
 static char*[] documentTypeNames = [ "Инвестиционная заявка", "Инвестиционный проект", "Запрос на изменение Инвестиционного проекта" ];
@@ -54,47 +56,35 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	if(is_user_in_oup)
 	{
 		bool is_element_a_document = false;
-		uint* facts = ts.getTriples(elementId, "magnet-ontology/authorization/acl#category", "DOCUMENT");
-		if(facts !is null)
-		{
-			byte* triple = cast(byte*) *facts;
-			if(triple !is null)
-				is_element_a_document = true;
-		}
+		triple_list_element* facts = ts.getTriples(fromStringz(elementId), "magnet-ontology/authorization/acl#category", "DOCUMENT");
+		if(facts !is null && facts.triple_ptr !is null)
+			is_element_a_document = true;
+
 		//log.trace("#5");
 		
 		if (is_element_a_document)
 		{
 			//log.trace("#6");
 			
-			facts = ts.getTriples(elementId, "magnet-ontology/documents#type_name", null);
-			if(facts !is null)
+			facts = ts.getTriples(fromStringz(elementId), "magnet-ontology/documents#type_name", null);
+			uint next_element0 = 0xFF;
+			while(facts !is null && !result)
 			{
-				//log.trace("#7");
-				
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0 && !result)
-				{
 					//log.trace("#8");
 					
-					byte* triple = cast(byte*) *facts;
-					if(triple !is null)
-					{
-						//log.trace("#8");
-						
-						char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
-								       (*(triple + 2) << 8) + *(triple + 3) + 1);
-						for(uint i = 0; i < documentTypeNames.length; i++)
-							if(strcmp(o, documentTypeNames[i]) == 0)
-							{
-								result = true;
-								break;
-							}
+				triple *triple_ptr = facts.triple_ptr;
+				if(triple_ptr !is null)
+				{
+					//log.trace("#8");
+					for(uint i = 0; i < documentTypeNames.length; i++)
+						if(strcmp(triple_ptr.o.ptr, documentTypeNames[i]) == 0)
+						{
+							result = true;
+							break;
+						}
 					
-					}
-					next_element0 = *(facts + 1);
-					facts = cast(uint*) next_element0;
 				}
+				facts = facts.next_triple_list_element;
 			}
 		}
 		else

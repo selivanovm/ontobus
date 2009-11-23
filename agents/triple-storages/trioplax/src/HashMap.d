@@ -18,7 +18,7 @@ struct triple
 	char[] o;
 }
 
-struct triple_list_element 
+public struct triple_list_element 
 {
 	triple* triple_ptr;
 	triple_list_element* next_triple_list_element;
@@ -263,8 +263,8 @@ class HashMap
 			{
 			// ключ уже существует, допишем триплет к last_element в найденном header
 				log.trace("put #27 header.last_element={:X4}", header.last_element);
-			header.last_element.next_triple_list_element = new_element;
-			header.last_element = new_element; 
+				header.last_element.next_triple_list_element = new_element;
+				header.last_element = new_element; 
 			}
 			
 			log.trace("put #30 reducer[{:X4}][{}]={:X4}", hash, i, reducer[hash][i]);
@@ -606,7 +606,7 @@ private static char[] _toString(char* s)
 	return s ? s[0 .. strlen(s)] : cast(char[]) null;
 }
 
-public void print_triple_ptr(byte* triple_ptr)
+/*private void print_triple_ptr(byte* triple_ptr)
 {
 	if(triple_ptr is null)
 		return;
@@ -620,7 +620,7 @@ public void print_triple_ptr(byte* triple_ptr)
 	log.trace("triple_ptr: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
 }
 
-public void print_list_triple(uint* list_iterator)
+private void print_list_triple(uint* list_iterator)
 {
 	byte* triple_ptr;
 	if(list_iterator !is null)
@@ -638,7 +638,7 @@ public void print_list_triple(uint* list_iterator)
 			list_iterator = cast(uint*) next_element0;
 		}
 	}
-}
+	}*/
 
 void main (char[][] args)
 {

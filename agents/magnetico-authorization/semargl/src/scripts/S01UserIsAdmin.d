@@ -4,6 +4,7 @@ private import TripleStorage;
 private import tango.io.Stdout;
 private import tango.stdc.stringz;
 private import Log;
+private import HashMap;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
 {
@@ -31,7 +32,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 public bool isAdmin(char* user, TripleStorage ts)
 {
-	uint* iterator0 = ts.getTriples(user, "magnet-ontology/authorization/functions#is_admin", "true");
+	triple_list_element* iterator0 = ts.getTriples(fromStringz(user), "magnet-ontology/authorization/functions#is_admin", "true");
 
 	if(iterator0 != null)
 		return true;

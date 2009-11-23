@@ -6,6 +6,8 @@ import RightTypeDef;
 
 private import Log;
 private import tango.stdc.string;
+private import tango.stdc.stringz;
+private import HashMap;
 
 static char* depId = "92e57b6d-83e3-485f-8885-0bade363f759";
 static char*[] documentTypeNames = [ "Комплект чертежей", "Конструкторский проект", "Чертеж", "Чертеж ТОРО", 
@@ -40,51 +42,34 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	if(is_user_in_dep)
 	{
 		bool is_element_a_document = false;
-		uint* facts = ts.getTriples(elementId, "magnet-ontology/authorization/acl#category", "DOCUMENT");
-		if(facts !is null)
-		{
-			byte* triple = cast(byte*) *facts;
-			if(triple !is null)
-				is_element_a_document = true;
-		}
+		triple_list_element* facts = ts.getTriples(fromStringz(elementId), "magnet-ontology/authorization/acl#category", "DOCUMENT");
+		if(facts !is null && facts.triple_ptr !is null)
+			is_element_a_document = true;
 		
 		if (is_element_a_document)
 		{
-			facts = ts.getTriples(elementId, "magnet-ontology/documents#type_name", null);
-			if(facts !is null)
+			facts = ts.getTriples(fromStringz(elementId), "magnet-ontology/documents#type_name", null);
+			while(facts !is null && !result)
 			{
-				uint next_element0 = 0xFF;
-				while(next_element0 > 0 && !result)
+				triple* triple_ptr = facts.triple_ptr;
+				if(triple_ptr !is null)
 				{
-					byte* triple = cast(byte*) *facts;
-					if(triple !is null)
-					{
-						char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + 
-								       (*(triple + 2) << 8) + *(triple + 3) + 1);
-						for(uint i = 0; i < documentTypeNames.length; i++)
-							if(strcmp(o, documentTypeNames[i]) == 0)
-							{
-								result = true;
-								break;
-							}
+					for(uint i = 0; i < documentTypeNames.length; i++)
+						if(strcmp(triple_ptr.o.ptr, documentTypeNames[i]) == 0)
+						{
+							result = true;
+							break;
+						}
 					
-					}
-					next_element0 = *(facts + 1);
-					facts = cast(uint*) next_element0;
 				}
+				facts = facts.next_triple_list_element;
 			}
 		}
-		else
-		{
-		//	log.trace("Документ в состоянии черновика!");
-		}
-
-			
-	} else
-	{
-	//	log.trace("Пользователь не находится  в подразделении {}!", depId);
 	}
-	
+	else
+	{
+		//	log.trace("Документ в состоянии черновика!");
+	}
 	return result;
 
 }

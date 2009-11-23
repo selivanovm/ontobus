@@ -382,7 +382,7 @@ void get_message(byte* message, ulong message_size)
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
 
-				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
+				triple_list_element* list_facts = az.getTripleStorage.getTriples(fromStringz(ss), fromStringz(pp), fromStringz(oo));
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
 				char* result_ptr = cast(char*) result_buffer;
@@ -394,40 +394,30 @@ void get_message(byte* message, ulong message_size)
 				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
 				result_ptr += 41;
 
-				if(list_facts !is null)
+				while(list_facts !is null)
 				{
-					uint next_element1 = 0xFF;
-					while(next_element1 > 0)
+					triple* triple_ptr = list_facts.triple_ptr;
+					//						log.trace("list_fact {:X4}", list_facts);
+					if(triple_ptr !is null)
 					{
-						byte* triple = cast(byte*) *list_facts;
-						//						log.trace("list_fact {:X4}", list_facts);
-						if(triple !is null)
-						{
-							char* s = cast(char*) triple + 6;
+						
+						//log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
 
-							char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-
-							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-
-							//log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
-
-							strcpy(result_ptr++, "<");
-							strcpy(result_ptr, s);
-							result_ptr += strlen(s);
-							strcpy(result_ptr, "><");
-							result_ptr += 2;
-							strcpy(result_ptr, p);
-							result_ptr += strlen(p);
-							strcpy(result_ptr, "><");
-							result_ptr += 2;
-							strcpy(result_ptr, o);
-							result_ptr += strlen(o);
-							strcpy(result_ptr, ">.");
-							result_ptr += 2;
-						}
-						next_element1 = *(list_facts + 1);
-						list_facts = cast(uint*) next_element1;
+						strcpy(result_ptr++, "<");
+						strcpy(result_ptr, triple_ptr.s.ptr);
+						result_ptr += triple_ptr.s.length;
+						strcpy(result_ptr, "><");
+						result_ptr += 2;
+						strcpy(result_ptr, triple_ptr.p.ptr);
+						result_ptr += triple_ptr.p.length;
+						strcpy(result_ptr, "><");
+						result_ptr += 2;
+						strcpy(result_ptr, triple_ptr.o.ptr);
+						result_ptr += triple_ptr.o.length;
+						strcpy(result_ptr, ">.");
+						result_ptr += 2;
 					}
+					list_facts = list_facts.next_triple_list_element;
 				}
 
 				time = elapsed.stop;
@@ -461,7 +451,7 @@ void get_message(byte* message, ulong message_size)
 					}
 				}
 
-				remove_subject(fact_o[arg_id]);
+				remove_subject(fromStringz(fact_o[arg_id]));
 				/*				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null);
 
 				if(removed_facts !is null)
@@ -525,57 +515,51 @@ void get_message(byte* message, ulong message_size)
 				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
 						getString(arg_o));
 
-				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o);
+				triple_list_element* removed_subjects = az.getTripleStorage.getTriples(null, fromStringz(arg_p), fromStringz(arg_o));
 
-				if(removed_subjects !is null)
+				while(removed_subjects !is null)
 				{
-					uint next_element0 = 0xFF;
-					while(next_element0 > 0)
+					triple* triple_ptr = removed_subjects.triple_ptr;
+
+					if(triple_ptr !is null)
 					{
-						byte* triple = cast(byte*) *removed_subjects;
 
-						if(triple !is null)
-						{
+						log.trace("removed_subjects <{}>", triple_ptr.s);
 
-							char* s = cast(char*) triple + 6;
-							log.trace("removed_subjects <{}>", getString(s));
+						remove_subject(triple_ptr.s);
 
-							remove_subject(s);
+						/*							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
-							/*							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+													if(removed_facts !is null)
+													{
+													uint next_element1 = 0xFF;
+													while(next_element1 > 0)
+													{
+													triple = cast(byte*) *removed_facts;
 
-							if(removed_facts !is null)
-							{
-								uint next_element1 = 0xFF;
-								while(next_element1 > 0)
-								{
-									triple = cast(byte*) *removed_facts;
+													if(triple !is null)
+													{
 
-									if(triple !is null)
-									{
+													s = cast(char*) triple + 6;
 
-										s = cast(char*) triple + 6;
+													char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
 
-										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+													char*
+													o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-										char*
-												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+													log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
 
-										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
+													az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
+													az.logginTriple('D', getString(s), getString(p), getString(o));
 
-										az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
-										az.logginTriple('D', getString(s), getString(p), getString(o));
+													}
 
-									}
+													next_element1 = *(removed_facts + 1);
+													removed_facts = cast(uint*) next_element1;
+													}
 
-									next_element1 = *(removed_facts + 1);
-									removed_facts = cast(uint*) next_element1;
-								}
-
-								}*/
-						}
-						next_element0 = *(removed_subjects + 1);
-						removed_subjects = cast(uint*) next_element0;
+													}*/
+						removed_subjects = removed_subjects.next_triple_list_element;
 					}
 				}
 
@@ -617,74 +601,65 @@ void get_message(byte* message, ulong message_size)
 					if(element_id >= 0)
 					{
 						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
-						uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[element_id]);
+						triple_list_element* founded_facts = az.getTripleStorage.getTriples(null, 
+														    "magnet-ontology/authorization/acl#elementId", fromStringz(fact_o[element_id]));
 						log.trace("#check for remove");
 						
 						print_list_triple(founded_facts);
-						if(founded_facts !is null)
+						while(founded_facts !is null)
 						{
-							uint next_element = 0xFF;
-							while(next_element > 0)
+							triple* triple_ptr = founded_facts.triple_ptr;
+							if(triple_ptr !is null)
 							{
-								byte* triple = cast(byte*) *founded_facts;
-								if(triple !is null)
+								log.trace("check right record with subject = {}", triple_ptr.s);
+								bool is_exists = true;
+								for(int i = 0; i < count_facts; i++)
 								{
-									char* s = cast(char*) triple + 6;
-									log.trace("check right record with subject = {}", getString(s));
-									bool is_exists = true;
-									for(int i = 0; i < count_facts; i++)
+									if(i != element_id && is_fact_in_object[i] == arg_id && 
+									   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
+									    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
+										//||
+										// strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0))
 									{
-										if(i != element_id && is_fact_in_object[i] == arg_id && 
-										   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
-										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
-										   //||
-										   // strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSubsystemElement") == 0))
+										log.trace("check for existance <{}> <{}> <{}>", triple_ptr.s, getString(fact_p[i]), 
+											  getString(fact_o[i]));
+										triple_list_element* founded_facts2 = 
+											az.getTripleStorage.getTriples(triple_ptr.s, fromStringz(fact_p[i]), 
+														       fromStringz(fact_o[i]));
+										if(founded_facts2 is null)
 										{
-											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
-											getString(fact_o[i]));
-											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
-											if(founded_facts2 is null)
+											log.trace("#444");
+											is_exists = false;
+											break;
+										}
+										else
+										{
+											log.trace("#555");
+											bool is_exists2 = false;
+											while(founded_facts2 !is null && is_exists)
 											{
-												log.trace("#444");
-												is_exists = false;
-												break;
-											}
-											else
-											{
-												log.trace("#555");
-												uint next_element2 = 0xFF;
-												bool is_exists2 = false;
-												while(next_element2 > 0 && is_exists)
+												triple* triple2 = founded_facts2.triple_ptr;
+												if(triple2 !is null)
 												{
-													byte* triple2 = cast(byte*) *founded_facts2;
-													if(triple2 !is null)
+													if(strcmp(triple2.o.ptr, fact_o[i]) == 0)
 													{
-														char*
-																o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
-
-														if(strcmp(o, fact_o[i]) == 0)
-														{
-															is_exists2 = true;
-															break;
-														}
-
+														is_exists2 = true;
+														break;
 													}
-													next_element2 = *(founded_facts2 + 1);
-													founded_facts2 = cast(uint*) next_element2;
+
 												}
-												log.trace("#666 {} {}", is_exists, is_exists2);
-												is_exists = is_exists2 && is_exists;
+												founded_facts2 = founded_facts2.next_triple_list_element;
 											}
+											log.trace("#666 {} {}", is_exists, is_exists2);
+											is_exists = is_exists2 && is_exists;
 										}
 									}
-									if(is_exists)
-									{
-										remove_subject(s);
-									}
-
 								}
-								next_element = *(founded_facts + 1);
-								founded_facts = cast(uint*) next_element;
+								if(is_exists)
+								{
+									remove_subject(triple_ptr.s);
+								}
+								founded_facts = founded_facts.next_triple_list_element;
 							}
 						}
 					}
@@ -692,16 +667,21 @@ void get_message(byte* message, ulong message_size)
 
 				for(int i = 0; i < count_facts; i++)
 				{
+					log.trace("# c1 {} {} {:X4}", i, fact_p.length, fact_p[10]);
 					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
 					{
+						log.trace("# c2");
 						reply_to_id = i;
 					}
 					else if(is_fact_in_object[i] == arg_id)
 					{
+						log.trace("# c4");
 						if(strlen(fact_s[i]) == 0)
 							fact_s[i] = uuid;
 						else
-						  uuid = fact_s[i];
+							uuid = fact_s[i];
+
+						log.trace("# c5");
 
 						try
 						{
@@ -710,13 +690,14 @@ void get_message(byte* message, ulong message_size)
 							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							
-							if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
+							/*							if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
 							{
 								log.trace("#CREATE");
-								uint* f = az.getTripleStorage.getTriples(cast(char*)null, 
-													 "magnet-ontology/authorization/acl#elementId".ptr, fact_o[i]);
+								triple_list_element* f = az.getTripleStorage.getTriples(cast(char*)null, 
+															"magnet-ontology/authorization/acl#elementId".ptr, fact_o[i]);
 								print_list_triple(f);
-							}
+								log.trace("#CREATE@1");
+								}*/
 
 						}
 						catch(Exception ex)
@@ -725,6 +706,7 @@ void get_message(byte* message, ulong message_size)
 								  getString(cast(char*) fact_o[i]), ex);
 						}
 					}
+					log.trace("# c6");
 				}
 
 				time = elapsed.stop;
@@ -999,13 +981,10 @@ void get_message(byte* message, ulong message_size)
 
 }
 
-private void remove_subject(char* s)
+private void remove_subject(char[] s)
 {
-	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-	uint* rf = removed_facts;
-
-	if(removed_facts !is null)
-	{
+	triple_list_element* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+	//	uint* rf = removed_facts;
 
 		char[][20] s_a;
 		char[][20] p_a;
@@ -1013,34 +992,28 @@ private void remove_subject(char* s)
 
 		int cnt = 0;
 		uint next_element1 = 0xFF;
-		while(next_element1 > 0)
+		while(removed_facts !is null)
 		{
-			byte* triple2 = cast(byte*) *removed_facts;
+			triple* triple_ptr = removed_facts.triple_ptr;
 
-			if(triple2 !is null)
+			if(triple_ptr !is null)
 			{
 
-				char* ss = cast(char*) triple2 + 6;
-
-				char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-				char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
-				s_a[cnt] = fromStringz(ss);
-				p_a[cnt] = fromStringz(pp);
-				o_a[cnt] = fromStringz(oo);
+				s_a[cnt] = triple_ptr.s;
+				p_a[cnt] = triple_ptr.p;
+				o_a[cnt] = triple_ptr.o;
 				log.trace("remove triple2 <{}><{}><{}>", s_a[cnt], p_a[cnt], o_a[cnt]);
 
 			}
 			cnt++;
-			next_element1 = *(removed_facts + 1);
-			removed_facts = cast(uint*) next_element1;
-												
+			removed_facts = removed_facts.next_triple_list_element;
 		}
 		for(int k = 0; k < cnt; k++)
 		{
 			az.getTripleStorage.removeTriple(s_a[k], p_a[k], o_a[k]);
 			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
 			//			log.trace("#WOOW");
-			rf = az.getTripleStorage.getTriples(s, null, null);
+			/*			rf = az.getTripleStorage.getTriples(s, null, null);
 
 			if(strcmp(p_a[k].ptr, "magnet-ontology/authorization/acl#elementId".ptr) == 0)
 			{
@@ -1048,11 +1021,10 @@ private void remove_subject(char* s)
 				uint* f = az.getTripleStorage.getTriples(cast(char*)null, 
 									 "magnet-ontology/authorization/acl#elementId".ptr, o_a[k].ptr);
 				print_list_triple(f);
-			}
+				}*/
 
 			//print_list_triple(rf);
 												
-		}
 	}
 	
 }

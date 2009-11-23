@@ -19,6 +19,7 @@ private import tango.time.StopWatch;
 private import tango.time.WallClock;
 private import tango.time.Clock;
 private import tango.io.FileScan;
+private import tango.stdc.stringz;
 
 private import tango.text.locale.Locale;
 private import tango.text.convert.TimeStamp;
@@ -43,6 +44,7 @@ private import Log;
 
 private import HashMap;
 private import TripleStorage;
+
 
 //private import mom_client;
 
@@ -288,7 +290,7 @@ class Authorization
 		//log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		//		}
 
-		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
+		triple_list_element* iterator_facts_of_document = ts.getTriples(fromStringz(authorizedElementId), null, null);
 
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
 		{
@@ -422,47 +424,47 @@ class Authorization
 			}
 		}
 
-		uint* start_facts_set = null;
+		triple_list_element* start_facts_set = null;
 		byte start_set_marker = 0;
 		if(elements_id > 0)
 		{
 			log.trace("object = {}", getString(fact_o[elements_id]));
-			start_facts_set = ts.getTriples(null, null, fact_o[elements_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[elements_id]));
 		}
 		else if(author_subsystem_element_id > 0)
 		{
 			start_set_marker = 1;
-			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_element_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[author_subsystem_element_id]));
 		}
 		else if(target_subsystem_element_id > 0)
 		{
 			start_set_marker = 2;
-			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_element_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[target_subsystem_element_id]));
 		}
 		else if(category_id > 0)
 		{
 			start_set_marker = 3;
-			start_facts_set = ts.getTriples(null, null, fact_o[category_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[category_id]));
 		}
 		else if(author_subsystem_id > 0)
 		{
 			start_set_marker = 4;
-			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[author_subsystem_id]));
 		}
 		else if(target_subsystem_id > 0)
 		{
 			start_set_marker = 5;
-			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[target_subsystem_id]));
 		}
 		else if(author_system_id > 0)
 		{
 			start_set_marker = 6;
-			start_facts_set = ts.getTriples(null, null, fact_o[author_system_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[author_system_id]));
 		}
 		else if(target_system_id > 0)
 		{
 			start_set_marker = 7;
-			start_facts_set = ts.getTriples(null, null, fact_o[target_system_id]);
+			start_facts_set = ts.getTriples(null, null, fromStringz(fact_o[target_system_id]));
 		}
 
 		log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id, author_subsystem_element_id,
@@ -479,142 +481,117 @@ class Authorization
 		strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
 		result_ptr += 41;
 
-		if(start_facts_set !is null)
+		while(start_facts_set !is null)
 		{
-			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			triple *tr = start_facts_set.triple_ptr;
+			
+			if(tr !is null)
 			{
-				byte* triple = cast(byte*) *start_facts_set;
-				if(triple !is null)
+				triple_list_element* founded_facts = ts.getTriples(tr.s, null, null);
+				triple_list_element* founded_facts_copy = founded_facts;
+				bool is_match = true;
+				byte checked_patterns_cnt = 1;
+				while(founded_facts !is null)
 				{
-					char* s = cast(char*) triple + 6;
 
-					uint* founded_facts = ts.getTriples(s, null, null);
-					uint* founded_facts_copy = founded_facts;
-					if(founded_facts !is null)
+					triple* triple1 = founded_facts.triple_ptr;
+
+					if(triple1 !is null)
 					{
-						uint next_element1 = 0xFF;
-						bool is_match = true;
-						byte checked_patterns_cnt = 1;
-						while(next_element1 > 0)
 
+						if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(triple1.p.ptr,
+														     "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
 						{
-
-							byte* triple1 = cast(byte*) *founded_facts;
-
-							if(triple1 !is null)
-							{
-
-								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-								char*
-										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
-
-								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
-										"magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
-								}
-								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1,
-										"magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
-								}
-								if(start_set_marker < 3 && category_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#category") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[category_id]) == 0;
-								}
-								if(start_set_marker < 4 && author_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSubsystem") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[author_subsystem_id]) == 0;
-								}
-								if(start_set_marker < 5 && target_subsystem_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSubsystem") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[target_subsystem_id]) == 0;
-								}
-								if(start_set_marker < 6 && author_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#authorSystem") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[author_system_id]) == 0;
-								}
-								if(start_set_marker < 7 && target_system_id > 0 && strcmp(p1, "magnet-ontology/authorization/acl#targetSystem") == 0)
-								{
-									checked_patterns_cnt++;
-									is_match = is_match & strcmp(o1, fact_o[target_system_id]) == 0;
-								}
-
-							}
-							next_element1 = *(founded_facts + 1);
-							founded_facts = cast(uint*) next_element1;
-
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[author_subsystem_element_id]) == 0;
+						}
+						if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(triple1.p.ptr,
+														     "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
+						{
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[target_subsystem_element_id]) == 0;
+						}
+						if(start_set_marker < 3 && category_id > 0 && strcmp(triple1.p.ptr, "magnet-ontology/authorization/acl#category") == 0)
+						{
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[category_id]) == 0;
+						}
+						if(start_set_marker < 4 && author_subsystem_id > 0 && strcmp(triple1.p.ptr, "magnet-ontology/authorization/acl#authorSubsystem") == 0)
+						{
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[author_subsystem_id]) == 0;
+						}
+						if(start_set_marker < 5 && target_subsystem_id > 0 && strcmp(triple1.p.ptr, "magnet-ontology/authorization/acl#targetSubsystem") == 0)
+						{
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[target_subsystem_id]) == 0;
+						}
+						if(start_set_marker < 6 && author_system_id > 0 && strcmp(triple1.p.ptr, "magnet-ontology/authorization/acl#authorSystem") == 0)
+						{
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[author_system_id]) == 0;
+						}
+						if(start_set_marker < 7 && target_system_id > 0 && strcmp(triple1.p.ptr, "magnet-ontology/authorization/acl#targetSystem") == 0)
+						{
+							checked_patterns_cnt++;
+							is_match = is_match & strcmp(triple1.o.ptr, fact_o[target_system_id]) == 0;
 						}
 
-						//log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
+					}
+					founded_facts = founded_facts.next_triple_list_element;
+				}
 
-						if(is_match && checked_patterns_cnt == patterns_cnt)
+				//log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
+
+				if(is_match && checked_patterns_cnt == patterns_cnt)
+				{
+					//log.trace("found match");
+					while(founded_facts_copy !is null)
+					{
+						triple* triple1 = founded_facts_copy.triple_ptr;
+						//log.trace("#3");
+						if(triple1 !is null)
 						{
-							//log.trace("found match");
-							next_element1 = 0xFF;
-							while(next_element1 > 0)
-							{
-								byte* triple1 = cast(byte*) *founded_facts_copy;
-								//log.trace("#3");
-								if(triple1 !is null)
-								{
-									//log.trace("...not null");
-									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-									char*
-											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
-
-									strcpy(result_ptr++, "<");
-									strcpy(result_ptr, s);
-									result_ptr += strlen(s);
-									strcpy(result_ptr, "><");
-									result_ptr += 2;
-									strcpy(result_ptr, p1);
-									result_ptr += strlen(p1);
-									strcpy(result_ptr, ">\"");
-									result_ptr += 2;
-									strcpy(result_ptr, o1);
-									result_ptr += strlen(o1);
-									strcpy(result_ptr, "\".");
-									result_ptr += 2;
-								}
-
-								next_element1 = *(founded_facts_copy + 1);
-								founded_facts_copy = cast(uint*) next_element1;
-							}
+							//log.trace("...not null");
+							strcpy(result_ptr++, "<");
+							strcpy(result_ptr, triple1.s.ptr);
+							result_ptr += triple1.s.length;
+							strcpy(result_ptr, "><");
+							result_ptr += 2;
+							strcpy(result_ptr, triple1.p.ptr);
+							result_ptr += triple1.p.length;
+							strcpy(result_ptr, ">\"");
+							result_ptr += 2;
+							strcpy(result_ptr, triple1.o.ptr);
+							result_ptr += triple1.o.length;
+							strcpy(result_ptr, "\".");
+							result_ptr += 2;
 						}
-
-						if(strlen(result_buffer) > 10000)
-						{
-							strcpy(result_ptr, "}.\0");
-
-							send_result_and_logging_messages(queue_name, result_buffer);
-
-							//							client.send(queue_name, result_buffer);
-
-							result_ptr = cast(char*) result_buffer;
-
-							*result_ptr = '<';
-							strcpy(result_ptr + 1, command_uid);
-							result_ptr += strlen(command_uid) + 1;
-							strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
-							result_ptr += 41;
-
-						}
+						founded_facts_copy = founded_facts_copy.next_triple_list_element;
 					}
 				}
-				next_element0 = *(start_facts_set + 1);
-				start_facts_set = cast(uint*) next_element0;
+
+				if(strlen(result_buffer) > 10000)
+				{
+					strcpy(result_ptr, "}.\0");
+
+					send_result_and_logging_messages(queue_name, result_buffer);
+
+					//							client.send(queue_name, result_buffer);
+
+					result_ptr = cast(char*) result_buffer;
+
+					*result_ptr = '<';
+					strcpy(result_ptr + 1, command_uid);
+					result_ptr += strlen(command_uid) + 1;
+					strcpy(result_ptr, "><magnet-ontology/transport#result:data>{");
+					result_ptr += 41;
+
+				}
 			}
-
+			start_facts_set = start_facts_set.next_triple_list_element;
 		}
-
+		
 		strcpy(result_ptr, "}.<");
 		result_ptr += 3;
 		strcpy(result_ptr, command_uid);
@@ -630,7 +607,7 @@ class Authorization
 		double time = elapsed.stop;
 		log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 		log.trace("result:{}\n sent to: {}", getString(result_buffer), getString(queue_name));
-
+	
 	}
 
 	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)
@@ -670,11 +647,11 @@ class Authorization
 		strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
 		result_ptr += 41;
 
-		void put_in_result(char* founded_delegate)
+		void put_in_result(char[] founded_delegate)
 		{
 			strcpy(result_ptr++, ",");
-			strcpy(result_ptr, founded_delegate);
-			result_ptr += strlen(founded_delegate);
+			strcpy(result_ptr, founded_delegate.ptr);
+			result_ptr += founded_delegate.length;
 		}
 
 		getDelegateAssignersForDelegate(fact_o[arg_id], ts, &put_in_result);

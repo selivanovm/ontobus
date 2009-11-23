@@ -7,88 +7,69 @@ private import tango.io.Stdout;
 //import str_tool;
 import script_util;
 private import Log;
+private import HashMap;
 
 public int calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
 
-	uint* iterator = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId);
-	char* ACL_subject;
+	triple_list_element* iterator = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", fromStringz(elementId));
+	char[] ACL_subject;
 
 	bool is_in_docflow = false;
 
-	if(iterator !is null)
+	while(iterator !is null)
 	{
-	  uint next_element = 0xFF;
-	  while(next_element > 0)
-	  {
-	    byte* triple = cast(byte*) *iterator; // берем субъект с нужным элементом
-	    if(triple !is null)
+		triple* triple_ptr = iterator.triple_ptr;
+	    if(triple_ptr !is null)
 	      {
-		ACL_subject = cast(char*) triple + 6;
-		uint* iterator1 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
+		      ACL_subject = triple_ptr.s;
+		      triple_list_element* iterator1 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
 
-		if(iterator1 !is null) // если не null, значит право с найденным субъектом создал документооборот
-		  {
-		    
-			  char* subject1 = cast(char*) triple + 6;
-
-			  log.trace("isInDocFlow : subject = {} | s1", fromStringz(ACL_subject), fromStringz(subject1));
-
-			  is_in_docflow = true;			  
-
-		    uint* iterator2 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#targetSubsystemElement", user);
-		    if(iterator2 !is null) // если не null, значит target для права это наш user
+		      if(iterator1 !is null) // если не null, значит право с найденным субъектом создал документооборот
 		      {
-
-			subject1 = cast(char*) triple + 6;
-			
-			log.trace("isInDocFlow #2 {}", fromStringz(subject1));
-
-
-			uint* iterator3 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#rights", null);
-			if(iterator3 !is null) 
-			  {
-			    
-				  subject1 = cast(char*) triple + 6;
-
-				  log.trace("isInDocFlow #3 | {}", subject1);
-			    
-			    triple = cast(byte*) *iterator3;
-			    if(triple !is null)
+			      log.trace("isInDocFlow : subject = {} | s1", ACL_subject);
+			      is_in_docflow = true;			  
+			      triple_list_element* iterator2 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#targetSubsystemElement", fromStringz(user));
+			      if(iterator2 !is null) // если не null, значит target для права это наш user
 			      {
-				  subject1 = cast(char*) triple + 6;				
-				  log.trace("isInDocFlow #4 | {}", subject1);
-				
-				// проверим, есть ли тут требуемуе нами право
-				char* triple2_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) 
-							       + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-				
-				bool is_actual = false;
-				while(*triple2_o != 0)
-				{
-				    log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), rightType);
-				    if(*triple2_o == *(rt_symbols + rightType) || *(triple2_o + 1) == *(rt_symbols + rightType))
-				    {
-					    if(!is_actual)
-						    is_actual = is_right_actual(ACL_subject, ts);
-					    if(is_actual)
-						    return 1;
-					    else
-						    break;
-				    }
-				    triple2_o++;
-				}
-			      }
-			    
-			  }
-			
-		      }
-		  }
-	      }
-	    next_element = *(iterator + 1);
-	    iterator = cast(uint*) next_element;
-	  }
 
+				      log.trace("isInDocFlow #2 {}", ACL_subject);
+
+				      triple_list_element* iterator3 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#rights", null);
+				      if(iterator3 !is null) 
+				      {
+			    
+					      log.trace("isInDocFlow #3 | {}", ACL_subject);
+			    
+					      triple_ptr = iterator3.triple_ptr;
+					      if(triple_ptr !is null)
+					      {
+						      log.trace("isInDocFlow #4 | {}", triple_ptr.s);
+				
+						      // проверим, есть ли тут требуемуе нами право
+
+						      bool is_actual = false;
+						      for(int i = 0; i < triple_ptr.o.length; i++)
+						      {
+							      log.trace("lookRightOfIterator ('{}' == '{}' ?)", triple_ptr.o[i], rightType);
+							      if(triple_ptr.o[i] == *(rt_symbols + rightType))
+							      {
+								      if(!is_actual)
+									      is_actual = is_right_actual(ACL_subject.ptr, ts);
+								      if(is_actual)
+									      return 1;
+								      else
+									      break;
+							      }
+						      }
+					      }
+			    
+				      }
+			
+			      }
+		      }
+	      }
+	    iterator = iterator.next_triple_list_element;
 	}
 	if(is_in_docflow)
 	  return 0;

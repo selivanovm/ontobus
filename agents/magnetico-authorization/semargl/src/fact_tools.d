@@ -6,6 +6,7 @@ private import tango.stdc.posix.stdio;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import Log;
+private import HashMap;
 
 struct Counts
 {
@@ -13,21 +14,12 @@ struct Counts
 	byte open_brakets;
 }
 
-public void print_list_triple(uint* list_iterator)
+public void print_list_triple(triple_list_element* list)
 {
-	byte* triple;
-	if(list_iterator !is null)
+	while(list !is null)
 	{
-		uint next_element0 = 0xFF;
-		while(next_element0 > 0)
-		{
-			triple = cast(byte*) *list_iterator;
-			if (triple !is null)
-			  print_triple(triple);
-			
-			next_element0 = *(list_iterator + 1);
-			list_iterator = cast(uint*) next_element0;
-		}
+		log.trace("triple: <{}><{}><{}>", *list.triple_ptr.s, *list.triple_ptr.p, *list.triple_ptr.o);
+		list = list.next_triple_list_element;
 	}
 }
 
@@ -195,4 +187,10 @@ public static final void longToHex(ulong dl, char* buff)
 public static char[] getString(char* s)
 {
 	return s ? s[0 .. strlen(s)] : cast(char[]) null;
+}
+
+public static void cpy_chars_to_buffer(char* buf, char[] chars)
+{
+	for(int i = 0; i < chars.length; i++)
+		*(buf + i) = chars[i];
 }

@@ -5,6 +5,7 @@ private import tango.io.Stdout;
 private import Log;
 private import tango.stdc.string;
 private import tango.stdc.stringz;
+private import HashMap;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
@@ -40,7 +41,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	// elementId - object id
 	{
 		//log.trace("S10UserIsPermissionTargetAuthor #3");
-		author = getObjectAuthor(at, ts);
+		author = getObjectAuthor(at, ts).ptr;
 	}
 
 	//log.trace("S10UserIsPermissionTargetAuthor #4 author = {}, user = {}", fromStringz(author), fromStringz(user));
@@ -48,35 +49,26 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 }
 
-private char* getObjectAuthor(char* elementId, TripleStorage ts)
+private char[] getObjectAuthor(char* elementId, TripleStorage ts)
 {
 	//log.trace("getObjectAuthor #START elementId = {}", fromStringz(elementId));
-	uint* iterator_facts_of_document = ts.getTriples(elementId, null, null);
+	triple_list_element* iterator_facts_of_document = ts.getTriples(fromStringz(elementId), null, null);
 	//log.trace("getObjectAuthor #1");
-	if(iterator_facts_of_document !is null)
+	while(iterator_facts_of_document !is null)
 	{
-		uint next_element0 = 0xFF;
-		while(next_element0 > 0)
+		//log.trace("getObjectAuthor #2");
+		triple* triple0 = iterator_facts_of_document.triple_ptr;
+		//log.trace("getObjectAuthor #3");
+		if(triple0 !is null)
 		{
-			//log.trace("getObjectAuthor #2");
-			byte* triple0 = cast(byte*) *iterator_facts_of_document;
-			//log.trace("getObjectAuthor #3");
-			if(triple0 !is null)
+			//log.trace("getObjectAuthor #4");
+			if(strcmp(triple0.p.ptr, "http://purl.org/dc/elements/1.1/creator") == 0)
 			{
-				//log.trace("getObjectAuthor #4");
-				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-				//log.trace("getObjectAuthor #5");
-				if(strcmp(triple0_p, "http://purl.org/dc/elements/1.1/creator") == 0)
-				{
-					//log.trace("getObjectAuthor #6");
-					char* result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-					//log.trace("getObjectAuthor #1 {}", fromStringz(result));
-					return result;
-				}
+				//log.trace("getObjectAuthor #6");
+				return triple0.o;
 			}
-			next_element0 = *(iterator_facts_of_document + 1);
-			iterator_facts_of_document = cast(uint*) next_element0;
 		}
+		iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 	}
 	return null;
 }
@@ -84,31 +76,22 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 {
 	//	log.trace("getRightRecordAuthor #START");
-	uint* iterator_facts_of_document = ts.getTriples(elementId, null, null);
+	triple_list_element* iterator_facts_of_document = ts.getTriples(fromStringz(elementId), null, null);
 	//	log.trace("getRightRecordAuthor #1");
-	if(iterator_facts_of_document !is null)
+	while(iterator_facts_of_document !is null)
 	{
-		uint next_element0 = 0xFF;
-		while(next_element0 > 0)
+		//			log.trace("getRightRecordAuthor #2");
+		triple* triple0 = iterator_facts_of_document.triple_ptr;
+		//			log.trace("getRightRecordAuthor #3");
+		if(triple0 !is null)
 		{
-			//			log.trace("getRightRecordAuthor #2");
-			byte* triple0 = cast(byte*) *iterator_facts_of_document;
-			//			log.trace("getRightRecordAuthor #3");
-			if(triple0 !is null)
+			//		log.trace("getRightRecordAuthor #4");
+			if(strcmp(triple0.p.ptr, "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
 			{
-				//		log.trace("getRightRecordAuthor #4");
-				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
-				//				log.trace("getRightRecordAuthor #5");
-				if(strcmp(triple0_p, "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
-				{
-					char* result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
-					//					log.trace("getRightRecordAuthor #RESULT {}", fromStringz(result));
-					return result;
-				}
+				return triple0.o.ptr;
 			}
-			next_element0 = *(iterator_facts_of_document + 1);
-			iterator_facts_of_document = cast(uint*) next_element0;
 		}
+		iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 	}
 	return null;
 }

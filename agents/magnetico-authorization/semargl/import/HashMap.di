@@ -6,6 +6,10 @@ private
 }
 private
 {
+    import tango.stdc.stringz;
+}
+private
+{
     import tango.io.Stdout;
 }
 private
@@ -19,6 +23,26 @@ private
 private
 {
     import Log;
+}
+struct triple
+{
+    char[] s;
+    char[] p;
+    char[] o;
+}
+public
+{
+    struct triple_list_element
+{
+    triple* triple_ptr;
+    triple_list_element* next_triple_list_element;
+}
+}
+struct triple_list_header
+{
+    triple_list_element* last_element;
+    triple* keys;
+    triple_list_element* first_element;
 }
 class HashMap
 {
@@ -37,6 +61,10 @@ class HashMap
     private
 {
     uint[] reducer_area_ptr;
+}
+    private
+{
+    triple_list_header*[][] reducer;
 }
     private
 {
@@ -65,7 +93,11 @@ class HashMap
     this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
     public
 {
-    void put(char[] key1, char[] key2, char[] key3, void* triple, bool is_delete);
+    triple* put(char[] key1, char[] key2, char[] key3, triple* triple_ptr, bool is_delete);
+}
+    public
+{
+    triple_list_element* get(char[] key1, char[] key2, char[] key3, bool debug_info);
 }
     public
 {
@@ -82,11 +114,7 @@ return null;
 }
     public
 {
-    uint* get(char* key1, char* key2, char* key3, bool debug_info);
-}
-    public
-{
-    void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o);
+    void remove_triple_from_list(triple_list_element* removed_triple, char[] s, char[] p, char[] o);
 }
     private
 {
@@ -123,3 +151,4 @@ return s ? s[0..strlen(s)] : cast(char[])null;
 }
 }
 }
+void main(char[][] args);
