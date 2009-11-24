@@ -101,6 +101,10 @@ class TripleStorage
 {
     char[] cat_buff2;
 }
+    private
+{
+    int dummy;
+}
     this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 {
 cat_buff1 = new char[](64 * 1024);

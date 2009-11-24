@@ -608,10 +608,10 @@ void get_message(byte* message, ulong message_size)
 				}
 
 				// проверим есть ли такая запись в хранилище
-				bool is_exists = false;
+
 				if(create_id >= 0 && strlen(fact_o[element_id]) > 0)
 				{
-					is_exists = true;
+
 					if(element_id >= 0)
 					{
 						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
@@ -620,7 +620,7 @@ void get_message(byte* message, ulong message_size)
 						{
 							bool is_exists_not_null = false;
 							uint next_element = 0xFF;
-							while(next_element > 0 && is_exists)
+							while(next_element > 0)
 							{
 								byte* triple = cast(byte*) *founded_facts;
 								if(triple !is null)
@@ -628,9 +628,12 @@ void get_message(byte* message, ulong message_size)
 									is_exists_not_null = true;
 									char* s = cast(char*) triple + 6;
 									log.trace("check right record with subject = {}", getString(s));
+									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
 									{
-										if(i != element_id && is_fact_in_object[i] == arg_id)
+										if(i != element_id && is_fact_in_object[i] == arg_id && 
+										   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
+										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
 										{
 											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
 											//  getString(fact_o[i]));
@@ -710,20 +713,8 @@ void get_message(byte* message, ulong message_size)
 								next_element = *(founded_facts + 1);
 								founded_facts = cast(uint*) next_element;
 							}
-							is_exists = is_exists_not_null && is_exists;
-						}
-						else
-						{
-							//log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
-							is_exists = false;
 						}
 					}
-					else
-					{
-						//log.trace("elementId isn't present");
-					}
-
-					log.trace("is_exists = {}", is_exists);
 				}
 
 				for(int i = 0; i < count_facts; i++)
