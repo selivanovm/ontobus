@@ -1,2 +1,2 @@
-./Semargl.test -autotest new_log -repeat 1
+./Semargl.test -autotest io_messages_log -repeat 1
 
