@@ -271,8 +271,8 @@ class HashMap
 				// позиция next_short_order_conflict_keys содержит ссылку в очереди на совпавший ключ при isKeyExist == true
 				// last_element_of_list установлен в позицию последнего элемента очереди !!!
 
-				end_element__triples_list = ptr_from_mem(key_2_list_triples_area, keys_and_triplets_list);
-//				log.trace("put:[{:X}] 10 end_element__triples_list={:X}", cast(void*) this,	end_element__triples_list);
+				end_element__triples_list = cast(ubyte*) ptr_from_mem(key_2_list_triples_area, keys_and_triplets_list) - key_2_list_triples_area.ptr;
+				//				log.trace("put:{} 10 end_element__triples_list_arr_pos={:X}", hashName,	end_element__triples_list);
 
 				//				dump_mem(key_2_list_triples_area);
 			}
@@ -367,11 +367,13 @@ class HashMap
 
 				//			dump_mem(key_2_list_triples_area);
 
-				// log.trace("put:[{:X}] 21 сохраним в заголовке списка ссылку на последний элемент",
-				//		cast(void*) this);
+				//				log.trace("put:[{}] 21 сохраним в заголовке списка {:X} ссылку на последний элемент {:X}", hashName,
+				//                        key_2_list_triples_area.ptr + keys_and_triplets_list, key_2_list_triples_area.ptr + new_list_elements);
 
 				// сохраним в заголовке списка, ссылку на последний элемент этого списка
-				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
+				//				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
+				ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list,
+						cast(uint) (key_2_list_triples_area.ptr + new_list_elements));
 
 				//			dump_mem(key_2_list_triples_area);
 
@@ -471,7 +473,8 @@ class HashMap
 						next_short_order_conflict_keys);
 			}
 
-			for(byte i = max_size_short_order; i > 0; i--)
+			byte i = max_size_short_order;
+			for(; i > 0; i--)
 			{
 				version(trace)
 				{
@@ -608,14 +611,18 @@ class HashMap
 					// если в этой позиции ключа 0, то очевидно дальше искать нет смысла
 					break;
 				}
+
 				//				log.trace("get:[{:X}] 7.4 next_short_order_conflict_keys++ = {:X4}", cast(void*) this, next_short_order_conflict_keys);
 				next_short_order_conflict_keys++;
-
 			}
 
 			if(isKeyExist)
 			{
-				out_next_short_order_conflict_keys = next_short_order_conflict_keys - 1;
+				if(i == 0)
+					out_next_short_order_conflict_keys = next_short_order_conflict_keys - 1;
+				else
+					out_next_short_order_conflict_keys = next_short_order_conflict_keys;
+
 				//				 log.trace("get:8 ключ найден, list_elements={:X4}", list_elements);
 				//								dump_mem(key_2_list_triples_area);
 
@@ -648,20 +655,20 @@ class HashMap
 				if(removed_triple == cast(uint*) *list)
 				{
 					//log.trace("#rtf2");
-					
+
 					if(*(list + 1) == 0)
 					{
 						// *(list + 1) == 0 -> означает что далее нет элементов, список закончен.
-						
+
 						if(i == 0)
 						{
 							// это первый и последний элемент в списке, и так как длинна будующего списока равна нулю, 
 							// то следует удалить запись об этом списке в короткой очереди reducer'a
-//							log.trace("#remove_triple_from_list: это первый и последний элемент в списке");
-						
+							//							log.trace("#remove_triple_from_list: это первый и последний элемент в списке");
+
 							{
 								//				reducer_area_ptr[next_short_order_conflict_keys] = 0;
-								found_short_order_conflict_keys ++;
+//								found_short_order_conflict_keys++;
 								uint ii = found_short_order_conflict_keys;
 								for(; ii > 0; ii--)
 									if(reducer_area_ptr[ii] == 0)
@@ -676,7 +683,7 @@ class HashMap
 									reducer_area_ptr[found_short_order_conflict_keys] = 0;
 
 							}
-							
+
 							break;
 						}
 						else
@@ -684,16 +691,21 @@ class HashMap
 							// удаляемый элемент является последним элементом в списке, но список еще не пуст,   
 							// нужно выставить указатель на последний элемент списка, 
 							// для корректной работы добавления фактов с список (put) 
-
-							log.trace("#remove_triple_from_list: это последний но не единственный элемент в списке");
-							log.trace("#remove_triple_from_list: prev_element={:X4}", cast(uint)(cast (ubyte*)prev_element - key_2_list_triples_area.ptr));
-
 							uint keys_of_hash_in_reducer = reducer_area_ptr[found_short_order_conflict_keys];
-							
-							// сохраним в заголовке списка, ссылку на последний элемент этого списка
-							ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_of_hash_in_reducer, cast(uint) (cast (ubyte*)prev_element - key_2_list_triples_area.ptr));
-							
-							*(prev_element + 1) = 0;
+
+//							log.trace("#remove_triple_from_list: это последний но не единственный элемент в списке");
+//							log.trace("#remove_triple_from_list: keys_of_hash_in_reducer={:X4}, found_short_order_conflict_keys={:X4}",
+//									keys_of_hash_in_reducer, found_short_order_conflict_keys);
+
+							if(keys_of_hash_in_reducer != 0)
+							{
+//								log.trace("#remove_triple_from_list: prev_element={:X4}", cast(uint) prev_element);
+								// сохраним в заголовке списка, ссылку на последний элемент этого списка
+								ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_of_hash_in_reducer, cast(uint) prev_element);
+								//							ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
+
+								*(prev_element + 1) = 0;
+							}
 							break;
 						}
 					}
@@ -711,10 +723,10 @@ class HashMap
 							//print_triple(cast(byte*)*(list));
 							//print_triple(cast(byte*)*(cast(uint*)*(list + 1)));
 
-							*list = *(cast(uint*)*(list + 1));
+							*list = *(cast(uint*) *(list + 1));
 							//print_list_triple(list);
 
-							*(list + 1) = *((cast(uint*)*(list + 1)) + 1);
+							*(list + 1) = *((cast(uint*) *(list + 1)) + 1);
 							//print_list_triple(list);
 
 							break;
@@ -729,10 +741,8 @@ class HashMap
 
 			}
 		}
-			
+
 	}
-
-
 
 	private void dump_mem(ubyte[] mem, uint ptr)
 	{
@@ -752,7 +762,6 @@ class HashMap
 					cast(char) mem[ptr + row * 16 + 14], cast(char) mem[ptr + row * 16 + 15]);
 		}
 	}
-
 
 	public uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
 	{
@@ -882,7 +891,7 @@ public void print_triple(byte* triple)
 
 	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
-	log.trace("triple: <{}><{}><{}>", fromStringz (s), fromStringz (p), fromStringz (o));
+	log.trace("triple: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
 }
 
 public void print_list_triple(uint* list_iterator)
@@ -894,14 +903,13 @@ public void print_list_triple(uint* list_iterator)
 		while(next_element0 > 0)
 		{
 			log.trace("#YYY {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
-			
+
 			triple = cast(byte*) *list_iterator;
-			if (triple !is null)
-			  print_triple(triple);
-			
+			if(triple !is null)
+				print_triple(triple);
+
 			next_element0 = *(list_iterator + 1);
 			list_iterator = cast(uint*) next_element0;
 		}
 	}
 }
-
