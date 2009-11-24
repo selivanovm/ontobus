@@ -139,7 +139,7 @@ class Authorization
 		Stdout.format("authorization init..").newline;
 
 		//		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
-		ts = new TripleStorage(2_000_000, 9, 1024 * 1024 * 150);
+		ts = new TripleStorage(2_000_000, 9, 1024 * 1024 * 250);
 		ts.set_new_index(idx_name.S, 500_000, 6, 1024 * 1024 * 40);
 		ts.set_new_index(idx_name.O, 500_000, 6, 1024 * 1024 * 20);
 		ts.set_new_index(idx_name.PO, 1_000_000, 9, 1024 * 1024 * 40);

@@ -675,7 +675,10 @@ void get_message(byte* message, ulong message_size)
 									if(is_exists)
 									{
 
-										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+										remove_subject(s);
+										
+										//										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+										/*	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
 										if(removed_facts !is null)
 										{
@@ -705,7 +708,7 @@ void get_message(byte* message, ulong message_size)
 												removed_facts = cast(uint*) next_element1;
 											}
 
-										}
+											} */
 
 									}
 
@@ -1012,6 +1015,57 @@ void get_message(byte* message, ulong message_size)
 		log.trace("message successful prepared\r\n");
 	}
 
+}
+
+void remove_subject(char* s)
+{
+
+	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+
+	if(removed_facts !is null)
+	{
+
+		char[][20] s_a;
+		char[][20] p_a;
+		char[][20] o_a;
+
+		int cnt = 0;
+
+		uint next_element1 = 0xFF;
+		while(next_element1 > 0)
+		{
+			byte* triple2 = cast(byte*) *removed_facts;
+			
+			if(triple2 !is null)
+			{
+				
+				char* ss = cast(char*) triple2 + 6;
+				
+				char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+				
+				char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+
+				s_a[cnt] = getString(ss);
+				p_a[cnt] = getString(pp);
+				o_a[cnt] = getString(oo);
+				log.trace("remove triple2 <{}><{}><{}>", s_a[cnt], p_a[cnt], o_a[cnt]);
+
+				//				az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
+				az.logginTriple('D', getString(ss), getString(pp), getString(oo));
+				
+			}
+			cnt++;
+			next_element1 = *(removed_facts + 1);
+			removed_facts = cast(uint*) next_element1;
+		}
+
+		for(int k = 0; k < cnt; k++)
+		{
+			az.getTripleStorage.removeTriple(s_a[k], p_a[k], o_a[k]);
+			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
+		}
+		
+	}
 }
 
 // Loads server properties
