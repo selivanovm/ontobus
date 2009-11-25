@@ -288,6 +288,14 @@ class Authorization
 		//log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		//		}
 
+		if(scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments))
+		{
+			//log.trace("# User Is Admin");
+			return true;
+		}
+
+			//log.trace("# User Is not Admin");
+
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
