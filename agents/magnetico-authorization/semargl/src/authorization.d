@@ -44,6 +44,8 @@ private import Log;
 private import HashMap;
 private import TripleStorage;
 
+private import Category;
+
 //private import mom_client;
 
 private import server;
@@ -246,13 +248,13 @@ class Authorization
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
-		if(strcmp(authorizedElementCategory, "PERMISSION") == 0)
+		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || scripts.S10UserIsPermissionTargetAuthor.calculate(
 					User, authorizedElementId, targetRightType, ts);
 
 		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
-				authorizedElementCategory, "DOCUMENT") == 0)
+				authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			is_in_docflow = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
 			if(is_in_docflow == 1)
@@ -261,8 +263,10 @@ class Authorization
 				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
-		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || (*authorizedElementId == '*' && (strcmp(
-				authorizedElementCategory, "DOCUMENTTYPE") == 0 || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
+		if(targetRightType == RightType.CREATE && 
+		   (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || 
+		    (*authorizedElementId == '*' && strcmp(authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
+			// || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
 
 		{
 
@@ -298,7 +302,7 @@ class Authorization
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 
-		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, "DOCUMENT") == 0)
+		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
 			//log.trace("autorize end#2, return:[false]");
@@ -311,7 +315,7 @@ class Authorization
 			//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		}
 
-		bool is_doc_or_draft = (strcmp(authorizedElementCategory, "DOCUMENT") == 0 || strcmp(authorizedElementCategory, "DOCUMENT_DRAFT") == 0);
+		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
 		if(calculatedRight == false && is_doc_or_draft)
 		{
 			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);

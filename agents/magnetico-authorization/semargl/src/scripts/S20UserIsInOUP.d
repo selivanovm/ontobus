@@ -4,6 +4,7 @@ import TripleStorage;
 import RightTypeDef;
 private import Log;
 private import tango.stdc.string;
+private import Category;
 
 static char* oupDepId = "f8c51331-b1d8-48ac-ae69-91af741f6320";
 static char*[] documentTypeNames = [ "Инвестиционная заявка", "Инвестиционный проект", "Запрос на изменение Инвестиционного проекта" ];
@@ -54,7 +55,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	if(is_user_in_oup)
 	{
 		bool is_element_a_document = false;
-		uint* facts = ts.getTriples(elementId, "magnet-ontology/authorization/acl#category", "DOCUMENT");
+		uint* facts = ts.getTriples(elementId, "magnet-ontology/authorization/acl#category", Category.DOCUMENT.ptr);
 		if(facts !is null)
 		{
 			byte* triple = cast(byte*) *facts;
