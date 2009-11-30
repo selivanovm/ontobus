@@ -142,10 +142,10 @@ class Authorization
 
 		//		ts = new TripleStorage(idx_name.S | idx_name.SP | idx_name.PO | idx_name.SPO | idx_name.O | idx_name.S1PPOO, 1_200_000, 20, 1024 * 1024 * 100);
 		ts = new TripleStorage(2_000_000, 9, 1024 * 1024 * 250);
-		ts.set_new_index(idx_name.S, 500_000, 6, 1024 * 1024 * 40);
+		ts.set_new_index(idx_name.S, 500_000, 20, 1024 * 1024 * 40);
 		ts.set_new_index(idx_name.O, 500_000, 6, 1024 * 1024 * 20);
 		ts.set_new_index(idx_name.PO, 1_000_000, 9, 1024 * 1024 * 40);
-		ts.set_new_index(idx_name.SP, 2_000_000, 9, 1024 * 1024 * 150);
+		ts.set_new_index(idx_name.SP, 2_000_000, 9, 1024 * 1024 * 250);
 		ts.set_new_index(idx_name.S1PPOO, 500_000, 6, 1024 * 1024 * 40);
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
@@ -316,29 +316,6 @@ class Authorization
 		}
 
 		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
-		if(calculatedRight == false && is_doc_or_draft)
-		{
-			calculatedRight = scripts.S20UserIsInOUP.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			//log.trace("authorize:S20UserIsInOUP res={}", calculatedRight);
-		}
-
-		if(calculatedRight == false && is_doc_or_draft)
-		{
-			calculatedRight = scripts.S30UsersOfDocumentum.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			//log.trace("authorize:S30UsersOfDocumentum res={}", calculatedRight);
-		}
-
-		if(calculatedRight == false && is_doc_or_draft)
-		{
-			calculatedRight = scripts.S40UsersOfTAImport.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			//log.trace("authorize:S40UsersOfTAImport res={}", calculatedRight);
-		}
-
-		if(calculatedRight == false && is_doc_or_draft)
-		{
-			calculatedRight = scripts.S50UserOfTORO.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-			//log.trace("authorize:S50UserOfTORO res={}", calculatedRight);
-		}
 
 		if(calculatedRight == false)
 		{
