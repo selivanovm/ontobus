@@ -29,9 +29,6 @@ private import scripts.S01AllLoggedUsersCanCreateDocuments;
 private import scripts.S01UserIsAdmin;
 private import scripts.S10UserIsAuthorOfDocument;
 private import scripts.S11ACLRightsHierarhical;
-private import scripts.S20UserIsInOUP;
-private import scripts.S30UsersOfDocumentum;
-private import scripts.S40UsersOfTAImport;
 
 private import RightTypeDef;
 private import script_util;
