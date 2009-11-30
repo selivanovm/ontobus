@@ -73,15 +73,12 @@ uint[] reply_to_l;
 char*[] reply_to_uids;
 uint[] reply_to_uids_l;
 
-char*[] reply_to_uids;
-uint[] reply_to_uids_l;
-
 char*[] tmp_subj;
-uint tmp_subj_l;
+uint[] tmp_subj_l;
 char*[] tmp_pred;
-uint tmp_pred_l;
+uint[] tmp_pred_l;
 char*[] tmp_obj;
-uint tmp_obj_l;
+uint[] tmp_obj_l;
 
 int tmp_cnt = 0;
 
@@ -848,37 +845,6 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 										remove_subject(s);
 										
 										//										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-										/*	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-
-										if(removed_facts !is null)
-										{
-											uint next_element1 = 0xFF;
-											while(next_element1 > 0)
-											{
-												byte* triple2 = cast(byte*) *removed_facts;
-
-												if(triple2 !is null)
-												{
-
-													char* ss = cast(char*) triple2 + 6;
-
-													char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-
-													char*
-															oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
-
-													log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
-
-													az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
-													az.logginTriple('D', getString(ss), getString(pp), getString(oo));
-
-												}
-
-												next_element1 = *(removed_facts + 1);
-												removed_facts = cast(uint*) next_element1;
-											}
-
-											} */
 
 									}
 
@@ -1318,11 +1284,7 @@ private void put_triplets(uint fn_num, uint reply_to_id, bool is_create)
     az.logginTriple('A', getString(subject, s_l), getString(p, p_l), getString(o, o_l));
   }
 
-  for(uint j = 0; j < args_cnt; j++) {
-	  if (cmp_str(fn_uids[fn_num], fn_uids_l[fn_num], args_uids[j], args_uids_l[j])) {
-		  split_triples_line(args[j], args_l[j], &store_triplet);	  
-	  }
-  }
+  process_arguments(fn_num, &store_triplet);
 
   double time = elapsed.stop;
   log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -1343,122 +1305,93 @@ private void put_triplets(uint fn_num, uint reply_to_id, bool is_create)
 
 private bool is_record_exists(uint fn_num, char* element)
 {
-	is_exists = true;
-	if(element !is null)
+	return false;
+	// проверим есть ли такая запись в хранилище
+
+	//log.trace("check for elementId = {}", getString(fact_o[element_id]));
+	/*	uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[element_id]);
+	if(founded_facts !is null)
 	{
-		//log.trace("check for elementId = {}", getString(fact_o[element_id]));
-		uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId);
-		if(founded_facts !is null)
+		bool is_exists_not_null = false;
+		uint next_element = 0xFF;
+		while(next_element > 0)
 		{
-			bool is_exists_not_null = false;
-			uint next_element = 0xFF;
-			while(next_element > 0 && is_exists)
+			byte* triple = cast(byte*) *founded_facts;
+			if(triple !is null)
 			{
-				byte* triple = cast(byte*) *founded_facts;
-				if(triple !is null)
+				is_exists_not_null = true;
+				char* s = cast(char*) triple + 6;
+				log.trace("check right record with subject = {}", getString(s));
+				bool is_exists = true;
+				for(int i = 0; i < count_facts; i++)
 				{
-					is_exists_not_null = true;
-					char* s = cast(char*) triple + 6;
-					log.trace("check right record with subject = {}", getString(s));
-					for(int i = 0; i < count_facts; i++)
+					if(i != element_id && is_fact_in_object[i] == arg_id && 
+					   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
+					    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
 					{
-						if(i != element_id && is_fact_in_object[i] == arg_id)
+						//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
+						//  getString(fact_o[i]));
+						uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
+						if(founded_facts2 is null)
 						{
-							//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
-							//  getString(fact_o[i]));
-							uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
-							if(founded_facts2 is null)
-							{
-								// log.trace("#444");
-								is_exists = false;
-								break;
-							}
-							else
-							{
-								// log.trace("#555");
-								uint next_element2 = 0xFF;
-								bool is_exists2 = false;
-								while(next_element2 > 0 && is_exists)
-								{
-									byte* triple2 = cast(byte*) *founded_facts2;
-									if(triple2 !is null)
-									{
-										char*
-											o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
-
-										if(strcmp(o, fact_o[i]) == 0)
-										{
-											is_exists2 = true;
-											break;
-										}
-
-									}
-									next_element2 = *(founded_facts2 + 1);
-									founded_facts2 = cast(uint*) next_element2;
-								}
-								// log.trace("#666 {} {}", is_exists, is_exists2);
-								is_exists = is_exists2 && is_exists;
-							}
+							// log.trace("#444");
+							is_exists = false;
+							break;
 						}
-					}
-					if(is_exists)
-					{
-
-						uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-
-						if(removed_facts !is null)
+						else
 						{
-							uint next_element1 = 0xFF;
-							while(next_element1 > 0)
+							// log.trace("#555");
+							uint next_element2 = 0xFF;
+							bool is_exists2 = false;
+							while(next_element2 > 0 && is_exists)
 							{
-								byte* triple2 = cast(byte*) *removed_facts;
-
+								byte* triple2 = cast(byte*) *founded_facts2;
 								if(triple2 !is null)
 								{
-
-									char* ss = cast(char*) triple2 + 6;
-
-									char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-
 									char*
-										oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+										o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
-									log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
-
-									az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
-									az.logginTriple('D', getString(ss), getString(pp), getString(oo));
+									if(strcmp(o, fact_o[i]) == 0)
+									{
+										is_exists2 = true;
+										break;
+									}
 
 								}
-
-								next_element1 = *(removed_facts + 1);
-								removed_facts = cast(uint*) next_element1;
+								next_element2 = *(founded_facts2 + 1);
+								founded_facts2 = cast(uint*) next_element2;
 							}
-
+							// log.trace("#666 {} {}", is_exists, is_exists2);
+							is_exists = is_exists2 && is_exists;
 						}
-
 					}
+				}
+				if(is_exists)
+				{
+
+					remove_subject(s);
+										
+					//										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
 				}
-				next_element = *(founded_facts + 1);
-				founded_facts = cast(uint*) next_element;
+
 			}
-			is_exists = is_exists_not_null && is_exists;
+			next_element = *(founded_facts + 1);
+			founded_facts = cast(uint*) next_element;
 		}
-		else
-		{
-			//log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
-			is_exists = false;
-		}
-	}
-	else
-	{
-		//log.trace("elementId isn't present");
-	}
-
-	log.trace("is_exists = {}", is_exists);
-
+		}*/
 } 
 
+private void process_arguments(uint fn_num, void delegate(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m) processor)
+{
+	for(uint j = 0; j < args_cnt; j++) 
+	{
+		if (cmp_str(fn_uids[fn_num], fn_uids_l[fn_num], args_uids[j], args_uids_l[j])) 
+		{
+			split_triples_line(args[j], args_l[j], processor);	  
+		}
+	}
+}
 
 private void sendResult(uint reply_to_id, double time, StopWatch *elapsed)
 {
