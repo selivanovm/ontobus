@@ -778,10 +778,10 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 				}
 
 				// проверим есть ли такая запись в хранилище
-				bool is_exists = false;
+
 				if(create_id >= 0 && strlen(fact_o[element_id]) > 0)
 				{
-					is_exists = true;
+
 					if(element_id >= 0)
 					{
 						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
@@ -790,7 +790,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 						{
 							bool is_exists_not_null = false;
 							uint next_element = 0xFF;
-							while(next_element > 0 && is_exists)
+							while(next_element > 0)
 							{
 								byte* triple = cast(byte*) *founded_facts;
 								if(triple !is null)
@@ -798,9 +798,12 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 									is_exists_not_null = true;
 									char* s = cast(char*) triple + 6;
 									log.trace("check right record with subject = {}", getString(s));
+									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
 									{
-										if(i != element_id && is_fact_in_object[i] == arg_id)
+										if(i != element_id && is_fact_in_object[i] == arg_id && 
+										   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
+										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
 										{
 											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
 											//  getString(fact_o[i]));
@@ -842,7 +845,10 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 									if(is_exists)
 									{
 
-										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+										remove_subject(s);
+										
+										//										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+										/*	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
 
 										if(removed_facts !is null)
 										{
@@ -872,7 +878,7 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 												removed_facts = cast(uint*) next_element1;
 											}
 
-										}
+											} */
 
 									}
 
@@ -880,20 +886,8 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 								next_element = *(founded_facts + 1);
 								founded_facts = cast(uint*) next_element;
 							}
-							is_exists = is_exists_not_null && is_exists;
-						}
-						else
-						{
-							//log.trace("right record with elementId = {} doesn't exists", fact_o[element_id]);
-							is_exists = false;
 						}
 					}
-					else
-					{
-						//log.trace("elementId isn't present");
-					}
-
-					log.trace("is_exists = {}", is_exists);
 				}
 
 				for(int i = 0; i < count_facts; i++)
@@ -1178,6 +1172,57 @@ void parse_functions(char* start, int l, char* s, int s_l, char* p, int p_l, cha
 		log.trace("message successful prepared\r\n");
 	}
 
+}
+
+void remove_subject(char* s)
+{
+
+	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+
+	if(removed_facts !is null)
+	{
+
+		char[][20] s_a;
+		char[][20] p_a;
+		char[][20] o_a;
+
+		int cnt = 0;
+
+		uint next_element1 = 0xFF;
+		while(next_element1 > 0)
+		{
+			byte* triple2 = cast(byte*) *removed_facts;
+			
+			if(triple2 !is null)
+			{
+				
+				char* ss = cast(char*) triple2 + 6;
+				
+				char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+				
+				char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+
+				s_a[cnt] = getString(ss);
+				p_a[cnt] = getString(pp);
+				o_a[cnt] = getString(oo);
+				log.trace("remove triple2 <{}><{}><{}>", s_a[cnt], p_a[cnt], o_a[cnt]);
+
+				//				az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
+				az.logginTriple('D', getString(ss), getString(pp), getString(oo));
+				
+			}
+			cnt++;
+			next_element1 = *(removed_facts + 1);
+			removed_facts = cast(uint*) next_element1;
+		}
+
+		for(int k = 0; k < cnt; k++)
+		{
+			az.getTripleStorage.removeTriple(s_a[k], p_a[k], o_a[k]);
+			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
+		}
+		
+	}
 }
 
 // Loads server properties

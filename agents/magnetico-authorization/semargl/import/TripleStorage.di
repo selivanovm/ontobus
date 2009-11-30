@@ -101,6 +101,10 @@ class TripleStorage
 {
     char[] cat_buff2;
 }
+    private
+{
+    int dummy;
+}
     this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 {
 cat_buff1 = new char[](64 * 1024);
@@ -148,5 +152,13 @@ count_look_predicate_on_idx_s1ppoo++;
     public
 {
     void do_things(char* ooo);
+}
+    public
+{
+    void print_list_triple(uint* list_iterator);
+}
+    public
+{
+    void print_triple(byte* triple);
 }
 }

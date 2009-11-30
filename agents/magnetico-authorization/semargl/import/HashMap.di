@@ -6,6 +6,10 @@ private
 }
 private
 {
+    import tango.stdc.stringz;
+}
+private
+{
     import tango.io.Stdout;
 }
 private
@@ -65,7 +69,19 @@ class HashMap
     this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
     public
 {
-    void put(char[] key1, char[] key2, char[] key3, void* triple, bool is_delete);
+    void put(char[] key1, char[] key2, char[] key3, void* triple);
+}
+    public
+{
+    uint* get(char* key1, char* key2, char* key3, out int out_next_short_order_conflict_keys);
+}
+    public
+{
+    void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o);
+}
+    private
+{
+    void dump_mem(ubyte[] mem, uint ptr);
 }
     public
 {
@@ -79,18 +95,6 @@ if (current_list_of_list_V_iterator < max_count_elements)
 current_list_of_list_V_iterator += max_size_short_order;
 return null;
 }
-}
-    public
-{
-    uint* get(char* key1, char* key2, char* key3, bool debug_info);
-}
-    public
-{
-    void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o);
-}
-    private
-{
-    void dump_mem(ubyte[] mem, uint ptr);
 }
 }
 private
@@ -122,4 +126,12 @@ private
 return s ? s[0..strlen(s)] : cast(char[])null;
 }
 }
+}
+public
+{
+    void print_triple(byte* triple);
+}
+public
+{
+    void print_list_triple(uint* list_iterator);
 }
