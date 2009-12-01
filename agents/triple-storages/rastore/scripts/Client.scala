@@ -73,6 +73,8 @@ object Client {
                                MessageProperties.TEXT_PLAIN,
                                message.getBytes)
 
+          Thread.sleep(50)
+
           if (listenAfterSending == "true") {
             val consumer = new QueueingConsumer(channel)
             channel.basicConsume(queue, true, consumer)
@@ -107,7 +109,7 @@ object Client {
         var receivedBytesCount : Long = 0
         var receptionTime : Long= 0
         var receivedMsgCount : Long = 0
-        var i = msgCount
+        var i = msgCount - 1
         while(i > 0) {
           val start = System.nanoTime
 
