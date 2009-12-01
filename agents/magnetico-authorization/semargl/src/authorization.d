@@ -27,6 +27,7 @@ private import tango.text.convert.Layout;
 private import scripts.S05InDocFlow;
 private import scripts.S01AllLoggedUsersCanCreateDocuments;
 private import scripts.S01UserIsAdmin;
+private import scripts.S09DocumentOfTemplate;
 private import scripts.S10UserIsAuthorOfDocument;
 private import scripts.S11ACLRightsHierarhical;
 
@@ -120,7 +121,7 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology#memberOf";
 		i_know_predicates[d++] = "magnet-ontology#loginName";
 
-		i_know_predicates[d++] = "magnet-ontology/documents#type_name";
+		i_know_predicates[d++] = "magnet-ontology/documents#template_id";
 
 		init();
 	}
@@ -275,6 +276,12 @@ class Authorization
 		{
 			//log.trace("autorize end#1, return:[{}]", calculatedRight);
 			return calculatedRight;
+		}
+
+		if(calculatedRight == false && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
+		{
+			calculatedRight = scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
+			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
