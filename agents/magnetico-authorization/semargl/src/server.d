@@ -354,11 +354,9 @@ void get_message(byte* message, ulong message_size)
 				for(uint k = 0; k < reply_to_cnt; k++) {
 					if (cmp_str(fn_uids[i], fn_uids_l[i], reply_to_uids[k], reply_to_uids_l[k])) {
 						reply_to_id = k;
+						break;
 					}
 				}
-
-    
-
 
 				if (reply_to_id < 0) {
 					continue;
@@ -1392,12 +1390,8 @@ private bool is_record_exists(uint fn_num, char* element)
 private void process_arguments(uint fn_num, void delegate(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m) processor)
 {
 	for(uint j = 0; j < args_cnt; j++) 
-	{
 		if (cmp_str(fn_uids[fn_num], fn_uids_l[fn_num], args_uids[j], args_uids_l[j])) 
-		{
 			split_triples_line(args[j], args_l[j], processor);	  
-		}
-	}
 }
 
 private void sendResult(uint reply_to_id, double time, StopWatch *elapsed)
