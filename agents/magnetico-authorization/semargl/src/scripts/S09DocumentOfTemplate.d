@@ -13,9 +13,6 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
         bool result = false;
 
-	if(rightType != RightType.READ)
-		return false;
-
 	if(elementId is null || *elementId == '*')
 	{
 		log.trace("Неподдерживаемый идентификатор : {}.", elementId);
@@ -30,9 +27,14 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		if(template_triple !is null)
 		{
 			char* template_id = cast(char*) (template_triple + 6 + (*(template_triple + 0) << 8) + *(template_triple + 1) + 1 + (*(template_triple + 2) << 8) + *(template_triple + 3) + 1);
+			//log.trace("S09 #1 template_id = {}", template_id);
+			
 			result = scripts.S11ACLRightsHierarhical.checkRight(user, template_id, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp);	
 		}
-	}
+	} 
+	//	else
+	//		log.trace("S09 template_id not found");
+
 	return result;
 
 }

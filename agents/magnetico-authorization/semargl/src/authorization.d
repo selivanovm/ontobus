@@ -281,7 +281,7 @@ class Authorization
 		if(calculatedRight == false && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			calculatedRight = scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
-			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
