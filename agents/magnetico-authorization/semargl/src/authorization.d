@@ -96,7 +96,8 @@ class Authorization
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSystem"; //                         - система выдающая право, "BA"/"DOCFLOW"
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystem"; //                 - "user"/routeName
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#authorSubsystemElement"; // - id user or id route.
-		//?		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; //                   - система, для которой выдали права, "BA"/"DOCFLOW".
+		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSystem"; //                   - система, для которой выдали права, "BA"/"DOCFLOW".
+
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystem"; //                 - "user"/"department".
 		i_know_predicates[d++] = "magnet-ontology/authorization/acl#targetSubsystemElement"; // - user id or department id.
 
