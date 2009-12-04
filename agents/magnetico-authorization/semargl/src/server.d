@@ -1272,8 +1272,8 @@ private void put_triplets(uint fn_num, uint reply_to_id, bool is_create)
 
 	ulong uuid = getUUID();
 
-	void store_triplet(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
-	{
+	//	void store_triplet(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m)
+	/*	{
 		char* subject = null;
 		if(s_l == 0)
 		{
@@ -1287,9 +1287,22 @@ private void put_triplets(uint fn_num, uint reply_to_id, bool is_create)
 		//    log.trace("add triple <{}><{}><{}>. {} {} {}", getString(subject, s_l), getString(p, p_l), getString(o, o_l), s_l, p_l, o_l);
 		az.getTripleStorage.addTriple(getString(subject, s_l), getString(p, p_l), getString(o, o_l));
 		az.logginTriple('A', getString(subject, s_l), getString(p, p_l), getString(o, o_l));
-	}
+		}*/
 
-	process_arguments(fn_num, &store_triplet);
+	process_arguments(fn_num, void delegate(char* start, int l, char* s, int s_l, char* p, int p_l, char* o, int o_l, uint  m) store_triplet {
+			char* subject = null;
+			if(s_l == 0)
+			{
+				subject = cast(char*) new char[16];
+				s_l = 16;
+				longToHex(uuid, subject);
+			}
+			else
+				subject = s;
+		//    log.trace("add triple <{}><{}><{}>. {} {} {}", getString(subject, s_l), getString(p, p_l), getString(o, o_l), s_l, p_l, o_l);
+			az.getTripleStorage.addTriple(getString(subject, s_l), getString(p, p_l), getString(o, o_l));
+			az.logginTriple('A', getString(subject, s_l), getString(p, p_l), getString(o, o_l));
+	});//&store_triplet);
 
 	double time = elapsed.stop;
 	log.trace("add triple time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
