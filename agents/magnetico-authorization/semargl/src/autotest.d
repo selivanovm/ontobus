@@ -37,6 +37,7 @@ class autotest: mom_client
 	int send(char* routingkey, char* messagebody)
 	{
 		//		printf("\nOUTPUT: %s\n", output_data);
+		log.trace("prepare block #5");
 
 		if(nocompare == false && strcmp(messagebody, output_data) != 0)
 		{
@@ -45,6 +46,8 @@ class autotest: mom_client
 			throw new Exception("out messages not compare with original");
 
 		}
+		
+		log.trace("prepare block #6");
 		return 0;
 	}
 
@@ -69,7 +72,9 @@ void prepare_block(char* line, ulong line_length)
 	char* end_io_block = strstr(line, "\r\n\r\n\r\n");
 	if(end_io_block !is null)
 		*end_io_block = 0;
-	//	log.trace("read new block {}", line[0 .. line_length]);
+	
+//	log.trace("read new block {}", line[0 .. (end_io_block-line)]);
+	
 	char* input_data = strstr(line, "INPUT");
 
 	if(input_data !is null)
@@ -77,8 +82,8 @@ void prepare_block(char* line, ulong line_length)
 		input_data += 7;
 	}
 
-	output_data = strstr(line, "OUTPUT");
-
+	output_data = strstr(input_data, "OUTPUT");
+	
 	if(output_data !is null)
 	{
 		*output_data = 0;
@@ -88,13 +93,19 @@ void prepare_block(char* line, ulong line_length)
 	char* end_input_block = strstr(input_data + 2, "\r\n");
 	if(end_input_block !is null)
 		*end_input_block = 0;
-
+	else
+		end_input_block = end_io_block;
+	
 	int size = end_input_block - input_data;
+	
+	if (size < 0)
+		throw new Exception ("autotest:prepare_block, size < 0");
+	
 	//	printf("\nINPUT %d: %s\n", size, input_data);
 
 	//	printf("\nOUTPUT: %s\n", output_data);
 
-	if(strstr(input_data, "magnet-ontology/authorization/functions#create") !is null && strstr(input_data, "<>") !is null)
+	if(strstr(input_data, "magnet-ontology/authorization/functions#create") !is null && strstr(input_data, "<>") !is null && output_data !is null)
 	{
 		//		printf("\nINPUT %d: %s\n", size, input_data);
 
@@ -103,7 +114,7 @@ void prepare_block(char* line, ulong line_length)
 		// это команда на создание записи авторизации
 
 		char[] result_id_tag = "<magnet-ontology/transport#result:data>";
-
+		
 		char* result_id = strstr(output_data, result_id_tag.ptr);
 		if(result_id !is null)
 			result_id += result_id_tag.length;
@@ -127,7 +138,7 @@ void prepare_block(char* line, ulong line_length)
 
 		//		printf("\nresult: %s\n", input_data);
 	}
-
+	
 	message_acceptor(cast(byte*) input_data, size);
 	count_commands++;
 }

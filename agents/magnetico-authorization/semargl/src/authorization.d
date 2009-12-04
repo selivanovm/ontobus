@@ -177,10 +177,12 @@ class Authorization
 			log.trace("{}\n", folder);
 		log.trace("\n{0} Files\n", scan.files.length);
 
-		foreach(file; scan.files)
+		FilePath[] fp = scan.files;
+		
+		for (int i = fp.length - 1; i >= 0; i--)
 		{
-			log.trace("{}\n", file);
-			load_from_file(file, i_know_predicates, ts);
+			log.trace("{}\n", fp[i]);
+			load_from_file(fp[i], i_know_predicates, ts);
 		}
 		log.trace("\n{} Errors", scan.errors.length);
 		foreach(error; scan.errors)

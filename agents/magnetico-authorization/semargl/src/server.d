@@ -127,7 +127,6 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 		auto dt = Clock.toDate(tm);
 		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
 		File.append("io_messages.log", fromStringz(result_buffer));
-		File.append("io_messages.log", "\r\n\r\n\r\n");
 
 		time = elapsed.stop;
 		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -137,8 +136,8 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 void get_message(byte* message, ulong message_size)
 {
 	char* msg = cast(char*) message;
-	//	log.trace("get message {}", msg[0 .. message_size]);
-	//	printf ("\nget message !%s!\n", message);
+//		log.trace("get message {}", msg[0 .. message_size]);
+//		printf ("\nget message !%s!\n", message);
 
 	synchronized
 	{
@@ -1012,6 +1011,11 @@ void get_message(byte* message, ulong message_size)
 		//	printf("!!!! list_docid=%s\n", list_docid);
 
 		//	log.trace("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length));
+		
+		if(logging_io_messages == true)
+		{
+			File.append("io_messages.log", "\r\n\r\n\r\n");
+		}
 
 		log.trace("message successful prepared\r\n");
 	}
