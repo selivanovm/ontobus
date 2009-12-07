@@ -509,6 +509,7 @@ void get_message(byte* message, ulong message_size)
 			{
 				char* arg_p;
 				char* arg_o;
+				int reply_to_id = 0;
 
 				for(ubyte i = 0; i < count_facts; i++)
 				{
@@ -516,8 +517,21 @@ void get_message(byte* message, ulong message_size)
 					{
 						arg_p = fact_p[i];
 						arg_o = fact_o[i];
+					}
+
+					if(strlen(fact_o[i]) > 0)
+					{
+						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						{
+							reply_to_id = i;
+						}
+					}
+
+					if(arg_o !is null && reply_to_id != 0)
+					{
 						break;
 					}
+
 				}
 
 				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
@@ -577,6 +591,19 @@ void get_message(byte* message, ulong message_size)
 
 				time = elapsed.stop;
 				log.trace("remove triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
+				result_ptr += 47;
+
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				send_result_and_logging_messages(queue_name, result_buffer);
 			}
 
 			// GET_AUTHORIZATION_RIGHTS_RECORDS
