@@ -633,6 +633,7 @@ void get_message(byte* message, ulong message_size)
 										if(i != element_id && is_fact_in_object[i] == arg_id && 
 										   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
 										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0 ||
+										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#rights") == 0 ||
 										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
 										{
 											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
