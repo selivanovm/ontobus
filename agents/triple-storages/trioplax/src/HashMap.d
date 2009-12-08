@@ -642,6 +642,10 @@ class HashMap
 
 	public void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o)
 	{
+
+		//log.trace("# rtfl idx_name = {}", hashName);
+		
+
 		int found_short_order_conflict_keys = 0;
 		uint* list = get(s.ptr, p.ptr, o.ptr, found_short_order_conflict_keys);
 
@@ -652,9 +656,11 @@ class HashMap
 			uint* prev_element = null;
 			while(next_element > 0)
 			{
+
+				//log.trace("#rtf iter");
+
 				if(removed_triple == cast(uint*) *list)
 				{
-					//log.trace("#rtf2");
 
 					if(*(list + 1) == 0)
 					{
@@ -669,6 +675,8 @@ class HashMap
 							{
 								//				reducer_area_ptr[next_short_order_conflict_keys] = 0;
 //								found_short_order_conflict_keys++;
+//log.trace("#rtfl 1");
+
 								uint ii = found_short_order_conflict_keys;
 								for(; ii > 0; ii--)
 									if(reducer_area_ptr[ii] == 0)
@@ -688,6 +696,8 @@ class HashMap
 						}
 						else
 						{
+
+//log.trace("#rtfl 2");
 							// удаляемый элемент является последним элементом в списке, но список еще не пуст,   
 							// нужно выставить указатель на последний элемент списка, 
 							// для корректной работы добавления фактов с список (put) 
@@ -714,6 +724,7 @@ class HashMap
 						//log.trace("#rtf5 {:X4} {:X4} {:X4}", list, list + 1, prev_element);
 						if(prev_element !is null)
 						{
+//log.trace("#rtfl 3");
 							*(prev_element + 1) = *(list + 1);
 							break;
 						}
@@ -723,11 +734,37 @@ class HashMap
 							//print_triple(cast(byte*)*(list));
 							//print_triple(cast(byte*)*(cast(uint*)*(list + 1)));
 
+							//log.trace("#rtfl 4");
+
+							//log.trace("# old = {:X4}:{:X4}", *list, *(list + 1));
+
 							*list = *(cast(uint*) *(list + 1));
 							//print_list_triple(list);
 
 							*(list + 1) = *((cast(uint*) *(list + 1)) + 1);
-							//print_list_triple(list);
+							//log.trace("# new = {:X4}:{:X4}", *list, *(list + 1));
+							
+							if(*(list + 1) == 0)
+							{
+								uint keys_of_hash_in_reducer = reducer_area_ptr[found_short_order_conflict_keys];
+
+//							log.trace("#remove_triple_from_list: это последний но не единственный элемент в списке");
+//							log.trace("#remove_triple_from_list: keys_of_hash_in_reducer={:X4}, found_short_order_conflict_keys={:X4}",
+//									keys_of_hash_in_reducer, found_short_order_conflict_keys);
+
+								if(keys_of_hash_in_reducer != 0)
+								{
+//								log.trace("#remove_triple_from_list: prev_element={:X4}", cast(uint) prev_element);
+								// сохраним в заголовке списка, ссылку на последний элемент этого списка
+									ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_of_hash_in_reducer, cast(uint) list);
+								//							ptr_to_mem(key_2_list_triples_area, key_2_list_triples_area__right, keys_and_triplets_list, cast(uint) new_list_elements);
+
+									//									*(prev_element + 1) = 0;
+								}
+								
+							}
+
+							//							print_list_triple(list);
 
 							break;
 						}
