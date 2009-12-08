@@ -13,7 +13,7 @@ private import Log;
 
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
-		char[] pp)
+		      char[] pp, char* authorizedElementCategory)
 {
 	bool result = false;
 
@@ -26,20 +26,20 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		{
 			// то извлечём все права выданные документооборотом
 			//						result = iSystem.authorizationComponent.checkRight("DOCFLOW", null, null, "BA", null, orgIds, category, elementId, rightType);
-			result = checkRight(user, elementId, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp);
+			result = checkRight(user, elementId, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp, authorizedElementCategory);
 		}
 	}
 	else
 	{
 		// иначе выдадим все права выданные системой электоронного архива
 		//					result = iSystem.authorizationComponent.checkRight(null , null, null, "BA", null, orgIds, category, elementId, rightType);
-		result = checkRight(user, elementId, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp);
+		result = checkRight(user, elementId, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp, authorizedElementCategory);
 	}
 
 	return result;
 }
 
-bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments, char[] pp)
+bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments, char[] pp, char* authorizedElementCategory)
 {
 	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
@@ -49,7 +49,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
 
-	if(lookRightOfIterator(iterator1, rt_symbols + rightType, ts) == true)
+	if(lookRightOfIterator(iterator1, rt_symbols + rightType, ts, authorizedElementCategory) == true)
 		return true;
 
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
@@ -60,31 +60,52 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);
 
-		if(lookRightOfIterator(iterator2, rt_symbols + rightType, ts) == true)
+		if(lookRightOfIterator(iterator2, rt_symbols + rightType, ts, authorizedElementCategory) == true)
 			return true;
 	}
 
 	return false;
 }
 
-bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts)
+bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, char* authorizedElementCategory)
 {
 
 	//		log.trace("checkRight query: p1={}, p2={}, o1={}, o2={}", "magnet-ontology/authorization/acl#targetSubsystemElement",
 	//				"magnet-ontology/authorization/acl#elementId", getString(user), getString(elementId));
 	//		print_list_triple(iterator1);
 
+
 	if(iterator3 !is null)
 	{
 		uint next_element3 = 0xFF;
 		while(next_element3 > 0)
 		{
+
+			bool category_match = false;
+			bool rights_match = false;
+
 			byte* triple3 = cast(byte*) *iterator3;
 
 			if(triple3 !is null)
 			{
 				char* s = cast(char*) triple3 + 6;
 				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
+
+				uint* category_triples = ts.getTriples(s, "magnet-ontology/authorization/acl#category", null);
+				if(category_triples !is null)
+				{
+					byte* category_triple = cast(byte*) *category_triples;
+					if(category_triple !is null) 
+					{
+						char* category = cast(char*) (category_triple + 6 + (*(category_triple + 0) << 8) + *(category_triple + 1) + 1 + (*(category_triple + 2) << 8) + *(category_triple + 3) + 1);
+						//						log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
+						
+						if(strcmp(authorizedElementCategory, category) == 0)
+						{
+							category_match = true;
+						}
+					}
+				}
 
 				if(strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
 				{
@@ -101,13 +122,20 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts)
 							if(!is_actual)
 								is_actual = is_right_actual(s, ts);
 							if(is_actual)
-								return true;
+							{
+								//								log.trace("# subject = {} ", getString(s));
+								
+								rights_match = true;
+								break;
+							}
 							else
 								break;
 						}
 						triple2_o++;
 					}
 				}
+				if(rights_match && category_match)
+					return true;
 			}
 			next_element3 = *(iterator3 + 1);
 			iterator3 = cast(uint*) next_element3;

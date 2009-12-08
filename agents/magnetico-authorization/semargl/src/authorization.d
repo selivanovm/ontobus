@@ -283,13 +283,13 @@ class Authorization
 
 		if(calculatedRight == false && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
-			calculatedRight = scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
+			calculatedRight = scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory);
 			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
 		if(calculatedRight == false)
 		{
-			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
+			calculatedRight = scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory);
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
@@ -299,13 +299,13 @@ class Authorization
 		//log.trace("authorize:S05InDocFlow res={}", calculatedRight);
 		//		}
 
-		if(scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments))
+		if(calculatedRight == false && scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments))
 		{
 			//log.trace("# User Is Admin");
 			return true;
 		}
 
-			//log.trace("# User Is not Admin");
+		//log.trace("# User Is not Admin");
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 

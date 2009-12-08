@@ -9,7 +9,7 @@ private import tango.stdc.string;
 private import scripts.S11ACLRightsHierarhical;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
-		char[] pp)
+		      char[] pp, char* authorizedElementCategory)
 {
         bool result = false;
 
@@ -29,7 +29,9 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 			char* template_id = cast(char*) (template_triple + 6 + (*(template_triple + 0) << 8) + *(template_triple + 1) + 1 + (*(template_triple + 2) << 8) + *(template_triple + 3) + 1);
 			//log.trace("S09 #1 template_id = {}", template_id);
 			
-			result = scripts.S11ACLRightsHierarhical.checkRight(user, template_id, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp);	
+			result = scripts.S11ACLRightsHierarhical.checkRight(user, template_id, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp, 
+									    "DOCUMENTS_OF_TEMPLATE");
+									    //authorizedElementCategory);	
 		}
 	} 
 	//	else
