@@ -418,12 +418,16 @@ class Authorization
 			}
 		}
 
+
+		//		uint* SET = ts.getTriples("6fcb52fc46889ba8", null, null);
+		//		fact_tools.print_list_triple(SET);
+
 		uint* start_facts_set = null;
 		byte start_set_marker = 0;
 		if(elements_id > 0)
 		{
 			log.trace("object = {}", getString(fact_o[elements_id]));
-			start_facts_set = ts.getTriples(null, null, fact_o[elements_id]);
+			start_facts_set = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[elements_id]);
 		}
 		else if(author_subsystem_element_id > 0)
 		{
@@ -481,6 +485,8 @@ class Authorization
 			while(next_element0 > 0)
 			{
 				byte* triple = cast(byte*) *start_facts_set;
+				//				log.trace("# get_authorization_rights_records : triple = {:X4}", triple);
+				
 				if(triple !is null)
 				{
 					char* s = cast(char*) triple + 6;
@@ -549,7 +555,7 @@ class Authorization
 
 						}
 
-						//log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
+						//						log.trace("is_match = {} checked_patterns_cnt = {} patterns_cnt = {} ", is_match, checked_patterns_cnt, patterns_cnt);
 
 						if(is_match && checked_patterns_cnt == patterns_cnt)
 						{

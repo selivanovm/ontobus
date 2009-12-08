@@ -460,36 +460,7 @@ void get_message(byte* message, ulong message_size)
 					}
 				}
 
-				uint* removed_facts = az.getTripleStorage.getTriples(fact_o[arg_id], null, null);
-
-				if(removed_facts !is null)
-				{
-					uint next_element1 = 0xFF;
-					while(next_element1 > 0)
-					{
-						byte* triple = cast(byte*) *removed_facts;
-
-						if(triple !is null)
-						{
-
-							char* s = cast(char*) triple + 6;
-
-							char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-
-							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-
-							log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
-
-							az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
-							az.logginTriple('D', getString(s), getString(p), getString(o));
-
-						}
-
-						next_element1 = *(removed_facts + 1);
-						removed_facts = cast(uint*) next_element1;
-					}
-
-				}
+				remove_subject(fact_o[arg_id]);
 
 				char* result_ptr = cast(char*) result_buffer;
 				char* command_uid = fact_s[0];
@@ -503,6 +474,11 @@ void get_message(byte* message, ulong message_size)
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer);
+
+				//				uint* SET = az.getTripleStorage.getTriples(null, null, "45fd1447ef7a46c9ac08b73cddc776d4");
+				//				fact_tools.print_list_triple(SET);
+
+
 			}
 
 			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
@@ -537,57 +513,7 @@ void get_message(byte* message, ulong message_size)
 				log.trace("команда на удаление всех фактов у найденных субьектов по заданному предикату (при p={} o={})", getString(arg_p),
 						getString(arg_o));
 
-				uint* removed_subjects = az.getTripleStorage.getTriples(null, arg_p, arg_o);
-
-				if(removed_subjects !is null)
-				{
-					uint next_element0 = 0xFF;
-					while(next_element0 > 0)
-					{
-						byte* triple = cast(byte*) *removed_subjects;
-
-						if(triple !is null)
-						{
-
-							char* s = cast(char*) triple + 6;
-							log.trace("removed_subjects <{}>", getString(s));
-
-							uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-
-							if(removed_facts !is null)
-							{
-								uint next_element1 = 0xFF;
-								while(next_element1 > 0)
-								{
-									triple = cast(byte*) *removed_facts;
-
-									if(triple !is null)
-									{
-
-										s = cast(char*) triple + 6;
-
-										char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-
-										char*
-												o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-
-										log.trace("remove triple <{}><{}><{}>", getString(s), getString(p), getString(o));
-
-										az.getTripleStorage.removeTriple(getString(s), getString(p), getString(o));
-										az.logginTriple('D', getString(s), getString(p), getString(o));
-
-									}
-
-									next_element1 = *(removed_facts + 1);
-									removed_facts = cast(uint*) next_element1;
-								}
-
-							}
-						}
-						next_element0 = *(removed_subjects + 1);
-						removed_subjects = cast(uint*) next_element0;
-					}
-				}
+				remove_subjects_by_predicate(arg_p, arg_o);
 
 				time = elapsed.stop;
 				log.trace("remove triples time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -705,39 +631,6 @@ void get_message(byte* message, ulong message_size)
 
 										remove_subject(s);
 										
-										//										uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-										/*	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
-
-										if(removed_facts !is null)
-										{
-											uint next_element1 = 0xFF;
-											while(next_element1 > 0)
-											{
-												byte* triple2 = cast(byte*) *removed_facts;
-
-												if(triple2 !is null)
-												{
-
-													char* ss = cast(char*) triple2 + 6;
-
-													char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-
-													char*
-															oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
-
-													log.trace("remove triple2 <{}><{}><{}>", getString(ss), getString(pp), getString(oo));
-
-													az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
-													az.logginTriple('D', getString(ss), getString(pp), getString(oo));
-
-												}
-
-												next_element1 = *(removed_facts + 1);
-												removed_facts = cast(uint*) next_element1;
-											}
-
-											} */
-
 									}
 
 								}
@@ -805,6 +698,11 @@ void get_message(byte* message, ulong message_size)
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer);
+
+				//				uint* SET = az.getTripleStorage.getTriples(null, null, "45fd1447ef7a46c9ac08b73cddc776d4");
+				//				fact_tools.print_list_triple(SET);
+
+
 			}
 
 			// GET_DELEGATE_ASSIGNERS
@@ -1081,11 +979,9 @@ void remove_subject(char* s)
 				s_a[cnt] = getString(ss);
 				p_a[cnt] = getString(pp);
 				o_a[cnt] = getString(oo);
-				log.trace("remove triple2 <{}><{}><{}>", s_a[cnt], p_a[cnt], o_a[cnt]);
+
 
 				//				az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
-				az.logginTriple('D', getString(ss), getString(pp), getString(oo));
-				
 			}
 			cnt++;
 			next_element1 = *(removed_facts + 1);
@@ -1094,12 +990,51 @@ void remove_subject(char* s)
 
 		for(int k = 0; k < cnt; k++)
 		{
+			log.trace("remove triple2 <{}><{}><{}>", s_a[k], p_a[k], o_a[k]);
 			az.getTripleStorage.removeTriple(s_a[k], p_a[k], o_a[k]);
 			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
 		}
 		
 	}
 }
+
+void remove_subjects_by_predicate(char* p, char* o)
+{
+
+
+	uint* removed_facts = az.getTripleStorage.getTriples(null, p, o);
+
+	if(removed_facts !is null)
+	{
+
+		char[][100] s_a;
+
+		int cnt = 0;
+
+		uint next_element1 = 0xFF;
+		while(next_element1 > 0)
+		{
+			byte* triple2 = cast(byte*) *removed_facts;
+			
+			if(triple2 !is null)
+			{
+				char* ss = cast(char*) triple2 + 6;
+				s_a[cnt] = getString(ss);
+			}
+			cnt++;
+			next_element1 = *(removed_facts + 1);
+			removed_facts = cast(uint*) next_element1;
+		}
+
+		for(int k = 0; k < cnt; k++)
+		{
+			remove_subject(s_a[k].ptr);
+		}
+		
+	}
+}
+
+
 
 // Loads server properties
 private char[][char[]] load_props()
