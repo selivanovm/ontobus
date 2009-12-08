@@ -39,7 +39,7 @@ object Client {
       val factory = new ConnectionFactory(params)
       val conn = factory.newConnection(hostName, portNumber.toInt)
       
-      val channel = conn.createChannel()
+      var channel = conn.createChannel()
 
       //      channel.exchangeDeclare(exchange, exchangeType)
       //      channel.queueBind(queue, exchange, routingKey)
@@ -50,16 +50,24 @@ object Client {
           try {
             channel.queueDelete(exchange)
           } catch {
-            case ex: Exception =>
+            case ex: Exception => ex.printStackTrace()
+            channel = conn.createChannel()
           }
           channel.queueDeclare(exchange, false)
         }
         try {
           channel.queueDelete(queue)
         } catch {
-          case ex: Exception =>
+          case ex: Exception => ex.printStackTrace()
+          channel = conn.createChannel()
         }
-        channel.queueDeclare(queue, false)
+        try {
+          channel.queueDeclare(queue, false)
+        } catch {
+          case ex: Exception => ex.printStackTrace()
+          channel = conn.createChannel()
+        }
+
 
         var messageBuilder = new StringBuilder(1000)
         for(i <- 0 until msgMultiplier) {
@@ -67,6 +75,7 @@ object Client {
         }
         val message = messageBuilder.toString
 
+        channel = conn.createChannel()
         val startTime = System.nanoTime;
         for(i <- 0 until msgCount) {
           channel.basicPublish(routingKey, exchange,
@@ -77,6 +86,7 @@ object Client {
 
           if (listenAfterSending == "true") {
             val consumer = new QueueingConsumer(channel)
+            channel = conn.createChannel()
             channel.basicConsume(queue, true, consumer)
 
             while(true) {
