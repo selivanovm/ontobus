@@ -4,7 +4,7 @@ private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
 private import tango.stdc.stdlib;
-private import tango.stdc.posix.stdio;
+private import tango.stdc.stdio;
 private import tango.stdc.stringz;
 private import Log;
 
