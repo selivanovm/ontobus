@@ -1,4 +1,4 @@
-// D import file generated from 'src/amqp_api.d'
+// D import file generated from 'src\amqp_api.d'
 import amqp_base;
 import amqp;
 import amqp_framing;

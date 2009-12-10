@@ -2,7 +2,7 @@ module fact_tools;
 
 private import tango.time.Clock;
 private import tango.time.Time;
-private import tango.stdc.posix.stdio;
+private import tango.stdc.stdio;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import Log;
