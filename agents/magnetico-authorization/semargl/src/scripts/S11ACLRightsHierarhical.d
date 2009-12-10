@@ -5,7 +5,7 @@ import TripleStorage;
 private import tango.io.Stdout;
 private import script_util;
 private import tango.stdc.string;
-private import tango.stdc.posix.stdio;
+private import tango.stdc.stdio;
 
 private import fact_tools;
 private import Log;

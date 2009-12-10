@@ -1,4 +1,4 @@
-// D import file generated from 'src/librabbitmq_client.d'
+// D import file generated from 'src\librabbitmq_client.d'
 private
 {
     import tango.io.Stdout;
@@ -9,7 +9,7 @@ private
 }
 private
 {
-    import tango.stdc.posix.stdio;
+    import tango.stdc.stdio;
 }
 import tango.net.Socket;
 import mom_client;
