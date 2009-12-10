@@ -1,4 +1,4 @@
-// D import file generated from 'src/amqp_base.d'
+// D import file generated from 'src\amqp_base.d'
 public
 {
     import tango.stdc.inttypes;

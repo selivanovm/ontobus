@@ -1,4 +1,4 @@
-// D import file generated from 'src/amqp_connection.d'
+// D import file generated from 'src\amqp_connection.d'
 import tango.stdc.stdlib;
 import tango.io.Stdout;
 import tango.net.Socket;
@@ -14,7 +14,7 @@ const INITIAL_DECODING_POOL_PAGE_SIZE = 131072;
 const INITIAL_INBOUND_SOCK_BUFFER_SIZE = 131072;
 public
 {
-    static 
+    static
 {
     void ENFORCE_STATE(amqp_connection_state_t* statevec, int statenum)
 {
@@ -47,7 +47,7 @@ free((*state).sock_inbound_buffer.bytes);
 (*state).socket.shutdown(SocketShutdown.BOTH);
 free(state);
 }
-static 
+static
 {
     void return_to_idle(amqp_connection_state_t* state)
 {
@@ -70,7 +70,7 @@ recycle_amqp_pool(&(*state).frame_pool);
 recycle_amqp_pool(&(*state).decoding_pool);
 }
 void amqp_maybe_release_buffers(amqp_connection_state_t* state);
-static 
+static
 {
     int inner_send_frame(amqp_connection_state_t* state, amqp_frame_t* frame, amqp_bytes_t* encoded, int* payload_len);
 }

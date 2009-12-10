@@ -1,4 +1,4 @@
-// D import file generated from 'src/amqp_table.d'
+// D import file generated from 'src\amqp_table.d'
 const INITIAL_TABLE_SIZE = 16;
 import tango.io.Stdout;
 import tango.stdc.stdlib;

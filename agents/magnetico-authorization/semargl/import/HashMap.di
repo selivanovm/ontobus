@@ -1,4 +1,4 @@
-// D import file generated from 'src/HashMap.d'
+// D import file generated from 'src\HashMap.d'
 module HashMap;
 private
 {
@@ -119,7 +119,7 @@ private
 }
 private
 {
-    static 
+    static
 {
     char[] _toString(char* s)
 {
@@ -130,8 +130,4 @@ return s ? s[0..strlen(s)] : cast(char[])null;
 public
 {
     void print_triple(byte* triple);
-}
-public
-{
-    void print_list_triple(uint* list_iterator);
 }

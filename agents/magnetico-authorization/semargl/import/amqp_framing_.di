@@ -1,4 +1,4 @@
-// D import file generated from 'src/amqp_framing_.d'
+// D import file generated from 'src\amqp_framing_.d'
 import tango.io.Stdout;
 import amqp_base;
 import amqp;
