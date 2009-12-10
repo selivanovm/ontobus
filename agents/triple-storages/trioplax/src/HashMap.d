@@ -931,7 +931,7 @@ public void print_triple(byte* triple)
 	log.trace("triple: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
 }
 
-public void print_list_triple(uint* list_iterator)
+/*public void print_list_triple(uint* list_iterator)
 {
 	byte* triple;
 	if(list_iterator !is null)
@@ -949,4 +949,4 @@ public void print_list_triple(uint* list_iterator)
 			list_iterator = cast(uint*) next_element0;
 		}
 	}
-}
+	}*/

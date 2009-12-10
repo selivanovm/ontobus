@@ -45,6 +45,8 @@ private char* user = null;
 private bool logging_io_messages = true;
 private Locale layout;
 
+FileConduit file;
+
 void main(char[][] args)
 {
 	char[] autotest_file = null;
@@ -125,8 +127,12 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
-		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
-		File.append("io_messages.log", fromStringz(result_buffer));
+		if(file is null)
+		{
+			file = new FileConduit ("io_messaging.log", FileConduit.ReadWriteOpen);
+		}
+		file.output.write(layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
+		file.output.write(fromStringz(result_buffer));
 
 		time = elapsed.stop;
 		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
