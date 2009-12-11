@@ -248,7 +248,7 @@ class File : Device, Device.Seek
         const Style ReadWriteOpen = {Access.ReadWrite, Open.Sedate}; 
 
 
-
+	const Style ReadWriteOpenShareRead = {Access.ReadWrite, Open.Create, Share.Read};
 
         // the file we're working with 
         private char[]  path_;
