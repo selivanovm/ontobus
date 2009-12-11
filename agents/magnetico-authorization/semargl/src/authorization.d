@@ -286,20 +286,19 @@ class Authorization
 			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
-		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
-		{
-			uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
+		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 			
-			if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
-			{
+		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
+		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
 				//log.trace("autorize end#2, return:[false]");
 				return false;
 			}
+
+		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
 		
 			return true;
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
-		}
 
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 			return true;
