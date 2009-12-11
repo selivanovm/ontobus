@@ -10,10 +10,7 @@ private
 private
 {
     import tango.stdc.stringz;
-}
-private
-{
-    import tango.stdc.posix.stdio;
+    import tango.stdc.stdio;
 }
 import tango.net.Socket;
 import mom_client;
