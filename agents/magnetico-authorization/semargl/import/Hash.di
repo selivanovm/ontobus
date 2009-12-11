@@ -1,4 +1,4 @@
-// D import file generated from 'src\Hash.d'
+// D import file generated from 'src/Hash.d'
 module Hash;
 public
 {

@@ -1,4 +1,4 @@
-// D import file generated from 'C:\tango-0.99.8-bin-win32-dmd.1.041\import\tango\stdc\stdarg.d'
+// D import file generated from '/usr/include/d/tango-dmd/tango/stdc/stdarg.d'
 module tango.stdc.stdarg;
 version (GNU)
 {

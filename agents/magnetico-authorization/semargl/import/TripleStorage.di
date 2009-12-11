@@ -1,4 +1,4 @@
-// D import file generated from 'src\TripleStorage.d'
+// D import file generated from 'src/TripleStorage.d'
 module TripleStorage;
 private
 {

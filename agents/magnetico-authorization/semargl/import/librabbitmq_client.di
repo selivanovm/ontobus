@@ -1,4 +1,4 @@
-// D import file generated from 'src\librabbitmq_client.d'
+// D import file generated from 'src/librabbitmq_client.d'
 private
 {
     import tango.io.Stdout;

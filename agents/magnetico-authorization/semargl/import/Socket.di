@@ -1,4 +1,4 @@
-// D import file generated from 'C:\tango-0.99.8-bin-win32-dmd.1.041\import\tango\net\Socket.d'
+// D import file generated from '/usr/include/d/tango-dmd/tango/net/Socket.d'
 module tango.net.Socket;
 private
 {
@@ -41,49 +41,49 @@ version (Win32)
 }
     private
 {
-    const
+    const 
 {
     int IOCPARM_MASK = 127;
 }
 }
     private
 {
-    const
+    const 
 {
     int IOC_IN = cast(int)-2147483648u;
 }
 }
     private
 {
-    const
+    const 
 {
     int FIONBIO = cast(int)(IOC_IN | ((int).sizeof & IOCPARM_MASK) << 16 | 102 << 8 | 126);
 }
 }
     private
 {
-    const
+    const 
 {
     int WSADESCRIPTION_LEN = 256;
 }
 }
     private
 {
-    const
+    const 
 {
     int WSASYS_STATUS_LEN = 128;
 }
 }
     private
 {
-    const
+    const 
 {
     int WSAEWOULDBLOCK = 10035;
 }
 }
     private
 {
-    const
+    const 
 {
     int WSAEINTR = 10004;
 }
@@ -142,14 +142,14 @@ version (BsdSockets)
 }
     private
 {
-    const
+    const 
 {
     int F_GETFL = 3;
 }
 }
     private
 {
-    const
+    const 
 {
     int F_SETFL = 4;
 }
@@ -158,7 +158,7 @@ version (BsdSockets)
 {
     private
 {
-    const
+    const 
 {
     int O_NONBLOCK = 4;
 }
@@ -170,7 +170,7 @@ else
 {
     private
 {
-    const
+    const 
 {
     int O_NONBLOCK = 128;
 }
@@ -180,7 +180,7 @@ else
 {
     private
 {
-    const
+    const 
 {
     int O_NONBLOCK = 2048;
 }
@@ -215,14 +215,14 @@ else
 }
 private
 {
-    const
+    const 
 {
     socket_t INVALID_SOCKET = socket_t.init;
 }
 }
 private
 {
-    const
+    const 
 {
     int SOCKET_ERROR = -1;
 }
@@ -310,7 +310,7 @@ private
 }
 private
 {
-    static
+    static 
 {
     char[] toString(char* s)
 {
@@ -320,7 +320,7 @@ return s ? s[0..strlen(s)] : cast(char[])null;
 }
 private
 {
-    static
+    static 
 {
     char* convert2C(char[] input, char[] output)
 {
@@ -332,7 +332,7 @@ return output.ptr;
 }
 public
 {
-    static
+    static 
 {
     int lastError();
 }
@@ -692,11 +692,10 @@ initialize(sock);
 }
     bool isAlive()
 {
-int type;
-int typesize = type.sizeof;
+int type,typesize = type.sizeof;
 return getsockopt(sock,SocketOptionLevel.SOCKET,SocketOption.SO_TYPE,cast(char*)&type,&typesize) != SOCKET_ERROR;
 }
-    override
+    override 
 {
     char[] toString()
 {
@@ -752,7 +751,7 @@ return setOption(SocketOptionLevel.TCP,SocketOption.TCP_NODELAY,x);
     void joinGroup(IPv4Address address, bool onOff);
     void detach();
     Address newFamilyObject();
-    static
+    static 
 {
     char[] hostName()
 {
@@ -762,7 +761,7 @@ exception("Unable to obtain host name: ");
 return name[0..strlen(name.ptr)].dup;
 }
 }
-    static
+    static 
 {
     uint hostAddress()
 {
@@ -791,7 +790,7 @@ exception("Unable to obtain local socket address: ");
 assert(addr.addressFamily() == family);
 return addr;
 }
-    const
+    const 
 {
     int ERROR = SOCKET_ERROR;
 }
@@ -850,23 +849,23 @@ return this;
 }
     protected
 {
-    static
+    static 
 {
     void exception(char[] msg);
 }
 }
     protected
 {
-    static
+    static 
 {
     void badArg(char[] msg);
 }
 }
-    static
+    static 
 {
     int select(SocketSet checkRead, SocketSet checkWrite, SocketSet checkError, timeval* tv);
 }
-    static
+    static 
 {
     int select(SocketSet checkRead, SocketSet checkWrite, SocketSet checkError, TimeSpan time)
 {
@@ -874,14 +873,14 @@ auto tv = toTimeval(time);
 return select(checkRead,checkWrite,checkError,&tv);
 }
 }
-    static
+    static 
 {
     int select(SocketSet checkRead, SocketSet checkWrite, SocketSet checkError)
 {
 return select(checkRead,checkWrite,checkError,null);
 }
 }
-    static
+    static 
 {
     timeval toTimeval(TimeSpan time)
 {
@@ -892,7 +891,7 @@ return tv;
 }
 }
 }
-    abstract
+    abstract 
 {
     class Address
 {
@@ -906,7 +905,7 @@ return tv;
 }
     AddressFamily addressFamily();
     char[] toString();
-    static
+    static 
 {
     void exception(char[] msg);
 }
@@ -985,15 +984,15 @@ return sin.sizeof;
     this()
 {
 }
-    const
+    const 
 {
     uint ADDR_ANY = 0;
 }
-    const
+    const 
 {
     uint ADDR_NONE = cast(uint)-1;
 }
-    const
+    const 
 {
     ushort PORT_ANY = 0;
 }
@@ -1020,7 +1019,7 @@ sin.sin_port = htons(port);
 sin.sin_addr = 0;
 sin.sin_port = htons(port);
 }
-    synchronized
+    synchronized 
 {
     char[] toAddrString()
 {
@@ -1035,7 +1034,7 @@ return .toString(_port,port());
 {
 return toAddrString() ~ ":" ~ toPortString();
 }
-    static
+    static 
 {
     uint parse(char[] addr);
 }
