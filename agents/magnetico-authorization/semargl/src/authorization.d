@@ -249,13 +249,11 @@ class Authorization
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
-		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-		if(isAdmin)
-			return true;
-		
-
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
-			return scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+		{
+			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || 
+				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+		}
 
 		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
@@ -264,12 +262,14 @@ class Authorization
 			is_in_docflow = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
 			if(is_in_docflow == 1)
 				return true;
+			else 
+				if (is_in_docflow == 0)
+					return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 		}
 
 		if(targetRightType == RightType.CREATE && 
 		   (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || 
 		    (*authorizedElementId == '*' && strcmp(authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
-			// || strcmp(authorizedElementCategory, "DICTIONARY") == 0))))
 
 		{
 
@@ -288,19 +288,19 @@ class Authorization
 
 		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
 		{
+			uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
+			
+			if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
+			{
+			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
+				//log.trace("autorize end#2, return:[false]");
+				return false;
+			}
+		
 			return true;
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 		}
 
-		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
-		
-		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
-		{
-			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-				//log.trace("autorize end#2, return:[false]");
-			return false;
-		}
-		
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 			return true;
 				//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
@@ -309,7 +309,7 @@ class Authorization
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
 			
 		//log.trace("autorize end#3, return:[{}]", calculatedRight);
-		return calculatedRight;
+		return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 	}
 
 	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)
