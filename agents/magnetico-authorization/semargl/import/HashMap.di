@@ -1,4 +1,4 @@
-// D import file generated from 'src\HashMap.d'
+// D import file generated from 'src/HashMap.d'
 module HashMap;
 private
 {
@@ -119,7 +119,7 @@ private
 }
 private
 {
-    static
+    static 
 {
     char[] _toString(char* s)
 {

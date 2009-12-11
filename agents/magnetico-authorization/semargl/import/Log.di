@@ -1,4 +1,4 @@
-// D import file generated from 'src\Log.d'
+// D import file generated from 'src/Log.d'
 module Log;
 private
 {
