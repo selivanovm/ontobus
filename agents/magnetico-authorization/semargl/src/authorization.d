@@ -53,8 +53,13 @@ class Authorization
 	private char[][] i_know_predicates;
 	private TripleStorage ts = null;
 
+	int[] counters;
+
 	this()
 	{
+
+		counters = new int[10];
+
 		i_know_predicates = new char[][48];
 
 		uint d = 0;
@@ -149,6 +154,10 @@ class Authorization
 
 		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 				"magnet-ontology/authorization/acl#rights");
+
+		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
+				"magnet-ontology/authorization/acl#rights");
+
 
 		pp = "magnet-ontology/authorization/acl#targetSubsystemElement" ~ "magnet-ontology/authorization/acl#elementId";
 		//
@@ -251,6 +260,7 @@ class Authorization
 
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
+			//counters[0]++;
 			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || 
 				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 		}
@@ -261,10 +271,16 @@ class Authorization
 		{
 			is_in_docflow = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
 			if(is_in_docflow == 1)
+			{
+				//counters[1]++;
 				return true;
+			}
 			else 
 				if (is_in_docflow == 0)
+				{
+					//counters[2]++;
 					return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
+				}
 		}
 
 		if(targetRightType == RightType.CREATE && 
@@ -274,15 +290,18 @@ class Authorization
 		{
 
 			if(scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts))
+			{
+				//counters[3]++;
 				return true;
+			}
 			//log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
 		if(strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
 		   scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
 		{
+			//counters[4]++;
 			return true;
-			
 			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
@@ -292,22 +311,31 @@ class Authorization
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
 				//log.trace("autorize end#2, return:[false]");
-				return false;
-			}
+			//counters[5]++;
+			return false;
+		}
 
 		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
-		
+		{
+			//counters[6]++;
 			return true;
+		}
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
+		{
+			//counters[7]++;
 			return true;
+		}
 				//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		
 		
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
 			
 		//log.trace("autorize end#3, return:[{}]", calculatedRight);
+		//counters[8]++;
+		//		log.trace("# {} {} {} {} {} {} {} {} {}",  counters[0], counters[1], counters[2], counters[3], counters[4], counters[5], counters[6], counters[7], counters[8]);
+
 		return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 	}
 
