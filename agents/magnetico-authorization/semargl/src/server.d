@@ -8,6 +8,7 @@ private import tango.stdc.stdio;
 private import tango.stdc.stringz;
 private import Log;
 
+private import tango.io.device.File;
 private import tango.io.FileScan;
 private import tango.io.FileConduit;
 private import tango.io.stream.MapStream;
@@ -30,6 +31,7 @@ private import script_util;
 private import RightTypeDef;
 private import fact_tools;
 private import tango.text.locale.Locale;
+//private import mod.tango.io.device.File;
 //private import tango.text.convert.Integer;
 
 private import autotest;
@@ -45,7 +47,7 @@ private char* user = null;
 private bool logging_io_messages = true;
 private Locale layout;
 
-FileConduit file;
+File file;
 
 void main(char[][] args)
 {
@@ -127,12 +129,9 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
-		if(file is null)
-		{
-			file = new FileConduit ("io_messaging.log", FileConduit.ReadWriteOpen);
-		}
-		file.output.write(layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
-		file.output.write(fromStringz(result_buffer));
+		
+		writeToLog(layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
+		writeToLog(fromStringz(result_buffer));
 
 		time = elapsed.stop;
 		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -165,9 +164,10 @@ void get_message(byte* message, ulong message_size)
 			char[] message_buffer = fromStringz(cast(char*) message);
 			auto tm = WallClock.now;
 			auto dt = Clock.toDate(tm);
-			File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
-			File.append("io_messages.log", message_buffer);
-			File.append("io_messages.log", "\r\n\r\n");
+
+			writeToLog(layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
+			writeToLog(message_buffer);
+			writeToLog("\r\n\r\n");
 			time = elapsed.stop;
 			log.trace("logging input message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 		}
@@ -946,7 +946,7 @@ void get_message(byte* message, ulong message_size)
 		
 		if(logging_io_messages == true)
 		{
-			File.append("io_messages.log", "\r\n\r\n\r\n");
+			writeToLog("\r\n\r\n\r\n");
 		}
 
 		log.trace("message successful prepared\r\n");
@@ -1040,7 +1040,19 @@ void remove_subjects_by_predicate(char* p, char* o)
 	}
 }
 
-
+private void writeToLog(char[] string)
+{
+	synchronized
+	{
+		if(file is null)
+		{
+			auto style = File.ReadWriteOpen;
+			style.share = File.Share.Read;
+			file = new File ("io_messages.log", style);
+		}
+		file.output.write(string);
+	}
+}
 
 // Loads server properties
 private char[][char[]] load_props()
