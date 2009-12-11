@@ -5,36 +5,45 @@ private import tango.io.Stdout;
 private import tango.stdc.stringz;
 private import Log;
 
+static private bool[char*] cache;
+
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
 {
 
 	//log.trace("!!! l={}", iterator_on_targets_of_hierarhical_departments.length);
 
-	if(isAdmin(user, ts))
+	bool *is_admin = (user in cache);
+	if(is_admin == null)
 	{
-		//		log.trace("User is admin");
-
-		return true;
-	} else {
-		for(int i = 0; i < iterator_on_targets_of_hierarhical_departments.length; i++)
+		if(isAdmin(user, ts))
 		{
-			//log.trace("!!! {}", fromStringz(iterator_on_targets_of_hierarhical_departments[i]));
-			if(isAdmin(iterator_on_targets_of_hierarhical_departments[i], ts)) {
-
-				return true;
+			//		log.trace("User is admin");
+			cache[user] = true;
+			return true;
+		} else {
+			for(int i = 0; i < iterator_on_targets_of_hierarhical_departments.length; i++)
+			{
+				//log.trace("!!! {}", fromStringz(iterator_on_targets_of_hierarhical_departments[i]));
+				if(isAdmin(iterator_on_targets_of_hierarhical_departments[i], ts)) {
+					cache[user] = true;
+					return true;
+				}
 			}
+			
 		}
-
+		cache[user] = false;
+		return false;
 	}
-	return false;
+	return *is_admin;
 }
 
 public bool isAdmin(char* user, TripleStorage ts)
 {
-	uint* iterator0 = ts.getTriples(user, "magnet-ontology/authorization/functions#is_admin", "true");
 
+	uint* iterator0 = ts.getTriples(user, "magnet-ontology/authorization/functions#is_admin", "true");
+	
 	if(iterator0 != null)
 		return true;
-
-	return false;
+	else
+		return false;
 }
