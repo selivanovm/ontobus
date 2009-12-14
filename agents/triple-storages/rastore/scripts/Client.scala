@@ -76,24 +76,25 @@ object Client {
         val message = messageBuilder.toString
 
         channel = conn.createChannel()
+        val consumer = new QueueingConsumer(channel)
+        channel.basicConsume(queue, true, consumer)
         val startTime = System.nanoTime;
         for(i <- 0 until msgCount) {
+
           channel.basicPublish(routingKey, exchange,
                                MessageProperties.TEXT_PLAIN,
                                message.getBytes)
 
-          Thread.sleep(50)
+//          Thread.sleep(50)
+
+          if(i % 1000 == 0 || i == msgCount - 1)
+            println ("Sent " + (i + 1) + " of " + msgCount)
 
           if (listenAfterSending == "true") {
-            val consumer = new QueueingConsumer(channel)
-            channel = conn.createChannel()
-            channel.basicConsume(queue, true, consumer)
-
-            while(true) {
-              val delivery = consumer.nextDelivery
-              val body = new String(delivery.getBody)
+            val delivery = consumer.nextDelivery
+            val body = new String(delivery.getBody)
+            if(i % 1000 == 0 || i == msgCount - 1)
               println("Got answer : " + body)
-            }
           }
         }
 
