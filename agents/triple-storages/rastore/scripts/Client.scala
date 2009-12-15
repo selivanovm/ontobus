@@ -47,27 +47,15 @@ object Client {
       if (!listen) {
 
         if (routingKey.length == 0) {
-          try {
-            channel.queueDelete(exchange)
-          } catch {
-            case ex: Exception => ex.printStackTrace()
-            channel = conn.createChannel()
-          }
-          channel.queueDeclare(exchange, false)
+          channel.queueDeclare(exchange, true, false, false, false, null)
         }
-        try {
+/*        try {
           channel.queueDelete(queue)
         } catch {
           case ex: Exception => ex.printStackTrace()
           channel = conn.createChannel()
-        }
-        try {
-          channel.queueDeclare(queue, false)
-        } catch {
-          case ex: Exception => ex.printStackTrace()
-          channel = conn.createChannel()
-        }
-
+        }*/
+        channel.queueDeclare(queue, true, false, false, false, null)
 
         var messageBuilder = new StringBuilder(1000)
         for(i <- 0 until msgMultiplier) {
