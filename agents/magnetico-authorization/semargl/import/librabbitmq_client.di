@@ -11,6 +11,7 @@ private
 {
     import tango.stdc.stringz;
     import tango.stdc.stdio;
+    import tango.stdc.stringz;
 }
 import tango.net.Socket;
 import mom_client;
