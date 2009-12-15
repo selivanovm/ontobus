@@ -47,27 +47,15 @@ object Client {
       if (!listen) {
 
         if (routingKey.length == 0) {
-          try {
-            channel.queueDelete(exchange)
-          } catch {
-            case ex: Exception => ex.printStackTrace()
-            channel = conn.createChannel()
-          }
-          channel.queueDeclare(exchange, false)
+          channel.queueDeclare(exchange, true, false, false, false, null)
         }
-        try {
+/*        try {
           channel.queueDelete(queue)
         } catch {
           case ex: Exception => ex.printStackTrace()
           channel = conn.createChannel()
-        }
-        try {
-          channel.queueDeclare(queue, false)
-        } catch {
-          case ex: Exception => ex.printStackTrace()
-          channel = conn.createChannel()
-        }
-
+        }*/
+        channel.queueDeclare(queue, true, false, false, false, null)
 
         var messageBuilder = new StringBuilder(1000)
         for(i <- 0 until msgMultiplier) {
@@ -82,7 +70,7 @@ object Client {
                                MessageProperties.TEXT_PLAIN,
                                message.getBytes)
 
-          Thread.sleep(50)
+//          Thread.sleep(50)
 
           if (listenAfterSending == "true") {
             val consumer = new QueueingConsumer(channel)
