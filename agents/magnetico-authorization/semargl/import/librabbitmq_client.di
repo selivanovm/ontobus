@@ -9,6 +9,10 @@ private
 }
 private
 {
+    import tango.stdc.stringz;
+}
+private
+{
     import tango.stdc.posix.stdio;
 }
 import librabbitmq_headers;
