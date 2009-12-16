@@ -7,6 +7,7 @@ private
 {
     import tango.stdc.string;
 }
+import tango.net.Socket;
 private
 {
     import tango.stdc.stdio;

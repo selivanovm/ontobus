@@ -187,7 +187,7 @@ public static final void longToHex(ulong dl, char* buff)
 	buff[2] = HEX_CHARS[cast(ubyte) ((dl >> 52) & 0x0F)];
 	buff[1] = HEX_CHARS[cast(ubyte) ((dl >> 56) & 0x0F)];
 	buff[0] = HEX_CHARS[cast(ubyte) ((dl >> 60) & 0x0F)];
-//	buff[16] = 0;
+	buff[16] = 0;
 
 //	printf("time=%s\n", buff);
 }

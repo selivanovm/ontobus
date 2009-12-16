@@ -551,7 +551,7 @@ void get_message(byte* message, ulong message_size)
 
 				int reply_to_id = 0;
 
-				char* uuid = cast(char*) new char[16];
+				char* uuid = cast(char*) new char[17];
 				longToHex(getUUID(), uuid);
 
 				// найдем триплет с elementId
