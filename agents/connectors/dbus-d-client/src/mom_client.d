@@ -5,4 +5,8 @@ interface mom_client
 	int send(char* routingkey, char* messagebody);
 
 	void listener();
+	
+//	void set_listen_queue (char* listen_queue);
+	
+//	char* listen (char* listen_queue);
 }
