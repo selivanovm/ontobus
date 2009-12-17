@@ -55,6 +55,9 @@ class Authorization
 
 	int[] counters;
 
+	private char[] log_path = "";
+	private File log_file;
+
 	this()
 	{
 
@@ -210,13 +213,27 @@ class Authorization
 	public void logginTriple(char command, char[] s, char[] p, char[] o)
 	{
 		auto layout = new Locale;
-		//		auto nameFile = layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now);
-		//		auto file = new File(nameFile, File.WriteAppending);
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
 		char[] tmp1 = new char[35 + s.length + p.length + o.length];
 		char[18] tmp;
+
+		auto actual_log_path = layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now);
+		if(actual_log_path != log_path || log_file is null)
+		{
+
+			log_path = actual_log_path;
+
+			if(log_file !is null)
+			{
+				log_file.close;
+			}
+
+			auto style = File.ReadWriteOpen;
+			style.share = File.Share.Read;
+			log_file = new File (log_path, style);
+		}
 
 		// так сделано из невозможности задать параметр из двух цифр в Util.layout
 		if(command == 'A')
@@ -225,7 +242,7 @@ class Authorization
 					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
 					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
-			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
+			log_file.output.write(now);
 		}
 		else if(command == 'U')
 		{
@@ -233,7 +250,7 @@ class Authorization
 					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
 					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
-			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
+			log_file.output.write(now);
 		}
 		else if(command == 'D')
 		{
@@ -241,7 +258,7 @@ class Authorization
 					dt.date.day), convert(tmp[6 .. 8], dt.date.month), convert(tmp[8 .. 10], dt.time.hours), convert(tmp[10 .. 12], dt.time.minutes),
 					convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p, o);
 
-			File.append(layout("data/authorize-data-{:yyyy-MM-dd}.n3log", WallClock.now), now);
+			log_file.output.write(now);
 		}
 	}
 
