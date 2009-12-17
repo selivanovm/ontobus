@@ -1,4 +1,4 @@
-// D import file generated from 'src\amqp_mem.d'
+// D import file generated from 'src/amqp_mem.d'
 import amqp;
 import amqp_base;
 import tango.stdc.string;
@@ -16,7 +16,7 @@ void init_amqp_pool(amqp_pool_t* pool, size_t pagesize)
 (*pool).alloc_block = null;
 (*pool).alloc_used = 0;
 }
-static
+static 
 {
     void empty_blocklist(amqp_pool_blocklist_t* x);
 }
@@ -32,7 +32,7 @@ void empty_amqp_pool(amqp_pool_t* pool)
 recycle_amqp_pool(pool);
 empty_blocklist(&(*pool).pages);
 }
-static
+static 
 {
     int record_pool_block(amqp_pool_blocklist_t* x, void* block);
 }

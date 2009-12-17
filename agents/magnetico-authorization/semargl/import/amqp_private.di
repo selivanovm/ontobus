@@ -1,4 +1,4 @@
-// D import file generated from 'src\amqp_private.d'
+// D import file generated from 'src/amqp_private.d'
 import tango.net.Socket;
 import tango.stdc.string;
 import tango.stdc.stdio;
@@ -48,7 +48,7 @@ return v;
 }
 public
 {
-    static
+    static 
 {
     uint8_t* BUF_AT(amqp_bytes_t b, int o)
 {
@@ -58,7 +58,7 @@ return &(cast(uint8_t*)b.bytes)[o];
 }
 public
 {
-    static
+    static 
 {
     uint8_t D_8(amqp_bytes_t b, int o)
 {
@@ -68,7 +68,7 @@ return CL!(uint8_t).CHECK_LIMIT(b,o,1,*cast(uint8_t*)BUF_AT(b,o));
 }
 public
 {
-    static
+    static 
 {
     uint16_t D_16(amqp_bytes_t b, int o)
 {
@@ -80,7 +80,7 @@ return CL!(uint16_t).CHECK_LIMIT(b,o,2,ntohs(v));
 }
 public
 {
-    static
+    static 
 {
     uint32_t D_32(amqp_bytes_t b, int o)
 {
@@ -92,7 +92,7 @@ return CL!(uint32_t).CHECK_LIMIT(b,o,4,ntohl(v));
 }
 public
 {
-    static
+    static 
 {
     uint64_t D_64(amqp_bytes_t b, int o)
 {
@@ -104,7 +104,7 @@ return hi << 32 | lo;
 }
 public
 {
-    static
+    static 
 {
     uint8_t* D_BYTES(amqp_bytes_t b, int o, int l)
 {
@@ -114,7 +114,7 @@ return CL!(uint8_t*).CHECK_LIMIT(b,o,l,BUF_AT(b,o));
 }
 public
 {
-    static
+    static 
 {
     uint8_t E_8(amqp_bytes_t b, int o, uint8_t v)
 {
@@ -125,7 +125,7 @@ return CL!(uint8_t).CHECK_LIMIT(b,o,1,*cast(uint8_t*)BUF_AT(b,o));
 }
 public
 {
-    static
+    static 
 {
     uint16_t E_16(amqp_bytes_t b, int o, uint16_t v)
 {
@@ -137,7 +137,7 @@ return CL!(uint16_t).CHECK_LIMIT(b,o,2,vv);
 }
 public
 {
-    static
+    static 
 {
     uint32_t E_32(amqp_bytes_t b, int o, uint32_t v)
 {
@@ -149,7 +149,7 @@ return CL!(uint32_t).CHECK_LIMIT(b,o,4,vv);
 }
 public
 {
-    static
+    static 
 {
     uint64_t E_64(amqp_bytes_t b, int o, int v)
 {
@@ -160,7 +160,7 @@ return E_32(b,o + 4,cast(uint32_t)(cast(uint64_t)v & -1u));
 }
 public
 {
-    static
+    static 
 {
     void E_BYTES(amqp_bytes_t b, int o, int l, void* v)
 {
@@ -170,21 +170,21 @@ CL!(void*).CHECK_LIMIT(b,o,l,memcpy(BUF_AT(b,o),v,l));
 }
 public
 {
-    static
+    static 
 {
     void amqp_assert(bool condition,...);
 }
 }
 public
 {
-    static
+    static 
 {
     int AMQP_CHECK_EOF_RESULT(int expr);
 }
 }
 public
 {
-    static
+    static 
 {
     void amqp_dump(void* buffer, size_t len)
 {

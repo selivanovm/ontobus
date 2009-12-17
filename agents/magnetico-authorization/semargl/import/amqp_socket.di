@@ -1,4 +1,4 @@
-// D import file generated from 'src\amqp_socket.d'
+// D import file generated from 'src/amqp_socket.d'
 import tango.stdc.stdarg;
 import tango.net.Socket;
 import tango.net.InternetAddress;
@@ -20,7 +20,7 @@ Socket socket = new Socket(AddressFamily.INET,SocketType.STREAM,ProtocolType.IP,
 socket.connect(new InternetAddress(hostname,portnumber));
 return socket;
 }
-static
+static 
 {
     char* header()
 {
@@ -44,11 +44,11 @@ int amqp_send_header_to(amqp_connection_state_t* state, int function(void* conte
 {
 return fn(context,header(),8);
 }
-static
+static 
 {
     amqp_bytes_t sasl_method_name(amqp_sasl_method_enum method);
 }
-static
+static 
 {
     amqp_bytes_t sasl_response(amqp_pool_t* pool, amqp_sasl_method_enum method, va_list args);
 }
@@ -56,7 +56,7 @@ amqp_boolean_t amqp_frames_enqueued(amqp_connection_state_t state)
 {
 return cast(amqp_boolean_t)(state.first_queued_frame !is null);
 }
-static
+static 
 {
     int wait_frame_inner(amqp_connection_state_t* state, amqp_frame_t* decoded_frame);
 }
@@ -72,7 +72,7 @@ frame.payload.method.decoded = decoded;
 return amqp_send_frame(state,&frame);
 }
 amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t* state, amqp_channel_t channel, amqp_method_number_t request_id, amqp_method_number_t expected_reply_id, void* decoded_request_method);
-static
+static 
 {
     int amqp_login_inner(amqp_connection_state_t* state, int channel_max, int frame_max, int heartbeat, amqp_sasl_method_enum sasl_method, va_list vl);
 }

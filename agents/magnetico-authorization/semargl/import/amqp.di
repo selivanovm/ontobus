@@ -1,7 +1,7 @@
-// D import file generated from 'src\amqp.d'
+// D import file generated from 'src/amqp.d'
 import amqp_base;
 import amqp_mem;
-const
+const 
 {
     amqp_bytes_t AMQP_EMPTY_BYTES = {len:0,bytes:null};
 }
@@ -12,7 +12,7 @@ struct amqp_decimal_t
 }
 public
 {
-    static
+    static 
 {
     amqp_decimal_t AMQP_DECIMAL(int d, uint32_t v)
 {
@@ -23,7 +23,7 @@ return decimal;
 }
 }
 }
-const
+const 
 {
     amqp_table_t AMQP_EMPTY_TABLE = {num_entries:0,entries:null};
 }
@@ -48,7 +48,7 @@ struct amqp_table_t
 }
 public
 {
-    static
+    static 
 {
     amqp_table_entry_t _AMQP_TE_INIT(amqp_bytes_t ke, char ki, VVV v)
 {
@@ -62,7 +62,7 @@ return entry;
 }
 public
 {
-    static
+    static 
 {
     amqp_table_entry_t AMQP_TABLE_ENTRY_S(amqp_bytes_t k, VVV v)
 {
@@ -74,7 +74,7 @@ return _AMQP_TE_INIT(k,'S',val);
 }
 public
 {
-    static
+    static 
 {
     amqp_table_entry_t AMQP_TABLE_ENTRY_I(amqp_bytes_t k, VVV v)
 {
@@ -86,7 +86,7 @@ return _AMQP_TE_INIT(k,'I',val);
 }
 public
 {
-    static
+    static 
 {
     amqp_table_entry_t AMQP_TABLE_ENTRY_D(amqp_bytes_t k, VVV v)
 {
@@ -98,7 +98,7 @@ return _AMQP_TE_INIT(k,'D',val);
 }
 public
 {
-    static
+    static 
 {
     amqp_table_entry_t AMQP_TABLE_ENTRY_T(amqp_bytes_t k, VVV v)
 {
@@ -110,7 +110,7 @@ return _AMQP_TE_INIT(k,'T',val);
 }
 public
 {
-    static
+    static 
 {
     amqp_table_entry_t AMQP_TABLE_ENTRY_F(amqp_bytes_t k, VVV v)
 {
@@ -185,11 +185,11 @@ public
 AMQP_SASL_METHOD_PLAIN = 0,
 }
 }
-const
+const 
 {
     uint8_t AMQP_PSEUDOFRAME_PROTOCOL_HEADER = 'A';
 }
-const
+const 
 {
     amqp_channel_t AMQP_PSEUDOFRAME_PROTOCOL_CHANNEL = cast(int)'M' << 8 | cast(int)'Q';
 }

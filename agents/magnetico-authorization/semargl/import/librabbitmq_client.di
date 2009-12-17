@@ -11,10 +11,11 @@ import tango.net.Socket;
 private
 {
     import tango.stdc.stringz;
-    import tango.stdc.stdio;
-    import tango.stdc.stringz;
 }
-import tango.net.Socket;
+private
+{
+    import tango.stdc.stdio;
+}
 import mom_client;
 import amqp_base;
 import amqp;
