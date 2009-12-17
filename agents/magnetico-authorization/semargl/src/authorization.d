@@ -232,6 +232,7 @@ class Authorization
 
 			auto style = File.ReadWriteOpen;
 			style.share = File.Share.Read;
+			style.open = File.Open.Append;
 			log_file = new File (log_path, style);
 		}
 

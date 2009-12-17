@@ -1048,6 +1048,7 @@ private void writeToLog(char[] string)
 		{
 			auto style = File.ReadWriteOpen;
 			style.share = File.Share.Read;
+			style.open = File.Open.Append;
 			file = new File ("io_messages.log", style);
 		}
 		file.output.write(string);
