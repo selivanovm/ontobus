@@ -2,7 +2,6 @@ private import tango.io.Stdout;
 private import tango.stdc.string;
 private import tango.stdc.stdio;
 
-
 private import tango.core.Thread;
 
 import libdbus_headers;
@@ -12,48 +11,47 @@ class libdbus_client: mom_client
 {
 	private DBusConnection* conn = null;
 	private DBusError err;
-	
-	private char*  reciever_name = null;
+
+	private char* reciever_name = null;
 	private char* see_rule_for_listener = null;
 	private char* interface_name = null;
 	private char* name_of_the_signal = "message";
-	
+
 	private char* sender_name = null; //
 	private char* dest_object_name_of_the_signal = null;
 	private char* sender_interface_name = null; //
 	private char* sender_name_of_the_signal = "message";
-				
+
 	void function(byte* txt, ulong size) message_acceptor;
 
-	this ()
+	this()
 	{
 	}
-	
-	void setReciever (char[] reciever)
+
+	void setReciever(char[] reciever)
 	{
 		reciever_name = (reciever ~ ".signal.sink\0").ptr;
 		see_rule_for_listener = ("type='signal',interface='" ~ reciever ~ ".signal.Type'\0").ptr;
-		interface_name = (reciever ~ ".signal.Type\0").ptr;		
+		interface_name = (reciever ~ ".signal.Type\0").ptr;
 	}
-	
-	void setSender (char[] sender, char[] to)
+
+	void setSender(char[] sender, char[] to)
 	{
 		sender_name = (sender ~ ".signal.source\0").ptr;
-		dest_object_name_of_the_signal = ("/"~ to ~"/signal/Object\0").ptr;
-		sender_interface_name = (sender ~ ".signal.Type\0").ptr;	
+		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
+		sender_interface_name = (sender ~ ".signal.Type\0").ptr;
 	}
-	
-	void connect ()
+
+	void connect()
 	{
 		int ret;
-		
+
 		if(err.name is null)
 		{
 			// initialise the error value
 			dbus_error_init(&err);
 		}
 
-		
 		if(conn is null)
 		{
 			// connect to the DBUS system bus, and check for errors
@@ -83,7 +81,7 @@ class libdbus_client: mom_client
 			fprintf(stderr, "ret != dbus_shared.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER\n");
 			return -1;
 		}
-		
+
 		// request our name on the bus and check for errors
 		ret = dbus_bus_request_name(conn, reciever_name, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
 		if(dbus_error_is_set(&err))
@@ -95,19 +93,14 @@ class libdbus_client: mom_client
 		{
 			return -1;
 		}
-		
-		
-		
-		
+
 	}
-	
-	
+
 	void set_callback(void function(byte* txt, ulong size) _message_acceptor)
 	{
 		message_acceptor = _message_acceptor;
 	}
-	
-	
+
 	/**
 	 * Connect to the DBUS bus and send a broadcast signal
 	 */
@@ -119,7 +112,6 @@ class libdbus_client: mom_client
 		dbus_uint32_t serial = 0;
 
 		printf("Sending signal with value %s\n", sigvalue);
-
 
 		// create a signal & check for errors 
 		msg = dbus_message_new_signal(dest_object_name_of_the_signal, // object name of the signal
@@ -163,7 +155,6 @@ class libdbus_client: mom_client
 	 
 	 }
 	 */
-
 
 	/**
 	 * Listens for signals on the bus
