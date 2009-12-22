@@ -9,30 +9,43 @@ import mom_client;
 
 class libdbus_client: mom_client
 {
-	DBusConnection* conn = null;
-	DBusError err;
-	
-	public char* service_name_for_listener = null;
-	public char* see_rule_for_listener = null;
-	public char* interface_name = null;
-	public char* name_of_the_signal = null;
-	
-	public char* sender_name = null; //
-	public char* dest_object_name_of_the_signal = null;
-	public char* sender_interface_name = null; //
-	public char* sender_name_of_the_signal = null;
-	
-	
+	private DBusConnection* conn = null;
+	private DBusError err;
+
+	private char* reciever_name = null;
+	private char* see_rule_for_listener = null;
+	private char* interface_name = null;
+	private char* name_of_the_signal = "message";
+
+	private char* sender_name = null; //
+	private char* dest_object_name_of_the_signal = null;
+	private char* sender_interface_name = null; //
+	private char* sender_name_of_the_signal = "message";
+
 	void function(byte* txt, ulong size) message_acceptor;
 
-	this ()
+	this()
 	{
 	}
-	
-	void connect ()
+
+	void setReciever(char[] reciever)
+	{
+		reciever_name = (reciever ~ ".signal.sink\0").ptr;
+		see_rule_for_listener = ("type='signal',interface='" ~ reciever ~ ".signal.Type'\0").ptr;
+		interface_name = (reciever ~ ".signal.Type\0").ptr;
+	}
+
+	void setSender(char[] sender, char[] to)
+	{
+		sender_name = (sender ~ ".signal.source\0").ptr;
+		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
+		sender_interface_name = (sender ~ ".signal.Type\0").ptr;
+	}
+
+	void connect()
 	{
 		int ret;
-		
+
 		if(err.name is null)
 		{
 			// initialise the error value
@@ -67,16 +80,27 @@ class libdbus_client: mom_client
 		{
 			fprintf(stderr, "ret != dbus_shared.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER\n");
 			return -1;
-		}		
+		}
+
+		// request our name on the bus and check for errors
+		ret = dbus_bus_request_name(conn, reciever_name, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
+		if(dbus_error_is_set(&err))
+		{
+			fprintf(stderr, "Name Error (%s)\n", err.message);
+			dbus_error_free(&err);
+		}
+		if(dbus_shared.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
+		{
+			return -1;
+		}
+
 	}
-	
-	
+
 	void set_callback(void function(byte* txt, ulong size) _message_acceptor)
 	{
 		message_acceptor = _message_acceptor;
 	}
-	
-	
+
 	/**
 	 * Connect to the DBUS bus and send a broadcast signal
 	 */
@@ -88,7 +112,6 @@ class libdbus_client: mom_client
 		dbus_uint32_t serial = 0;
 
 		printf("Sending signal with value %s\n", sigvalue);
-
 
 		// create a signal & check for errors 
 		msg = dbus_message_new_signal(dest_object_name_of_the_signal, // object name of the signal
@@ -133,7 +156,6 @@ class libdbus_client: mom_client
 	 }
 	 */
 
-
 	/**
 	 * Listens for signals on the bus
 	 */
@@ -155,31 +177,6 @@ class libdbus_client: mom_client
 
 		while(true)
 		{
-
-			// connect to the bus and check for errors
-			conn = dbus_bus_get(DBusBusType.DBUS_BUS_SESSION, &err);
-			if(dbus_error_is_set(&err))
-			{
-				fprintf(stderr, "Connection Error (%s)\n", err.message);
-				dbus_error_free(&err);
-			}
-			if(conn is null)
-			{
-				return -1;
-			}
-
-			// request our name on the bus and check for errors
-			ret = dbus_bus_request_name(conn, service_name_for_listener, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
-			if(dbus_error_is_set(&err))
-			{
-				fprintf(stderr, "Name Error (%s)\n", err.message);
-				dbus_error_free(&err);
-			}
-			if(dbus_shared.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
-			{
-				return -1;
-			}
-
 			// add a rule for which messages we want to see
 			dbus_bus_add_match(conn, see_rule_for_listener, &err); // see signals from the given interface
 			dbus_connection_flush(conn);
