@@ -276,26 +276,33 @@ class Authorization
 		//				authorizedElementId), getString(User));
 		bool calculatedRight;
 
+		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
+		log.trace("isAdmin = {}", isAdmin);
+
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
 			//counters[0]++;
-			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || 
-				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			//log.trace("#1");
+			return isAdmin || scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 		}
 
 		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
 				authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
+			//log.trace("#2");
+			
 			is_in_docflow = scripts.S05InDocFlow.calculate(User, authorizedElementId, targetRightType, ts);
 			if(is_in_docflow == 1)
 			{
+				//log.trace("#3");
 				//counters[1]++;
 				return true;
 			}
 			else 
 				if (is_in_docflow == 0)
 				{
+					//log.trace("#4");
 					//counters[2]++;
 					return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 				}
@@ -306,36 +313,43 @@ class Authorization
 		    (*authorizedElementId == '*' && strcmp(authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
 
 		{
-
+			//log.trace("#5");
+			
 			if(scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts))
 			{
+				//log.trace("#6");
 				//counters[3]++;
 				return true;
 			}
-			//log.trace("autorize end#0, return:[{}]", calculatedRight);
+			////log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
 		if(strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
 		   scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
 		{
 			//counters[4]++;
+			//log.trace("#7");
 			return true;
 			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 			
-		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
+		if(strcmp("null", authorizedElementId) != 0 && iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
 				//log.trace("autorize end#2, return:[false]");
 			//counters[5]++;
+			//log.trace("#8");
+			
 			return false;
 		}
 
 		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
 		{
 			//counters[6]++;
+			//log.trace("#9");
+			
 			return true;
 		}
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
@@ -343,18 +357,24 @@ class Authorization
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			//counters[7]++;
+			//log.trace("#10");
+			
 			return true;
 		}
 				//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
-		
-		
+
+		if(isAdmin) {
+			return true;
+		}
+
+		log.trace("Access Denied");
+
+		return false;
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
 			
 		//log.trace("autorize end#3, return:[{}]", calculatedRight);
 		//counters[8]++;
 		//		log.trace("# {} {} {} {} {} {} {} {} {}",  counters[0], counters[1], counters[2], counters[3], counters[4], counters[5], counters[6], counters[7], counters[8]);
-
-		return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 	}
 
 	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)
