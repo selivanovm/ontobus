@@ -65,45 +65,11 @@ void main(char[][] args)
 	user = cast(char*) (new char[40]);
 
 	char[][char[]] props = load_props();
-	char[] hostname = props["amqp_server_address"] ~ "\0";
-	int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
-	char[] vhost = props["amqp_server_vhost"] ~ "\0";
-	char[] login = props["amqp_server_login"] ~ "\0";
-	char[] passw = props["amqp_server_password"] ~ "\0";
-	char[] queue = props["amqp_server_queue"] ~ "\0";
+	char[] dbus_semargl_service_name = props["dbus_semargl_service_name"] ~ "\0";
 
-	autotest at = new autotest (autotest_file, count_repeat, nocompare, hostname, port, vhost, "", login, passw); 
+	autotest at = new autotest (autotest_file, count_repeat, nocompare, dbus_semargl_service_name); 
 	at.prepare_file ();
-	
-
 }
-
-//void send_result_and_logging_messages(char* queue_name, char* result_buffer)
-//{
-//	auto elapsed = new StopWatch();
-//	double time;
-//
-//	log.trace("queue_name:{}", fromStringz(queue_name));
-//	elapsed.start;
-//	client.send(queue_name, result_buffer);
-//
-//	time = elapsed.stop;
-//	log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-//
-//	if(logging_io_messages)
-//	{
-//		elapsed.start;
-//
-//		auto tm = WallClock.now;
-//		auto dt = Clock.toDate(tm);
-//		File.append("io_messages.log", layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
-//		File.append("io_messages.log", fromStringz(result_buffer));
-//		File.append("io_messages.log", "\r\n\r\n\r\n");
-//
-//		time = elapsed.stop;
-//		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-//	}
-//}
 
 private long count_prepared_messages = 0;
 
@@ -114,19 +80,12 @@ private char[][char[]] load_props()
 	char[][char[]] result;
 	FileConduit props_conduit;
 
-	auto props_path = new FilePath("./semargl.properties");
+	auto props_path = new FilePath("./autotest.properties");
 
 	if(!props_path.exists)
 	// props file doesn't exists, so create new one with defaults
 	{
-		result["amqp_server_address"] = "localhost";
-		result["amqp_server_port"] = "5672";
-		result["amqp_server_exchange"] = "";
-		result["amqp_server_login"] = "ba";
-		result["amqp_server_password"] = "123456";
-		result["amqp_server_routingkey"] = "";
-		result["amqp_server_queue"] = "semargl-a";
-		result["amqp_server_vhost"] = "magnetico";
+		result["dbus_semargl_service_name"] = "semargl";
 
 		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);

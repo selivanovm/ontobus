@@ -27,15 +27,15 @@ class libdbus_client : mom_client
 {
     DBusError err;
 }
-    public
+    private
 {
     char* reciever_name = null;
 }
-    public
+    private
 {
     char* see_rule_for_listener = null;
 }
-    public
+    private
 {
     char* interface_name = null;
 }
@@ -43,15 +43,15 @@ class libdbus_client : mom_client
 {
     char* name_of_the_signal = "message";
 }
-    public
+    private
 {
     char* sender_name = null;
 }
-    public
+    private
 {
     char* dest_object_name_of_the_signal = null;
 }
-    public
+    private
 {
     char* sender_interface_name = null;
 }

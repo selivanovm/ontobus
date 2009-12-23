@@ -16,30 +16,20 @@ private int count_commands = 0;
 private long count_repeat;
 private bool nocompare;
 
-private import amqp_messages;
+private import libdbus_client;
 
-char[] hostname;
-int port;
-char[] vhost;
-char[] login;
-char[] passw;
-char[] exchange;
+char[] dbus_semargl_service_name;
+
 private long count_send_messages = 0;
-amqp_messages client;
+libdbus_client client;
 
 class autotest
 {
 	char[] message_log_file_name;
 
-	this(char[] _message_log_file_name, long _count_repeat, bool _nocompare, char[] _hostname, int _port, char[] _vhost, char[] _exchange,
-			char[] _login, char[] _passw)
+	this(char[] _message_log_file_name, long _count_repeat, bool _nocompare, char[] _dbus_semargl_service_name)
 	{
-		hostname = _hostname;
-		port = _port;
-		vhost = _vhost;
-		login = _login;
-		passw = _passw;
-		exchange = _exchange;
+		dbus_semargl_service_name = _dbus_semargl_service_name;
 
 		count_repeat = _count_repeat;
 		nocompare = _nocompare;
@@ -49,7 +39,8 @@ class autotest
 
 	public void prepare_file()
 	{
-		client = new amqp_messages(hostname, port, vhost, exchange, login, passw);
+		client = new libdbus_client();
+		client.setSender ("autotest", dbus_semargl_service_name);
 		log.trace("create client");
 		client.connect();
 
@@ -62,7 +53,7 @@ class autotest
 
 		log.trace("autotest listen end, count commands: {}", count_commands);
 
-		client.close();
+//		client.close();
 
 	}
 
@@ -171,23 +162,23 @@ private void message_sender(char* message, long size)
 
 //		log.trace("set reply_to={}", reply_to);
 //		Stdout.format("set reply_to={}", reply_to).newline;
-		client.set_listen_queue (reply_to);
-		(new Thread(&client.listen)).start;
+//@		client.set_listen_queue (reply_to);
+//@		(new Thread(&client.listen)).start;
 //        Thread.sleep(0.250);
 
 		//		printf("\nmessage: %s\n", message);
 		count_send_messages++;
 //		log.trace("send message");
 //		Stdout.format("send message {}", count_send_messages).newline;
-		client.send(qqq, message);
+		client.send(qqq.ptr, message);
 		
 //		log.trace("wait reply message");
 //		Stdout.format("wait reply message").newline;
-		while (client.result_out is null) {Thread.yield();};
+//@		while (client.result_out is null) {Thread.yield();};
 //		log.trace("get reply message = {}", client.result_out);
 //		Stdout.format("get reply message = {}", client.result_out).newline;
 //		printf("\nout message: %s\n", client.result_out);
-		client.result_out = null;
+//@		client.result_out = null;
 				
 		
 
