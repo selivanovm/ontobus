@@ -309,8 +309,8 @@ void get_message(byte* message, ulong message_size)
 
 			}
 
-			log.trace("разбор сообщения закончен");
-
+			log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
+			
 			if(agent_function_id >= 0 && arg_id > 0)
 			{
 				/* пример сообщения: установить в модуле trioplax флаг set_stat_info_logging = true
@@ -949,7 +949,7 @@ void get_message(byte* message, ulong message_size)
 			writeToLog("\r\n\r\n\r\n");
 		}
 
-		log.trace("message successful prepared\r\n");
+		log.trace("message successfully prepared\r\n");
 	}
 
 }
