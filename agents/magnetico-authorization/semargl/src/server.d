@@ -28,6 +28,7 @@ private import authorization;
 private import mom_client;
 private import librabbitmq_client;
 private import libdbus_client;
+private import autotest;
 
 private import script_util;
 private import RightTypeDef;
@@ -35,8 +36,6 @@ private import fact_tools;
 private import tango.text.locale.Locale;
 //private import mod.tango.io.device.File;
 //private import tango.text.convert.Integer;
-
-private import autotest;
 
 private Authorization az = null;
 
@@ -91,33 +90,7 @@ void main(char[][] args)
 		log.trace("no autotest mode");
 		
 		char[][char[]] props = load_props();
-
-		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
-		if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
-		{
-			log.trace("connect to DBUS, service name = {})", dbus_semargl_service_name);
-			
-			// listen on d-bus
-			dbus_semargl_service_name ~= "\0";
-
-			mom_client client = null;
-
-			client = new libdbus_client();
-
-			(cast(libdbus_client) client).setReciever(dbus_semargl_service_name);
-
-			//			client.setSender("test", "test1");
-
-			(cast(libdbus_client) client).connect();
-
-			client.set_callback(&get_message);
-
-			(new Thread(&client.listener)).start;
-			Thread.sleep(0.250);
-
-			log.trace("ok");
-		}
-
+		
 		char[] hostname = props["amqp_server_address"] ~ "\0";
 
 		if(hostname.length > 2)
@@ -140,6 +113,34 @@ void main(char[][] args)
 			
 			log.trace("ok");
 		}
+		
+		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
+		if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
+		{
+			log.trace("connect to DBUS, service name = {}", dbus_semargl_service_name);
+			
+			// listen on d-bus
+//			dbus_semargl_service_name ~= "\0";
+
+			mom_client client = null;
+
+			client = new libdbus_client();
+			
+			(cast(libdbus_client) client).setServiceName (dbus_semargl_service_name);
+			(cast(libdbus_client) client).setReciever(dbus_semargl_service_name);
+
+			//			client.setSender("test", "test1");
+
+			(cast(libdbus_client) client).connect();
+
+			client.set_callback(&get_message);
+
+			(new Thread(&client.listener)).start;
+			Thread.sleep(0.250);
+
+			log.trace("ok");
+		}
+		
 	}
 	else
 	{

@@ -28,6 +28,12 @@ class libdbus_client: mom_client
 	{
 	}
 
+	void setServiceName (char[] im)
+	{
+		sender_name = (im ~ ".signal.source\0").ptr;		
+		sender_interface_name = (im ~ ".signal.Type\0").ptr;
+	}
+	
 	void setReciever(char[] reciever)
 	{
 		reciever_name = (reciever ~ ".signal.sink\0").ptr;
@@ -35,11 +41,9 @@ class libdbus_client: mom_client
 		interface_name = (reciever ~ ".signal.Type\0").ptr;
 	}
 
-	void setSender(char[] sender, char[] to)
+	void setSender(char[] to)
 	{
-		sender_name = (sender ~ ".signal.source\0").ptr;
 		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
-		sender_interface_name = (sender ~ ".signal.Type\0").ptr;
 	}
 
 	void connect()
