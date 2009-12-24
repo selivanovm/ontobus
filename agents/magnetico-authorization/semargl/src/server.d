@@ -27,6 +27,8 @@ private import authorization;
 
 private import mom_client;
 private import librabbitmq_client;
+private import libdbus_client;
+
 private import script_util;
 private import RightTypeDef;
 private import fact_tools;
@@ -76,11 +78,13 @@ void main(char[][] args)
 		}
 	}
 
+	layout = new Locale;
+
 	result_buffer = cast(char*) new char[200 * 1024];
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
-	mom_client client = null;
+	az = new Authorization();
 
 	if(autotest_file is null)
 	{
@@ -92,36 +96,57 @@ void main(char[][] args)
 			// listen on d-bus
 			dbus_semargl_service_name ~= "\0";
 
+			mom_client client = null;
+
+			client = new libdbus_client();
+
+			(cast(libdbus_client) client).setReciever(dbus_semargl_service_name);
+
+			//			client.setSender("test", "test1");
+
+			(cast(libdbus_client) client).connect();
+
+			client.set_callback(&get_message);
+
+			(new Thread(&client.listener)).start;
+			Thread.sleep(0.250);
+
 			log.trace("connect to DBUS, service name = {})", dbus_semargl_service_name);
 		}
 
 		char[] hostname = props["amqp_server_address"] ~ "\0";
-		int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
-		char[] vhost = props["amqp_server_vhost"] ~ "\0";
-		char[] login = props["amqp_server_login"] ~ "\0";
-		char[] passw = props["amqp_server_password"] ~ "\0";
-		char[] queue = props["amqp_server_queue"] ~ "\0";
 
-		log.trace("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
-		client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
-		client.set_callback(&get_message);
+		if(hostname.length > 2)
+		{
+			int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
+			char[] vhost = props["amqp_server_vhost"] ~ "\0";
+			char[] login = props["amqp_server_login"] ~ "\0";
+			char[] passw = props["amqp_server_password"] ~ "\0";
+			char[] queue = props["amqp_server_queue"] ~ "\0";
+
+			log.trace("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
+
+			mom_client client = null;
+
+			client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
+			client.set_callback(&get_message);
+
+			(new Thread(&client.listener)).start;
+			Thread.sleep(0.250);
+		}
 	}
 	else
 	{
 		log.trace("use direct send command");
+		mom_client client = null;
+
 		client = new autotest(autotest_file, count_repeat, nocompare);
 		client.set_callback(&get_message);
-	}
-
-	if(client !is null)
-	{
-		layout = new Locale;
-
-		az = new Authorization();
 
 		(new Thread(&client.listener)).start;
 		Thread.sleep(0.250);
 	}
+
 }
 
 void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom_client from_client)
