@@ -277,7 +277,7 @@ class Authorization
 		bool calculatedRight;
 
 		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-		log.trace("isAdmin = {}", isAdmin);
+		//		log.trace("isAdmin = {}", isAdmin);
 
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
@@ -367,7 +367,7 @@ class Authorization
 			return true;
 		}
 
-		log.trace("Access Denied");
+		//		log.trace("Access Denied");
 
 		return false;
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);

@@ -107,7 +107,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 					}
 				}
 
-				if(strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
+				if(category_match && strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
 				{
 					// проверим, есть ли тут требуемуе нами право
 					char* triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
@@ -125,8 +125,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 							{
 								//								log.trace("# subject = {} ", getString(s));
 								
-								rights_match = true;
-								break;
+								return true;
 							}
 							else
 								break;
@@ -134,8 +133,6 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 						triple2_o++;
 					}
 				}
-				if(rights_match && category_match)
-					return true;
 			}
 			next_element3 = *(iterator3 + 1);
 			iterator3 = cast(uint*) next_element3;
