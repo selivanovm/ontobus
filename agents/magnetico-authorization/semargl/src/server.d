@@ -88,11 +88,15 @@ void main(char[][] args)
 
 	if(autotest_file is null)
 	{
+		log.trace("no autotest mode");
+		
 		char[][char[]] props = load_props();
 
 		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
 		if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
 		{
+			log.trace("connect to DBUS, service name = {})", dbus_semargl_service_name);
+			
 			// listen on d-bus
 			dbus_semargl_service_name ~= "\0";
 
@@ -111,7 +115,7 @@ void main(char[][] args)
 			(new Thread(&client.listener)).start;
 			Thread.sleep(0.250);
 
-			log.trace("connect to DBUS, service name = {})", dbus_semargl_service_name);
+			log.trace("ok");
 		}
 
 		char[] hostname = props["amqp_server_address"] ~ "\0";
@@ -133,6 +137,8 @@ void main(char[][] args)
 
 			(new Thread(&client.listener)).start;
 			Thread.sleep(0.250);
+			
+			log.trace("ok");
 		}
 	}
 	else
