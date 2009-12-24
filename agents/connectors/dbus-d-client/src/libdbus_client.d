@@ -22,7 +22,7 @@ class libdbus_client: mom_client
 	private char* sender_interface_name = null; //
 	private char* sender_name_of_the_signal = "message";
 
-	void function(byte* txt, ulong size) message_acceptor;
+	void function(byte* txt, ulong size, mom_client from_client) message_acceptor;
 
 	this()
 	{
@@ -96,7 +96,7 @@ class libdbus_client: mom_client
 
 	}
 
-	void set_callback(void function(byte* txt, ulong size) _message_acceptor)
+	void set_callback(void function(byte* txt, ulong size, mom_client from_client) _message_acceptor)
 	{
 		message_acceptor = _message_acceptor;
 	}
@@ -216,7 +216,7 @@ class libdbus_client: mom_client
 					else
 						dbus_message_iter_get_basic(&args, &sigvalue);
 
-					message_acceptor(cast(byte*) sigvalue, strlen(sigvalue));
+					message_acceptor(cast(byte*) sigvalue, strlen(sigvalue), this);
 
 					//					printf("Got Signal with value %s\n", sigvalue);
 				}

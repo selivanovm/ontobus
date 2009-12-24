@@ -348,9 +348,5 @@ extern (C)
 }
 extern (C) 
 {
-    amqp_basic_consume_ok_t_* amqp_basic_consume(amqp_connection_state_t_* state, amqp_channel_t channel, amqp_bytes_t queue, amqp_bytes_t consumer_tag, amqp_boolean_t no_local, amqp_boolean_t no_ack, amqp_boolean_t exclusive, amqp_table_t filter);
-}
-extern (C) 
-{
-    int amqp_basic_ack(amqp_connection_state_t_* state, amqp_channel_t channel, uint64_t delivery_tag, amqp_boolean_t multiple);
+    amqp_basic_consume_ok_t_* amqp_basic_consume(amqp_connection_state_t_* state, amqp_channel_t channel, amqp_bytes_t queue, amqp_bytes_t consumer_tag, amqp_boolean_t no_local, amqp_boolean_t no_ack, amqp_boolean_t exclusive);
 }

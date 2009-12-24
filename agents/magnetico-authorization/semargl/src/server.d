@@ -85,12 +85,23 @@ void main(char[][] args)
 	if(autotest_file is null)
 	{
 		char[][char[]] props = load_props();
+
+		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
+		if (dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
+		{
+			// listen on d-bus
+			dbus_semargl_service_name ~= "\0";
+			
+			log.trace("connect to DBUS, service name = {})", dbus_semargl_service_name);
+		}
+		
 		char[] hostname = props["amqp_server_address"] ~ "\0";
 		int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
 		char[] vhost = props["amqp_server_vhost"] ~ "\0";
 		char[] login = props["amqp_server_login"] ~ "\0";
 		char[] passw = props["amqp_server_password"] ~ "\0";
 		char[] queue = props["amqp_server_queue"] ~ "\0";
+		
 
 		log.trace("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
 		client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
@@ -138,7 +149,7 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 	}
 }
 
-void get_message(byte* message, ulong message_size)
+void get_message(byte* message, ulong message_size, mom_client from_client)
 {
 	char* msg = cast(char*) message;
 //		log.trace("get message {}", msg[0 .. message_size]);
@@ -1074,6 +1085,7 @@ private char[][char[]] load_props()
 		result["amqp_server_routingkey"] = "";
 		result["amqp_server_queue"] = "semargl";
 		result["amqp_server_vhost"] = "magnetico";
+		result["dbus_semargl_service_name"] = "";
 
 		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);
