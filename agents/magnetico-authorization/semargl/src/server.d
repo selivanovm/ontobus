@@ -36,8 +36,6 @@ private import tango.text.locale.Locale;
 
 private import autotest;
 
-private mom_client client = null;
-
 private Authorization az = null;
 
 private char* result_buffer = null;
@@ -82,26 +80,27 @@ void main(char[][] args)
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
+	mom_client client = null;
+
 	if(autotest_file is null)
 	{
 		char[][char[]] props = load_props();
 
 		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
-		if (dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
+		if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
 		{
 			// listen on d-bus
 			dbus_semargl_service_name ~= "\0";
-			
+
 			log.trace("connect to DBUS, service name = {})", dbus_semargl_service_name);
 		}
-		
+
 		char[] hostname = props["amqp_server_address"] ~ "\0";
 		int port = atoi((props["amqp_server_port"] ~ "\0").ptr);
 		char[] vhost = props["amqp_server_vhost"] ~ "\0";
 		char[] login = props["amqp_server_login"] ~ "\0";
 		char[] passw = props["amqp_server_password"] ~ "\0";
 		char[] queue = props["amqp_server_queue"] ~ "\0";
-		
 
 		log.trace("connect to AMQP server ({}:{} vhost={}, queue={})", hostname, port, vhost, queue);
 		client = new librabbitmq_client(hostname, port, login, passw, queue, vhost);
@@ -114,22 +113,25 @@ void main(char[][] args)
 		client.set_callback(&get_message);
 	}
 
-	layout = new Locale;
+	if(client !is null)
+	{
+		layout = new Locale;
 
-	az = new Authorization();
+		az = new Authorization();
 
-	(new Thread(&client.listener)).start;
-	Thread.sleep(0.250);
+		(new Thread(&client.listener)).start;
+		Thread.sleep(0.250);
+	}
 }
 
-void send_result_and_logging_messages(char* queue_name, char* result_buffer)
+void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom_client from_client)
 {
 	auto elapsed = new StopWatch();
 	double time;
 
 	log.trace("queue_name:{}", getString(queue_name));
 	elapsed.start;
-	client.send(queue_name, result_buffer);
+	from_client.send(queue_name, result_buffer);
 
 	time = elapsed.stop;
 	log.trace("send result time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
@@ -140,7 +142,7 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
-		
+
 		writeToLog(layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
 		writeToLog(fromStringz(result_buffer));
 
@@ -152,8 +154,8 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer)
 void get_message(byte* message, ulong message_size, mom_client from_client)
 {
 	char* msg = cast(char*) message;
-//		log.trace("get message {}", msg[0 .. message_size]);
-//		printf ("\nget message !%s!\n", message);
+	//		log.trace("get message {}", msg[0 .. message_size]);
+	//		printf ("\nget message !%s!\n", message);
 
 	synchronized
 	{
@@ -458,7 +460,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(queue_name, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer, from_client);
 			}
 
 			if(delete_subjects_id >= 0 && arg_id > 0)
@@ -490,11 +492,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(queue_name, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer, from_client);
 
 				//				uint* SET = az.getTripleStorage.getTriples(null, null, "45fd1447ef7a46c9ac08b73cddc776d4");
 				//				fact_tools.print_list_triple(SET);
-
 
 			}
 
@@ -546,13 +547,13 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(queue_name, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer, from_client);
 			}
 
 			// GET_AUTHORIZATION_RIGHTS_RECORDS
 			if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 			{
-				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer);//, client);
+				az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, from_client);
 			}
 
 			// PUT
@@ -600,11 +601,11 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
 									{
-										if(i != element_id && is_fact_in_object[i] == arg_id && 
-										   (strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0 ||
-										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0 ||
-										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#rights") == 0 ||
-										    strcmp(fact_p[i], "magnet-ontology/authorization/acl#authorSystem") == 0))
+										if(i != element_id && is_fact_in_object[i] == arg_id && (strcmp(fact_p[i],
+												"magnet-ontology/authorization/acl#targetSubsystemElement") == 0 || strcmp(fact_p[i],
+												"magnet-ontology/authorization/acl#category") == 0 || strcmp(fact_p[i],
+												"magnet-ontology/authorization/acl#rights") == 0 || strcmp(fact_p[i],
+												"magnet-ontology/authorization/acl#authorSystem") == 0))
 										{
 											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
 											//  getString(fact_o[i]));
@@ -647,7 +648,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 									{
 
 										remove_subject(s);
-										
+
 									}
 
 								}
@@ -714,18 +715,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
-				send_result_and_logging_messages(queue_name, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer, from_client);
 
 				//				uint* SET = az.getTripleStorage.getTriples(null, null, "45fd1447ef7a46c9ac08b73cddc776d4");
 				//				fact_tools.print_list_triple(SET);
-
 
 			}
 
 			// GET_DELEGATE_ASSIGNERS
 			if(get_delegate_assigners_tree_id >= 0 && arg_id > 0)
 			{
-				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer);//, client);
+				az.getDelegateAssignersTree(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, from_client);
 			}
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
@@ -870,7 +870,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 						count_prepared_elements++;
 						bool calculatedRight;
-						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments);
+						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments, from_client);
 						//log.trace("right = {}", calculatedRight);
 
 						//log.trace("#23");
@@ -881,7 +881,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							{
 								//log.trace("#3");
 								calculatedRight = az.authorize(fact_o[category_id], docId, hierarhical_delegates[ii], targetRightType,
-										hierarhical_departments_of_delegate[ii]);
+										hierarhical_departments_of_delegate[ii], from_client);
 								if(calculatedRight == true)
 									break;
 							}
@@ -945,7 +945,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
 						count_prepared_elements / total_time_calculate_right);
 
-				send_result_and_logging_messages(queue_name, result_buffer);
+				send_result_and_logging_messages(queue_name, result_buffer, from_client);
 			}
 		}
 
@@ -954,7 +954,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 		//	printf("!!!! list_docid=%s\n", list_docid);
 
 		//	log.trace("\nIN: list_docid={}", str_2_char_array(cast(char*) list_docid, doclistid_length));
-		
+
 		if(logging_io_messages == true)
 		{
 			writeToLog("\r\n\r\n\r\n");
@@ -983,20 +983,19 @@ void remove_subject(char* s)
 		while(next_element1 > 0)
 		{
 			byte* triple2 = cast(byte*) *removed_facts;
-			
+
 			if(triple2 !is null)
 			{
-				
+
 				char* ss = cast(char*) triple2 + 6;
-				
+
 				char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
-				
+
 				char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
 
 				s_a[cnt] = getString(ss);
 				p_a[cnt] = getString(pp);
 				o_a[cnt] = getString(oo);
-
 
 				//				az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
 			}
@@ -1011,13 +1010,12 @@ void remove_subject(char* s)
 			az.getTripleStorage.removeTriple(s_a[k], p_a[k], o_a[k]);
 			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
 		}
-		
+
 	}
 }
 
 void remove_subjects_by_predicate(char* p, char* o)
 {
-
 
 	uint* removed_facts = az.getTripleStorage.getTriples(null, p, o);
 
@@ -1032,7 +1030,7 @@ void remove_subjects_by_predicate(char* p, char* o)
 		while(next_element1 > 0)
 		{
 			byte* triple2 = cast(byte*) *removed_facts;
-			
+
 			if(triple2 !is null)
 			{
 				char* ss = cast(char*) triple2 + 6;
@@ -1047,7 +1045,7 @@ void remove_subjects_by_predicate(char* p, char* o)
 		{
 			remove_subject(s_a[k].ptr);
 		}
-		
+
 	}
 }
 
@@ -1060,7 +1058,7 @@ private void writeToLog(char[] string)
 			auto style = File.ReadWriteOpen;
 			style.share = File.Share.Read;
 			style.open = File.Open.Append;
-			file = new File ("io_messages.log", style);
+			file = new File("io_messages.log", style);
 		}
 		file.output.write(string);
 	}

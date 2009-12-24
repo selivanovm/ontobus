@@ -270,7 +270,7 @@ class Authorization
 
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для заданного пользователя
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
-			char*[] hierarhical_departments)
+			char*[] hierarhical_departments, mom_client from_client)
 	{
 		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(authorizedElementCategory), getString(
 		//				authorizedElementId), getString(User));
@@ -357,7 +357,7 @@ class Authorization
 		return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer, mom_client from_client)
 	//, mom_client client)
 	{
 
@@ -620,7 +620,7 @@ class Authorization
 						{
 							strcpy(result_ptr, "}.\0");
 
-							send_result_and_logging_messages(queue_name, result_buffer);
+							send_result_and_logging_messages(queue_name, result_buffer, from_client);
 
 							//							client.send(queue_name, result_buffer);
 
@@ -649,7 +649,7 @@ class Authorization
 
 		strcpy(queue_name, fact_o[reply_to_id]);
 
-		send_result_and_logging_messages(queue_name, result_buffer);
+		send_result_and_logging_messages(queue_name, result_buffer, from_client);
 
 		//		client.send(queue_name, result_buffer);
 
@@ -659,9 +659,7 @@ class Authorization
 
 	}
 
-	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer)
-	//,
-	//			mom_client client)
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer, mom_client from_client)
 	{
 
 		log.trace("команда на выборку делегировавших");
@@ -712,7 +710,7 @@ class Authorization
 		strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
 
 		//		client.send(queue_name, result_buffer);
-		send_result_and_logging_messages(queue_name, result_buffer);
+		send_result_and_logging_messages(queue_name, result_buffer, from_client);
 
 		double time = elapsed.stop;
 		log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
