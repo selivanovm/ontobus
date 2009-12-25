@@ -85,7 +85,7 @@ private char[][char[]] load_props()
 	if(!props_path.exists)
 	// props file doesn't exists, so create new one with defaults
 	{
-		result["dbus_semargl_service_name"] = "semargl";
+		result["dbus_semargl_service_name"] = "semarglA";
 
 		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);

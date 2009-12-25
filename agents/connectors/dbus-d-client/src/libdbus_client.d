@@ -17,10 +17,10 @@ class libdbus_client: mom_client
 	private char* interface_name = null;
 	private char* name_of_the_signal = "message";
 
-	private char* sender_name = null; //
+	private char* service_name = null; //
 	private char* dest_object_name_of_the_signal = null;
-	private char* sender_interface_name = null; //
-	private char* sender_name_of_the_signal = "message";
+	private char* service_interface_name = null; //
+	private char* service_name_of_the_signal = "message";
 
 	void function(byte* txt, ulong size, mom_client from_client) message_acceptor;
 
@@ -28,23 +28,23 @@ class libdbus_client: mom_client
 	{
 	}
 
-	void setServiceName (char[] im)
+	void setServiceName(char[] im)
 	{
-		sender_name = (im ~ ".signal.source\0").ptr;		
-		sender_interface_name = (im ~ ".signal.Type\0").ptr;
-	}
-	
-	void setReciever(char[] reciever)
-	{
-		reciever_name = (reciever ~ ".signal.sink\0").ptr;
-		see_rule_for_listener = ("type='signal',interface='" ~ reciever ~ ".signal.Type'\0").ptr;
-		interface_name = (reciever ~ ".signal.Type\0").ptr;
+		service_name = (im ~ ".signal.source\0").ptr;
+		service_interface_name = (im ~ ".signal.Type\0").ptr;
 	}
 
-	void setSender(char[] to)
+	void setListenFrom(char[] listen_from)
 	{
-		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
+		reciever_name = (listen_from ~ ".signal.sink\0").ptr;
+		see_rule_for_listener = ("type='signal',interface='" ~ listen_from ~ ".signal.Type'\0").ptr;
+		interface_name = (listen_from ~ ".signal.Type\0").ptr;
 	}
+
+//	void setSender(char[] to)
+//	{
+//		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
+//	}
 
 	void connect()
 	{
@@ -74,7 +74,7 @@ class libdbus_client: mom_client
 		}
 
 		// register our name on the bus, and check for errors
-		ret = dbus_bus_request_name(conn, sender_name, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
+		ret = dbus_bus_request_name(conn, service_name, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
 		if(dbus_error_is_set(&err))
 		{
 			fprintf(stderr, "Name Error (%s)\n", err.message);
@@ -86,16 +86,19 @@ class libdbus_client: mom_client
 			return -1;
 		}
 
-		// request our name on the bus and check for errors
-		ret = dbus_bus_request_name(conn, reciever_name, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
-		if(dbus_error_is_set(&err))
+		if(reciever_name !is null)
 		{
-			fprintf(stderr, "Name Error (%s)\n", err.message);
-			dbus_error_free(&err);
-		}
-		if(dbus_shared.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
-		{
-			return -1;
+			// request our name on the bus and check for errors
+			ret = dbus_bus_request_name(conn, reciever_name, dbus_shared.DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
+			if(dbus_error_is_set(&err))
+			{
+				fprintf(stderr, "Name Error (%s)\n", err.message);
+				dbus_error_free(&err);
+			}
+			if(dbus_shared.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
+			{
+				return -1;
+			}
 		}
 
 	}
@@ -105,22 +108,37 @@ class libdbus_client: mom_client
 		message_acceptor = _message_acceptor;
 	}
 
+	char[] add_to_dest_object_name_of_the_signal = "/signal/Object\0";
+	
 	/**
 	 * Connect to the DBUS bus and send a broadcast signal
 	 */
 	int send(char* routingkey, char* sigvalue)
 	{
+		printf("Signal Sent to %s\n", routingkey);
+		
 		DBusMessage* msg;
 		DBusMessageIter args;
 		int ret;
 		dbus_uint32_t serial = 0;
 
-		printf("Sending signal with value %s\n", sigvalue);
-
+		int len_routingkey = strlen(routingkey);
+		printf("Signal Sent #0\n");
+		
+		char [] dest_object_name_of_the_signal = new char[strlen(routingkey) + 1 + add_to_dest_object_name_of_the_signal.length];
+		printf("Signal Sent dest_object_name_of_the_signal.length=%d\n", dest_object_name_of_the_signal);
+		dest_object_name_of_the_signal[0] = '/';
+		printf("Signal Sent #2\n");
+		strncpy (dest_object_name_of_the_signal.ptr + 1, routingkey, len_routingkey);
+		printf("Signal Sent %d=\n", 1 + len_routingkey + add_to_dest_object_name_of_the_signal.length);
+		strncpy (dest_object_name_of_the_signal.ptr + 1 + len_routingkey, add_to_dest_object_name_of_the_signal.ptr, add_to_dest_object_name_of_the_signal.length);
+		
+		printf("Sending signal to %s, with value %s\n", dest_object_name_of_the_signal.ptr, sigvalue);
+		
 		// create a signal & check for errors 
-		msg = dbus_message_new_signal(dest_object_name_of_the_signal, // object name of the signal
-				sender_interface_name, // interface name of the signal
-				sender_name_of_the_signal); // name of the signal
+		msg = dbus_message_new_signal(dest_object_name_of_the_signal.ptr, // object name of the signal
+				service_interface_name, // interface name of the signal
+				service_name_of_the_signal); // name of the signal
 		if(msg is null)
 		{
 			fprintf(stderr, "Message Null\n");

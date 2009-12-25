@@ -40,7 +40,8 @@ class autotest
 	public void prepare_file()
 	{
 		client = new libdbus_client();
-		client.setSender ("autotest", dbus_semargl_service_name);
+		client.setServiceName ("autotest");
+//		client.setSender (dbus_semargl_service_name);
 		log.trace("create client");
 		client.connect();
 
@@ -156,7 +157,7 @@ private void message_sender(char* message, long size)
 
 	if(reply_to !is null)
 	{
-		char[] qqq = "semargl-a";
+		char[] qqq = "semarglA";
 
 		size = strlen(message);
 

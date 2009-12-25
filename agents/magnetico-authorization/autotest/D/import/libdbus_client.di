@@ -45,7 +45,7 @@ class libdbus_client : mom_client
 }
     private
 {
-    char* sender_name = null;
+    char* service_name = null;
 }
     private
 {
@@ -53,33 +53,33 @@ class libdbus_client : mom_client
 }
     private
 {
-    char* sender_interface_name = null;
+    char* service_interface_name = null;
 }
     private
 {
-    char* sender_name_of_the_signal = "message";
+    char* service_name_of_the_signal = "message";
 }
-    void function(byte* txt, ulong size) message_acceptor;
+    void function(byte* txt, ulong size, mom_client from_client) message_acceptor;
     this()
 {
 }
-    void setReciever(char[] reciever)
+    void setServiceName(char[] im)
 {
-reciever_name = (reciever ~ ".signal.sink\x00").ptr;
-see_rule_for_listener = ("type='signal',interface='" ~ reciever ~ ".signal.Type'\x00").ptr;
-interface_name = (reciever ~ ".signal.Type\x00").ptr;
+service_name = (im ~ ".signal.source\x00").ptr;
+service_interface_name = (im ~ ".signal.Type\x00").ptr;
 }
-    void setSender(char[] sender, char[] to)
+    void setListenFrom(char[] listen_from)
 {
-sender_name = (sender ~ ".signal.source\x00").ptr;
-dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\x00").ptr;
-sender_interface_name = (sender ~ ".signal.Type\x00").ptr;
+reciever_name = (listen_from ~ ".signal.sink\x00").ptr;
+see_rule_for_listener = ("type='signal',interface='" ~ listen_from ~ ".signal.Type'\x00").ptr;
+interface_name = (listen_from ~ ".signal.Type\x00").ptr;
 }
     void connect();
-    void set_callback(void function(byte* txt, ulong size) _message_acceptor)
+    void set_callback(void function(byte* txt, ulong size, mom_client from_client) _message_acceptor)
 {
 message_acceptor = _message_acceptor;
 }
+    char[] add_to_dest_object_name_of_the_signal = "/signal/Object\x00";
     int send(char* routingkey, char* sigvalue);
     void listener();
 }

@@ -1,1 +1,1 @@
-./Autotest.test -autotest io_messages_log -repeat 200 -nocompare
+./Autotest.test -autotest io_messages_log -repeat 1 -nocompare
