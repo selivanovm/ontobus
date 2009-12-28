@@ -50,7 +50,11 @@ class autotest: mom_client
 		log.trace("prepare block #6");
 		return 0;
 	}
-
+	
+	char* get_message()
+	{
+		throw new Exception ("not implemented");
+	}
 	void listener()
 	{
 		log.trace("autotest listen!");

@@ -51,5 +51,6 @@ props.delivery_mode = 2;
 int result_publish = amqp_basic_publish(&conn,1,amqp_cstring_bytes(exchange),amqp_cstring_bytes(routingkey),0,0,&props,amqp_cstring_bytes(messagebody));
 return result_publish;
 }
+    char* get_message();
     void listener();
 }

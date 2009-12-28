@@ -65,7 +65,7 @@ void main(char[][] args)
 	user = cast(char*) (new char[40]);
 
 	char[][char[]] props = load_props();
-	char[] dbus_semargl_service_name = props["dbus_semargl_service_name"] ~ "\0";
+	char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
 
 	autotest at = new autotest (autotest_file, count_repeat, nocompare, dbus_semargl_service_name); 
 	at.prepare_file ();

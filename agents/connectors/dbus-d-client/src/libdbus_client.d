@@ -9,6 +9,8 @@ import mom_client;
 
 class libdbus_client: mom_client
 {
+	private float sleep_between_look_queue = 0.01; // in seconds
+	
 	private DBusConnection* conn = null;
 	private DBusError err;
 
@@ -41,10 +43,10 @@ class libdbus_client: mom_client
 		interface_name = (listen_from ~ ".signal.Type\0").ptr;
 	}
 
-//	void setSender(char[] to)
-//	{
-//		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
-//	}
+	//	void setSender(char[] to)
+	//	{
+	//		dest_object_name_of_the_signal = ("/" ~ to ~ "/signal/Object\0").ptr;
+	//	}
 
 	void connect()
 	{
@@ -109,32 +111,31 @@ class libdbus_client: mom_client
 	}
 
 	char[] add_to_dest_object_name_of_the_signal = "/signal/Object\0";
-	
+
 	/**
 	 * Connect to the DBUS bus and send a broadcast signal
 	 */
 	int send(char* routingkey, char* sigvalue)
 	{
-		printf("Signal Sent to %s\n", routingkey);
-		
+		//		printf("Signal Sent to %s\n", routingkey);
+
 		DBusMessage* msg;
 		DBusMessageIter args;
 		int ret;
 		dbus_uint32_t serial = 0;
 
 		int len_routingkey = strlen(routingkey);
-		printf("Signal Sent #0\n");
-		
-		char [] dest_object_name_of_the_signal = new char[strlen(routingkey) + 1 + add_to_dest_object_name_of_the_signal.length];
-		printf("Signal Sent dest_object_name_of_the_signal.length=%d\n", dest_object_name_of_the_signal);
+
+		char[] dest_object_name_of_the_signal = new char[strlen(routingkey) + 1 + add_to_dest_object_name_of_the_signal.length];
+		//		printf("Signal Sent dest_object_name_of_the_signal.length=%d\n", dest_object_name_of_the_signal);
 		dest_object_name_of_the_signal[0] = '/';
-		printf("Signal Sent #2\n");
-		strncpy (dest_object_name_of_the_signal.ptr + 1, routingkey, len_routingkey);
-		printf("Signal Sent %d=\n", 1 + len_routingkey + add_to_dest_object_name_of_the_signal.length);
-		strncpy (dest_object_name_of_the_signal.ptr + 1 + len_routingkey, add_to_dest_object_name_of_the_signal.ptr, add_to_dest_object_name_of_the_signal.length);
-		
-		printf("Sending signal to %s, with value %s\n", dest_object_name_of_the_signal.ptr, sigvalue);
-		
+		strncpy(dest_object_name_of_the_signal.ptr + 1, routingkey, len_routingkey);
+		//		printf("Signal Sent %d=\n", 1 + len_routingkey + add_to_dest_object_name_of_the_signal.length);
+		strncpy(dest_object_name_of_the_signal.ptr + 1 + len_routingkey, add_to_dest_object_name_of_the_signal.ptr,
+				add_to_dest_object_name_of_the_signal.length);
+
+		//		printf("Sending signal to %s, with value %s\n", dest_object_name_of_the_signal.ptr, sigvalue);
+
 		// create a signal & check for errors 
 		msg = dbus_message_new_signal(dest_object_name_of_the_signal.ptr, // object name of the signal
 				service_interface_name, // interface name of the signal
@@ -162,7 +163,7 @@ class libdbus_client: mom_client
 
 		dbus_connection_flush(conn);
 
-		printf("Signal Sent\n");
+		//		printf("Signal Sent\n");
 
 		// free the message 
 		dbus_message_unref(msg);
@@ -171,34 +172,90 @@ class libdbus_client: mom_client
 		return 0;
 	}
 
-	/*
-	 char* listen(char* listen_queue)
-	 {
-	 
-	 }
-	 */
-
-	/**
-	 * Listens for signals on the bus
-	 */
-	void listener()
+	char* get_message()
 	{
-		DBusMessage* msg;
-		DBusMessageIter args;
-
 		DBusError err;
-		int ret;
-		char* sigvalue;
-
-		printf("Listening for signals\n");
 
 		if(err.name is null)
 		{ // initialise the errors
 			dbus_error_init(&err);
 		}
 
+		DBusMessage* msg;
+		DBusMessageIter args;
+
+		char* sigvalue;
+
+		// add a rule for which messages we want to see
+		dbus_bus_add_match(conn, see_rule_for_listener, &err); // see signals from the given interface
+		dbus_connection_flush(conn);
+		if(dbus_error_is_set(&err))
+		{
+			fprintf(stderr, "Match Error (%s)\n", err.message);
+			return null;
+		}
+		printf("Match rule sent\n");
+
+		// loop listening for signals being emmitted
 		while(true)
 		{
+
+			// non blocking read of the next available message
+			dbus_connection_read_write(conn, 0);
+			msg = dbus_connection_pop_message(conn);
+
+			// loop again if we haven't read a message
+			if(msg is null)
+			{
+				Thread.sleep(sleep_between_look_queue);
+				continue;
+			}
+
+			//				printf("msg=%s", msg);
+
+			// check if the message is a signal from the correct interface and with the correct name
+			if(dbus_message_is_signal(msg, interface_name, name_of_the_signal))
+			{
+
+				// read the parameters
+				if(!dbus_message_iter_init(msg, &args))
+					fprintf(stderr, "Message Has No Parameters\n");
+				else if(dbus_shared.DBUS_TYPE_STRING != dbus_message_iter_get_arg_type(&args))
+					fprintf(stderr, "Argument is not string!\n");
+				else
+					dbus_message_iter_get_basic(&args, &sigvalue);
+
+				//					printf("Got Signal with value %s\n", sigvalue);
+			}
+
+			// free the message
+			dbus_message_unref(msg);
+		} // while read
+
+       return sigvalue;
+	}
+
+	/**
+	 * Listens for signals on the bus
+	 */
+	void listener()
+	{
+		printf("Listening for signals\n");
+
+		while(true)
+		{
+			DBusError err;
+
+			if(err.name is null)
+			{ // initialise the errors
+				dbus_error_init(&err);
+			}
+
+			DBusMessage* msg;
+			DBusMessageIter args;
+
+			char* sigvalue;
+
 			// add a rule for which messages we want to see
 			dbus_bus_add_match(conn, see_rule_for_listener, &err); // see signals from the given interface
 			dbus_connection_flush(conn);
@@ -220,7 +277,7 @@ class libdbus_client: mom_client
 				// loop again if we haven't read a message
 				if(msg is null)
 				{
-					Thread.sleep(0.01);
+					Thread.sleep(sleep_between_look_queue);
 					continue;
 				}
 
@@ -245,8 +302,8 @@ class libdbus_client: mom_client
 
 				// free the message
 				dbus_message_unref(msg);
-			}
-		}
+			} // while read
+		} // while
 	}
 
 }
