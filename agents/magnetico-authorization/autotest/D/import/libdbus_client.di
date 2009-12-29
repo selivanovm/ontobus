@@ -21,6 +21,10 @@ class libdbus_client : mom_client
 {
     private
 {
+    float sleep_between_look_queue = 0.01;
+}
+    private
+{
     DBusConnection* conn = null;
 }
     private
@@ -81,5 +85,6 @@ message_acceptor = _message_acceptor;
 }
     char[] add_to_dest_object_name_of_the_signal = "/signal/Object\x00";
     int send(char* routingkey, char* sigvalue);
+    char* get_message();
     void listener();
 }

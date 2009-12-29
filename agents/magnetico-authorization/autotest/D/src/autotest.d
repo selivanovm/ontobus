@@ -41,10 +41,16 @@ class autotest
 	{
 		client = new libdbus_client();
 		client.setServiceName("autotest");
-		client.setListenFrom (dbus_semargl_service_name);
+		client.setListenFrom ("semarglA");
 		log.trace("create client");
 		client.connect();
+		
+		client.set_callback(&get_message);
 
+		Thread thread = new Thread(&client.listener);
+		thread.start;
+		Thread.sleep(0.250);
+		
 		log.trace("autotest run");
 
 		for(long i = 0; i < count_repeat; i++)
@@ -60,14 +66,14 @@ class autotest
 
 }
 
-char[] reply_to_template = "<magnet-ontology/transport/message#reply_to>";
-
-void get_message(byte* message, ulong message_size)
+void get_message(byte* message, ulong message_size, mom_client from_client)
 {
-	log.trace("get_message, size={}", message_size);
 	char* msg = cast(char*) message;
-
+	//		log.trace("get message {}", msg[0 .. message_size]);
+	printf ("\nget message !%s!\n", message);	
 }
+
+char[] reply_to_template = "<magnet-ontology/transport/message#reply_to>";
 
 void prepare_block(char* line, ulong line_length)
 {
@@ -182,6 +188,13 @@ private void message_sender(char* message, long size)
 		//		Stdout.format("send message {}", count_send_messages).newline;
 		client.send(dbus_semargl_service_name.ptr, message);
 
+//				printf("\nmessage: %s\n", message);
+//		char* answer = client.get_message ();
+//		printf("\nanswer message: %s\n", answer);
+		
+		
+		
+		
 		//		log.trace("wait reply message");
 		//		Stdout.format("wait reply message").newline;
 		//@		while (client.result_out is null) {Thread.yield();};

@@ -167,7 +167,7 @@ class libdbus_client: mom_client
 
 		// free the message 
 		dbus_message_unref(msg);
-		printf("dbus_message_unref ok\n");
+//		printf("dbus_message_unref ok\n");
 
 		return 0;
 	}
@@ -194,7 +194,7 @@ class libdbus_client: mom_client
 			fprintf(stderr, "Match Error (%s)\n", err.message);
 			return null;
 		}
-		printf("Match rule sent\n");
+		printf("Match rule sent [%s]\n", see_rule_for_listener);
 
 		// loop listening for signals being emmitted
 		while(true)
