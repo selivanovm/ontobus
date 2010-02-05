@@ -9,7 +9,7 @@ private import tango.stdc.string;
 private import tango.stdc.stringz;
 private import tango.stdc.stdio;
 
-void function(byte* txt, ulong size) message_acceptor;
+void function(byte* txt, ulong size, mom_client from_client) message_acceptor;
 
 private char* output_data = null;
 private int count_commands = 0;
@@ -29,7 +29,7 @@ class autotest: mom_client
 
 	}
 
-	void set_callback(void function(byte* txt, ulong size) _message_acceptor)
+	void set_callback(void function(byte* txt, ulong size, mom_client from_client) _message_acceptor)
 	{
 		message_acceptor = _message_acceptor;
 	}
@@ -50,7 +50,11 @@ class autotest: mom_client
 		log.trace("prepare block #6");
 		return 0;
 	}
-
+	
+	char* get_message()
+	{
+		throw new Exception ("not implemented");
+	}
 	void listener()
 	{
 		log.trace("autotest listen!");
@@ -139,6 +143,6 @@ void prepare_block(char* line, ulong line_length)
 		//		printf("\nresult: %s\n", input_data);
 	}
 	
-	message_acceptor(cast(byte*) input_data, size);
+	message_acceptor(cast(byte*) input_data, size, null);
 	count_commands++;
 }

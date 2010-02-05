@@ -1,12 +1,14 @@
 interface mom_client
 {
-	void set_callback(void function(byte* txt, ulong size) _message_acceptor);
+	// set callback function for listener ()
+	void set_callback(void function(byte* txt, ulong size, mom_client from_client) _message_acceptor);
 
-	int send(char* routingkey, char* messagebody);
-
+	// in thread listens to the queue and calls _message_acceptor
 	void listener();
 	
-//	void set_listen_queue (char* listen_queue);
-	
-//	char* listen (char* listen_queue);
+	// sends a message to the specified queue
+	int send(char* routingkey, char* messagebody);
+
+	// forward to receiving the message
+	char* get_message ();
 }

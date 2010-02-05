@@ -16,30 +16,20 @@ private int count_commands = 0;
 private long count_repeat;
 private bool nocompare;
 
-private import amqp_messages;
+private import libdbus_client;
 
-char[] hostname;
-int port;
-char[] vhost;
-char[] login;
-char[] passw;
-char[] exchange;
+char[] dbus_semargl_service_name;
+
 private long count_send_messages = 0;
-amqp_messages client;
+libdbus_client client;
 
 class autotest
 {
 	char[] message_log_file_name;
 
-	this(char[] _message_log_file_name, long _count_repeat, bool _nocompare, char[] _hostname, int _port, char[] _vhost, char[] _exchange,
-			char[] _login, char[] _passw)
+	this(char[] _message_log_file_name, long _count_repeat, bool _nocompare, char[] _dbus_semargl_service_name)
 	{
-		hostname = _hostname;
-		port = _port;
-		vhost = _vhost;
-		login = _login;
-		passw = _passw;
-		exchange = _exchange;
+		dbus_semargl_service_name = _dbus_semargl_service_name;
 
 		count_repeat = _count_repeat;
 		nocompare = _nocompare;
@@ -49,10 +39,18 @@ class autotest
 
 	public void prepare_file()
 	{
-		client = new amqp_messages(hostname, port, vhost, exchange, login, passw);
+		client = new libdbus_client();
+		client.setServiceName("autotest");
+		client.setListenFrom ("semarglA");
 		log.trace("create client");
 		client.connect();
+		
+		client.set_callback(&get_message);
 
+		Thread thread = new Thread(&client.listener);
+		thread.start;
+		Thread.sleep(0.250);
+		
 		log.trace("autotest run");
 
 		for(long i = 0; i < count_repeat; i++)
@@ -62,18 +60,20 @@ class autotest
 
 		log.trace("autotest listen end, count commands: {}", count_commands);
 
-		client.close();
+		//		client.close();
 
 	}
 
 }
 
-void get_message(byte* message, ulong message_size)
+void get_message(byte* message, ulong message_size, mom_client from_client)
 {
-	log.trace("get_message, size={}", message_size);
 	char* msg = cast(char*) message;
-
+	//		log.trace("get message {}", msg[0 .. message_size]);
+	printf ("\nget message !%s!\n", message);	
 }
+
+char[] reply_to_template = "<magnet-ontology/transport/message#reply_to>";
 
 void prepare_block(char* line, ulong line_length)
 {
@@ -154,46 +154,57 @@ void prepare_block(char* line, ulong line_length)
 
 private void message_sender(char* message, long size)
 {
-	//	log.trace("send message {}", message[0 .. size]);
 
-	char[] str_template = "<magnet-ontology/transport/message#reply_to>";
+	char* reply_to_start = strstr(message, reply_to_template.ptr) + reply_to_template.length;
+	//	char* reply_to_end = strstr(reply_to_start, "\".".ptr);	
 
-	char* reply_to_start = strstr(message, str_template.ptr) + str_template.length + 1;
-	char* reply_to_end = strstr(reply_to_start, "\".".ptr);
-	char[] reply_to = reply_to_start[0 .. (reply_to_end - reply_to_start)];
+	if(reply_to_start !is null)
+	{
+		strcpy(reply_to_start, "\"autotest\".".ptr);
+	}
+
+//	log.trace("send message {}", message[0 .. size]);
+
+	//	char* reply_to_start = strstr(message, reply_to_template.ptr) + reply_to_template.length + 1;
+	//	char* reply_to_end = strstr(reply_to_start, "\".".ptr);
+	//	char[] reply_to = reply_to_start[0 .. (reply_to_end - reply_to_start)];
 	//	reply_to[reply_to_end - reply_to_start] = 0;
 
-	if(reply_to !is null)
-	{
-		char[] qqq = "semargl-a";
+//	if(reply_to !is null)
+//	{
+//		char[] qqq = "semarglA";
 
 		size = strlen(message);
 
-//		log.trace("set reply_to={}", reply_to);
-//		Stdout.format("set reply_to={}", reply_to).newline;
-		client.set_listen_queue (reply_to);
-		(new Thread(&client.listen)).start;
-//        Thread.sleep(0.250);
+		//		log.trace("set reply_to={}", reply_to);
+		//		Stdout.format("set reply_to={}", reply_to).newline;
+		//@		client.set_listen_queue (reply_to);
+		//@		(new Thread(&client.listen)).start;
+		//        Thread.sleep(0.250);
 
 		//		printf("\nmessage: %s\n", message);
 		count_send_messages++;
-//		log.trace("send message");
-//		Stdout.format("send message {}", count_send_messages).newline;
-		client.send(qqq, message);
-		
-//		log.trace("wait reply message");
-//		Stdout.format("wait reply message").newline;
-		while (client.result_out is null) {Thread.yield();};
-//		log.trace("get reply message = {}", client.result_out);
-//		Stdout.format("get reply message = {}", client.result_out).newline;
-//		printf("\nout message: %s\n", client.result_out);
-		client.result_out = null;
-				
-		
+		//		log.trace("send message");
+		//		Stdout.format("send message {}", count_send_messages).newline;
+		client.send(dbus_semargl_service_name.ptr, message);
 
-//		client.listen (reply_to);
-//		log.trace("listen ok");
+//				printf("\nmessage: %s\n", message);
+//		char* answer = client.get_message ();
+//		printf("\nanswer message: %s\n", answer);
+		
+		
+		
+		
+		//		log.trace("wait reply message");
+		//		Stdout.format("wait reply message").newline;
+		//@		while (client.result_out is null) {Thread.yield();};
+		//		log.trace("get reply message = {}", client.result_out);
+		//		Stdout.format("get reply message = {}", client.result_out).newline;
+		//		printf("\nout message: %s\n", client.result_out);
+		//@		client.result_out = null;
 
+		//		client.listen (reply_to);
+		//		log.trace("listen ok");
 
 		if(count_send_messages % 100 == 0)
 		{
@@ -202,5 +213,5 @@ private void message_sender(char* message, long size)
 
 		//		client.set_callback(&get_message);
 		//		client.listener();
-	}
+//	}
 }

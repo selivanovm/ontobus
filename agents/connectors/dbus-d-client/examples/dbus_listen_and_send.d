@@ -40,7 +40,7 @@ int main(char[][] args)
 	return 0;
 }
 
-void event_get_message(byte* txt, ulong size)
+void event_get_message(byte* txt, ulong size, mom_client from_client)
 {
 	count_recieve_messages++;
 	//	Stdout.format("message: \n{}", txt[0..size]).newline;
