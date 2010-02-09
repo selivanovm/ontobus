@@ -1,5 +1,7 @@
 module scripts.S09DocumentOfTemplate;
 
+private import Predicates;
+
 import TripleStorage;
 
 import RightTypeDef;
@@ -20,7 +22,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	}
 
 	byte* template_triple;
-	uint* facts = ts.getTriples(elementId, "magnet-ontology/documents#template_id", null);
+	uint* facts = ts.getTriples(elementId, DOCUMENT_TEMPLATE_ID.ptr, null);
 	if(facts !is null)
 	{
 		template_triple = cast(byte*) *facts;

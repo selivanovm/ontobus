@@ -1,5 +1,7 @@
 module scripts.S01AllLoggedUsersCanCreateDocuments;
 
+private import Predicates;
+
 import RightTypeDef;
 import TripleStorage;
 private import tango.io.Stdout;

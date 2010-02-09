@@ -1,5 +1,7 @@
 module scripts.S11ACLRightsHierarhical;
 
+private import Predicates;
+
 import RightTypeDef;
 import TripleStorage;
 private import tango.io.Stdout;
@@ -91,7 +93,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 				char* s = cast(char*) triple3 + 6;
 				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
 
-				uint* category_triples = ts.getTriples(s, "magnet-ontology/authorization/acl#category", null);
+				uint* category_triples = ts.getTriples(s, CATEGORY.ptr, null);
 				if(category_triples !is null)
 				{
 					byte* category_triple = cast(byte*) *category_triples;
@@ -107,7 +109,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 					}
 				}
 
-				if(strcmp(p, "magnet-ontology/authorization/acl#rights") == 0)
+				if(strcmp(p, RIGHTS.ptr) == 0)
 				{
 					// проверим, есть ли тут требуемуе нами право
 					char* triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);

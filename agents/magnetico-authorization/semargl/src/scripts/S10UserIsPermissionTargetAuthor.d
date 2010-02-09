@@ -1,5 +1,7 @@
 module scripts.S10UserIsPermissionTargetAuthor;
 
+private import Predicates;
+
 private import TripleStorage;
 private import tango.io.Stdout;
 private import Log;
@@ -66,7 +68,7 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 				//log.trace("getObjectAuthor #4");
 				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
 				//log.trace("getObjectAuthor #5");
-				if(strcmp(triple0_p, "http://purl.org/dc/elements/1.1/creator") == 0)
+				if(strcmp(triple0_p, CREATOR.ptr) == 0)
 				{
 					//log.trace("getObjectAuthor #6");
 					char* result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
@@ -99,7 +101,7 @@ private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 				//		log.trace("getRightRecordAuthor #4");
 				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
 				//				log.trace("getRightRecordAuthor #5");
-				if(strcmp(triple0_p, "magnet-ontology/authorization/acl#authorSubsystemElement") == 0)
+				if(strcmp(triple0_p, AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
 				{
 					char* result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
 					//					log.trace("getRightRecordAuthor #RESULT {}", fromStringz(result));

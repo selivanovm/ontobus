@@ -1,3 +1,6 @@
+module autotest;
+
+private import Predicates;
 private import mom_client;
 private import Log;
 private import tango.io.File;
@@ -109,19 +112,17 @@ void prepare_block(char* line, ulong line_length)
 
 	//	printf("\nOUTPUT: %s\n", output_data);
 
-	if(strstr(input_data, "magnet-ontology/authorization/functions#create") !is null && strstr(input_data, "<>") !is null && output_data !is null)
+	if(strstr(input_data, CREATE.ptr) !is null && strstr(input_data, "<>") !is null && output_data !is null)
 	{
 		//		printf("\nINPUT %d: %s\n", size, input_data);
 
 		//		printf("\nOUTPUT: %s\n", output_data);
 
 		// это команда на создание записи авторизации
-
-		char[] result_id_tag = "<magnet-ontology/transport#result:data>";
 		
-		char* result_id = strstr(output_data, result_id_tag.ptr);
+		char* result_id = strstr(output_data, result_data_header.ptr);
 		if(result_id !is null)
-			result_id += result_id_tag.length;
+			result_id += result_data_header.length;
 
 		int size_id = strlen(result_id) - 2;
 		char[] result_id_text = result_id[1 .. size_id];

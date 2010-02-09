@@ -1,5 +1,7 @@
 module server;
 
+private import Predicates;
+
 private import tango.core.Thread;
 private import tango.io.Console;
 private import tango.stdc.string;
@@ -84,13 +86,13 @@ void main(char[][] args)
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
-	az = new Authorization();
+	char[][char[]] props = load_props();
+
+	az = new Authorization(props);
 
 	if(autotest_file is null)
 	{
 		log.trace("no autotest mode");
-
-		char[][char[]] props = load_props();
 
 		char[] hostname = props["amqp_server_address"] ~ "\0";
 
@@ -262,62 +264,55 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				//				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), toString(
 				//						cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 
-				if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#put") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
+				if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
 				{
 					put_id = i;
 					//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
 				}
 				else
 				{
-					if(arg_id < 0 && strcmp(fact_p[i], "magnet-ontology/transport#argument") == 0)
+					if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
 					{
 						arg_id = i;
 						//						Stdout.format("found comand {}, id ={} ", getString(fact_p[i]), i);
 					}
 					else
 					{
-						if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], "magnet-ontology#delete_subjects_by_predicate") == 0 && strcmp(
-								fact_p[i], "magnet-ontology#subject") == 0)
+						if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS_BY_PREDICATE.ptr) == 0 && strcmp(
+								fact_p[i], SUBJECT.ptr) == 0)
 						{
 							delete_subjects_by_predicate_id = i;
 							//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
 						}
 						else
 						{
-							if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology#get") == 0 && strcmp(fact_p[i], "magnet-ontology#subject") == 0)
+							if(get_id < 0 && strcmp(fact_o[i], GET.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
 							{
 								get_id = i;
 								Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
 							}
 							else
 							{
-								if(delete_subjects_id < 0 && strcmp(fact_o[i], "magnet-ontology#delete_subjects") == 0 && strcmp(fact_p[i],
-										"magnet-ontology#subject") == 0)
+								if(delete_subjects_id < 0 && strcmp(fact_o[i], SUBJECT.ptr) == 0 && strcmp(fact_p[i],
+										SUBJECT.ptr) == 0)
 								{
 									delete_subjects_id = i;
 									log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 								}
 								else
 								{
-									if(get_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#get_authorization_rights_records") == 0 && strcmp(
-											fact_p[i], "magnet-ontology#subject") == 0)
+									if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0 && strcmp(
+											fact_p[i], SUBJECT.ptr) == 0)
 									{
 										get_authorization_rights_records_id = i;
 										//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 									}
 									else
 									{
-										if(add_delegates_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#add_delegates") == 0 && strcmp(
-												fact_p[i], "magnet-ontology#subject") == 0)
-										{
-											add_delegates_id = i;
-											//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-										}
-										else
-										{
+										
 											if(get_delegate_assigners_tree_id < 0 && strcmp(fact_o[i],
-													"magnet-ontology/authorization/functions#get_delegate_assigners_tree") == 0 && strcmp(fact_p[i],
-													"magnet-ontology#subject") == 0)
+													GET_DELEGATE_ASSIGNERS_TREE.ptr) == 0 && strcmp(fact_p[i],
+													SUBJECT.ptr) == 0)
 											{
 												get_delegate_assigners_tree_id = i;
 												//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
@@ -325,14 +320,14 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 											else
 											{
 												if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0 && strcmp(fact_p[i],
-														"magnet-ontology#subject") == 0)
+														SUBJECT.ptr) == 0)
 												{
 													agent_function_id = i;
 												}
 												else
 												{
-													if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology/authorization/functions#create") == 0 && strcmp(
-															fact_p[i], "magnet-ontology#subject") == 0)
+													if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0 && strcmp(
+															fact_p[i], SUBJECT.ptr) == 0)
 													{
 														create_id = i;
 														put_id = i;
@@ -341,7 +336,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 											}
 
-										}
+										
 									}
 								}
 							}
@@ -409,7 +404,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				{
 					if(strlen(fact_o[i]) > 0)
 					{
-						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 						{
 							reply_to_id = i;
 						}
@@ -439,8 +434,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
-				result_ptr += 41;
+				strcpy(result_ptr, result_data_header.ptr);
+				result_ptr += result_data_header.length;
 
 				if(list_facts !is null)
 				{
@@ -485,8 +480,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				result_ptr += 3;
 				strcpy(result_ptr, command_uid);
 				result_ptr += strlen(command_uid);
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".");
-				result_ptr += 46;
+				strcpy(result_ptr, result_state_ok_header.ptr);
+				result_ptr += result_state_ok_header.length;
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -502,7 +497,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				{
 					if(strlen(fact_o[i]) > 0)
 					{
-						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 						{
 							reply_to_id = i;
 						}
@@ -517,8 +512,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-				result_ptr += 47;
+				strcpy(result_ptr, result_state_ok_header.ptr);
+				result_ptr += result_state_ok_header.length;
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -545,7 +540,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 					if(strlen(fact_o[i]) > 0)
 					{
-						if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 						{
 							reply_to_id = i;
 						}
@@ -572,8 +567,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-				result_ptr += 47;
+				strcpy(result_ptr, result_state_ok_header.ptr);
+				result_ptr += result_state_ok_header.length;
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -600,7 +595,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				int element_id = -1;
 				for(int i = 0; i < count_facts; i++)
 				{
-					if(strcmp("magnet-ontology/authorization/acl#elementId", fact_p[i]) == 0)
+					if(strcmp(ELEMENT_ID.ptr, fact_p[i]) == 0)
 					{
 						element_id = i;
 						break;
@@ -615,7 +610,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					if(element_id >= 0)
 					{
 						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
-						uint* founded_facts = az.getTripleStorage.getTriples(null, "magnet-ontology/authorization/acl#elementId", fact_o[element_id]);
+						uint* founded_facts = az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr, fact_o[element_id]);
 						if(founded_facts !is null)
 						{
 							bool is_exists_not_null = false;
@@ -632,10 +627,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 									for(int i = 0; i < count_facts; i++)
 									{
 										if(i != element_id && is_fact_in_object[i] == arg_id && (strcmp(fact_p[i],
-												"magnet-ontology/authorization/acl#targetSubsystemElement") == 0 || strcmp(fact_p[i],
-												"magnet-ontology/authorization/acl#category") == 0 || strcmp(fact_p[i],
-												"magnet-ontology/authorization/acl#rights") == 0 || strcmp(fact_p[i],
-												"magnet-ontology/authorization/acl#authorSystem") == 0))
+												TARGET_SUBSYSTEM_ELEMENT.ptr) == 0 || strcmp(fact_p[i],
+												CATEGORY.ptr) == 0 || strcmp(fact_p[i],
+												RIGHTS.ptr) == 0 || strcmp(fact_p[i],
+												AUTHOR_SYSTEM.ptr) == 0))
 										{
 											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
 											//  getString(fact_o[i]));
@@ -691,7 +686,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				for(int i = 0; i < count_facts; i++)
 				{
-					if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+					if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 					{
 						reply_to_id = i;
 					}
@@ -726,8 +721,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok");
-				result_ptr += 44;
+				strcpy(result_ptr, result_state_ok_header.ptr);
+				result_ptr += result_state_ok_header.length;
 
 				if(uuid !is null)
 				{
@@ -735,8 +730,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					result_ptr += 3;
 					strcpy(result_ptr, command_uid);
 					result_ptr += strlen(command_uid);
-					strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
-					result_ptr += 41;
+					strcpy(result_ptr, result_data_header.ptr);
+					result_ptr += result_data_header.length;
 					strcpy(result_ptr, uuid);
 					result_ptr += 16;
 				}
@@ -760,7 +755,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
 			// AUTHORIZE
-			if(strcmp(fact_o[0], "magnet-ontology/authorization/functions#authorize") == 0 && strcmp(fact_p[0], "magnet-ontology#subject") == 0)
+			if(strcmp(fact_o[0], AUTHORIZE.ptr) == 0 && strcmp(fact_p[0], SUBJECT.ptr) == 0)
 			{
 				log.trace("function authorize");
 
@@ -793,27 +788,27 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				{
 					for(int i = 0; i < count_facts; i++)
 					{
-						if(strcmp(fact_p[i], "magnet-ontology/transport#set_from") == 0)
+						if(strcmp(fact_p[i], SET_FROM.ptr) == 0)
 						{
 							from_id = i;
 						}
-						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#rights") == 0)
+						else if(strcmp(fact_p[i], RIGHTS.ptr) == 0)
 						{
 							right_id = i;
 						}
-						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#category") == 0)
+						else if(strcmp(fact_p[i], CATEGORY.ptr) == 0)
 						{
 							category_id = i;
 						}
-						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#targetSubsystemElement") == 0)
+						else if(strcmp(fact_p[i], TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
 						{
 							targetId_id = i;
 						}
-						else if(strcmp(fact_p[i], "magnet-ontology/authorization/acl#elementId") == 0)
+						else if(strcmp(fact_p[i], ELEMENT_ID.ptr) == 0)
 						{
 							elements_id = i;
 						}
-						else if(strcmp(fact_p[i], "magnet-ontology/transport/message#reply_to") == 0)
+						else if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 						{
 							reply_to_id = i;
 						}
@@ -870,8 +865,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
-				strcpy(result_ptr, "><magnet-ontology/transport#result:data>\"");
-				result_ptr += 41;
+				strcpy(result_ptr, result_data_header.ptr);
+				result_ptr += result_data_header.length;
 
 				time_calculate_right.start;
 
@@ -963,8 +958,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				result_ptr += 3;
 				strcpy(result_ptr, command_uid);
 				result_ptr += strlen(command_uid);
-				strcpy(result_ptr, "><magnet-ontology/transport#result:state>\"ok\".\0");
-				result_ptr += 47;
+				strcpy(result_ptr, result_state_ok_header.ptr);
+				result_ptr += result_state_ok_header.length;
 
 				time = elapsed.stop;
 

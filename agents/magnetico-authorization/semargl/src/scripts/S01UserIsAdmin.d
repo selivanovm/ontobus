@@ -1,5 +1,7 @@
 module scripts.S01UserIsAdmin;
 
+private import Predicates;
+
 private import TripleStorage;
 private import tango.io.Stdout;
 private import tango.stdc.stringz;
@@ -40,7 +42,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 public bool isAdmin(char* user, TripleStorage ts)
 {
 
-	uint* iterator0 = ts.getTriples(user, "magnet-ontology/authorization/functions#is_admin", "true");
+	uint* iterator0 = ts.getTriples(user, IS_ADMIN.ptr, "true");
 	
 	if(iterator0 != null)
 		return true;

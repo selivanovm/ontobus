@@ -1,5 +1,7 @@
 module scripts.S05InDocFlow;
 
+private import Predicates;
+
 import RightTypeDef;
 import TripleStorage;
 import tango.stdc.stringz;
@@ -11,7 +13,7 @@ private import Log;
 public int calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
 
-	uint* iterator = ts.getTriples(null, "magnet-ontology/authorization/acl#elementId", elementId);
+	uint* iterator = ts.getTriples(null, ELEMENT_ID.ptr, elementId);
 	char* ACL_subject;
 
 	bool is_in_docflow = false;
@@ -25,7 +27,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 	    if(triple !is null)
 	      {
 		ACL_subject = cast(char*) triple + 6;
-		uint* iterator1 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#authorSystem", "DOCFLOW");
+		uint* iterator1 = ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
 
 		if(iterator1 !is null) // если не null, значит право с найденным субъектом создал документооборот
 		  {
@@ -36,7 +38,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 
 			  is_in_docflow = true;			  
 
-		    uint* iterator2 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#targetSubsystemElement", user);
+		    uint* iterator2 = ts.getTriples(ACL_subject, TARGET_SUBSYSTEM_ELEMENT.ptr, user);
 		    if(iterator2 !is null) // если не null, значит target для права это наш user
 		      {
 
@@ -45,7 +47,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 			log.trace("isInDocFlow #2 {}", fromStringz(subject1));
 
 
-			uint* iterator3 = ts.getTriples(ACL_subject, "magnet-ontology/authorization/acl#rights", null);
+			uint* iterator3 = ts.getTriples(ACL_subject, RIGHTS.ptr, null);
 			if(iterator3 !is null) 
 			  {
 			    
