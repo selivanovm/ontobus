@@ -70,20 +70,4 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	}
 	return false;
 
-	/*		
-	 
-	 // найдем для этого автора группу
-	 def authorId = document.authorId;
-	 log.debug('AuthorId:'+authorId+' userId: '+ticket.userId+'.')
-	 
-	 if (ticket.userId == authorId){
-	 if ((null!=document.documentDraftId)&&((RightType.DELETE == rightType)||(RightType.WRITE == rightType))) {
-	 return false
-	 } else {
-	 return true
-	 }
-	 }    	
-	 return false  
-	 }
-	 */
 }

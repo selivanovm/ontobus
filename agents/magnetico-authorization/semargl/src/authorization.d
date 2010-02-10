@@ -75,7 +75,8 @@ class Authorization
 		i_know_predicates[d++] = AUTHOR_SYSTEM; 
 		//      - "user"/routeName
 		i_know_predicates[d++] = AUTHOR_SUBSYSTEM; 
-		i_know_predicates[d++] = AUTHOR_SUBSYSTEM_ELEMENT; // - id user or id route.
+		//		 - id user or id route.
+		i_know_predicates[d++] = AUTHOR_SUBSYSTEM_ELEMENT; 
 		i_know_predicates[d++] = TARGET_SYSTEM; //           - система, для которой выдали права, "BA"/"DOCFLOW".
 
 		i_know_predicates[d++] = TARGET_SUBSYSTEM; //       - "user"/"department".
@@ -100,7 +101,7 @@ class Authorization
 		// ORGANIZATION
 		i_know_predicates[d++] = HAS_PART;
 		i_know_predicates[d++] = MEMBER_OF;
-//		i_know_predicates[d++] = "magnet-ontology#loginName";
+		i_know_predicates[d++] = IS_ADMIN;
 
 		i_know_predicates[d++] = DOCUMENT_TEMPLATE_ID;
 
@@ -251,6 +252,8 @@ class Authorization
 			//counters[0]++;
 			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || 
 				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+
+			log.trace("autorize:S01UserIsAdmin res={}", calculatedRight);
 		}
 
 		int is_in_docflow = -1;
@@ -264,11 +267,15 @@ class Authorization
 				return true;
 			}
 			else 
+			{
 				if (is_in_docflow == 0)
 				{
 					//counters[2]++;
 					return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 				}
+				
+				log.trace("autorize:S05InDocFlow res={}", calculatedRight);
+			}
 		}
 
 		if(targetRightType == RightType.CREATE && 
@@ -282,7 +289,7 @@ class Authorization
 				//counters[3]++;
 				return true;
 			}
-			//log.trace("autorize end#0, return:[{}]", calculatedRight);
+			log.trace("autorize:S01AllLoggedUsersCanCreateDocuments res={}", calculatedRight);
 		}
 
 		if(strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
@@ -290,7 +297,7 @@ class Authorization
 		{
 			//counters[4]++;
 			return true;
-			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
+			log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
@@ -298,7 +305,7 @@ class Authorization
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-				//log.trace("autorize end#2, return:[false]");
+				log.trace("autorize end#2, return:[false]");
 			//counters[5]++;
 			return false;
 		}
@@ -308,14 +315,14 @@ class Authorization
 			//counters[6]++;
 			return true;
 		}
-			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			//counters[7]++;
 			return true;
 		}
-				//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+				log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 		
 		
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);

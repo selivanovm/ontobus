@@ -853,7 +853,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				char*[] hierarhical_departments = null;
 				hierarhical_departments = getDepartmentTreePathOfUser(user, az.getTripleStorage());
-				// log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
+				log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
 
 				uint count_prepared_elements = 0;
 				uint count_authorized_doc = 0;
