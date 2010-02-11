@@ -19,6 +19,8 @@ private int count_commands = 0;
 private long count_repeat;
 private bool nocompare;
 
+private static mom_client im;
+
 class autotest: mom_client
 {
 	char[] message_log_file_name;
@@ -29,7 +31,7 @@ class autotest: mom_client
 		nocompare = _nocompare;
 		message_log_file_name = _message_log_file_name;
 		log.trace("open message_log file [{}]", message_log_file_name);
-
+		im = this;
 	}
 
 	void set_callback(void function(byte* txt, ulong size, mom_client from_client) _message_acceptor)
@@ -39,18 +41,18 @@ class autotest: mom_client
 
 	int send(char* routingkey, char* messagebody)
 	{
-		//		printf("\nOUTPUT: %s\n", output_data);
-		log.trace("prepare block #5");
 
 		if(nocompare == false && strcmp(messagebody, output_data) != 0)
 		{
+			printf("\nCOMPARE OUTPUT message from file: %s\n", output_data);
+			printf("\nCOMPARE OUTPUT message accepted : %s\n", messagebody);
 			log.trace("out messages\r\n[{}]", fromStringz(messagebody));
 			log.trace("not compare with original \r\n[{}]", fromStringz(output_data));
 			throw new Exception("out messages not compare with original");
 
 		}
 		
-		log.trace("prepare block #6");
+//		log.trace("prepare block #6");
 		return 0;
 	}
 	
@@ -80,7 +82,7 @@ void prepare_block(char* line, ulong line_length)
 	if(end_io_block !is null)
 		*end_io_block = 0;
 	
-//	log.trace("read new block {}", line[0 .. (end_io_block-line)]);
+	log.trace("read new block {}", line[0 .. (end_io_block-line)]);
 	
 	char* input_data = strstr(line, "INPUT");
 
@@ -90,6 +92,12 @@ void prepare_block(char* line, ulong line_length)
 	}
 
 	output_data = strstr(input_data, "OUTPUT");
+	
+	if (output_data is null)
+	{
+		printf("\nINPUT %s\n", input_data);
+		throw new Exception ("OUTPUT message not found");
+	}
 	
 	if(output_data !is null)
 	{
@@ -108,15 +116,17 @@ void prepare_block(char* line, ulong line_length)
 	if (size < 0)
 		throw new Exception ("autotest:prepare_block, size < 0");
 	
-	//	printf("\nINPUT %d: %s\n", size, input_data);
+//		printf("\nINPUT %d: %s\n", size, input_data);
 
-	//	printf("\nOUTPUT: %s\n", output_data);
+//		printf("\nOUTPUT: %s\n", output_data);
+		
 
 	if(strstr(input_data, CREATE.ptr) !is null && strstr(input_data, "<>") !is null && output_data !is null)
 	{
-		//		printf("\nINPUT %d: %s\n", size, input_data);
+		log.trace("#i1 result_data_header={}", result_data_header);
+//				printf("\nINPUT %d: %s\n", size, input_data);
 
-		//		printf("\nOUTPUT: %s\n", output_data);
+//				printf("\nOUTPUT: %s\n", output_data);
 
 		// это команда на создание записи авторизации
 		
@@ -124,9 +134,16 @@ void prepare_block(char* line, ulong line_length)
 		if(result_id !is null)
 			result_id += result_data_header.length;
 
+		printf("\nresult_id: %s\n", result_id);
+		log.trace("#i1-1 result_id = {}", result_id);
+
 		int size_id = strlen(result_id) - 2;
+		log.trace("#i1-2");
 		char[] result_id_text = result_id[1 .. size_id];
+		log.trace("#i1-3");
 		char[] qqq = input_data[0 .. size];
+		log.trace("#i1-4");
+		
 
 		//		auto rr = Regex(result_id_text).replaceAll ("<>", "<" ~ result_id_text ~ ">");
 		//		printf("\nresult: %s\n", rr.ptr);
@@ -137,13 +154,17 @@ void prepare_block(char* line, ulong line_length)
 			input_data_text.select("<>");
 			input_data_text.replace("<" ~ result_id_text ~ ">");
 		}
+		log.trace("#i1-5");
 
 		input_data = toStringz(input_data_text.toString());
 		size = strlen(input_data);
 
-		//		printf("\nresult: %s\n", input_data);
+//				printf("\nresult: %s\n", input_data);
+		log.trace("#i2");
 	}
 	
-	message_acceptor(cast(byte*) input_data, size, null);
+	log.trace("message_acceptor #in");
+	message_acceptor(cast(byte*) input_data, size, im);
+	log.trace("message_acceptor #out");
 	count_commands++;
 }

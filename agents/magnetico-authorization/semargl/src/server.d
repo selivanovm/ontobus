@@ -41,6 +41,7 @@ private import tango.text.locale.Locale;
 //private import tango.text.convert.Integer;
 
 private Authorization az = null;
+public char[][char[]] props;
 
 private char* result_buffer = null;
 private char* queue_name = null;
@@ -86,7 +87,7 @@ void main(char[][] args)
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
-	char[][char[]] props = load_props();
+	props = load_props();
 
 	az = new Authorization(props);
 
@@ -161,7 +162,7 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom
 	auto elapsed = new StopWatch();
 	double time;
 
-	log.trace("queue_name:{}", getString(queue_name));
+	log.trace("send to queue {}", fromStringz (queue_name));
 	elapsed.start;
 	from_client.send(queue_name, result_buffer);
 
@@ -293,7 +294,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							}
 							else
 							{
-								if(delete_subjects_id < 0 && strcmp(fact_o[i], SUBJECT.ptr) == 0 && strcmp(fact_p[i],
+								if(delete_subjects_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS.ptr) == 0 && strcmp(fact_p[i],
 										SUBJECT.ptr) == 0)
 								{
 									delete_subjects_id = i;
@@ -482,7 +483,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				result_ptr += strlen(command_uid);
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
-
+				*(result_ptr - 1) = 0;
+				
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
@@ -514,6 +516,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				result_ptr += strlen(command_uid) + 1;
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
+				*(result_ptr - 1) = 0;
 
 				strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -521,7 +524,6 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				//				uint* SET = az.getTripleStorage.getTriples(null, null, "45fd1447ef7a46c9ac08b73cddc776d4");
 				//				fact_tools.print_list_triple(SET);
-
 			}
 
 			if(delete_subjects_by_predicate_id >= 0 && arg_id > 0)
@@ -569,7 +571,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				result_ptr += strlen(command_uid) + 1;
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
-
+				*(result_ptr - 1) = 0;
+				
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
@@ -701,8 +704,15 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						{
 							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
 									cast(char*) fact_o[i]));
-							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							try
+							{
+							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							}
+							catch (IndexException ex)
+							{
+								throw new Exception ("message - add triple");
+							}
 						}
 						catch(Exception ex)
 						{
@@ -722,7 +732,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(result_ptr + 1, command_uid);
 				result_ptr += strlen(command_uid) + 1;
 				strcpy(result_ptr, result_state_ok_header.ptr);
-				result_ptr += result_state_ok_header.length;
+				result_ptr += result_state_ok_header.length - 1;
 
 				if(uuid !is null)
 				{
@@ -960,7 +970,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				result_ptr += strlen(command_uid);
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
-
+				*(result_ptr - 1) = 0;
+				
 				time = elapsed.stop;
 
 				log.trace("count auth in count docs={}, authorized count docs={}", count_prepared_elements, count_authorized_doc);

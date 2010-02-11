@@ -22,6 +22,10 @@ private
 }
 private
 {
+    import IndexException;
+}
+private
+{
     import Log;
 }
 class HashMap
@@ -29,6 +33,10 @@ class HashMap
     private
 {
     uint max_count_elements = 1000;
+}
+    private
+{
+    uint count_element = 0;
 }
     private
 {
@@ -79,6 +87,20 @@ class HashMap
 {
     void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o);
 }
+    public
+{
+    uint get_count_elements()
+{
+return count_element;
+}
+}
+    public
+{
+    char[] getName()
+{
+return hashName;
+}
+}
     private
 {
     void dump_mem(ubyte[] mem, uint ptr);
@@ -96,6 +118,10 @@ current_list_of_list_V_iterator += max_size_short_order;
 return null;
 }
 }
+    private
+{
+    void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr);
+}
 }
 private
 {
@@ -112,10 +138,6 @@ private
 private
 {
     uint ptr_from_mem(ubyte[] mem, uint ptr);
-}
-private
-{
-    void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr);
 }
 private
 {

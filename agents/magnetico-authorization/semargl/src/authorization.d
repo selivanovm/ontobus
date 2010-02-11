@@ -5,8 +5,11 @@ private import Predicates;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import tango.stdc.stdlib;
+private import tango.io.FileConduit;
+private import tango.io.stream.MapStream;
 
-//import Integer = tango.text.convert.Integer;
+import Integer = tango.text.convert.Integer;
+
 version(tango_99_8)
 {
 	private import tango.io.device.File;
@@ -72,11 +75,11 @@ class Authorization
 		//		 запись о праве, данная часть ACL требует переработки!
 
 		//      - система выдающая право, "BA"/"DOCFLOW"
-		i_know_predicates[d++] = AUTHOR_SYSTEM; 
+		i_know_predicates[d++] = AUTHOR_SYSTEM;
 		//      - "user"/routeName
-		i_know_predicates[d++] = AUTHOR_SUBSYSTEM; 
+		i_know_predicates[d++] = AUTHOR_SUBSYSTEM;
 		//		 - id user or id route.
-		i_know_predicates[d++] = AUTHOR_SUBSYSTEM_ELEMENT; 
+		i_know_predicates[d++] = AUTHOR_SUBSYSTEM_ELEMENT;
 		i_know_predicates[d++] = TARGET_SYSTEM; //           - система, для которой выдали права, "BA"/"DOCFLOW".
 
 		i_know_predicates[d++] = TARGET_SUBSYSTEM; //       - "user"/"department".
@@ -96,7 +99,7 @@ class Authorization
 		// document
 		i_know_predicates[d++] = CREATOR; // - создатель объекта(документа, типа документа, справочника)
 		i_know_predicates[d++] = SUBJECT;
-//		i_know_predicates[d++] = "magnet-ontology#typeName";
+		//		i_know_predicates[d++] = "magnet-ontology#typeName";
 
 		// ORGANIZATION
 		i_know_predicates[d++] = HAS_PART;
@@ -117,68 +120,121 @@ class Authorization
 
 	private void init(char[][char[]] props)
 	{
-		log.trace("authorization init..");
-		Stdout.format("authorization init..").newline;
-
-		ts = new TripleStorage(atoi(props["index_spo_count"].ptr), atoi(props["index_spo_short_order"].ptr), atoi(props["index_spo_key_area"].ptr));
-		ts.set_new_index(idx_name.S, atoi(props["index_s_count"].ptr), atoi(props["index_s_short_order"].ptr), atoi(props["index_s_key_area"].ptr));
-		ts.set_new_index(idx_name.O, atoi(props["index_o_count"].ptr), atoi(props["index_o_short_order"].ptr), atoi(props["index_o_key_area"].ptr));
-		ts.set_new_index(idx_name.PO, atoi(props["index_po_count"].ptr), atoi(props["index_po_short_order"].ptr), atoi(props["index_po_key_area"].ptr));
-		ts.set_new_index(idx_name.SP, atoi(props["index_sp_count"].ptr), atoi(props["index_sp_short_order"].ptr), atoi(props["index_sp_key_area"].ptr));
-		ts.set_new_index(idx_name.S1PPOO, atoi(props["index_s1ppoo_count"].ptr), atoi(props["index_s1ppoo_short_order"].ptr), atoi(props["index_s1ppoo_key_area"].ptr));
-
-		ts.setPredicatesToS1PPOO(TARGET_SUBSYSTEM_ELEMENT, ELEMENT_ID, RIGHTS);
-
-//		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
-//				"magnet-ontology/authorization/acl#rights");
-
-
-		pp = TARGET_SUBSYSTEM_ELEMENT ~ ELEMENT_ID;
-		//
-
-		char[] root = ".";
-		log.trace("Scanning '{}'", root);
-
-		auto scan = (new FileScan)(root, ".n3");
-		log.trace("\n{} Folders\n", scan.folders.length);
-		foreach(folder; scan.folders)
-			log.trace("{}\n", folder);
-		log.trace("\n{0} Files\n", scan.files.length);
-
-		foreach(file; scan.files)
+		try
 		{
-			log.trace("{}\n", file);
-			load_from_file(file, i_know_predicates, ts);
+			log.trace("authorization init..");
+			Stdout.format("authorization init..").newline;
+
+			ts = new TripleStorage(atoi(props["index_SPO_count"].ptr), atoi(props["index_SPO_short_order"].ptr),
+					atoi(props["index_SPO_key_area"].ptr));
+			ts.set_new_index(idx_name.S, atoi(props["index_S_count"].ptr), atoi(props["index_S_short_order"].ptr),
+					atoi(props["index_S_key_area"].ptr));
+			ts.set_new_index(idx_name.O, atoi(props["index_O_count"].ptr), atoi(props["index_O_short_order"].ptr),
+					atoi(props["index_O_key_area"].ptr));
+			ts.set_new_index(idx_name.PO, atoi(props["index_PO_count"].ptr), atoi(props["index_PO_short_order"].ptr), atoi(
+					props["index_PO_key_area"].ptr));
+			ts.set_new_index(idx_name.SP, atoi(props["index_SP_count"].ptr), atoi(props["index_SP_short_order"].ptr), atoi(
+					props["index_SP_key_area"].ptr));
+			ts.set_new_index(idx_name.S1PPOO, atoi(props["index_S1PPOO_count"].ptr), atoi(props["index_S1PPOO_short_order"].ptr), atoi(
+					props["index_S1PPOO_key_area"].ptr));
+
+			ts.setPredicatesToS1PPOO(TARGET_SUBSYSTEM_ELEMENT, ELEMENT_ID, RIGHTS);
+
+			//		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
+			//				"magnet-ontology/authorization/acl#rights");
+
+			pp = TARGET_SUBSYSTEM_ELEMENT ~ ELEMENT_ID;
+			//
+
+			char[] root = ".";
+			log.trace("Scanning '{}'", root);
+
+			auto scan = (new FileScan)(root, ".n3");
+			log.trace("\n{} Folders\n", scan.folders.length);
+			foreach(folder; scan.folders)
+				log.trace("{}\n", folder);
+			log.trace("\n{0} Files\n", scan.files.length);
+
+			foreach(file; scan.files)
+			{
+				log.trace("{}\n", file);
+				load_from_file(file, i_know_predicates, ts);
+			}
+			log.trace("\n{} Errors", scan.errors.length);
+			foreach(error; scan.errors)
+				log.trace(error);
+
+			scan = (new FileScan)(root, ".n3log");
+			log.trace("\n{} Folders\n", scan.folders.length);
+			foreach(folder; scan.folders)
+				log.trace("{}\n", folder);
+			log.trace("\n{0} Files\n", scan.files.length);
+
+			FilePath[] fp = scan.files;
+
+			for(int i = fp.length - 1; i >= 0; i--)
+			{
+				log.trace("{}\n", fp[i]);
+				load_from_file(fp[i], i_know_predicates, ts);
+			}
+			log.trace("\n{} Errors", scan.errors.length);
+			foreach(error; scan.errors)
+				log.trace(error);
+
+			//		print_list_triple(ts.getTriples("record", null, null, false));
+
+			//		ts.removeTriple("record", "magnet-ontology#target", "92e57b6d-83e3-485f-8885-0bade363f759");
+
+			//		print_list_triple(ts.getTriples("record", null, null, false));
+
+			log.trace("authorization init ... ok");
+			Stdout.format("authorization init.. ok").newline;
+			
+			ts.print_stat ();			
 		}
-		log.trace("\n{} Errors", scan.errors.length);
-		foreach(error; scan.errors)
-			log.trace(error);
-
-		scan = (new FileScan)(root, ".n3log");
-		log.trace("\n{} Folders\n", scan.folders.length);
-		foreach(folder; scan.folders)
-			log.trace("{}\n", folder);
-		log.trace("\n{0} Files\n", scan.files.length);
-
-		FilePath[] fp = scan.files;
-		
-		for (int i = fp.length - 1; i >= 0; i--)
+		catch(IndexException ex)
 		{
-			log.trace("{}\n", fp[i]);
-			load_from_file(fp[i], i_know_predicates, ts);
+			if (ex.errCode == IndexException.errorCode.short_order_is_full)
+			{
+				char[] prop_name = "index_" ~ ex.idxName ~ "_short_order";
+				int short_order_param = atoi(props[prop_name].ptr);
+				
+				log.trace("prev short order param = {}", short_order_param);
+				Stdout.format("prev short order param = {}", short_order_param).newline;
+				short_order_param++;
+				log.trace("new short order param = {}", short_order_param);
+				Stdout.format("prev short order param = {}", short_order_param).newline;
+				props[prop_name] = Integer.toString(short_order_param); 				
+			}
+			if (ex.errCode == IndexException.errorCode.block_triple_area_is_full)
+			{
+				char[] prop_name = "index_" ~ ex.idxName ~ "_key_area";
+				int param = atoi(props[prop_name].ptr);
+				
+				log.trace("prev key area param = {}", param);
+				Stdout.format("prev key area param = {}", param).newline;
+				param += 1000*1024;
+				log.trace("prev key area param = {}", param);
+				Stdout.format("prev key area param = {}", param).newline;
+				
+				props[prop_name] = Integer.toString(param); 								
+			}
+				
+			FileConduit props_conduit;
+			auto props_path = new FilePath("./semargl.properties");
+			props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
+			auto output = new MapOutput!(char)(props_conduit.output);
+
+			output.append(props);
+			output.flush;
+			props_conduit.close;
+			
+			throw ex;
 		}
-		log.trace("\n{} Errors", scan.errors.length);
-		foreach(error; scan.errors)
-			log.trace(error);
-
-		//		print_list_triple(ts.getTriples("record", null, null, false));
-
-		//		ts.removeTriple("record", "magnet-ontology#target", "92e57b6d-83e3-485f-8885-0bade363f759");
-
-		//		print_list_triple(ts.getTriples("record", null, null, false));
-
-		log.trace("authorization init ... ok");
-		Stdout.format("authorization init.. ok").newline;
+		catch(Exception ex)
+		{
+			throw ex;
+		}
 	}
 
 	public void logginTriple(char command, char[] s, char[] p, char[] o)
@@ -204,7 +260,7 @@ class Authorization
 			auto style = File.ReadWriteOpen;
 			style.share = File.Share.Read;
 			style.open = File.Open.Append;
-			log_file = new File (log_path, style);
+			log_file = new File(log_path, style);
 		}
 
 		// так сделано из невозможности задать параметр из двух цифр в Util.layout
@@ -250,8 +306,8 @@ class Authorization
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
 			//counters[0]++;
-			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || 
-				scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments) || scripts.S10UserIsPermissionTargetAuthor.calculate(
+					User, authorizedElementId, targetRightType, ts);
 
 			log.trace("autorize:S01UserIsAdmin res={}", calculatedRight);
 		}
@@ -266,21 +322,20 @@ class Authorization
 				//counters[1]++;
 				return true;
 			}
-			else 
+			else
 			{
-				if (is_in_docflow == 0)
+				if(is_in_docflow == 0)
 				{
 					//counters[2]++;
 					return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 				}
-				
+
 				log.trace("autorize:S05InDocFlow res={}", calculatedRight);
 			}
 		}
 
-		if(targetRightType == RightType.CREATE && 
-		   (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || 
-		    (*authorizedElementId == '*' && strcmp(authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
+		if(targetRightType == RightType.CREATE && (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || (*authorizedElementId == '*' && strcmp(
+				authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
 
 		{
 
@@ -292,41 +347,41 @@ class Authorization
 			log.trace("autorize:S01AllLoggedUsersCanCreateDocuments res={}", calculatedRight);
 		}
 
-		if(strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
-		   scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
+		if(strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId,
+				targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
 		{
 			//counters[4]++;
 			return true;
-			log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
+		log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 
 		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
-			
+
 		if(iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-				log.trace("autorize end#2, return:[false]");
+			log.trace("autorize (authorizedElementCategory == DOCUMENT), return:[false]");
 			//counters[5]++;
 			return false;
 		}
 
-		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
+		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp,
+				authorizedElementCategory))
 		{
 			//counters[6]++;
 			return true;
 		}
-			log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
+		log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			//counters[7]++;
 			return true;
 		}
-				log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
-		
-		
+		log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
-			
+
 		//log.trace("autorize end#3, return:[{}]", calculatedRight);
 		//counters[8]++;
 		//		log.trace("# {} {} {} {} {} {} {} {} {}",  counters[0], counters[1], counters[2], counters[3], counters[4], counters[5], counters[6], counters[7], counters[8]);
@@ -334,7 +389,8 @@ class Authorization
 		return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer, mom_client from_client)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer,
+			mom_client from_client)
 	//, mom_client client)
 	{
 
@@ -419,7 +475,6 @@ class Authorization
 			}
 		}
 
-
 		//		uint* SET = ts.getTriples("6fcb52fc46889ba8", null, null);
 		//		fact_tools.print_list_triple(SET);
 
@@ -487,7 +542,7 @@ class Authorization
 			{
 				byte* triple = cast(byte*) *start_facts_set;
 				//				log.trace("# get_authorization_rights_records : triple = {:X4}", triple);
-				
+
 				if(triple !is null)
 				{
 					char* s = cast(char*) triple + 6;
@@ -512,14 +567,12 @@ class Authorization
 								char*
 										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
 
-								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
-										AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
+								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1, AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
 								{
 									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
 								}
-								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1,
-										TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
+								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1, TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
 								{
 									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
@@ -623,6 +676,8 @@ class Authorization
 		strcpy(result_ptr, command_uid);
 		result_ptr += strlen(command_uid);
 		strcpy(result_ptr, result_state_ok_header.ptr);
+		result_ptr += result_state_ok_header.length;
+		*(result_ptr - 1) = 0;
 
 		strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -636,7 +691,8 @@ class Authorization
 
 	}
 
-	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer, mom_client from_client)
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
+			mom_client from_client)
 	{
 
 		log.trace("команда на выборку делегировавших");
@@ -685,6 +741,8 @@ class Authorization
 		strcpy(result_ptr, command_uid);
 		result_ptr += strlen(command_uid);
 		strcpy(result_ptr, result_state_ok_header.ptr);
+		result_ptr += result_state_ok_header.length;
+		*(result_ptr - 1) = 0;		
 
 		//		client.send(queue_name, result_buffer);
 		send_result_and_logging_messages(queue_name, result_buffer, from_client);
