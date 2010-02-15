@@ -736,8 +736,9 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				if(uuid !is null)
 				{
-					strcpy(result_ptr, "\".<");
-					result_ptr += 3;
+//					strcpy(result_ptr, "\".<");
+					strcpy(result_ptr, "<");
+					result_ptr += 1;
 					strcpy(result_ptr, command_uid);
 					result_ptr += strlen(command_uid);
 					strcpy(result_ptr, result_data_header.ptr);

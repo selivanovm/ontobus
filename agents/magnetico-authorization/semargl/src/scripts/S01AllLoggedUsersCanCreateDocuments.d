@@ -1,10 +1,10 @@
 module scripts.S01AllLoggedUsersCanCreateDocuments;
 
-private import Predicates;
+private import tango.io.Stdout;
 
 import RightTypeDef;
 import TripleStorage;
-private import tango.io.Stdout;
+private import Predicates;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
