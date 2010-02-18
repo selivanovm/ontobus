@@ -2,10 +2,6 @@
 module TripleStorage;
 private
 {
-    import HashMap;
-}
-private
-{
     import tango.io.Stdout;
 }
 private
@@ -14,11 +10,19 @@ private
 }
 private
 {
-    import Log;
+    import tango.stdc.stringz;
 }
 private
 {
-    import tango.stdc.stringz;
+    import HashMap;
+}
+private
+{
+    import IndexException;
+}
+private
+{
+    import Log;
 }
 enum idx_name 
 {
@@ -152,6 +156,28 @@ count_look_predicate_on_idx_s1ppoo++;
     public
 {
     void do_things(char* ooo);
+}
+    public
+{
+    void print_stat()
+{
+if (idx_s !is null)
+log.trace("index {}, counts={} ",idx_s.getName(),idx_s.get_count_elements());
+if (idx_p !is null)
+log.trace("index {}, counts={} ",idx_p.getName(),idx_p.get_count_elements());
+if (idx_o !is null)
+log.trace("index {}, counts={} ",idx_o.getName(),idx_o.get_count_elements());
+if (idx_sp !is null)
+log.trace("index {}, counts={} ",idx_sp.getName(),idx_sp.get_count_elements());
+if (idx_po !is null)
+log.trace("index {}, counts={} ",idx_po.getName(),idx_po.get_count_elements());
+if (idx_so !is null)
+log.trace("index {}, counts={} ",idx_so.getName(),idx_so.get_count_elements());
+if (idx_spo !is null)
+log.trace("index {}, counts={} ",idx_spo.getName(),idx_spo.get_count_elements());
+if (idx_s1ppoo !is null)
+log.trace("index {}, counts={} ",idx_s1ppoo.getName(),idx_s1ppoo.get_count_elements());
+}
 }
     public
 {

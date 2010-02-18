@@ -1,5 +1,7 @@
 module scripts.S10UserIsAuthorOfDocument;
 
+private import Predicates;
+
 private import tango.stdc.string;
 private import TripleStorage;
 private import tango.io.Stdout;
@@ -49,7 +51,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
 				//			Stdout.format("UserIsAuthorOfDocument #3 triple0_p={}", getString(triple0_p)).newline;
 
-				if(strcmp(triple0_p, "http://purl.org/dc/elements/1.1/creator") == 0)
+				if(strcmp(triple0_p, CREATOR.ptr) == 0)
 				{
 					char*
 							triple0_o = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
@@ -68,20 +70,4 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	}
 	return false;
 
-	/*		
-	 
-	 // найдем для этого автора группу
-	 def authorId = document.authorId;
-	 log.debug('AuthorId:'+authorId+' userId: '+ticket.userId+'.')
-	 
-	 if (ticket.userId == authorId){
-	 if ((null!=document.documentDraftId)&&((RightType.DELETE == rightType)||(RightType.WRITE == rightType))) {
-	 return false
-	 } else {
-	 return true
-	 }
-	 }    	
-	 return false  
-	 }
-	 */
 }
