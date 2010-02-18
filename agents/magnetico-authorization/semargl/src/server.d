@@ -37,9 +37,6 @@ private import RightTypeDef;
 private import fact_tools;
 private import tango.text.locale.Locale;
 
-//private import mod.tango.io.device.File;
-//private import tango.text.convert.Integer;
-
 private Authorization az = null;
 public char[][char[]] props;
 
@@ -175,7 +172,6 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom
 
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
-
 		writeToLog(layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
 		writeToLog(fromStringz(result_buffer));
 

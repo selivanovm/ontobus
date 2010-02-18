@@ -139,7 +139,7 @@ void prepare_block(char* line, ulong line_length)
 
 		int size_id = strlen(result_id) - 2;
 		log.trace("#i1-2");
-		char[] result_id_text = result_id[1 .. size_id];
+		char[] result_id_text = result_id[0 .. size_id];
 		log.trace("#i1-3");
 		char[] qqq = input_data[0 .. size];
 		log.trace("#i1-4");

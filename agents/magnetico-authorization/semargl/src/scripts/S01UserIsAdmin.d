@@ -15,7 +15,6 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	//log.trace("!!! l={}", iterator_on_targets_of_hierarhical_departments.length);
 
 	bool *is_admin = null; 
-//	is_admin = (user in cache);
 	if(is_admin == null)
 	{
 		if(isAdmin(user, ts))

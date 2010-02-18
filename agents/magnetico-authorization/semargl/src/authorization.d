@@ -376,6 +376,7 @@ class Authorization
 			//log.trace("#9");
 			
 			return true;
+			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
 			//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 
