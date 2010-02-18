@@ -767,30 +767,3 @@ class Authorization
 
 }
 
-		void put_in_result(char* founded_delegate)
-		{
-			strcpy(result_ptr++, ",");
-			strcpy(result_ptr, founded_delegate);
-			result_ptr += strlen(founded_delegate);
-		}
-
-		getDelegateAssignersForDelegate(fact_o[arg_id], ts, &put_in_result);
-
-		strcpy(result_ptr, "\".<");
-		result_ptr += 3;
-		strcpy(result_ptr, command_uid);
-		result_ptr += strlen(command_uid);
-		strcpy(result_ptr, result_state_ok_header.ptr);
-		result_ptr += result_state_ok_header.length;
-		*(result_ptr - 1) = 0;		
-
-		//		client.send(queue_name, result_buffer);
-		send_result_and_logging_messages(queue_name, result_buffer, from_client);
-
-		double time = elapsed.stop;
-		log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-		log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
-
-	}
-
-}
