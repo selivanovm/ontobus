@@ -3,5 +3,5 @@
 #sudo rabbitmqctl add_vhost auth
 #sudo rabbitmqctl map_user_vhost rastore auth
 
-scalac -cp /home/selivanovm/soft/javalibs/rabbitmq-client.jar Client.scala
-/usr/lib/jvm/java-1.5.0-sun/bin/java -cp /home/selivanovm/soft/javalibs/commons-io-1.2.jar:/home/selivanovm/soft/javalibs/commons-cli-1.1.jar:/home/selivanovm/soft/javalibs/rabbitmq-client.jar:./:/home/selivanovm/bin/scala-2.7.3.final/lib/scala-library.jar Client $1 192.168.150.44 5672 big-archive semargl test ba 123456 0 "" direct $2
+#scalac -cp /home/selivanovm/soft/javalibs/rabbitmq-client.jar Client.scala
+/usr/lib/jvm/java-1.5.0-sun/bin/java -cp /home/selivanovm/soft/javalibs/commons-io-1.2.jar:/home/selivanovm/soft/javalibs/commons-cli-1.1.jar:/home/selivanovm/soft/javalibs/rabbitmq-client.jar:./:/home/selivanovm/bin/scala-2.7.3.final/lib/scala-library.jar Client $1 192.168.150.44 5672 big-archive semargl test ba 123456 0 "" direct $2 $3 $4 $5
