@@ -258,9 +258,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			for(int i = 0; i < count_facts; i++)
 			{
-				//				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), toString(
-				//						cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
-
+				//				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+				//getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 				if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
 				{
 					put_id = i;
@@ -954,10 +953,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						*(autz_elements + i) = 0;
 						break;
 					}
-					//log.trace("#6");
 				}
-
-				//log.trace("#7");
 
 				double total_time_calculate_right = time_calculate_right.stop;
 
@@ -968,15 +964,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
 				*(result_ptr - 1) = 0;
-				
+
 				time = elapsed.stop;
 
 				log.trace("count auth in count docs={}, authorized count docs={}", count_prepared_elements, count_authorized_doc);
 
 				log.trace("total time = {:d6} ms. ( {:d6} sec.), cps={}", time * 1000, time, count_prepared_elements / time);
 
+				//				printf("send_result_and_logging_messages #1\n");
 				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
 						count_prepared_elements / total_time_calculate_right);
+
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
 			}

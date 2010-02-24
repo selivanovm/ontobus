@@ -19,7 +19,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
 	bool result = false;
 
-//		Stdout.format("S11ACLRightsHierarhical document = {:X4}", elementId).newline;
+	//	log.trace("S11ACLRightsHierarhical document = {:X4}", elementId);
 
 	// если документ в документообороте и мы хотим модифицировать
 	if((RightType.WRITE == rightType) || (RightType.DELETE == rightType))
@@ -43,7 +43,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 
 bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments, char[] pp, char* authorizedElementCategory)
 {
-//		log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
+	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
 	// найдем все ACL записи для заданных user и elementId 
 	uint* iterator1 = ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);

@@ -5,7 +5,7 @@ extern (C)
 }
 extern (C) 
 {
-    struct amqp_table_t
+    struct amqp_table_t_
 {
     int num_entries;
     amqp_table_entry_t_* entries;
@@ -13,7 +13,7 @@ extern (C)
 }
 extern (C) 
 {
-    struct amqp_bytes_t
+    struct amqp_bytes_t_
 {
     size_t len;
     void* bytes;
@@ -29,7 +29,7 @@ alias amqp_table_t_ amqp_table_t;
 alias amqp_frame_t_ amqp_frame_t;
 alias uint32_t amqp_method_number_t;
 typedef uint32_t amqp_flags_t;
-enum amqp_connection_state_enum 
+enum amqp_connection_state_enum_ 
 {
 CONNECTION_STATE_IDLE = 0,
 CONNECTION_STATE_WAITING_FOR_HEADER,
