@@ -8,6 +8,9 @@ private import HashMap;
 private import IndexException;
 private import Log;
 
+import Integer = tango.text.convert.Integer;
+private import tango.io.FileConduit;
+
 enum idx_name
 {
 	S = (1 << 0),
@@ -22,6 +25,11 @@ enum idx_name
 
 class TripleStorage
 {
+	private char[] buff = null;
+
+	public bool INFO_stat_get_triples = false;
+	public bool INFO_remove_triple_from_list = false;
+
 	private HashMap idx_s = null;
 	private HashMap idx_p = null;
 	private HashMap idx_o = null;
@@ -39,7 +47,7 @@ class TripleStorage
 
 	private char* idx;
 
-	private bool log_stat_info = false;
+	private bool log_stat_info = true;
 
 	private char[] cat_buff1;
 	private char[] cat_buff2;
@@ -50,6 +58,7 @@ class TripleStorage
 	{
 		cat_buff1 = new char[64 * 1024];
 		cat_buff2 = new char[64 * 1024];
+		buff = new char[32];
 
 		// создается всегда, потому как является особенным индексом, хранящим экземпляры триплетов
 		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length, max_length_order);
@@ -133,7 +142,7 @@ class TripleStorage
 		//log.trace("### getTriples1");
 		if(useindex & idx_name.S1PPOO)
 		{
-			return idx_s1ppoo.get(s, p, o, dummy);
+			return cast(uint*) idx_s1ppoo.get(s, p, o, dummy);
 		}
 	}
 
@@ -141,27 +150,8 @@ class TripleStorage
 	{
 		bool debug_info = false;
 
-		if(log_stat_info == true)
-		{
-			char[] a_s = "";
-			char[] a_p = "";
-			char[] a_o = "";
-
-			if(s != null)
-				a_s = "S";
-
-			if(p != null)
-				a_p = "P";
-
-			if(o != null)
-				a_o = "O";
-
-			log.trace("A get from index {}{}{}: s={}, p={}, o={},", a_s, a_p, a_o, fromStringz(s), fromStringz(p), fromStringz(o));
-			log.trace("B get from index {}{}{}: p={}", a_s, a_p, a_o, fromStringz(p));
-		}
-
 		//log.trace("### getTriples2");
-		uint* list = null;
+		triple_list_element* list = null;
 
 		if(s != null)
 		{
@@ -229,53 +219,99 @@ class TripleStorage
 			}
 		}
 
-		//log.trace("LIST {:X4}", list);
-		return list;
+		if(log_stat_info == true || INFO_stat_get_triples == true)
+		{
+			if(s is null || p is null || o is null)
+			{
+				char[] a_s = "";
+				char[] a_p = "";
+				char[] a_o = "";
+
+				if(s !is null)
+					a_s = "S";
+
+				if(p !is null)
+					a_p = "P";
+
+				if(o !is null)
+					a_o = "O";
+
+				int count = get_count_form_list_triple(list);
+
+				auto style = File.ReadWriteOpen;
+				style.share = File.Share.Read;
+				style.open = File.Open.Append;
+				File log_file = new File("triple-storage-io", style);
+
+				log_file.output.write(
+						"\nGET FROM INDEX " ~ a_s ~ a_p ~ a_o ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(
+								buff, count) ~ "\n");
+
+				print_list_triple_to_file(log_file, list);
+
+				log_file.close();
+			}
+		}
+		return cast(uint*) list;
 	}
 
 	public bool removeTriple(char[] s, char[] p, char[] o)
 	{
 
 		if(s.length == 0 && p.length == 0 && o.length == 0)
+		{
+			INFO_remove_triple_from_list = false;
 			return false;
+		}
 
 		//do_things(o);
 
 		if(s is null && p is null && o is null)
+		{
+			INFO_remove_triple_from_list = false;
 			return false;
+		}
 
-		uint* removed_triple;
+		byte* removed_triple;
 
-		uint* list_iterator = idx_spo.get(s.ptr, p.ptr, o.ptr, dummy);
+		triple_list_element* list_iterator = idx_spo.get(s.ptr, p.ptr, o.ptr, dummy);
 		if(list_iterator !is null)
 		{
-			removed_triple = cast(uint*) (*list_iterator);
+			removed_triple = cast(byte*) list_iterator.triple_ptr;
 		}
 		else
+		{
+			INFO_remove_triple_from_list = false;
 			return false;
+		}
 
 		if(idx_s !is null)
 		{
+			idx_s.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 			idx_s.remove_triple_from_list(removed_triple, s, null, null);
 		}
 
 		if(idx_p !is null)
 		{
+			idx_p.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 			idx_p.remove_triple_from_list(removed_triple, p, null, null);
 		}
 
 		if(idx_o !is null)
 		{
+			idx_o.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 			idx_o.remove_triple_from_list(removed_triple, o, null, null);
 		}
 
 		if(idx_po !is null)
 		{
+			idx_po.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 			idx_po.remove_triple_from_list(removed_triple, p, o, null);
 		}
 
 		if(idx_so !is null)
 		{
+			idx_so.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 			idx_so.remove_triple_from_list(removed_triple, s, o, null);
 		}
 
@@ -292,10 +328,10 @@ class TripleStorage
 					char[] p1 = p;
 					char[] p2 = look_predicate_p2_on_idx_s1ppoo[i];
 
-					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, dummy);
+					triple_list_element* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, dummy);
 					if(listS !is null)
 					{
-						byte* tripleS = cast(byte*) *listS;
+						byte* tripleS = cast(byte*) listS.triple_ptr;
 						char[] o2 = fromStringz(
 								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
@@ -309,10 +345,9 @@ class TripleStorage
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
 						if(listS !is null)
 						{
-							uint next_element1 = 0xFF;
-							while(next_element1 > 0)
+							while(listS !is null)
 							{
-								triple1 = cast(byte*) *listS;
+								triple1 = cast(byte*) listS.triple_ptr;
 								if(triple1 !is null)
 								{
 									char* sss = cast(char*) triple1 + 6;
@@ -322,15 +357,15 @@ class TripleStorage
 									}
 									//log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
 								}
-								next_element1 = *(listS + 1);
-								listS = cast(uint*) next_element1;
+								listS = listS.next_triple_list_element;
 							}
 						}
 						//print_list_triple(listS);
 
 						if(triple1 !is null)
 						{
-							idx_s1ppoo.remove_triple_from_list(cast(uint*) triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
+							idx_s1ppoo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
+							idx_s1ppoo.remove_triple_from_list(triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 							//log.trace("#333");
 							//						listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, false);						
 							listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, dummy);
@@ -346,15 +381,16 @@ class TripleStorage
 					char[] p2 = p;
 					char[] p1 = look_predicate_p1_on_idx_s1ppoo[i];
 
-					uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, dummy);
+					triple_list_element* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, dummy);
 					if(listS !is null)
 					{
-						byte* tripleS = cast(byte*) *listS;
+						byte* tripleS = cast(byte*) listS.triple_ptr;
 						char[] o1 = fromStringz(
 								cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 
 						//log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
+						idx_s1ppoo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 					}
 
@@ -363,12 +399,15 @@ class TripleStorage
 			}
 			if(idx_sp !is null)
 			{
+				idx_sp.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 				idx_sp.remove_triple_from_list(removed_triple, s, p, null);
 			}
 
 		}
+		idx_spo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
 		idx_spo.remove_triple_from_list(removed_triple, s, p, o);
 
+		INFO_remove_triple_from_list = false;
 		//do_things(o);
 		return true;
 	}
@@ -395,7 +434,7 @@ class TripleStorage
 				if(s.length == 0 && p.length == 0 && o.length == 0)
 					return -1;
 
-				uint* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, dummy);
+				triple_list_element* list = idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, dummy);
 				//log.trace("addTriple #1");
 				if(list !is null)
 				{
@@ -437,17 +476,31 @@ class TripleStorage
 				//		log.trace("addTriple:ok, list={:X4}", list);
 				//log.trace("addTriple #3");
 				if(list is null)
-					throw new Exception("addTriple: not found triple in index spo");
+				{
+					idx_spo.f_trace_put = true;
+					idx_spo.f_trace_get = true;
 
-				triple = cast(void*) *list;
+					idx_spo.put(s, p, o, null);
+
+					idx_spo.get(cast(char*) s, cast(char*) p, cast(char*) o, dummy);
+
+					throw new Exception("addTriple: not found triple <" ~ s ~ "><" ~ p ~ "><" ~ o ~ "> in index spo");
+				}
+
+				triple = cast(void*) list.triple_ptr;
 
 				//log.trace("!!!!!!!!!!!!!!!!!!11");
 
 				//		log.trace("addTriple:3 addr={:X4}", triple);
 				//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, fromStringz(cast(char*) (triple + 6)));
 
+				//				idx_s.f_check_add_to_index = true;
+
 				if(idx_s !is null)
 					idx_s.put(s, null, null, triple);
+
+				//				idx_s.f_check_add_to_index = false;
+
 				//log.trace("addTriple #4");
 				if(idx_p !is null)
 					idx_p.put(p, null, null, triple);
@@ -492,11 +545,11 @@ class TripleStorage
 							p3 = store_predicate_in_list_on_idx_s1ppoo[i];
 
 							o1 = o;
-							uint* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, dummy);
+							triple_list_element* listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, dummy);
 
 							if(listS !is null)
 							{
-								byte* tripleS = cast(byte*) *listS;
+								byte* tripleS = cast(byte*) listS.triple_ptr;
 								o2 = fromStringz(
 										cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 							}
@@ -510,11 +563,11 @@ class TripleStorage
 							p3 = store_predicate_in_list_on_idx_s1ppoo[i];
 
 							o2 = o;
-							uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, dummy);
+							triple_list_element* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, dummy);
 
 							if(listS !is null)
 							{
-								byte* tripleS = cast(byte*) *listS;
+								byte* tripleS = cast(byte*) listS.triple_ptr;
 								o1 = fromStringz(
 										cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 							}
@@ -527,10 +580,10 @@ class TripleStorage
 							p2 = look_predicate_p2_on_idx_s1ppoo[i];
 							p3 = p;
 
-							uint* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, dummy);
+							triple_list_element* listS = idx_sp.get(cast(char*) s, cast(char*) p1, null, dummy);
 							if(listS !is null)
 							{
-								byte* tripleS = cast(byte*) *listS;
+								byte* tripleS = cast(byte*) listS.triple_ptr;
 								o1 = fromStringz(
 										cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 							}
@@ -538,7 +591,7 @@ class TripleStorage
 							listS = idx_sp.get(cast(char*) s, cast(char*) p2, null, dummy);
 							if(listS !is null)
 							{
-								byte* tripleS = cast(byte*) *listS;
+								byte* tripleS = cast(byte*) listS.triple_ptr;
 								o2 = fromStringz(
 										cast(char*) (tripleS + 6 + (*(tripleS + 0) << 8) + *(tripleS + 1) + 1 + (*(tripleS + 2) << 8) + *(tripleS + 3) + 1));
 							}
@@ -549,14 +602,21 @@ class TripleStorage
 
 					if(p1 !is null && p2 !is null && p3 !is null && o1 !is null && o2 !is null)
 					{
-						uint* listS = idx_sp.get(cast(char*) s, cast(char*) p3, null, dummy);
+						triple_list_element* listS = idx_sp.get(cast(char*) s, cast(char*) p3, null, dummy);
 						if(listS !is null)
 						{
 							//log.trace("#SPPOO_ADD 0");
 							//print_list_triple(listS);
 							char[] p1p2 = p1 ~ p2;
 							//log.trace ("#SPPOO_ADD 1 {} {} {} {} {} {}", p1 , p2 , p3 , o1 , o2, p1p2);
-							void* tripleS = cast(void*) *listS;
+							void* tripleS = listS.triple_ptr;
+
+							if(idx_s1ppoo.check_triple_in_list(tripleS, p1p2.ptr, o1.ptr, o2.ptr) == true)
+							{
+								return -2;
+								//								throw new Exception ("triple already in index S1PPOO");
+							}
+
 							idx_s1ppoo.put(p1p2, o1, o2, tripleS);
 
 							//listS = idx_s1ppoo.get(p1p2.ptr, o1.ptr, o2.ptr, false);					
@@ -580,41 +640,6 @@ class TripleStorage
 		return 0;
 	}
 
-	//do_things(o.ptr);
-
-	public void do_things(char* ooo)
-	{
-		if(strcmp(ooo, "4f7a561bd9024baebb2efea4c7b8e1c9") == 0)
-		{
-			uint* list_facts = getTriples(null, null, "4f7a561bd9024baebb2efea4c7b8e1c9".ptr);
-
-			if(list_facts !is null)
-			{
-				uint next_element1 = 0xFF;
-				while(next_element1 > 0)
-				{
-					if(list_facts !is null)
-					{
-						byte* triple = cast(byte*) *list_facts;
-						log.trace("list_fact {:X4}", list_facts);
-						if(triple !is null)
-						{
-							char* s = cast(char*) triple + 6;
-
-							char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
-
-							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
-
-							log.trace("get result: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
-						}
-					}
-					next_element1 = *(list_facts + 1);
-					list_facts = cast(uint*) next_element1;
-				}
-			}
-		}
-	}
-
 	public void print_stat()
 	{
 		if(idx_s !is null)
@@ -635,24 +660,65 @@ class TripleStorage
 			log.trace("index {}, counts={} ", idx_s1ppoo.getName(), idx_s1ppoo.get_count_elements());
 	}
 
-	public void print_list_triple(uint* list_iterator)
+	public void print_list_triple_to_file(File log_file, triple_list_element* list_iterator)
 	{
 		byte* triple;
 		if(list_iterator !is null)
 		{
 			uint next_element0 = 0xFF;
-			while(next_element0 > 0)
+			while(list_iterator !is null)
 			{
-				log.trace("#KKK {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
+				//				log.trace("#KKK {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
 
-				triple = cast(byte*) *list_iterator;
+				triple = cast(byte*) list_iterator.triple_ptr;
+				if(triple !is null)
+				{
+					char[] triple_str = triple_to_string(triple);
+					log_file.output.write(triple_str);
+				}
+
+				list_iterator = list_iterator.next_triple_list_element;
+			}
+		}
+	}
+
+	public void print_list_triple(triple_list_element* list_iterator)
+	{
+		byte* triple;
+		if(list_iterator !is null)
+		{
+			uint next_element0 = 0xFF;
+			while(list_iterator !is null)
+			{
+				//				log.trace("#KKK {:X4} {:X4} {:X4}", list_iterator, *list_iterator, *(list_iterator + 1));
+
+				triple = cast(byte*) list_iterator.triple_ptr;
 				if(triple !is null)
 					print_triple(triple);
 
-				next_element0 = *(list_iterator + 1);
-				list_iterator = cast(uint*) next_element0;
+				list_iterator = list_iterator.next_triple_list_element;
 			}
 		}
+	}
+
+	public int get_count_form_list_triple(triple_list_element* list_iterator)
+	{
+		int count;
+		byte* triple;
+		if(list_iterator !is null)
+		{
+			while(list_iterator !is null)
+			{
+				triple = cast(byte*) list_iterator.triple_ptr;
+				if(triple !is null)
+				{
+					count++;
+				}
+
+				list_iterator = list_iterator.next_triple_list_element;
+			}
+		}
+		return count;
 	}
 
 	public void print_triple(byte* triple)
@@ -667,6 +733,20 @@ class TripleStorage
 		char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
 
 		log.trace("triple: <{}><{}><{}>", fromStringz(s), fromStringz(p), fromStringz(o));
+	}
+
+	public char[] triple_to_string(byte* triple)
+	{
+		if(triple is null)
+			return "";
+
+		char* s = cast(char*) triple + 6;
+
+		char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+
+		char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+
+		return "<" ~ fromStringz(s) ~ "><" ~ fromStringz(p) ~ "><" ~ fromStringz(o) ~ ">\n";
 	}
 
 }

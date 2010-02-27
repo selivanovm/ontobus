@@ -22,17 +22,36 @@ private
 }
 private
 {
-    import IndexException;
+    import Log;
 }
 private
 {
-    import Log;
+    import IndexException;
+}
+struct triple_list_element
+{
+    char* triple_ptr;
+    triple_list_element* next_triple_list_element;
+}
+struct triple_list_header
+{
+    triple_list_element* first_element;
+    triple_list_element* last_element;
+    char* keys;
 }
 class HashMap
 {
-    private
+    public
 {
-    uint max_count_elements = 1000;
+    bool f_check_add_to_index = false;
+}
+    public
+{
+    bool f_check_remove_from_index = true;
+}
+    public
+{
+    bool INFO_remove_triple_from_list = true;
 }
     private
 {
@@ -40,23 +59,23 @@ class HashMap
 }
     private
 {
+    char[] hashName;
+}
+    private
+{
+    uint max_count_elements = 1000;
+}
+    private
+{
     uint max_size_short_order = 8;
 }
     private
 {
-    uint reducer_area_length;
+    triple_list_header*[] reducer;
 }
     private
 {
-    uint[] reducer_area_ptr;
-}
-    private
-{
-    uint reducer_area_right;
-}
-    private
-{
-    uint key_2_list_triples_area__length;
+    uint max_size_reducer = 0;
 }
     private
 {
@@ -70,22 +89,20 @@ class HashMap
 {
     uint key_2_list_triples_area__right = 0;
 }
-    private
+    this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 {
-    char[] hashName;
-}
-    this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order);
-    public
-{
-    void put(char[] key1, char[] key2, char[] key3, void* triple);
-}
-    public
-{
-    uint* get(char* key1, char* key2, char* key3, out int out_next_short_order_conflict_keys);
-}
-    public
-{
-    void remove_triple_from_list(uint* removed_triple, char[] s, char[] p, char[] o);
+hashName = _hashName;
+max_size_short_order = _max_size_short_order;
+max_count_elements = _max_count_elements;
+log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start",hashName,_max_count_elements,max_size_short_order,_triple_area_length);
+max_size_reducer = max_count_elements * max_size_short_order + max_size_short_order;
+reducer = new triple_list_header*[](max_size_reducer);
+log.trace("*** HashMap[name={}, reducer.length={}",hashName,reducer.length);
+key_2_list_triples_area = new ubyte[](_triple_area_length);
+key_2_list_triples_area__last = 0;
+key_2_list_triples_area__right = key_2_list_triples_area.length;
+log.trace("*** HashMap[name={}, key_2_list_triples_area__right={}",hashName,key_2_list_triples_area__right);
+log.trace("*** create object HashMap... ok");
 }
     public
 {
@@ -101,55 +118,36 @@ return count_element;
 return hashName;
 }
 }
-    private
+    public
 {
-    void dump_mem(ubyte[] mem, uint ptr);
+    bool f_trace_put = false;
 }
     public
 {
-    uint* get_next_list_of_list_iterator(ref uint current_list_of_list_V_iterator, ref uint current_list_of_list_H_iterator)
+    void put(char[] key1, char[] key2, char[] key3, void* triple_ptr);
+}
+    public
 {
-if (current_list_of_list_H_iterator < max_size_short_order)
-max_size_short_order++;
-else
-max_size_short_order = 0;
-if (current_list_of_list_V_iterator < max_count_elements)
-current_list_of_list_V_iterator += max_size_short_order;
-return null;
+    bool check_triple_in_list(void* triple_ptr, char* key1, char* key2, char* key3);
 }
-}
-    private
+    public
 {
-    void ptr_to_mem(ubyte[] mem, uint max_size_mem, uint ptr, uint addr);
+    bool f_trace_get = false;
 }
-}
-private
+    public
 {
-    bool _strcmp(char[] mem, uint ptr, char[] key);
+    triple_list_element* get(char* key1, char* key2, char* key3, out int pos_in_reducer);
 }
-private
+    public
 {
-    bool _strcmp(char[] mem, uint ptr, char* key);
+    void remove_triple_from_list(byte* removed_triple, char[] s, char[] p, char[] o);
 }
-private
+    public
 {
-    char[] mem_to_char(ubyte[] mem, uint ptr, int length);
+    void print_triple(char[] header, byte* triple);
 }
-private
+    public
 {
-    uint ptr_from_mem(ubyte[] mem, uint ptr);
+    char[] triple_to_string(byte* triple);
 }
-private
-{
-    static 
-{
-    char[] _toString(char* s)
-{
-return s ? s[0..strlen(s)] : cast(char[])null;
-}
-}
-}
-public
-{
-    void print_triple(byte* triple);
 }
