@@ -40,9 +40,9 @@ struct triple_list_header
 class HashMap
 {
 	public bool f_check_add_to_index = false;
-	public bool f_check_remove_from_index = true;
+	public bool f_check_remove_from_index = false;
 
-	public bool INFO_remove_triple_from_list = true;
+	public bool INFO_remove_triple_from_list = false;
 	private uint count_element = 0;
 	private char[] hashName;
 
@@ -575,7 +575,7 @@ class HashMap
 
 	public void remove_triple_from_list(byte* removed_triple, char[] s, char[] p, char[] o)
 	{
-		f_check_add_to_index = true;
+//		f_check_add_to_index = true;
 
 		//		INFO_remove_triple_from_list = true;
 

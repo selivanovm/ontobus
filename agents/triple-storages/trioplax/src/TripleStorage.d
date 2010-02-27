@@ -29,6 +29,7 @@ class TripleStorage
 
 	public bool INFO_stat_get_triples = false;
 	public bool INFO_remove_triple_from_list = false;
+	private bool log_stat_info = false;
 
 	private HashMap idx_s = null;
 	private HashMap idx_p = null;
@@ -46,8 +47,6 @@ class TripleStorage
 	private uint count_look_predicate_on_idx_s1ppoo = 0;
 
 	private char* idx;
-
-	private bool log_stat_info = true;
 
 	private char[] cat_buff1;
 	private char[] cat_buff2;
