@@ -47,11 +47,11 @@ class HashMap
 }
     public
 {
-    bool f_check_remove_from_index = true;
+    bool f_check_remove_from_index = false;
 }
     public
 {
-    bool INFO_remove_triple_from_list = true;
+    bool INFO_remove_triple_from_list = false;
 }
     private
 {

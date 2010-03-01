@@ -317,7 +317,7 @@ class Authorization
 		
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
-			bool calculatedRight = scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			calculatedRight = scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 			
 			bool result = isAdmin || calculatedRight;
 			

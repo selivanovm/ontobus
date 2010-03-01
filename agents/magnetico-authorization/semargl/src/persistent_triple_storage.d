@@ -110,6 +110,10 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 					if(result >= 0)
 					{
 						count_add_triple++;
+
+						if(count_add_triple % 34567 == 0)
+							Stdout.format("count load triples {}", count_add_triple).newline;
+
 					}
 					else
 					{

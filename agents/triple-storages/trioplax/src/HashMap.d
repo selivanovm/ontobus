@@ -362,9 +362,11 @@ class HashMap
 
 		if(f_check_add_to_index && triple_ptr !is null)
 		{
-			log.trace("Exception: {} check add triple {} -> [{}][{}][{}] in index", triple_to_string(cast(byte*) triple_ptr), hashName, key1, key2, key3);
 			if(check_triple_in_list(triple_ptr, key1.ptr, key2.ptr, key3.ptr) == false)
+			{
+				log.trace("Exception: {} check add triple {} -> [{}][{}][{}] in index, triple not added in index", triple_to_string(cast(byte*) triple_ptr), hashName, key1, key2, key3);
 				throw new Exception(hashName ~ " triple <" ~ key1 ~ "><" ~ key2 ~ "><" ~ key3 ~ "> not added in index");
+			}
 		}
 
 	}
@@ -575,7 +577,7 @@ class HashMap
 
 	public void remove_triple_from_list(byte* removed_triple, char[] s, char[] p, char[] o)
 	{
-//		f_check_add_to_index = true;
+		f_check_add_to_index = true;
 
 		//		INFO_remove_triple_from_list = true;
 
@@ -786,7 +788,7 @@ class HashMap
 			}
 			int tmp_count_triples_in_list = 0;
 
-			log.trace("{} check deleted triple from list, in list = {} triples", hashName, count_triples_in_list);
+//			log.trace("{} check deleted triple from list, in list = {} triples", hashName, count_triples_in_list);
 			list = get(s.ptr, p.ptr, o.ptr, idx_header);
 
 			if(list is null && count_triples_in_list > 1)
