@@ -229,6 +229,8 @@ class Authorization
 			output.flush;
 			props_conduit.close;
 			
+			log.trace("wait to exit");			
+			
 			throw ex;
 		}
 		catch(Exception ex)
@@ -295,6 +297,9 @@ class Authorization
 		return Integer.formatter(tmp, i, 'u', '?', 8);
 	}
 
+	
+	bool f_authorization_trace = false;
+	
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для заданного пользователя
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
 			char*[] hierarhical_departments, mom_client from_client)
@@ -304,13 +309,23 @@ class Authorization
 		bool calculatedRight;
 
 		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-		//log.trace("isAdmin = {}", isAdmin);
 
+		if (f_authorization_trace)
+		{
+ 			log.trace("autorize:S01UserIsAdmin res={}", isAdmin);
+		}
+		
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
-			//counters[0]++;
-			bool result = isAdmin || scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
-			//log.trace("CATEGORY = PERMISSION . isAdmin || scripts.S10UserIsPermissionTargetAuthor = {}", result);
+			bool calculatedRight = scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			
+			bool result = isAdmin || calculatedRight;
+			
+			if (f_authorization_trace)
+			{
+	 			log.trace("autorize: isAdmin || calculatedRight res={}", result);				
+			}
+			
 			return result;
 		}
 
