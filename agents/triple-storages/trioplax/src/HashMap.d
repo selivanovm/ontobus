@@ -107,7 +107,7 @@ class HashMap
 
 		if(short_order_conflict_keys + max_size_short_order >= max_size_reducer)
 		{
-			log.trace("{}, hash={}, short_order_conflict_keys={}, short_order_conflict_keys + max_size_short_order={}, max_size_reducer={}",
+			log.trace("Exception: {}, hash={}, short_order_conflict_keys={}, short_order_conflict_keys + max_size_short_order={}, max_size_reducer={}",
 					hashName, hash, short_order_conflict_keys, short_order_conflict_keys + max_size_short_order, max_size_reducer);
 			throw new Exception(hashName ~ "put:short_order_conflict_keys + max_size_short_order >= max_size_reducer");
 		}
@@ -323,7 +323,7 @@ class HashMap
 
 			if(key_2_list_triples_area__last + 1024 > key_2_list_triples_area__right)
 			{
-				log.trace("put:{}, key_2_list_triples_area__last[{}] + 128 > key_2_list_triples_area__right[{}]", hashName,
+				log.trace("Exception: put:{}, key_2_list_triples_area__last[{}] + 128 > key_2_list_triples_area__right[{}]", hashName,
 						key_2_list_triples_area__last, key_2_list_triples_area__right);
 				//				throw new Exception("put:" ~ hashName ~ ", key_2_list_triples_area__last + 128 > key_2_list_triples_area__right");
 				throw new IndexException("hashName=" ~ hashName ~ ", key_2_list_triples_area__last > key_2_list_triples_area__right", hashName,
@@ -362,7 +362,7 @@ class HashMap
 
 		if(f_check_add_to_index && triple_ptr !is null)
 		{
-			log.trace("{} check add triple {} -> [{}][{}][{}] in index", triple_to_string(cast(byte*) triple_ptr), hashName, key1, key2, key3);
+			log.trace("Exception: {} check add triple {} -> [{}][{}][{}] in index", triple_to_string(cast(byte*) triple_ptr), hashName, key1, key2, key3);
 			if(check_triple_in_list(triple_ptr, key1.ptr, key2.ptr, key3.ptr) == false)
 				throw new Exception(hashName ~ " triple <" ~ key1 ~ "><" ~ key2 ~ "><" ~ key3 ~ "> not added in index");
 		}
@@ -422,7 +422,7 @@ class HashMap
 
 		if(short_order_conflict_keys + max_size_short_order >= max_size_reducer)
 		{
-			log.trace("{}, hash={}, short_order_conflict_keys={}, short_order_conflict_keys + max_size_short_order={}, max_size_reducer={}",
+			log.trace("Exception: {}, hash={}, short_order_conflict_keys={}, short_order_conflict_keys + max_size_short_order={}, max_size_reducer={}",
 					hashName, hash, short_order_conflict_keys, short_order_conflict_keys + max_size_short_order, max_size_reducer);
 			throw new Exception(hashName ~ "get:short_order_conflict_keys + max_size_short_order >= max_size_reducer");
 		}
@@ -608,7 +608,7 @@ class HashMap
 		}
 
 		if(list != reducer[idx_header].first_element)
-			throw new Exception("неведомахуйня");
+			throw new Exception("Exception: неведомахуйня");
 
 		if(INFO_remove_triple_from_list)
 		{
@@ -790,9 +790,12 @@ class HashMap
 			list = get(s.ptr, p.ptr, o.ptr, idx_header);
 
 			if(list is null && count_triples_in_list > 1)
-				throw new Exception("list is null && count_triples_in_list > 1");
+			{
+				log.trace("Exception: {} first_element={:X4}", hashName, list);
+				throw new Exception(hashName ~ " list is null && count_triples_in_list > 1");
+			}
 
-			log.trace("first_element={:X4}", list);
+//			log.trace("first_element={:X4}", list);
 
 			if(list !is null)
 			{
@@ -803,7 +806,7 @@ class HashMap
 						tmp_count_triples_in_list++;
 						if(removed_triple == cast(byte*) list.triple_ptr)
 						{
-							log.trace("{} this triple found in list, not deleted !", hashName);
+							log.trace("Exception: {} this triple found in list, not deleted !", hashName);
 							throw new Exception(hashName ~ " this triple found in list, not deleted !");
 						}
 					}
@@ -814,7 +817,7 @@ class HashMap
 
 			if(count_triples_in_list > 0 && count_triples_in_list != (tmp_count_triples_in_list + 1))
 			{
-				log.trace("{} count_triples_in_list, before {} + 1 == after {}", hashName, count_triples_in_list, tmp_count_triples_in_list);
+				log.trace("Exception: list corrupted, {} count_triples_in_list, before {} != after {} + 1", hashName, count_triples_in_list, tmp_count_triples_in_list);
 				throw new Exception("list corrupted");
 			}
 		}
