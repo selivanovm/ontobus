@@ -258,19 +258,19 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			for(int i = 0; i < count_facts; i++)
 			{
-				//				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-				//getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+					  getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 				if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
 				{
 					put_id = i;
-					//					Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
+					log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 				}
 				else
 				{
 					if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
 					{
 						arg_id = i;
-						//						Stdout.format("found comand {}, id ={} ", getString(fact_p[i]), i);
+						log.trace("found comand {}, id ={} ", getString(fact_p[i]), i);
 					}
 					else
 					{
@@ -278,14 +278,14 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								fact_p[i], SUBJECT.ptr) == 0)
 						{
 							delete_subjects_by_predicate_id = i;
-							//							Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
+							log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 						}
 						else
 						{
 							if(get_id < 0 && strcmp(fact_o[i], GET.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
 							{
 								get_id = i;
-								Stdout.format("found comand {}, id ={} ", getString(fact_o[i]), i);
+								log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 							}
 							else
 							{
@@ -297,11 +297,12 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								}
 								else
 								{
+							
 									if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0 && strcmp(
 											fact_p[i], SUBJECT.ptr) == 0)
 									{
 										get_authorization_rights_records_id = i;
-										//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+										log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 									}
 									else
 									{
@@ -311,7 +312,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 													SUBJECT.ptr) == 0)
 											{
 												get_delegate_assigners_tree_id = i;
-												//log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+												log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 											}
 											else
 											{
@@ -325,6 +326,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 													if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0 && strcmp(
 															fact_p[i], SUBJECT.ptr) == 0)
 													{
+														log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 														create_id = i;
 														put_id = i;
 													}
@@ -344,6 +346,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 			}
 
 			log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
+
+			bool isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 ||
+				get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 ||
+				agent_function_id > -1 || create_id > -1;
+
+			if(!isCommandRecognized) 
+			{
+				log.trace("# unrecognized command");
+				//				return;
+			}
+
 			
 			if(agent_function_id >= 0 && arg_id > 0)
 			{
@@ -385,6 +398,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			if(get_id >= 0 && arg_id > 0)
 			{
+
+				log.trace("#GET");
+				
+
 				/* пример сообщения: запрос всех фактов с p=predicate1 и o=object1
 				 
 				 <2014a><magnet-ontology#subject><magnet-ontology#get>.
@@ -406,26 +423,38 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						}
 					}
 				}
-
+				log.trace("#GET 1");
+				
 				int i = 0;
 				for(; i < count_facts; i++)
 				{
 					if(is_fact_in_object[i] == arg_id)
 						break;
 				}
+				log.trace("#GET 2 i={} {:X4} {:X4} {:X4}", i, fact_s[i], fact_p[i], fact_o[i]);
+				
+				log.trace("query s = {} , p = {} , o = {}", getString(fact_p[i]));
+					  //getString(fact_p[i]), getString(fact_o[i]));
 
-				//log.trace("function get: query={} ", getString(fact_o[arg_id]));
-				log.trace("query s = {} , p = {} , o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
-
+				log.trace("#GET 3");
+				
 				char* ss = strlen(fact_s[i]) == 0 ? null : fact_s[i];
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
 
+				log.trace("#GET 4");
+
 				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
+
+				log.trace("#GET 5");
+
 				char* result_ptr = cast(char*) result_buffer;
 				char* command_uid = fact_s[0];
+
+
+				log.trace("#GET 6");
 
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
@@ -585,10 +614,11 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				log.trace("команда на добавление");
 
 				int reply_to_id = 0;
+				bool facts_removed = false;
 
 				char* uuid = cast(char*) new char[17];
 				longToHex(getUUID(), uuid);
-
+				
 				// найдем триплет с elementId
 				int element_id = -1;
 				for(int i = 0; i < count_facts; i++)
@@ -607,7 +637,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 					if(element_id >= 0)
 					{
-						//log.trace("check for elementId = {}", getString(fact_o[element_id]));
+						log.trace("check for elementId = {}", getString(fact_o[element_id]));
 						uint* founded_facts = az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr, fact_o[element_id]);
 						if(founded_facts !is null)
 						{
@@ -627,21 +657,21 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 										if(i != element_id && is_fact_in_object[i] == arg_id && (strcmp(fact_p[i],
 												TARGET_SUBSYSTEM_ELEMENT.ptr) == 0 || strcmp(fact_p[i],
 												CATEGORY.ptr) == 0 || strcmp(fact_p[i],
-												RIGHTS.ptr) == 0 || strcmp(fact_p[i],
-												AUTHOR_SYSTEM.ptr) == 0))
+												AUTHOR_SYSTEM.ptr) == 0) || strcmp(fact_p[i], RIGHTS.ptr) == 0)
+											 
 										{
-											//log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
-											//  getString(fact_o[i]));
+											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
+											 getString(fact_o[i]));
 											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
 											if(founded_facts2 is null)
 											{
-												// log.trace("#444");
+											log.trace("#444");
 												is_exists = false;
 												break;
 											}
 											else
 											{
-												// log.trace("#555");
+											log.trace("#555");
 												uint next_element2 = 0xFF;
 												bool is_exists2 = false;
 												while(next_element2 > 0 && is_exists)
@@ -662,16 +692,15 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 													next_element2 = *(founded_facts2 + 1);
 													founded_facts2 = cast(uint*) next_element2;
 												}
-												// log.trace("#666 {} {}", is_exists, is_exists2);
+												log.trace("#666 {} {}", is_exists, is_exists2);
 												is_exists = is_exists2 && is_exists;
 											}
 										}
 									}
 									if(is_exists)
 									{
-
+										facts_removed = true;
 										remove_subject(s);
-
 									}
 
 								}
@@ -690,7 +719,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					}
 					else if(is_fact_in_object[i] == arg_id)
 					{
-						if(strlen(fact_s[i]) == 0)
+						if(facts_removed || strlen(fact_s[i]) == 0)
 							fact_s[i] = uuid;
 						else
 							uuid = fact_s[i];
@@ -976,7 +1005,12 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						count_prepared_elements / total_time_calculate_right);
 
 
+				//				printf("try to send message\n");
+
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
+
+				//				printf("message successfully sent\n");
+
 			}
 		}
 

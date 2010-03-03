@@ -24,6 +24,11 @@ private
 {
     import Log;
 }
+import Integer = tango.text.convert.Integer;
+private
+{
+    import tango.io.FileConduit;
+}
 enum idx_name 
 {
 S = 1 << 0,
@@ -37,6 +42,18 @@ S1PPOO = 1 << 7,
 }
 class TripleStorage
 {
+    private
+{
+    char[] buff = null;
+}
+    public
+{
+    bool INFO_stat_get_triples = false;
+}
+    public
+{
+    bool INFO_remove_triple_from_list = false;
+}
     private
 {
     HashMap idx_s = null;
@@ -95,7 +112,7 @@ class TripleStorage
 }
     private
 {
-    bool log_stat_info = false;
+    bool log_stat_info = true;
 }
     private
 {
@@ -113,6 +130,7 @@ class TripleStorage
 {
 cat_buff1 = new char[](64 * 1024);
 cat_buff2 = new char[](64 * 1024);
+buff = new char[](32);
 idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_length_order);
 }
     public
@@ -155,10 +173,6 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    void do_things(char* ooo);
-}
-    public
-{
     void print_stat()
 {
 if (idx_s !is null)
@@ -181,10 +195,22 @@ log.trace("index {}, counts={} ",idx_s1ppoo.getName(),idx_s1ppoo.get_count_eleme
 }
     public
 {
-    void print_list_triple(uint* list_iterator);
+    void print_list_triple_to_file(File log_file, triple_list_element* list_iterator);
+}
+    public
+{
+    void print_list_triple(triple_list_element* list_iterator);
+}
+    public
+{
+    int get_count_form_list_triple(triple_list_element* list_iterator);
 }
     public
 {
     void print_triple(byte* triple);
+}
+    public
+{
+    char[] triple_to_string(byte* triple);
 }
 }

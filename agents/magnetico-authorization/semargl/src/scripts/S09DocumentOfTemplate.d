@@ -1,6 +1,7 @@
 module scripts.S09DocumentOfTemplate;
 
 private import Predicates;
+private import Category;
 
 import TripleStorage;
 
@@ -11,7 +12,7 @@ private import tango.stdc.string;
 private import scripts.S11ACLRightsHierarhical;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
-		      char[] pp, char* authorizedElementCategory)
+		      char[] pp)
 {
         bool result = false;
 
@@ -32,7 +33,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 			//log.trace("S09 #1 template_id = {}", template_id);
 			
 			result = scripts.S11ACLRightsHierarhical.checkRight(user, template_id, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp, 
-									    "DOCUMENTS_OF_TEMPLATE");
+									    DOCUMENTS_OF_TEMPLATE.ptr);
 									    //authorizedElementCategory);	
 		}
 	} 

@@ -304,12 +304,13 @@ class Authorization
 		bool calculatedRight;
 
 		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
-		//log.trace("isAdmin = {}", isAdmin);
+		log.trace("isAdmin = {}", isAdmin);
+		bool result;
 
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
 			//counters[0]++;
-			bool result = isAdmin || scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
+			result = isAdmin || scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 			//log.trace("CATEGORY = PERMISSION . isAdmin || scripts.S10UserIsPermissionTargetAuthor = {}", result);
 			return result;
 		}
@@ -333,6 +334,8 @@ class Authorization
 				}
 		}
 
+		
+	
 		if(targetRightType == RightType.CREATE && 
 		   (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || 
 		    (*authorizedElementId == '*' && strcmp(authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
@@ -346,8 +349,11 @@ class Authorization
 			////log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
-		if(strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
-		   scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp, authorizedElementCategory))
+		
+		result = strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
+			scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
+		log.trace("S09DocumentOfTemplate result = {}", result);
+		if(result)
 		{
 			//counters[4]++;
 			return true;
@@ -381,7 +387,7 @@ class Authorization
 			return true;
 		}
 
-		log.trace("Access Denied");
+		//		log.trace("Access Denied");
 
 		return false;
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);

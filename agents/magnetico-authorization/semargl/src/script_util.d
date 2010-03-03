@@ -60,11 +60,11 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 	uint* iterator0;
 	byte* triple0;
 
-	//log.trace("getDepartmentTreePath #1 for user={}", getString(user));
+	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
 	iterator0 = ts.getTriples(user, MEMBER_OF.ptr, null);
 
-	//	print_list_triple(iterator0);
+	//print_list_triple(iterator0);
 
 	if(iterator0 !is null)
 	{
@@ -73,7 +73,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 		if(next_branch !is null)
 		{
-			//			log.trace("getDepartmentTreePath #1 next_branch={}", getString(next_branch));
+			//log.trace("getDepartmentTreePath #1 next_branch={}", getString(next_branch));
 			result[count_result] = next_branch;
 			count_result++;
 		}

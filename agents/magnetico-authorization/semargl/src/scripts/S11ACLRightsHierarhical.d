@@ -72,9 +72,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, char* authorizedElementCategory)
 {
 
-	//		log.trace("checkRight query: p1={}, p2={}, o1={}, o2={}", "magnet-ontology/authorization/acl#targetSubsystemElement",
-	//				"magnet-ontology/authorization/acl#elementId", getString(user), getString(elementId));
-	//		print_list_triple(iterator1);
+	//	print_list_triple(iterator3);
 
 
 	if(iterator3 !is null)
@@ -100,7 +98,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 					if(category_triple !is null) 
 					{
 						char* category = cast(char*) (category_triple + 6 + (*(category_triple + 0) << 8) + *(category_triple + 1) + 1 + (*(category_triple + 2) << 8) + *(category_triple + 3) + 1);
-						//						log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
+						//log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
 						
 						if(strcmp(authorizedElementCategory, category) == 0)
 						{
@@ -125,7 +123,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 								is_actual = is_right_actual(s, ts);
 							if(is_actual)
 							{
-								//								log.trace("# subject = {} ", getString(s));
+								//log.trace("# subject = {} ", getString(s));
 								
 								return true;
 							}
