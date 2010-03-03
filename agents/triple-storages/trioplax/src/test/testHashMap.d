@@ -34,6 +34,9 @@ void main()
 	int* control_mem_addr = null;
 	uint control_mem_content = 0;
 
+	int dummy;
+	uint dummy1;
+	
 	/*
 	 char* triple_ptr = cast(char*)alloca (10+1);
 	 
@@ -70,7 +73,8 @@ void main()
 
 	Stdout.format("main:2 stop full data").newline;
 
-	res_triples = hm.get("testkeys", null, null, false);
+	res_triples = hm.get("testkeys", null, null, dummy, dummy1);
+
 	print_triple_list(res_triples);
 
 	Stdout.format("main:3 ----------------- res_triples={:X} ", res_triples).newline;
@@ -78,34 +82,34 @@ void main()
 	for(int h = 0; h < 1; h++)
 	{
 
-		res_triples = hm.get("testkey_1", "testkey_1", null, false);
+		res_triples = hm.get("testkey_1", "testkey_1", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_999", "testkey_999", null, false);
+		res_triples = hm.get("testkey_999", "testkey_999", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_99", "testkey_99", null, false);
+		res_triples = hm.get("testkey_99", "testkey_99", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_50", "testkey_50", null, false);
+		res_triples = hm.get("testkey_50", "testkey_50", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_1", "testkey_1", null, false);
+		res_triples = hm.get("testkey_1", "testkey_1", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_999", "testkey_999", null, false);
+		res_triples = hm.get("testkey_999", "testkey_999", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_99", "testkey_99", null, false);
+		res_triples = hm.get("testkey_99", "testkey_99", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_50", "testkey_50", null, false);
+		res_triples = hm.get("testkey_50", "testkey_50", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
 		Stdout.format("start read").newline;
 		for(int i = 2_000_000; i > 0; i--)
 		{
-			res_triples = hm.get("testkey_1", "testkey_1", null, false);
+			res_triples = hm.get("testkey_1", "testkey_1", null, dummy, dummy1);
 
 			//		ListTripleIterator it = res_triples.iterator ();
 			//		while (it.hasNext ())
@@ -119,19 +123,20 @@ void main()
 		}
 		Stdout.format("stop read").newline;
 
-		res_triples = hm.get("testkey_1", "testkey_1", null, false);
+		res_triples = hm.get("testkey_1", "testkey_1", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_999", "testkey_999", null, false);
+		res_triples = hm.get("testkey_999", "testkey_999", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_99", "testkey_99", null, false);
+		res_triples = hm.get("testkey_99", "testkey_99", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
-		res_triples = hm.get("testkey_50", "testkey_50", null, false);
+		res_triples = hm.get("testkey_50", "testkey_50", null, dummy, dummy1);
 		print_triple_list(res_triples);
 
 	}
+
 }
 
 void print_triple_list(uint* res_triples)
@@ -152,7 +157,7 @@ void print_triple_list(uint* res_triples)
 
 			next_element = *(iterator + 1);
 			iterator = cast(uint*) next_element;
-			//			Stdout.format("print_triple_list:3 iterator={:X}", iterator);
+						Stdout.format("print_triple_list:3 iterator={:X}", iterator).newline;
 		}
 	}
 
