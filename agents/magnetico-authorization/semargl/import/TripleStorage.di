@@ -56,6 +56,10 @@ class TripleStorage
 }
     private
 {
+    bool log_stat_info = false;
+}
+    private
+{
     HashMap idx_s = null;
 }
     private
@@ -109,10 +113,6 @@ class TripleStorage
     private
 {
     char* idx;
-}
-    private
-{
-    bool log_stat_info = true;
 }
     private
 {
