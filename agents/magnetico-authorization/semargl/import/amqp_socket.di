@@ -14,10 +14,19 @@ import amqp_connection;
 const AF_INET = 2;
 const PF_INET = AF_INET;
 alias ushort sa_family_t;
+private
+{
+    import Log;
+}
+static 
+{
+    void[] buf_array;
+}
 Socket amqp_open_socket(char[] hostname, int portnumber)
 {
 Socket socket = new Socket(AddressFamily.INET,SocketType.STREAM,ProtocolType.IP,true);
 socket.connect(new InternetAddress(hostname,portnumber));
+buf_array = new void[](INITIAL_INBOUND_SOCK_BUFFER_SIZE);
 return socket;
 }
 static 

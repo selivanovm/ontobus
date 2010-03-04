@@ -56,10 +56,6 @@ class TripleStorage
 }
     private
 {
-    bool log_stat_info = false;
-}
-    private
-{
     HashMap idx_s = null;
 }
     private
@@ -116,13 +112,10 @@ class TripleStorage
 }
     private
 {
-<<<<<<< HEAD:agents/magnetico-authorization/semargl/import/TripleStorage.di
     bool log_stat_info = true;
 }
     private
 {
-=======
->>>>>>> master:agents/magnetico-authorization/semargl/import/TripleStorage.di
     char[] cat_buff1;
 }
     private

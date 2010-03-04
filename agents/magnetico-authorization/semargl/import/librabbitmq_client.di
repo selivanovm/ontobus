@@ -27,6 +27,10 @@ import amqp_api;
 import amqp_mem;
 private
 {
+    import Log;
+}
+private
+{
     import tango.core.Thread;
 }
 class librabbitmq_client : mom_client
@@ -38,6 +42,7 @@ class librabbitmq_client : mom_client
     char* bindingkey = null;
     char* exchange = cast(char*)"\x00";
     int waiting_for_login = 5;
+    Socket socket;
     char[] hostname;
     int port;
     void function(byte* txt, ulong size, mom_client from_client) message_acceptor;
@@ -52,9 +57,12 @@ vhost = _vhost;
 }
     void set_callback(void function(byte* txt, ulong size, mom_client from_client) _message_acceptor)
 {
-printf("lc#0\x0a");
 message_acceptor = _message_acceptor;
 }
     int send(char* routingkey, char* messagebody);
+    char* get_message()
+{
+return null;
+}
     void listener();
 }

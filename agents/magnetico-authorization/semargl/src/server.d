@@ -80,7 +80,7 @@ void main(char[][] args)
 
 	layout = new Locale;
 
-	result_buffer = cast(char*) new char[200 * 1024];
+	result_buffer = cast(char*) new char[1024 * 1024];
 	queue_name = cast(char*) (new char[40]);
 	user = cast(char*) (new char[40]);
 
@@ -258,8 +258,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			for(int i = 0; i < count_facts; i++)
 			{
-				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-					  getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+				/*				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+								getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));*/
 				if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
 				{
 					put_id = i;
@@ -347,7 +347,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
 
-			bool isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 ||
+			/*			bool isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 ||
 				get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 ||
 				agent_function_id > -1 || create_id > -1;
 
@@ -355,7 +355,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 			{
 				log.trace("# unrecognized command");
 				//				return;
-			}
+				}*/
 
 			
 			if(agent_function_id >= 0 && arg_id > 0)
