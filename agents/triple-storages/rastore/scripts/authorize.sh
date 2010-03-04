@@ -1,0 +1,1 @@
+./sendMessage.sh "<uid><mo#sj><mo/at/fn#a>.<uid><mo/ts#arg>{<><mo/at/acl#rt>\"c\".<><mo/at/acl#cat>\"DOCUMENTTEMPLATE\".<><mo/at/acl#eId>\"d93786a694374a07ac935e04bb389c3e\"<><mo/at/acl#tgSsE>\"c9692331-78a4-4506-96f7-b1e1594e465a\".}.<uid><mo/ts/msg#r_t>\"test\"." true 1 1 false
