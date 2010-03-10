@@ -171,12 +171,22 @@ class Authorization
 			log.trace("\n{0} Files\n", scan.files.length);
 
 			FilePath[] fp = scan.files;
-
-			for(int i = fp.length - 1; i >= 0; i--)
+			
+                        char[][] fp_str = new char[][fp.length];
+                        
+			for(int i = 0; i < fp.length; i++)
 			{
-				log.trace("{}\n", fp[i]);
-				load_from_file(fp[i], i_know_predicates, ts);
+				fp_str[i] = fp[i].toString ();
 			}
+			fp_str.sort;
+			
+			for(int i = 0; i < fp_str.length; i++)
+			{
+				log.trace("{}\n", fp_str[i]);
+				load_from_file(new FilePath (fp_str[i]), i_know_predicates, ts);
+			}
+			
+			
 			log.trace("\n{} Errors", scan.errors.length);
 			foreach(error; scan.errors)
 				log.trace(error);
