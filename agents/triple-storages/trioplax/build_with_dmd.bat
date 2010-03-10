@@ -12,7 +12,7 @@ rem dmd -Iimport src/*.d lib/librabbitmq_client.a lib/librabbitmq.a -O -release 
 rem date
 dmd src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d -O -Hdexport -release -lib
 
-rem dmd Triple.d socketserver.d ListStrings.d TripleStorage.d Log.d HashMap.d Hash.d -O -release -ofFRTSServer
+rem dmd Triple.d socketserver.d ListStrings.d TripleStorage.d Log.d HashMap.d Hash.d src/IndexException.d -O -release -ofFRTSServer
 rem rm hashMap.log
 rem rm *.o
 rem date

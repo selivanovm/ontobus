@@ -312,7 +312,7 @@ class Authorization
 
 		if (f_authorization_trace)
 		{
- 			log.trace("autorize:S01UserIsAdmin res={}", isAdmin);
+			// 			log.trace("autorize:S01UserIsAdmin res={}", isAdmin);
 		}
 		bool result;
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
@@ -323,7 +323,7 @@ class Authorization
 			
 			if (f_authorization_trace)
 			{
-	 			log.trace("autorize: isAdmin || calculatedRight res={}", result);				
+	 			//log.trace("autorize: isAdmin || calculatedRight res={}", result);				
 			}
 			
 			return result;
@@ -364,7 +364,7 @@ class Authorization
 		
 		result = strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && 
 			scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
-		log.trace("S09DocumentOfTemplate result = {}", result);
+		//		log.trace("S09DocumentOfTemplate result = {}", result);
 		if(result)
 		{
 			//counters[4]++;
@@ -441,8 +441,8 @@ class Authorization
 		{
 			if(strlen(fact_o[i]) > 0)
 			{
-				log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", getString(fact_p[i]), getString(fact_o[i]), strlen(
-						fact_o[i]));
+				/*				log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", 
+								getString(fact_p[i]), getString(fact_o[i]), strlen(fact_o[i]));*/
 				if(strcmp(fact_p[i], SET_FROM.ptr) == 0)
 				{
 					from_id = i;

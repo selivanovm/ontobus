@@ -29,7 +29,7 @@ private import authorization;
 
 private import mom_client;
 private import librabbitmq_client;
-private import libdbus_client;
+// private import libdbus_client;
 private import autotest;
 
 private import script_util;
@@ -116,6 +116,7 @@ void main(char[][] args)
 			log.trace("start new Thread {:X4}", &thread);
 		}
 
+		/*
 		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
 		if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
 		{
@@ -138,6 +139,7 @@ void main(char[][] args)
 
 			log.trace("start new Thread {:X4}", &thread);
 		}
+		*/
 
 	}
 	else
@@ -245,6 +247,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			// 				
 			// замапим предикаты фактов на конкретные переменные put_id, arg_id
+			int authorization_id = -1;
 			int delete_subjects_id = -1;
 			int get_id = -1;
 			int put_id = -1;
@@ -258,104 +261,116 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			for(int i = 0; i < count_facts; i++)
 			{
-				/*				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-								getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));*/
-				if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
+				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+					  getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+
+				if(strcmp(fact_p[i], SUBJECT.ptr) == 0) 
 				{
-					put_id = i;
-					log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-				}
-				else
-				{
-					if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
+					if(authorization_id < 0 && strcmp(fact_o[i], AUTHORIZE.ptr) == 0)
 					{
-						arg_id = i;
-						log.trace("found comand {}, id ={} ", getString(fact_p[i]), i);
+						authorization_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 					}
 					else
-					{
-						if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS_BY_PREDICATE.ptr) == 0 && strcmp(
-								fact_p[i], SUBJECT.ptr) == 0)
+						if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0)
 						{
-							delete_subjects_by_predicate_id = i;
+							put_id = i;
 							log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 						}
 						else
-						{
-							if(get_id < 0 && strcmp(fact_o[i], GET.ptr) == 0 && strcmp(fact_p[i], SUBJECT.ptr) == 0)
+							if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS_BY_PREDICATE.ptr) == 0)
 							{
-								get_id = i;
+								delete_subjects_by_predicate_id = i;
 								log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 							}
 							else
-							{
-								if(delete_subjects_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS.ptr) == 0 && strcmp(fact_p[i],
-										SUBJECT.ptr) == 0)
+								if(get_id < 0 && strcmp(fact_o[i], GET.ptr) == 0)
 								{
-									delete_subjects_id = i;
+									get_id = i;
 									log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 								}
 								else
-								{
-							
-									if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0 && strcmp(
-											fact_p[i], SUBJECT.ptr) == 0)
+									if(delete_subjects_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS.ptr) == 0)
 									{
-										get_authorization_rights_records_id = i;
+										delete_subjects_id = i;
 										log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 									}
 									else
-									{
-										
-											if(get_delegate_assigners_tree_id < 0 && strcmp(fact_o[i],
-													GET_DELEGATE_ASSIGNERS_TREE.ptr) == 0 && strcmp(fact_p[i],
-													SUBJECT.ptr) == 0)
+										if(get_delegate_assigners_tree_id < 0 && strcmp(fact_o[i], 
+																GET_DELEGATE_ASSIGNERS_TREE.ptr) == 0)
+										{
+											get_delegate_assigners_tree_id = i;
+											log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+										}
+										else
+											if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0)
 											{
-												get_delegate_assigners_tree_id = i;
+												get_authorization_rights_records_id = i;
 												log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 											}
 											else
-											{
-												if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0 && strcmp(fact_p[i],
-														SUBJECT.ptr) == 0)
+												if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0)
 												{
 													agent_function_id = i;
 												}
 												else
-												{
-													if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0 && strcmp(
-															fact_p[i], SUBJECT.ptr) == 0)
+													if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0)
 													{
 														log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 														create_id = i;
 														put_id = i;
 													}
-												}
-
-											}
-
-										
-									}
-								}
-							}
-						}
-					}
+					
 
 				}
+				else
+					if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
+					{
+						arg_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_p[i]), i);
+					}
 
 			}
 
 			log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
 
-			/*			bool isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 ||
+			bool isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 ||
 				get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 ||
-				agent_function_id > -1 || create_id > -1;
+				agent_function_id > -1 || create_id > -1 || authorization_id > -1;
 
 			if(!isCommandRecognized) 
 			{
 				log.trace("# unrecognized command");
-				//				return;
-				}*/
+
+
+				int reply_to_id = 0;
+				for(int i = 0; i < count_facts; i++)
+				{
+					if(strlen(fact_o[i]) > 0)
+					{
+						if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
+						{
+							reply_to_id = i;
+						}
+					}
+				}
+
+				char* result_ptr = cast(char*) result_buffer;
+				char* command_uid = fact_s[0];
+
+				*result_ptr = '<';
+				strcpy(result_ptr + 1, command_uid);
+				result_ptr += strlen(command_uid) + 1;
+				strcpy(result_ptr, result_state_err_header.ptr);
+				result_ptr += result_state_err_header.length;
+				*(result_ptr - 1) = 0;
+
+				strcpy(queue_name, fact_o[reply_to_id]);
+
+				send_result_and_logging_messages(queue_name, result_buffer, from_client);
+				
+				return;
+			}
 
 			
 			if(agent_function_id >= 0 && arg_id > 0)
@@ -399,9 +414,6 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 			if(get_id >= 0 && arg_id > 0)
 			{
 
-				log.trace("#GET");
-				
-
 				/* пример сообщения: запрос всех фактов с p=predicate1 и o=object1
 				 
 				 <2014a><magnet-ontology#subject><magnet-ontology#get>.
@@ -423,38 +435,26 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						}
 					}
 				}
-				log.trace("#GET 1");
-				
 				int i = 0;
 				for(; i < count_facts; i++)
 				{
 					if(is_fact_in_object[i] == arg_id)
 						break;
 				}
-				log.trace("#GET 2 i={} {:X4} {:X4} {:X4}", i, fact_s[i], fact_p[i], fact_o[i]);
-				
 				log.trace("query s = {} , p = {} , o = {}", getString(fact_p[i]));
 					  //getString(fact_p[i]), getString(fact_o[i]));
 
-				log.trace("#GET 3");
-				
 				char* ss = strlen(fact_s[i]) == 0 ? null : fact_s[i];
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
-
-				log.trace("#GET 4");
 
 				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
 
-				log.trace("#GET 5");
-
 				char* result_ptr = cast(char*) result_buffer;
 				char* command_uid = fact_s[0];
 
-
-				log.trace("#GET 6");
 
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
@@ -790,7 +790,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 			//			log.trace("# fact_p[0]={}, fact_o[0]={}", getString(fact_p[0]), getString(fact_o[0]));
 
 			// AUTHORIZE
-			if(strcmp(fact_o[0], AUTHORIZE.ptr) == 0 && strcmp(fact_p[0], SUBJECT.ptr) == 0)
+			if(authorization_id >= 0)
 			{
 				log.trace("function authorize");
 

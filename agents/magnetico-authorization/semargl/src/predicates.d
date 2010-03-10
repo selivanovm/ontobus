@@ -5,6 +5,7 @@ module Predicates;
 public static const char[] result_data_header_with_bracets = "><" ~ RESULT_DATA ~ ">{";
 public static const char[] result_data_header = "><" ~ RESULT_DATA ~ ">\"";
 public static const char[] result_state_ok_header = "><" ~ RESULT_STATE ~ ">\"ok\". ";
+public static const char[] result_state_err_header = "><" ~ RESULT_STATE ~ ">\"er\". ";
 
 alias char[] String;
 
