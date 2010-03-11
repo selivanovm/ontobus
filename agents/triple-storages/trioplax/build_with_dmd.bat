@@ -10,7 +10,7 @@ rem dmd src/testHashMap.d src/Log.d src/HashMap.d src/Hash.d -O -release -ofhash
 rem date
 rem dmd -Iimport src/*.d lib/librabbitmq_client.a lib/librabbitmq.a -O -release -ofTrioplaxServer.run
 rem date
-dmd src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d -O -Hdexport -release -lib
+dmd src/TripleStorage.d src/Log.d src/HashMap.d src/Hash.d src/IndexException.d -O -Hdexport -release -lib
 
 rem dmd Triple.d socketserver.d ListStrings.d TripleStorage.d Log.d HashMap.d Hash.d src/IndexException.d -O -release -ofFRTSServer
 rem rm hashMap.log

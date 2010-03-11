@@ -34,7 +34,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 		    
 			  char* subject1 = cast(char*) triple + 6;
 
-			  log.trace("isInDocFlow : subject = {} | s1", fromStringz(ACL_subject), fromStringz(subject1));
+			  //log.trace("isInDocFlow : subject = {} | s1", fromStringz(ACL_subject), fromStringz(subject1));
 
 			  is_in_docflow = true;			  
 
@@ -44,7 +44,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 
 			subject1 = cast(char*) triple + 6;
 			
-			log.trace("isInDocFlow #2 {}", fromStringz(subject1));
+			//log.trace("isInDocFlow #2 {}", fromStringz(subject1));
 
 
 			uint* iterator3 = ts.getTriples(ACL_subject, RIGHTS.ptr, null);
@@ -53,13 +53,13 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 			    
 				  subject1 = cast(char*) triple + 6;
 
-				  log.trace("isInDocFlow #3 | {}", subject1);
+				  //log.trace("isInDocFlow #3 | {}", subject1);
 			    
 			    triple = cast(byte*) *iterator3;
 			    if(triple !is null)
 			      {
 				  subject1 = cast(char*) triple + 6;				
-				  log.trace("isInDocFlow #4 | {}", subject1);
+				  //log.trace("isInDocFlow #4 | {}", subject1);
 				
 				// проверим, есть ли тут требуемуе нами право
 				char* triple2_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) 
@@ -68,7 +68,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 				bool is_actual = false;
 				while(*triple2_o != 0)
 				{
-				    log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), rightType);
+					//log.trace("lookRightOfIterator ('{}' || '{}' == '{}' ?)", *triple2_o, *(triple2_o + 1), rightType);
 				    if(*triple2_o == *(rt_symbols + rightType) || *(triple2_o + 1) == *(rt_symbols + rightType))
 				    {
 					    if(!is_actual)

@@ -20,7 +20,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		if(isAdmin(user, ts))
 		{
 			cache[user] = true;
-			log.trace("User is admin? {}", true);
+			//log.trace("User is admin? {}", true);
 			return true;
 		} else {
 			for(int i = 0; i < iterator_on_targets_of_hierarhical_departments.length; i++)
@@ -28,7 +28,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 				//log.trace("!!! {}", fromStringz(iterator_on_targets_of_hierarhical_departments[i]));
 				if(isAdmin(iterator_on_targets_of_hierarhical_departments[i], ts)) {
 					cache[user] = true;
-					log.trace("User is admin? {}", false);
+					//log.trace("User is admin? {}", false);
 					return true;
 				}
 			}
@@ -37,7 +37,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		cache[user] = false;
 		return false;
 	}
-	log.trace("User is admin? {}", *is_admin);
+	//log.trace("User is admin? {}", *is_admin);
 	return *is_admin;
 }
 

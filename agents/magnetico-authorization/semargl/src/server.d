@@ -261,13 +261,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 			for(int i = 0; i < count_facts; i++)
 			{
-				log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
-					  getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
+				//log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
+				//  getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 
 				if(strcmp(fact_p[i], SUBJECT.ptr) == 0) 
 				{
+					//log.trace("#1");
+					
+
 					if(authorization_id < 0 && strcmp(fact_o[i], AUTHORIZE.ptr) == 0)
 					{
+						//log.trace("#2");
 						authorization_id = i;
 						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 					}
@@ -665,13 +669,13 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
 											if(founded_facts2 is null)
 											{
-											log.trace("#444");
+												//log.trace("#444");
 												is_exists = false;
 												break;
 											}
 											else
 											{
-											log.trace("#555");
+												//log.trace("#555");
 												uint next_element2 = 0xFF;
 												bool is_exists2 = false;
 												while(next_element2 > 0 && is_exists)
@@ -692,7 +696,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 													next_element2 = *(founded_facts2 + 1);
 													founded_facts2 = cast(uint*) next_element2;
 												}
-												log.trace("#666 {} {}", is_exists, is_exists2);
+												//log.trace("#666 {} {}", is_exists, is_exists2);
 												is_exists = is_exists2 && is_exists;
 											}
 										}
@@ -740,7 +744,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						}
 						catch(Exception ex)
 						{
-							log.trace("faled command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
+							log.trace("failed command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
 									getString(cast(char*) fact_o[i]));
 						}
 					}

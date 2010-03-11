@@ -178,7 +178,7 @@ class Authorization
 			{
 				fp_str[i] = fp[i].toString ();
 			}
-			fp_str.sort;
+			fp_str = fp_str.sort;
 			
 			for(int i = 0; i < fp_str.length; i++)
 			{
