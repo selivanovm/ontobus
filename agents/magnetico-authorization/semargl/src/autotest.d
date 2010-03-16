@@ -68,18 +68,18 @@ class autotest: mom_client
 			auto style = File.ReadWriteOpen;
 			style.share = File.Share.Read;
 			style.open = File.Open.Create;
-			File file = new File("original_message", style);
+			File file = new File("recieved_message", style);
 			file.output.write(fromStringz(messagebody));
 			file.close();
 
-			File file2 = new File("recieved_message", style);
+			File file2 = new File("original_message", style);
 			file2.output.write(fromStringz(output_data));
 			file2.close();
 
 			File file3 = new File("original_recieved_message", style);
-			file3.output.write(fromStringz(messagebody));
-			file3.output.write("\r\n");
 			file3.output.write(fromStringz(output_data));
+			file3.output.write("\r\n");
+			file3.output.write(fromStringz(messagebody));
 			file3.close();
 			//			log.trace("out messages {} \r\n[{}]", strlen (messagebody), fromStringz(messagebody));
 			//			log.trace("not compare with original {} \r\n[{}]", strlen (output_data), fromStringz(output_data));
