@@ -715,15 +715,29 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					}
 				}
 
+				int ext_uid = -1;
+				
 				for(int i = 0; i < count_facts; i++)
 				{
+					if (strcmp(fact_p[i], NEW_UID.ptr) == 0)
+					{
+						ext_uid = i;						
+					    continue;
+					}
+					
 					if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 					{
 						reply_to_id = i;
 					}
 					else if(is_fact_in_object[i] == arg_id)
 					{
-						if(facts_removed || strlen(fact_s[i]) == 0)
+						if (ext_uid > 0)
+						{
+							uuid = fact_o[ext_uid];
+						}
+						
+//						if(facts_removed || strlen(fact_s[i]) == 0)
+						if(strlen(fact_s[i]) == 0)
 							fact_s[i] = uuid;
 						else
 							uuid = fact_s[i];

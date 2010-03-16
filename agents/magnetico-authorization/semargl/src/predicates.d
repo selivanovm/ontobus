@@ -11,6 +11,8 @@ alias char[] String;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+public static const String NEW_UID = "new-uid";
+
 public static const String NAMESPACE = "mo#";
 public static const String AUTHORIZATION_FUNCTIONS_NAMESPACE = "mo/at/fn#";
 public static const String AUTHORIZATION_ACL_NAMESPACE = "mo/at/acl#";

@@ -158,10 +158,10 @@ void prepare_block(char* line, ulong line_length)
 
 	if(strstr(input_data, CREATE.ptr) !is null && strstr(input_data, "<>") !is null && output_data !is null)
 	{
-		//		log.trace("#i1 result_data_header={}", result_data_header);
-		//				printf("\nINPUT %d: %s\n", size, input_data);
+		//				log.trace("#i1 result_data_header={}", result_data_header);
+		//						printf("\nINPUT %d: %s\n", size, input_data);
 
-		//				printf("\nOUTPUT: %s\n", output_data);
+		//						printf("\nOUTPUT: %s\n", output_data);
 
 		// это команда на создание записи авторизации
 
@@ -169,12 +169,12 @@ void prepare_block(char* line, ulong line_length)
 		if(result_id !is null)
 			result_id += result_data_header.length;
 
-		//		printf("\nresult_id: %s\n", result_id);
-		//		log.trace("#i1-1 result_id = {}", result_id);
+		//				printf("\nresult_id: %s\n", result_id);
+		//				log.trace("#i1-1 result_id = {}", result_id);
 
 		int size_id = strlen(result_id) - 2;
 		//		log.trace("#i1-2");
-		char[] result_id_text = result_id[1 .. size_id];
+		char[] result_id_text = result_id[0 .. size_id];
 		//		log.trace("#i1-3");
 		char[] qqq = input_data[0 .. size];
 		//		log.trace("#i1-4");
@@ -183,11 +183,11 @@ void prepare_block(char* line, ulong line_length)
 		//		printf("\nresult: %s\n", rr.ptr);
 
 		auto input_data_text = new Text!(char)(qqq);
-		while(strstr(input_data_text.toString().ptr, "<>") !is null)
-		{
-			input_data_text.select("<>");
-			input_data_text.replace("<" ~ result_id_text ~ ">");
-		}
+		//		while(strstr(input_data_text.toString().ptr, "<>") !is null)
+		//		{
+		input_data_text.select("{<>");
+		input_data_text.replace("{<><" ~ NEW_UID ~ ">\"" ~ result_id_text ~ "\".<>");
+		//		}
 		//		log.trace("#i1-5");
 
 		input_data = toStringz(input_data_text.toString());
