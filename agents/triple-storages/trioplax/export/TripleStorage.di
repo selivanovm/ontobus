@@ -157,11 +157,11 @@ count_look_predicate_on_idx_s1ppoo++;
 }
     public
 {
-    uint* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
+    triple_list_element* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
 }
     public
 {
-    uint* getTriples(char* s, char* p, char* o);
+    triple_list_element* getTriples(char* s, char* p, char* o);
 }
     public
 {

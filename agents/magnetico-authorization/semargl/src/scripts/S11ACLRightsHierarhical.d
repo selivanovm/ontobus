@@ -87,10 +87,10 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 				char* s = cast(char*) triple3 + 6;
 				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
 
-				uint* category_triples = ts.getTriples(s, CATEGORY.ptr, null);
+				triple_list_element* category_triples = ts.getTriples(s, CATEGORY.ptr, null);
 				if(category_triples !is null)
 				{
-					byte* category_triple = cast(byte*) *category_triples;
+					byte* category_triple = cast(byte*) category_triples.triple_ptr;
 					if(category_triple !is null)
 					{
 						char*

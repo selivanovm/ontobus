@@ -376,7 +376,7 @@ class Authorization
 			return true;
 		}
 
-		uint* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
+		triple_list_element* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 		if(strcmp("null", authorizedElementId) != 0 && iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
@@ -394,8 +394,7 @@ class Authorization
 		}
 		//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 
-		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts,
-				cast(triple_list_element*) iterator_facts_of_document))
+		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			//counters[7]++;
 			return true;

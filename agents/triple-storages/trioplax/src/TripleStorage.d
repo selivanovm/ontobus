@@ -140,7 +140,7 @@ class TripleStorage
 		//log.trace("### getTriples1");
 		if(useindex & idx_name.S1PPOO)
 		{
-			return cast(uint*) idx_s1ppoo.get(s, p, o, dummy);
+			return idx_s1ppoo.get(s, p, o, dummy);
 		}
 	}
 
@@ -250,7 +250,7 @@ class TripleStorage
 				log_file.close();
 			}
 		}
-		return cast(uint*) list;
+		return list;
 	}
 
 	public bool removeTriple(char[] s, char[] p, char[] o)
