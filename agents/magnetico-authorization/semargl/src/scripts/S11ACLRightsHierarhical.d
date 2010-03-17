@@ -1,21 +1,19 @@
 module scripts.S11ACLRightsHierarhical;
 
-private import Predicates;
-
-import RightTypeDef;
-import TripleStorage;
 private import tango.io.Stdout;
-private import script_util;
 private import tango.stdc.string;
 private import tango.stdc.stdio;
 
+private import Predicates;
+private import RightTypeDef;
+private import TripleStorage;
+private import script_util;
 private import fact_tools;
+private import HashMap;
 private import Log;
 
-
-
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
-		      char[] pp, char* authorizedElementCategory)
+		char[] pp, char* authorizedElementCategory)
 {
 	bool result = false;
 
@@ -41,12 +39,13 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	return result;
 }
 
-bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments, char[] pp, char* authorizedElementCategory)
+bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments, char[] pp,
+		char* authorizedElementCategory)
 {
 	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
 
 	// найдем все ACL записи для заданных user и elementId 
-	uint* iterator1 = ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
+	triple_list_element* iterator1 = cast (triple_list_element*)ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
 
 	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
@@ -57,7 +56,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
 	for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
 	{
-		uint* iterator2 = ts.getTriplesUseIndex(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
+		triple_list_element* iterator2 = cast (triple_list_element*)ts.getTriplesUseIndex(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
 
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);
@@ -69,22 +68,19 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	return false;
 }
 
-bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, char* authorizedElementCategory)
+bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, TripleStorage ts, char* authorizedElementCategory)
 {
 
 	//	print_list_triple(iterator3);
 
-
-	if(iterator3 !is null)
 	{
-		uint next_element3 = 0xFF;
-		while(next_element3 > 0)
+		while(iterator3 !is null)
 		{
 
 			bool category_match = false;
 			bool rights_match = false;
 
-			byte* triple3 = cast(byte*) *iterator3;
+			byte* triple3 = cast(byte*) iterator3.triple_ptr;
 
 			if(triple3 !is null)
 			{
@@ -95,11 +91,12 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 				if(category_triples !is null)
 				{
 					byte* category_triple = cast(byte*) *category_triples;
-					if(category_triple !is null) 
+					if(category_triple !is null)
 					{
-						char* category = cast(char*) (category_triple + 6 + (*(category_triple + 0) << 8) + *(category_triple + 1) + 1 + (*(category_triple + 2) << 8) + *(category_triple + 3) + 1);
+						char*
+								category = cast(char*) (category_triple + 6 + (*(category_triple + 0) << 8) + *(category_triple + 1) + 1 + (*(category_triple + 2) << 8) + *(category_triple + 3) + 1);
 						//log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
-						
+
 						if(strcmp(authorizedElementCategory, category) == 0)
 						{
 							category_match = true;
@@ -110,7 +107,8 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 				if(category_match && strcmp(p, RIGHTS.ptr) == 0)
 				{
 					// проверим, есть ли тут требуемуе нами право
-					char* triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
+					char*
+							triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
 					//		log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
 
 					bool is_actual = false;
@@ -124,7 +122,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 							if(is_actual)
 							{
 								//log.trace("# subject = {} ", getString(s));
-								
+
 								return true;
 							}
 							else
@@ -134,8 +132,7 @@ bool lookRightOfIterator(uint* iterator3, char* rightType, TripleStorage ts, cha
 					}
 				}
 			}
-			next_element3 = *(iterator3 + 1);
-			iterator3 = cast(uint*) next_element3;
+			iterator3 = iterator3.next_triple_list_element;
 		}
 	}
 

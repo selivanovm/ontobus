@@ -1,48 +1,46 @@
 module script_util;
 
-private import Predicates;
-
-private import RightTypeDef;
-private import TripleStorage;
 private import tango.io.Stdout;
-private import fact_tools;
-private import Log;
 private import tango.text.convert.Integer;
 private import tango.stdc.string;
 private import tango.stdc.stringz;
 private import tango.stdc.time;
 
+private import Predicates;
+private import RightTypeDef;
+private import TripleStorage;
+private import fact_tools;
+private import Log;
+private import HashMap;
+
 public char* isInDocFlow(char* elementId, TripleStorage ts)
 {
 	//log.trace("isInDocFlow, elementId={}", getString(elementId));
 	// найдем субьекта ACL записи по <magnet-ontology#elementId>=elementId
-	uint* iterator0 = ts.getTriples(null, ELEMENT_ID.ptr, elementId);
+	triple_list_element* iterator0 = cast(triple_list_element*) ts.getTriples(null, ELEMENT_ID.ptr, elementId);
 	char* ACL_subject;
 
-	if(iterator0 !is null) // таких записей может быть несколько, но с DOCFLOW одна
+	//	if(iterator0 !is null) // таких записей может быть несколько, но с DOCFLOW одна
 	{
-	  
-	  uint next_element = 0xFF;
-	  while(next_element > 0)
-	  {
-		byte* triple0 = cast(byte*) *iterator0;
-
-		if(triple0 !is null)
+		while(iterator0 !is null)
 		{
-		  ACL_subject = cast(char*) triple0 + 6;
-		  //log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
+			byte* triple0 = cast(byte*) iterator0.triple_ptr;
 
-		  // найдем автора 
-		  iterator0 = ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
+			if(triple0 !is null)
+			{
+				ACL_subject = cast(char*) triple0 + 6;
+				//log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
 
-		  if(iterator0 !is null)
-		  {
-		    return ACL_subject;
-		  }
+				// найдем автора 
+				iterator0 = cast(triple_list_element*) ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
+
+				if(iterator0 !is null)
+				{
+					return ACL_subject;
+				}
+			}
+			iterator0 = iterator0.next_triple_list_element;
 		}
-		next_element = *(iterator0 + 1);
-		iterator0 = cast(uint*) next_element;
-	  }
 
 	}
 	return null;
@@ -57,18 +55,18 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 	char*[] result = new char*[16];
 	ubyte count_result = 0;
 
-	uint* iterator0;
+	triple_list_element* iterator0;
 	byte* triple0;
 
 	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
-	iterator0 = ts.getTriples(user, MEMBER_OF.ptr, null);
+	iterator0 = cast(triple_list_element*) ts.getTriples(user, MEMBER_OF.ptr, null);
 
 	//print_list_triple(iterator0);
 
 	if(iterator0 !is null)
 	{
-		triple0 = cast(byte*) *iterator0;
+		triple0 = cast(byte*) iterator0.triple_ptr;
 		char* next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
 
 		if(next_branch !is null)
@@ -80,11 +78,11 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 		while(next_branch !is null)
 		{
-			uint* iterator1 = ts.getTriples(null, HAS_PART.ptr, next_branch);
+			triple_list_element* iterator1 = cast(triple_list_element*) ts.getTriples(null, HAS_PART.ptr, next_branch);
 			next_branch = null;
 			if(iterator1 !is null)
 			{
-				byte* triple = cast(byte*) *iterator1;
+				byte* triple = cast(byte*) iterator1.triple_ptr;
 				char* s = cast(char*) triple + 6;
 				//log.trace("next_element1={}", getString (s));
 				result[count_result] = s;
@@ -126,27 +124,25 @@ public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts
 public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
 {
 
-	uint* delegates_facts = ts.getTriples(null, DELEGATION_DELEGATE.ptr, delegate_id);
+	triple_list_element* delegates_facts = cast(triple_list_element*) ts.getTriples(null, DELEGATION_DELEGATE.ptr, delegate_id);
 
 	if(delegates_facts !is null)
 	{
 		//log.trace("#2 gda");
-		uint next_delegate = 0xFF;
-		while(next_delegate > 0)
+		while(delegates_facts !is null)
 		{
 			//log.trace("#3 gda");
-			byte* de_legate = cast(byte*) *delegates_facts;
+			byte* de_legate = cast(byte*) delegates_facts.triple_ptr;
 			if(de_legate !is null)
 			{
 				char* subject = cast(char*) de_legate + 6;
-				uint* owners_facts = ts.getTriples(subject, DELEGATION_OWNER.ptr, null);
+				triple_list_element* owners_facts = cast(triple_list_element*) ts.getTriples(subject, DELEGATION_OWNER.ptr, null);
 
 				if(owners_facts !is null)
 				{
-					uint next_owner = 0xFF;
-					while(next_owner > 0)
+					while(owners_facts !is null)
 					{
-						byte* owner = cast(byte*) *owners_facts;
+						byte* owner = cast(byte*) owners_facts.triple_ptr;
 						if(owner !is null)
 						{
 							//log.trace("#4 gda");
@@ -160,38 +156,35 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							 result_ptr += strlen(object);*/
 							process_delegate(object);
 
-							uint* with_tree_facts = ts.getTriples(subject, DELEGATION_WITH_TREE.ptr, null);
-							if(with_tree_facts !is null)
+							triple_list_element* with_tree_facts = cast(triple_list_element*) ts.getTriples(subject, DELEGATION_WITH_TREE.ptr, null);
 							{
-								uint next_with_tree = 0xFF;
-								while(next_with_tree > 0)
+								while(with_tree_facts !is null)
 								{
-									byte* with_tree = cast(byte*) *with_tree_facts;
+									byte* with_tree = cast(byte*) with_tree_facts.triple_ptr;
 									if(with_tree !is null)
 									{
 										if(strcmp(cast(char*) with_tree, "1") == 0)
 											getDelegateAssignersForDelegate(object, ts, process_delegate);
-										next_with_tree = 0;
+										with_tree_facts = null;
 									}
 									else
 									{
-										next_with_tree = *(with_tree_facts + 1);
-										with_tree_facts = cast(uint*) next_with_tree;
+										with_tree_facts = with_tree_facts.next_triple_list_element;
 									}
 								}
 							}
-							next_owner = 0;
+							owners_facts = null;
 						}
 						else
 						{
-							next_owner = *(owners_facts + 1);
-							owners_facts = cast(uint*) next_owner;
+							//?							next_owner = *(owners_facts + 1);
+							owners_facts = delegates_facts.next_triple_list_element;
+							//?cast(uint*) next_owner;
 						}
 					}
 				}
 			}
-			next_delegate = *(delegates_facts + 1);
-			delegates_facts = cast(uint*) next_delegate;
+			delegates_facts = delegates_facts.next_triple_list_element;
 		}
 	}
 }
@@ -201,16 +194,14 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 	char* from;
 	char* to;
 
-	uint* from_iter = ts.getTriples(subject, DATE_FROM.ptr, null);
+	triple_list_element* from_iter = cast(triple_list_element*) ts.getTriples(subject, DATE_FROM.ptr, null);
 
 	// log.trace("#1");
 
-	if(from_iter !is null)
 	{
-		uint next_el = 0xFF;
-		while(next_el > 0)
+		while(from_iter !is null)
 		{
-			byte* el = cast(byte*) *from_iter;
+			byte* el = cast(byte*) from_iter.triple_ptr;
 			if(el !is null)
 			{
 				from = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
@@ -219,20 +210,17 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 				else
 					from = null;
 			}
-			next_el = *(from_iter + 1);
-			from_iter = cast(uint*) next_el;
+			from_iter = from_iter.next_triple_list_element;
 		}
 	}
 
 	//	log.trace("#10");
 
-	uint* to_iter = ts.getTriples(subject, DATE_TO.ptr, null);
-	if(to_iter !is null)
+	triple_list_element* to_iter = cast(triple_list_element*) ts.getTriples(subject, DATE_TO.ptr, null);
 	{
-		uint next_el = 0xFF;
-		while(next_el > 0)
+		while(to_iter !is null)
 		{
-			byte* el = cast(byte*) *to_iter;
+			byte* el = cast(byte*) to_iter.triple_ptr;
 			if(el !is null)
 			{
 				to = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
@@ -241,8 +229,7 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 				else
 					to = null;
 			}
-			next_el = *(to_iter + 1);
-			to_iter = cast(uint*) next_el;
+			to_iter = to_iter.next_triple_list_element;
 		}
 	}
 
@@ -254,10 +241,10 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 public tm* get_local_time()
 {
 	time_t rawtime;
-	tm * timeinfo;
+	tm* timeinfo;
 
-	time ( &rawtime );
-	timeinfo = localtime ( &rawtime );
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
 
 	return timeinfo;
 }
@@ -265,14 +252,14 @@ public tm* get_local_time()
 public char[] get_year(tm* timeinfo)
 {
 	char[] lt = new char[4];
-	itoa(lt, cast(uint)timeinfo.tm_year + 1900);
+	itoa(lt, cast(uint) timeinfo.tm_year + 1900);
 	return lt;
 }
 
 public char[] get_month(tm* timeinfo)
 {
 	char[] lt = new char[2];
-	itoa(lt, cast(uint)timeinfo.tm_mon + 1);
+	itoa(lt, cast(uint) timeinfo.tm_mon + 1);
 	if(timeinfo.tm_mon < 9)
 		lt[0] = '0';
 	return lt;
@@ -281,7 +268,7 @@ public char[] get_month(tm* timeinfo)
 public char[] get_day(tm* timeinfo)
 {
 	char[] lt = new char[2];
-	itoa(lt, cast(uint)timeinfo.tm_mday);
+	itoa(lt, cast(uint) timeinfo.tm_mday);
 	if(timeinfo.tm_mday < 10)
 		lt[0] = '0';
 	return lt;
@@ -289,7 +276,7 @@ public char[] get_day(tm* timeinfo)
 
 public int cmp_date_with_tm(char* date, tm* timeinfo)
 {
-	
+
 	assert(strlen(date) == 10);
 
 	char[] today_y = get_year(timeinfo);
@@ -339,9 +326,8 @@ public bool is_today_in_interval(char* from, char* to)
 	return true;
 }
 
-unittest 
-{
-	
+unittest {
+
 	Stdout.format("\n ::: TESTS START ::: ").newline;
 
 	tm* timeinfo = get_local_time();

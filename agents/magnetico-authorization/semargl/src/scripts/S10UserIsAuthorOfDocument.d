@@ -1,13 +1,14 @@
 module scripts.S10UserIsAuthorOfDocument;
 
+private import tango.stdc.string;
+private import tango.io.Stdout;
+
+private import TripleStorage;
+private import HashMap;
+private import fact_tools;
 private import Predicates;
 
-private import tango.stdc.string;
-private import TripleStorage;
-private import tango.io.Stdout;
-private import fact_tools;
-
-public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, uint* iterator_facts_of_document)
+public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, triple_list_element* iterator_facts_of_document)
 {
 
 	// ! не ясно зачем это
@@ -35,13 +36,11 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	// найдем автора документа
 	//	uint* iterator0 = ts.getTriples(elementId, "http://purl.org/dc/elements/1.1/creator", user, false);
 
-	if(iterator_facts_of_document !is null)
 	{
-		uint next_element0 = 0xFF;
-		while(next_element0 > 0)
+		while(iterator_facts_of_document !is null)
 		{
 			//			Stdout.format("UserIsAuthorOfDocument #2").newline;
-			byte* triple0 = cast(byte*) *iterator_facts_of_document;
+			byte* triple0 = cast(byte*) iterator_facts_of_document.triple_ptr;
 
 			if(triple0 !is null)
 			{
@@ -64,8 +63,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 					}
 				}
 			}
-			next_element0 = *(iterator_facts_of_document + 1);
-			iterator_facts_of_document = cast(uint*) next_element0;
+			iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 		}
 	}
 	return false;

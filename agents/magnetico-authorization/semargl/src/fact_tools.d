@@ -6,6 +6,7 @@ private import tango.stdc.stdio;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import Log;
+private import HashMap;
 
 struct Counts
 {
@@ -13,20 +14,18 @@ struct Counts
 	byte open_brakets;
 }
 
-public void print_list_triple(uint* list_iterator)
+public void print_list_triple(triple_list_element* list_iterator)
 {
 	byte* triple;
 	if(list_iterator !is null)
 	{
-		uint next_element0 = 0xFF;
-		while(next_element0 > 0)
+		while(list_iterator !is null)
 		{
-			triple = cast(byte*) *list_iterator;
+			triple = cast(byte*) list_iterator.triple_ptr;
 			if (triple !is null)
 			  print_triple(triple);
 			
-			next_element0 = *(list_iterator + 1);
-			list_iterator = cast(uint*) next_element0;
+			list_iterator = list_iterator.next_triple_list_element;
 		}
 	}
 }

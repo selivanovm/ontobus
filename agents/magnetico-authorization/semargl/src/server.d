@@ -117,29 +117,29 @@ void main(char[][] args)
 		}
 
 		/*
-		char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
-		if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
-		{
-			log.trace("connect to DBUS, service name = {}", dbus_semargl_service_name);
+		 char[] dbus_semargl_service_name = props["dbus_semargl_service_name"];
+		 if(dbus_semargl_service_name !is null && dbus_semargl_service_name.length > 1)
+		 {
+		 log.trace("connect to DBUS, service name = {}", dbus_semargl_service_name);
 
-			mom_client client = null;
+		 mom_client client = null;
 
-			client = new libdbus_client();
+		 client = new libdbus_client();
 
-			(cast(libdbus_client) client).setServiceName(dbus_semargl_service_name);
-			(cast(libdbus_client) client).setListenFrom(props["dbus_semargl_listen_from"]);
+		 (cast(libdbus_client) client).setServiceName(dbus_semargl_service_name);
+		 (cast(libdbus_client) client).setListenFrom(props["dbus_semargl_listen_from"]);
 
-			(cast(libdbus_client) client).connect();
+		 (cast(libdbus_client) client).connect();
 
-			client.set_callback(&get_message);
+		 client.set_callback(&get_message);
 
-			Thread thread = new Thread(&client.listener);
-			thread.start;
-			Thread.sleep(0.250);
+		 Thread thread = new Thread(&client.listener);
+		 thread.start;
+		 Thread.sleep(0.250);
 
-			log.trace("start new Thread {:X4}", &thread);
-		}
-		*/
+		 log.trace("start new Thread {:X4}", &thread);
+		 }
+		 */
 
 	}
 	else
@@ -161,7 +161,7 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom
 	auto elapsed = new StopWatch();
 	double time;
 
-	log.trace("send to queue {}", fromStringz (queue_name));
+	log.trace("send to queue {}", fromStringz(queue_name));
 	elapsed.start;
 	from_client.send(queue_name, result_buffer);
 
@@ -264,10 +264,9 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				//log.trace("look triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), 
 				//  getString( cast(char*) fact_p[i]), getString(cast(char*) fact_o[i]));
 
-				if(strcmp(fact_p[i], SUBJECT.ptr) == 0) 
+				if(strcmp(fact_p[i], SUBJECT.ptr) == 0)
 				{
 					//log.trace("#1");
-					
 
 					if(authorization_id < 0 && strcmp(fact_o[i], AUTHORIZE.ptr) == 0)
 					{
@@ -275,77 +274,64 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						authorization_id = i;
 						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
 					}
-					else
-						if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0)
-						{
-							put_id = i;
-							log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-						}
-						else
-							if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS_BY_PREDICATE.ptr) == 0)
-							{
-								delete_subjects_by_predicate_id = i;
-								log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-							}
-							else
-								if(get_id < 0 && strcmp(fact_o[i], GET.ptr) == 0)
-								{
-									get_id = i;
-									log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-								}
-								else
-									if(delete_subjects_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS.ptr) == 0)
-									{
-										delete_subjects_id = i;
-										log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-									}
-									else
-										if(get_delegate_assigners_tree_id < 0 && strcmp(fact_o[i], 
-																GET_DELEGATE_ASSIGNERS_TREE.ptr) == 0)
-										{
-											get_delegate_assigners_tree_id = i;
-											log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-										}
-										else
-											if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0)
-											{
-												get_authorization_rights_records_id = i;
-												log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-											}
-											else
-												if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0)
-												{
-													agent_function_id = i;
-												}
-												else
-													if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0)
-													{
-														log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-														create_id = i;
-														put_id = i;
-													}
-					
+					else if(put_id < 0 && strcmp(fact_o[i], PUT.ptr) == 0)
+					{
+						put_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+					}
+					else if(delete_subjects_by_predicate_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS_BY_PREDICATE.ptr) == 0)
+					{
+						delete_subjects_by_predicate_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+					}
+					else if(get_id < 0 && strcmp(fact_o[i], GET.ptr) == 0)
+					{
+						get_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+					}
+					else if(delete_subjects_id < 0 && strcmp(fact_o[i], DELETE_SUBJECTS.ptr) == 0)
+					{
+						delete_subjects_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+					}
+					else if(get_delegate_assigners_tree_id < 0 && strcmp(fact_o[i], GET_DELEGATE_ASSIGNERS_TREE.ptr) == 0)
+					{
+						get_delegate_assigners_tree_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+					}
+					else if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0)
+					{
+						get_authorization_rights_records_id = i;
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+					}
+					else if(put_id < 0 && strcmp(fact_o[i], "magnet-ontology#agent_function") == 0)
+					{
+						agent_function_id = i;
+					}
+					else if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0)
+					{
+						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+						create_id = i;
+						put_id = i;
+					}
 
 				}
-				else
-					if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
-					{
-						arg_id = i;
-						log.trace("found comand {}, id ={} ", getString(fact_p[i]), i);
-					}
+				else if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
+				{
+					arg_id = i;
+					log.trace("found comand {}, id ={} ", getString(fact_p[i]), i);
+				}
 
 			}
 
 			log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
 
-			bool isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 ||
-				get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 ||
-				agent_function_id > -1 || create_id > -1 || authorization_id > -1;
+			bool
+					isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 || get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 || agent_function_id > -1 || create_id > -1 || authorization_id > -1;
 
-			if(!isCommandRecognized) 
+			if(!isCommandRecognized)
 			{
 				log.trace("# unrecognized command");
-
 
 				int reply_to_id = 0;
 				for(int i = 0; i < count_facts; i++)
@@ -372,11 +358,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
-				
+
 				return;
 			}
 
-			
 			if(agent_function_id >= 0 && arg_id > 0)
 			{
 				/* пример сообщения: установить в модуле trioplax флаг set_stat_info_logging = true
@@ -446,19 +431,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						break;
 				}
 				log.trace("query s = {} , p = {} , o = {}", getString(fact_p[i]));
-					  //getString(fact_p[i]), getString(fact_o[i]));
+				//getString(fact_p[i]), getString(fact_o[i]));
 
 				char* ss = strlen(fact_s[i]) == 0 ? null : fact_s[i];
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
 
-				uint* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
+				triple_list_element* list_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(ss, pp, oo);
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
-
 
 				char* result_ptr = cast(char*) result_buffer;
 				char* command_uid = fact_s[0];
-
 
 				*result_ptr = '<';
 				strcpy(result_ptr + 1, command_uid);
@@ -466,12 +449,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(result_ptr, result_data_header.ptr);
 				result_ptr += result_data_header.length;
 
-				if(list_facts !is null)
 				{
-					uint next_element1 = 0xFF;
-					while(next_element1 > 0)
+					while(list_facts !is null)
 					{
-						byte* triple = cast(byte*) *list_facts;
+						byte* triple = cast(byte*) list_facts.triple_ptr;
 						//						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
@@ -497,8 +478,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							strcpy(result_ptr, ">.");
 							result_ptr += 2;
 						}
-						next_element1 = *(list_facts + 1);
-						list_facts = cast(uint*) next_element1;
+						list_facts = list_facts.next_triple_list_element;
 					}
 				}
 
@@ -512,7 +492,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
 				*(result_ptr - 1) = 0;
-				
+
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
@@ -600,7 +580,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
 				*(result_ptr - 1) = 0;
-				
+
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
@@ -622,7 +602,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				char* uuid = cast(char*) new char[17];
 				longToHex(getUUID(), uuid);
-				
+
 				// найдем триплет с elementId
 				int element_id = -1;
 				for(int i = 0; i < count_facts; i++)
@@ -642,14 +622,13 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					if(element_id >= 0)
 					{
 						log.trace("check for elementId = {}", getString(fact_o[element_id]));
-						uint* founded_facts = az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr, fact_o[element_id]);
-						if(founded_facts !is null)
+						triple_list_element* founded_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr,
+								fact_o[element_id]);
 						{
 							bool is_exists_not_null = false;
-							uint next_element = 0xFF;
-							while(next_element > 0)
+							while(founded_facts !is null)
 							{
-								byte* triple = cast(byte*) *founded_facts;
+								byte* triple = cast(byte*) founded_facts.triple_ptr;
 								if(triple !is null)
 								{
 									is_exists_not_null = true;
@@ -658,15 +637,14 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
 									{
-										if(i != element_id && is_fact_in_object[i] == arg_id && (strcmp(fact_p[i],
-												TARGET_SUBSYSTEM_ELEMENT.ptr) == 0 || strcmp(fact_p[i],
-												CATEGORY.ptr) == 0 || strcmp(fact_p[i],
-												AUTHOR_SYSTEM.ptr) == 0) || strcmp(fact_p[i], RIGHTS.ptr) == 0)
-											 
+										if(i != element_id && is_fact_in_object[i] == arg_id && (strcmp(fact_p[i], TARGET_SUBSYSTEM_ELEMENT.ptr) == 0 || strcmp(
+												fact_p[i], CATEGORY.ptr) == 0 || strcmp(fact_p[i], AUTHOR_SYSTEM.ptr) == 0) || strcmp(fact_p[i],
+												RIGHTS.ptr) == 0)
+
 										{
-											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), 
-											 getString(fact_o[i]));
-											uint* founded_facts2 = az.getTripleStorage.getTriples(s, fact_p[i], fact_o[i]);
+											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), getString(fact_o[i]));
+											triple_list_element* founded_facts2 = cast(triple_list_element*) az.getTripleStorage.getTriples(s,
+													fact_p[i], fact_o[i]);
 											if(founded_facts2 is null)
 											{
 												//log.trace("#444");
@@ -676,11 +654,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 											else
 											{
 												//log.trace("#555");
-												uint next_element2 = 0xFF;
 												bool is_exists2 = false;
-												while(next_element2 > 0 && is_exists)
+												while(founded_facts2 !is null && is_exists)
 												{
-													byte* triple2 = cast(byte*) *founded_facts2;
+													byte* triple2 = cast(byte*) founded_facts2.triple_ptr;
 													if(triple2 !is null)
 													{
 														char*
@@ -693,8 +670,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 														}
 
 													}
-													next_element2 = *(founded_facts2 + 1);
-													founded_facts2 = cast(uint*) next_element2;
+													founded_facts2 = founded_facts2.next_triple_list_element;
 												}
 												//log.trace("#666 {} {}", is_exists, is_exists2);
 												is_exists = is_exists2 && is_exists;
@@ -708,35 +684,34 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 									}
 
 								}
-								next_element = *(founded_facts + 1);
-								founded_facts = cast(uint*) next_element;
+								founded_facts = founded_facts.next_triple_list_element;
 							}
 						}
 					}
 				}
 
 				int ext_uid = -1;
-				
+
 				for(int i = 0; i < count_facts; i++)
 				{
-					if (strcmp(fact_p[i], NEW_UID.ptr) == 0)
+					if(strcmp(fact_p[i], NEW_UID.ptr) == 0)
 					{
-						ext_uid = i;						
-					    continue;
+						ext_uid = i;
+						continue;
 					}
-					
+
 					if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 					{
 						reply_to_id = i;
 					}
 					else if(is_fact_in_object[i] == arg_id)
 					{
-						if (ext_uid > 0)
+						if(ext_uid > 0)
 						{
 							uuid = fact_o[ext_uid];
 						}
-						
-//						if(facts_removed || strlen(fact_s[i]) == 0)
+
+						//						if(facts_removed || strlen(fact_s[i]) == 0)
 						if(strlen(fact_s[i]) == 0)
 							fact_s[i] = uuid;
 						else
@@ -749,11 +724,11 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							try
 							{
-							az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+								az.getTripleStorage.addTriple(getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							}
-							catch (IndexException ex)
+							catch(IndexException ex)
 							{
-								throw new Exception ("message - add triple");
+								throw new Exception("message - add triple");
 							}
 						}
 						catch(Exception ex)
@@ -778,7 +753,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				if(uuid !is null)
 				{
-//					strcpy(result_ptr, "\".<");
+					//					strcpy(result_ptr, "\".<");
 					strcpy(result_ptr, "<");
 					result_ptr += 1;
 					strcpy(result_ptr, command_uid);
@@ -1022,7 +997,6 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				log.trace("time calculate right = {:d6} ms. ( {:d6} sec.), cps={}", total_time_calculate_right * 1000, total_time_calculate_right,
 						count_prepared_elements / total_time_calculate_right);
 
-
 				//				printf("try to send message\n");
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
@@ -1051,7 +1025,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 void remove_subject(char* s)
 {
 
-	uint* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+	triple_list_element* removed_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(s, null, null);
 
 	if(removed_facts !is null)
 	{
@@ -1062,10 +1036,9 @@ void remove_subject(char* s)
 
 		int cnt = 0;
 
-		uint next_element1 = 0xFF;
-		while(next_element1 > 0)
+		while(removed_facts !is null)
 		{
-			byte* triple2 = cast(byte*) *removed_facts;
+			byte* triple2 = cast(byte*) removed_facts.triple_ptr;
 
 			if(triple2 !is null)
 			{
@@ -1083,8 +1056,7 @@ void remove_subject(char* s)
 				//				az.getTripleStorage.removeTriple(getString(ss), getString(pp), getString(oo));
 			}
 			cnt++;
-			next_element1 = *(removed_facts + 1);
-			removed_facts = cast(uint*) next_element1;
+			removed_facts = removed_facts.next_triple_list_element;
 		}
 
 		for(int k = 0; k < cnt; k++)
@@ -1100,7 +1072,7 @@ void remove_subject(char* s)
 void remove_subjects_by_predicate(char* p, char* o)
 {
 
-	uint* removed_facts = az.getTripleStorage.getTriples(null, p, o);
+	triple_list_element* removed_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(null, p, o);
 
 	if(removed_facts !is null)
 	{
@@ -1109,10 +1081,9 @@ void remove_subjects_by_predicate(char* p, char* o)
 
 		int cnt = 0;
 
-		uint next_element1 = 0xFF;
-		while(next_element1 > 0)
+		while(removed_facts !is null)
 		{
-			byte* triple2 = cast(byte*) *removed_facts;
+			byte* triple2 = cast(byte*) removed_facts.triple_ptr;
 
 			if(triple2 !is null)
 			{
@@ -1120,8 +1091,7 @@ void remove_subjects_by_predicate(char* p, char* o)
 				s_a[cnt] = getString(ss);
 			}
 			cnt++;
-			next_element1 = *(removed_facts + 1);
-			removed_facts = cast(uint*) next_element1;
+			removed_facts = removed_facts.next_triple_list_element;
 		}
 
 		for(int k = 0; k < cnt; k++)
