@@ -67,11 +67,11 @@ class TripleStorage
 }
     public
 {
-    bool INFO_stat_get_triples = true;
+    bool INFO_stat_get_triples = false;
 }
     private
 {
-    bool log_stat_info = true;
+    bool log_stat_info = false;
 }
     public
 {
@@ -160,6 +160,12 @@ log.trace("create idx_spo...");
 idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_length_order);
 if (f_init_debug)
 log.trace("ok");
+}
+    public
+{
+    void list_no_longer_required(triple_list_element* first_element_of_list)
+{
+}
 }
     public
 {
