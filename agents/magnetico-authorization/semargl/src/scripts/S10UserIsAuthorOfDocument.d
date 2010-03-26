@@ -40,20 +40,19 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		while(iterator_facts_of_document !is null)
 		{
 			//			Stdout.format("UserIsAuthorOfDocument #2").newline;
-			byte* triple0 = cast(byte*) iterator_facts_of_document.triple_ptr;
+			Triple* triple0 = iterator_facts_of_document.triple;
 
 			if(triple0 !is null)
 			{
 
 				//			Stdout.format("UserIsAuthorOfDocument #2.1").newline;
 
-				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
+				char* triple0_p = cast(char*) triple0.p;
 				//			Stdout.format("UserIsAuthorOfDocument #3 triple0_p={}", getString(triple0_p)).newline;
 
 				if(strcmp(triple0_p, CREATOR.ptr) == 0)
 				{
-					char*
-							triple0_o = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+					char*	triple0_o = triple0.o;
 
 					if(strcmp(triple0_o, user) == 0)
 					{

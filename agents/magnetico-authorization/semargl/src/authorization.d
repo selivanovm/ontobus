@@ -566,12 +566,12 @@ class Authorization
 		{
 			while(start_facts_set !is null)
 			{
-				byte* triple = cast(byte*) start_facts_set.triple_ptr;
+				Triple* triple = start_facts_set.triple;
 				//				log.trace("# get_authorization_rights_records : triple = {:X4}", triple);
 
 				if(triple !is null)
 				{
-					char* s = cast(char*) triple + 6;
+					char* s = cast(char*) triple.s;
 
 					triple_list_element* founded_facts = cast(triple_list_element*) ts.getTriples(s, null, null);
 					triple_list_element* founded_facts_copy = founded_facts;
@@ -582,14 +582,13 @@ class Authorization
 						while(founded_facts !is null)
 						{
 
-							byte* triple1 = cast(byte*) founded_facts.triple_ptr;
+							Triple* triple1 = founded_facts.triple;
 
 							if(triple1 !is null)
 							{
 
-								char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-								char*
-										o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+								char* p1 = cast(char*) triple1.p;
+								char* o1 = cast(char*) triple1.o;
 
 								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1, AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
 								{
@@ -640,14 +639,13 @@ class Authorization
 							//log.trace("found match");
 							while(founded_facts_copy !is null)
 							{
-								byte* triple1 = cast(byte*) founded_facts_copy.triple_ptr;
+								Triple* triple1 = founded_facts_copy.triple;
 								//log.trace("#3");
 								if(triple1 !is null)
 								{
 									//log.trace("...not null");
-									char* p1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1);
-									char*
-											o1 = cast(char*) (triple1 + 6 + (*(triple1 + 0) << 8) + *(triple1 + 1) + 1 + (*(triple1 + 2) << 8) + *(triple1 + 3) + 1);
+									char* p1 = cast(char*) triple1.p;
+									char* o1 = cast(char*) triple1.o;
 
 									strcpy(result_ptr++, "<");
 									strcpy(result_ptr, s);

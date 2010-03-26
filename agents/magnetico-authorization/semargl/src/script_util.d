@@ -13,39 +13,6 @@ private import fact_tools;
 private import Log;
 private import HashMap;
 
-public char* isInDocFlow(char* elementId, TripleStorage ts)
-{
-	//log.trace("isInDocFlow, elementId={}", getString(elementId));
-	// найдем субьекта ACL записи по <magnet-ontology#elementId>=elementId
-	triple_list_element* iterator0 = cast(triple_list_element*) ts.getTriples(null, ELEMENT_ID.ptr, elementId);
-	char* ACL_subject;
-
-	//	if(iterator0 !is null) // таких записей может быть несколько, но с DOCFLOW одна
-	{
-		while(iterator0 !is null)
-		{
-			byte* triple0 = cast(byte*) iterator0.triple_ptr;
-
-			if(triple0 !is null)
-			{
-				ACL_subject = cast(char*) triple0 + 6;
-				//log.trace("isInDocFlow #1 ACL Subject {}", getString(ACL_subject));
-
-				// найдем автора 
-				iterator0 = cast(triple_list_element*) ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
-
-				if(iterator0 !is null)
-				{
-					return ACL_subject;
-				}
-			}
-			iterator0 = iterator0.next_triple_list_element;
-		}
-
-	}
-	return null;
-}
-
 /*
  * возвращает массив субьектов (s) вышестоящих подразделений по отношению к user   
  */
@@ -56,7 +23,7 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 	ubyte count_result = 0;
 
 	triple_list_element* iterator0;
-	byte* triple0;
+	Triple* triple0;
 
 	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
@@ -66,8 +33,8 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 	if(iterator0 !is null)
 	{
-		triple0 = cast(byte*) iterator0.triple_ptr;
-		char* next_branch = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);;
+		triple0 = iterator0.triple;
+		char* next_branch = cast(char*) triple0.o;
 
 		if(next_branch !is null)
 		{
@@ -82,8 +49,8 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 			next_branch = null;
 			if(iterator1 !is null)
 			{
-				byte* triple = cast(byte*) iterator1.triple_ptr;
-				char* s = cast(char*) triple + 6;
+				Triple* triple = iterator1.triple;
+				char* s = cast(char*) triple.s;
 				//log.trace("next_element1={}", getString (s));
 				result[count_result] = s;
 				count_result++;
@@ -132,22 +99,22 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 		while(delegates_facts !is null)
 		{
 			//log.trace("#3 gda");
-			byte* de_legate = cast(byte*) delegates_facts.triple_ptr;
+			Triple* de_legate = delegates_facts.triple;
 			if(de_legate !is null)
 			{
-				char* subject = cast(char*) de_legate + 6;
+				char* subject = cast(char*) de_legate.s;
 				triple_list_element* owners_facts = cast(triple_list_element*) ts.getTriples(subject, DELEGATION_OWNER.ptr, null);
 
 				if(owners_facts !is null)
 				{
 					while(owners_facts !is null)
 					{
-						byte* owner = cast(byte*) owners_facts.triple_ptr;
+						Triple* owner = owners_facts.triple;
 						if(owner !is null)
 						{
 							//log.trace("#4 gda");
 
-							char* object = cast(char*) (owner + 6 + (*(owner + 0) << 8) + *(owner + 1) + 1 + (*(owner + 2) << 8) + *(owner + 3) + 1);
+							char* object = cast(char*) owner.o;
 
 							//log.trace("delegate = {}, owner = {}", getString(subject), getString(object));
 
@@ -160,7 +127,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							{
 								while(with_tree_facts !is null)
 								{
-									byte* with_tree = cast(byte*) with_tree_facts.triple_ptr;
+									Triple* with_tree = with_tree_facts.triple;
 									if(with_tree !is null)
 									{
 										if(strcmp(cast(char*) with_tree, "1") == 0)
@@ -201,10 +168,10 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 	{
 		while(from_iter !is null)
 		{
-			byte* el = cast(byte*) from_iter.triple_ptr;
+			Triple* el = from_iter.triple;
 			if(el !is null)
 			{
-				from = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
+				from = cast(char*) el.o;
 				if(el !is null)
 					break;
 				else
@@ -220,10 +187,10 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 	{
 		while(to_iter !is null)
 		{
-			byte* el = cast(byte*) to_iter.triple_ptr;
+			Triple* el = to_iter.triple;
 			if(el !is null)
 			{
-				to = cast(char*) (el + 6 + (*(el + 0) << 8) + *(el + 1) + 1 + (*(el + 2) << 8) + *(el + 3) + 1);
+				to = cast(char*) el.o;
 				if(el !is null)
 					break;
 				else

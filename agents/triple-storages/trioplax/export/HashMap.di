@@ -2,6 +2,14 @@
 module HashMap;
 private
 {
+    import tango.stdc.stdlib;
+}
+private
+{
+    import tango.stdc.stdlib;
+}
+private
+{
     import tango.stdc.string;
 }
 private
@@ -28,16 +36,27 @@ private
 {
     import IndexException;
 }
+bool f_trace_qqq = false;
+triple_list_header* header_tmp = null;
+struct Triple
+{
+    short s_length = 0;
+    short p_length = 0;
+    short o_length = 0;
+    char* s;
+    char* p;
+    char* o;
+}
 struct triple_list_element
 {
-    char* triple_ptr;
+    Triple* triple;
     triple_list_element* next_triple_list_element;
 }
 struct triple_list_header
 {
     triple_list_element* first_element;
     triple_list_element* last_element;
-    char* keys;
+    Triple* keys;
 }
 class HashMap
 {
@@ -52,6 +71,14 @@ class HashMap
     public
 {
     bool INFO_remove_triple_from_list = false;
+}
+    public
+{
+    bool f_trace_put = false;
+}
+    public
+{
+    bool f_trace_get = false;
 }
     private
 {
@@ -77,18 +104,6 @@ class HashMap
 {
     uint max_size_reducer = 0;
 }
-    private
-{
-    ubyte[] key_2_list_triples_area;
-}
-    private
-{
-    uint key_2_list_triples_area__last = 0;
-}
-    private
-{
-    uint key_2_list_triples_area__right = 0;
-}
     this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 {
 hashName = _hashName;
@@ -98,10 +113,6 @@ log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_ord
 max_size_reducer = max_count_elements * max_size_short_order + max_size_short_order;
 reducer = new triple_list_header*[](max_size_reducer);
 log.trace("*** HashMap[name={}, reducer.length={}",hashName,reducer.length);
-key_2_list_triples_area = new ubyte[](_triple_area_length);
-key_2_list_triples_area__last = 0;
-key_2_list_triples_area__right = key_2_list_triples_area.length;
-log.trace("*** HashMap[name={}, key_2_list_triples_area__right={}",hashName,key_2_list_triples_area__right);
 log.trace("*** create object HashMap... ok");
 }
     public
@@ -120,19 +131,11 @@ return hashName;
 }
     public
 {
-    bool f_trace_put = false;
+    void put(char[] key1, char[] key2, char[] key3, Triple* triple_ptr);
 }
     public
 {
-    void put(char[] key1, char[] key2, char[] key3, void* triple_ptr);
-}
-    public
-{
-    bool check_triple_in_list(void* triple_ptr, char* key1, char* key2, char* key3);
-}
-    public
-{
-    bool f_trace_get = false;
+    bool check_triple_in_list(Triple* triple_ptr, char* key1, char* key2, char* key3);
 }
     public
 {
@@ -140,14 +143,14 @@ return hashName;
 }
     public
 {
-    void remove_triple_from_list(byte* removed_triple, char[] s, char[] p, char[] o);
+    void remove_triple_from_list(Triple* removed_triple, char[] s, char[] p, char[] o);
 }
     public
 {
-    void print_triple(char[] header, byte* triple);
+    void print_triple(char[] header, Triple* triple);
 }
     public
 {
-    char[] triple_to_string(byte* triple);
+    char[] triple_to_string(Triple* triple);
 }
 }

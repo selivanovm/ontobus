@@ -80,21 +80,20 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 			bool category_match = false;
 			bool rights_match = false;
 
-			byte* triple3 = cast(byte*) iterator3.triple_ptr;
+			Triple* triple3 = iterator3.triple;
 
 			if(triple3 !is null)
 			{
-				char* s = cast(char*) triple3 + 6;
-				char* p = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1);
+				char* s = cast(char*) triple3.s;
+				char* p = cast(char*) triple3.p;
 
 				triple_list_element* category_triples = ts.getTriples(s, CATEGORY.ptr, null);
 				if(category_triples !is null)
 				{
-					byte* category_triple = cast(byte*) category_triples.triple_ptr;
+					Triple* category_triple = category_triples.triple;
 					if(category_triple !is null)
 					{
-						char*
-								category = cast(char*) (category_triple + 6 + (*(category_triple + 0) << 8) + *(category_triple + 1) + 1 + (*(category_triple + 2) << 8) + *(category_triple + 3) + 1);
+						char*	category = cast(char*) category_triple.o;
 						//log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
 
 						if(strcmp(authorizedElementCategory, category) == 0)
@@ -107,8 +106,7 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 				if(category_match && strcmp(p, RIGHTS.ptr) == 0)
 				{
 					// проверим, есть ли тут требуемуе нами право
-					char*
-							triple2_o = cast(char*) (triple3 + 6 + (*(triple3 + 0) << 8) + *(triple3 + 1) + 1 + (*(triple3 + 2) << 8) + *(triple3 + 3) + 1);
+					char*	triple2_o = cast(char*) triple3.o;
 					//		log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
 
 					bool is_actual = false;

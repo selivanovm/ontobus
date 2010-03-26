@@ -16,12 +16,12 @@ struct Counts
 
 public void print_list_triple(triple_list_element* list_iterator)
 {
-	byte* triple;
+	Triple* triple;
 	if(list_iterator !is null)
 	{
 		while(list_iterator !is null)
 		{
-			triple = cast(byte*) list_iterator.triple_ptr;
+			triple = list_iterator.triple;
 			if (triple !is null)
 			  print_triple(triple);
 			
@@ -30,16 +30,16 @@ public void print_list_triple(triple_list_element* list_iterator)
 	}
 }
 
-public void print_triple(byte* triple)
+public void print_triple(Triple* triple)
 {
 	if(triple is null)
 		return;
 
-	char* s = cast(char*) triple + 6;
+	char* s = cast(char*) triple.s;
 
-	char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+	char* p = cast(char*) triple.p;
 
-	char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+	char* o = cast(char*) triple.o;
 
 	log.trace("triple: <{}><{}><{}>", getString (s), getString (p), getString (o));
 }

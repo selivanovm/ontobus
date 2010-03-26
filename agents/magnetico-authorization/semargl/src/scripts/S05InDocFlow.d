@@ -21,26 +21,24 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 	{
 		while(iterator !is null)
 		{
-			byte* triple = cast(byte*) iterator.triple_ptr; // берем субъект с нужным элементом
+			Triple* triple = iterator.triple; // берем субъект с нужным элементом
 			if(triple !is null)
 			{
-				ACL_subject = cast(char*) triple + 6;
+				ACL_subject = cast(char*) triple.s;
 				triple_list_element* iterator1 = cast(triple_list_element*) ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
 
 				if(iterator1 !is null)
-				// если не null, значит право с найденным субъектом создал документооборот
 				{
-
-					char* subject1 = cast(char*) triple + 6;
-
+				// если не null, значит право с найденным субъектом создал документооборот
+				
 					//log.trace("isInDocFlow : subject = {} | s1", fromStringz(ACL_subject), fromStringz(subject1));
 
 					is_in_docflow = true;
 
 					triple_list_element* iterator2 = cast(triple_list_element*) ts.getTriples(ACL_subject, TARGET_SUBSYSTEM_ELEMENT.ptr, user);
 					if(iterator2 !is null)
-					// если не null, значит target для права это наш user
 					{
+					// если не null, значит target для права это наш user
 
 						//			subject1 = cast(char*) triple + 6;
 
@@ -54,7 +52,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 
 							//log.trace("isInDocFlow #3 | {}", subject1);
 
-							triple = cast(byte*) iterator3.triple_ptr;
+							triple = iterator3.triple;
 							if(triple !is null)
 							{
 								//				  subject1 = cast(char*) triple + 6;				
@@ -62,7 +60,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 
 								// проверим, есть ли тут требуемуе нами право
 								char*
-										triple2_o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+										triple2_o = cast(char*) triple.o;
 
 								bool is_actual = false;
 								while(*triple2_o != 0)

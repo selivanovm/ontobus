@@ -24,10 +24,29 @@ private
 {
     import Log;
 }
-import Integer = tango.text.convert.Integer;
+private
+{
+    import Integer = tango.text.convert.Integer;
+}
 private
 {
     import tango.io.FileConduit;
+}
+private
+{
+    import tango.time.WallClock;
+}
+private
+{
+    import tango.time.Clock;
+}
+private
+{
+    import tango.text.locale.Locale;
+}
+private
+{
+    Locale layout;
 }
 enum idx_name 
 {
@@ -48,7 +67,11 @@ class TripleStorage
 }
     public
 {
-    bool INFO_stat_get_triples = false;
+    bool INFO_stat_get_triples = true;
+}
+    private
+{
+    bool log_stat_info = true;
 }
     public
 {
@@ -56,7 +79,7 @@ class TripleStorage
 }
     private
 {
-    bool log_stat_info = false;
+    bool f_init_debug = false;
 }
     private
 {
@@ -128,10 +151,15 @@ class TripleStorage
 }
     this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 {
+layout = new Locale;
 cat_buff1 = new char[](64 * 1024);
 cat_buff2 = new char[](64 * 1024);
 buff = new char[](32);
+if (f_init_debug)
+log.trace("create idx_spo...");
 idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_length_order);
+if (f_init_debug)
+log.trace("ok");
 }
     public
 {
@@ -167,6 +195,7 @@ count_look_predicate_on_idx_s1ppoo++;
 {
     bool removeTriple(char[] s, char[] p, char[] o);
 }
+    bool f_trace_addTriple = false;
     public
 {
     int addTriple(char[] s, char[] p, char[] o);
@@ -207,10 +236,10 @@ log.trace("index {}, counts={} ",idx_s1ppoo.getName(),idx_s1ppoo.get_count_eleme
 }
     public
 {
-    void print_triple(byte* triple);
+    void print_triple(Triple* triple);
 }
     public
 {
-    char[] triple_to_string(byte* triple);
+    char[] triple_to_string(Triple* triple);
 }
 }

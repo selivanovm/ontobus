@@ -452,15 +452,15 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				{
 					while(list_facts !is null)
 					{
-						byte* triple = cast(byte*) list_facts.triple_ptr;
+						Triple* triple = list_facts.triple;
 						//						log.trace("list_fact {:X4}", list_facts);
 						if(triple !is null)
 						{
-							char* s = cast(char*) triple + 6;
+							char* s = cast(char*) triple.s;
 
-							char* p = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1);
+							char* p = cast(char*) triple.p;
 
-							char* o = cast(char*) (triple + 6 + (*(triple + 0) << 8) + *(triple + 1) + 1 + (*(triple + 2) << 8) + *(triple + 3) + 1);
+							char* o = cast(char*) triple.o;
 
 							//log.trace("get result: <{}><{}><{}>", getString(s), getString(p), getString(o));
 
@@ -628,11 +628,11 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							bool is_exists_not_null = false;
 							while(founded_facts !is null)
 							{
-								byte* triple = cast(byte*) founded_facts.triple_ptr;
+								Triple* triple = founded_facts.triple;
 								if(triple !is null)
 								{
 									is_exists_not_null = true;
-									char* s = cast(char*) triple + 6;
+									char* s = cast(char*) triple.s;
 									log.trace("check right record with subject = {}", getString(s));
 									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
@@ -657,11 +657,10 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 												bool is_exists2 = false;
 												while(founded_facts2 !is null && is_exists)
 												{
-													byte* triple2 = cast(byte*) founded_facts2.triple_ptr;
+													Triple* triple2 = founded_facts2.triple;
 													if(triple2 !is null)
 													{
-														char*
-																o = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+														char* o = cast(char*) triple2.o;
 
 														if(strcmp(o, fact_o[i]) == 0)
 														{
@@ -1038,16 +1037,16 @@ void remove_subject(char* s)
 
 		while(removed_facts !is null)
 		{
-			byte* triple2 = cast(byte*) removed_facts.triple_ptr;
+			Triple* triple2 = removed_facts.triple;
 
 			if(triple2 !is null)
 			{
 
-				char* ss = cast(char*) triple2 + 6;
+				char* ss = cast(char*) triple2.s;
 
-				char* pp = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1);
+				char* pp = cast(char*) triple2.p;
 
-				char* oo = cast(char*) (triple2 + 6 + (*(triple2 + 0) << 8) + *(triple2 + 1) + 1 + (*(triple2 + 2) << 8) + *(triple2 + 3) + 1);
+				char* oo = cast(char*) triple2.o;
 
 				s_a[cnt] = getString(ss);
 				p_a[cnt] = getString(pp);
@@ -1083,11 +1082,11 @@ void remove_subjects_by_predicate(char* p, char* o)
 
 		while(removed_facts !is null)
 		{
-			byte* triple2 = cast(byte*) removed_facts.triple_ptr;
+			Triple* triple2 = removed_facts.triple;
 
 			if(triple2 !is null)
 			{
-				char* ss = cast(char*) triple2 + 6;
+				char* ss = cast(char*) triple2.s;
 				s_a[cnt] = getString(ss);
 			}
 			cnt++;

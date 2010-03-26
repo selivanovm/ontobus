@@ -59,18 +59,17 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 		while(iterator_facts_of_document !is null)
 		{
 			//log.trace("getObjectAuthor #2");
-			byte* triple0 = cast(byte*) iterator_facts_of_document.triple_ptr;
+			Triple* triple0 = iterator_facts_of_document.triple;
 			//log.trace("getObjectAuthor #3");
 			if(triple0 !is null)
 			{
 				//log.trace("getObjectAuthor #4");
-				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
+				char* triple0_p = cast(char*) triple0.p;
 				//log.trace("getObjectAuthor #5");
 				if(strcmp(triple0_p, CREATOR.ptr) == 0)
 				{
 					//log.trace("getObjectAuthor #6");
-					char*
-							result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+					char*	result = cast(char*) triple0.o;
 					//log.trace("getObjectAuthor #1 {}", fromStringz(result));
 					return result;
 				}
@@ -90,17 +89,16 @@ private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 		while(iterator_facts_of_document !is null)
 		{
 			//			log.trace("getRightRecordAuthor #2");
-			byte* triple0 = cast(byte*) iterator_facts_of_document.triple_ptr;
+			Triple* triple0 = iterator_facts_of_document.triple;
 			//			log.trace("getRightRecordAuthor #3");
 			if(triple0 !is null)
 			{
 				//		log.trace("getRightRecordAuthor #4");
-				char* triple0_p = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1);
+				char* triple0_p = cast(char*) triple0.p;
 				//				log.trace("getRightRecordAuthor #5");
 				if(strcmp(triple0_p, AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
 				{
-					char*
-							result = cast(char*) (triple0 + 6 + (*(triple0 + 0) << 8) + *(triple0 + 1) + 1 + (*(triple0 + 2) << 8) + *(triple0 + 3) + 1);
+					char*	result = cast(char*) triple0.o;
 					//					log.trace("getRightRecordAuthor #RESULT {}", fromStringz(result));
 					return result;
 				}

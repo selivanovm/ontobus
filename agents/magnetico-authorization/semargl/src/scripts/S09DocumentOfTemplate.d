@@ -21,15 +21,14 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 		return false;
 	}
 
-	byte* template_triple;
+	Triple* template_triple;
 	triple_list_element* facts = cast(triple_list_element*) ts.getTriples(elementId, DOCUMENT_TEMPLATE_ID.ptr, null);
 	if(facts !is null)
 	{
-		template_triple = cast(byte*) facts.triple_ptr;
+		template_triple = facts.triple;
 		if(template_triple !is null)
 		{
-			char*
-					template_id = cast(char*) (template_triple + 6 + (*(template_triple + 0) << 8) + *(template_triple + 1) + 1 + (*(template_triple + 2) << 8) + *(template_triple + 3) + 1);
+			char*	template_id = cast(char*) template_triple.o;
 			//log.trace("S09 #1 template_id = {}", template_id);
 
 			result = scripts.S11ACLRightsHierarhical.checkRight(user, template_id, rightType, ts, iterator_on_targets_of_hierarhical_departments, pp,
