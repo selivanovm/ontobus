@@ -687,7 +687,7 @@ class Authorization
 				}
 				start_facts_set = start_facts_set.next_triple_list_element;
 			}
-
+			list_no_longer_required (founded_facts_copy);
 		}
 
 		strcpy(result_ptr, "}.<");

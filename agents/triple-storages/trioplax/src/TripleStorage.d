@@ -76,9 +76,9 @@ class TripleStorage
 			log.trace ("ok");
 	}
 
-        public void list_no_longer_required (triple_list_element* first_element_of_list)
-        {
-        }
+    public void list_no_longer_required (triple_list_element* first_element_of_list)
+    {
+    }
 
 	public void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 	{
