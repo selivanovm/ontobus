@@ -50,7 +50,10 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
 
-	if(lookRightOfIterator(iterator1, rt_symbols + rightType, ts, authorizedElementCategory) == true)
+	bool res = lookRightOfIterator(iterator1, rt_symbols + rightType, ts, authorizedElementCategory);
+	ts.list_no_longer_required (iterator1);
+	
+	if(res == true)
 		return true;
 
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
@@ -61,7 +64,10 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);
 
-		if(lookRightOfIterator(iterator2, rt_symbols + rightType, ts, authorizedElementCategory) == true)
+		res = lookRightOfIterator(iterator2, rt_symbols + rightType, ts, authorizedElementCategory);
+		ts.list_no_longer_required (iterator2);
+
+		if(res == true)
 			return true;
 	}
 
@@ -101,6 +107,7 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 							category_match = true;
 						}
 					}
+					ts.list_no_longer_required (category_triples);
 				}
 
 				if(category_match && strcmp(p, RIGHTS.ptr) == 0)

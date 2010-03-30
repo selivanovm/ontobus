@@ -55,9 +55,13 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 				result[count_result] = s;
 				count_result++;
 				next_branch = s;
+				ts.list_no_longer_required (iterator1);
+
 			}
 
 		}
+		ts.list_no_longer_required (iterator0);
+
 	}
 
 	//		Stdout.format("getDepartmentTreePath #5 ok").newline;
@@ -90,7 +94,6 @@ public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts
 
 public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
 {
-
 	triple_list_element* delegates_facts = cast(triple_list_element*) ts.getTriples(null, DELEGATION_DELEGATE.ptr, delegate_id);
 
 	if(delegates_facts !is null)
@@ -140,6 +143,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 									}
 								}
 							}
+							ts.list_no_longer_required (with_tree_facts);
 							owners_facts = null;
 						}
 						else
@@ -149,10 +153,12 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							//?cast(uint*) next_owner;
 						}
 					}
+					ts.list_no_longer_required (owners_facts);
 				}
 			}
 			delegates_facts = delegates_facts.next_triple_list_element;
 		}
+		ts.list_no_longer_required (delegates_facts);		
 	}
 }
 
@@ -179,6 +185,7 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 			}
 			from_iter = from_iter.next_triple_list_element;
 		}
+		ts.list_no_longer_required (from_iter);
 	}
 
 	//	log.trace("#10");
@@ -198,6 +205,7 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 			}
 			to_iter = to_iter.next_triple_list_element;
 		}
+		ts.list_no_longer_required (to_iter);
 	}
 
 	//	log.trace("#20");	

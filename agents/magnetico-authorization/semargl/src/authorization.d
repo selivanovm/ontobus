@@ -7,8 +7,7 @@ private import tango.stdc.string;
 private import tango.stdc.stdlib;
 private import tango.io.FileConduit;
 private import tango.io.stream.MapStream;
-
-import Integer = tango.text.convert.Integer;
+private import Integer = tango.text.convert.Integer;
 
 version(tango_99_8)
 {
@@ -382,6 +381,7 @@ class Authorization
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
 			//log.trace("autorize end#2, return:[false]");
 			//counters[5]++;
+			ts.list_no_longer_required (iterator_facts_of_document);
 			return false;
 		}
 
@@ -389,6 +389,7 @@ class Authorization
 				authorizedElementCategory))
 		{
 			//counters[6]++;
+			ts.list_no_longer_required (iterator_facts_of_document);
 			return true;
 			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
@@ -397,17 +398,20 @@ class Authorization
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			//counters[7]++;
+			ts.list_no_longer_required (iterator_facts_of_document);
 			return true;
 		}
 		//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
 
 		if(isAdmin)
 		{
+			ts.list_no_longer_required (iterator_facts_of_document);
 			return true;
 		}
 
 		//		log.trace("Access Denied");
 
+		ts.list_no_longer_required (iterator_facts_of_document);
 		return false;
 		//		bool is_doc_or_draft = (strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 || strcmp(authorizedElementCategory, Category.DOCUMENT_DRAFT.ptr) == 0);
 
@@ -664,6 +668,8 @@ class Authorization
 
 								founded_facts_copy = founded_facts_copy.next_triple_list_element;
 							}
+							ts.list_no_longer_required (founded_facts_copy);
+							
 						}
 
 						if(strlen(result_buffer) > 10000)
@@ -687,7 +693,7 @@ class Authorization
 				}
 				start_facts_set = start_facts_set.next_triple_list_element;
 			}
-			list_no_longer_required (founded_facts_copy);
+			ts.list_no_longer_required (start_facts_set);
 		}
 
 		strcpy(result_ptr, "}.<");

@@ -35,6 +35,8 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 					DOCUMENTS_OF_TEMPLATE.ptr);
 			//authorizedElementCategory);	
 		}
+		ts.list_no_longer_required (facts);
+
 	}
 	//	else
 	//		log.trace("S09 template_id not found");

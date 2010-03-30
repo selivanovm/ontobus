@@ -480,6 +480,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						}
 						list_facts = list_facts.next_triple_list_element;
 					}
+					az.getTripleStorage.list_no_longer_required (list_facts);
 				}
 
 				time = elapsed.stop;
@@ -671,6 +672,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 													}
 													founded_facts2 = founded_facts2.next_triple_list_element;
 												}
+												az.getTripleStorage.list_no_longer_required (founded_facts2);
 												//log.trace("#666 {} {}", is_exists, is_exists2);
 												is_exists = is_exists2 && is_exists;
 											}
@@ -685,6 +687,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								}
 								founded_facts = founded_facts.next_triple_list_element;
 							}
+							az.getTripleStorage.list_no_longer_required (founded_facts);
 						}
 					}
 				}
@@ -923,6 +926,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						count_prepared_elements++;
 						bool calculatedRight;
 						calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType, hierarhical_departments, from_client);
+						
 						//log.trace("right = {}", calculatedRight);
 
 						//log.trace("#23");
@@ -937,8 +941,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								if(calculatedRight == true)
 									break;
 							}
-						}
-
+						}						
+						
 						//log.trace("#4");
 
 						if(calculatedRight == false)
@@ -1057,6 +1061,7 @@ void remove_subject(char* s)
 			cnt++;
 			removed_facts = removed_facts.next_triple_list_element;
 		}
+		az.getTripleStorage.list_no_longer_required (removed_facts);
 
 		for(int k = 0; k < cnt; k++)
 		{
@@ -1092,6 +1097,7 @@ void remove_subjects_by_predicate(char* p, char* o)
 			cnt++;
 			removed_facts = removed_facts.next_triple_list_element;
 		}
+		az.getTripleStorage.list_no_longer_required (removed_facts);
 
 		for(int k = 0; k < cnt; k++)
 		{

@@ -76,6 +76,8 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 			}
 			iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 		}
+		ts.list_no_longer_required (iterator_facts_of_document);
+
 	}
 	return null;
 }
@@ -105,6 +107,8 @@ private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 			}
 			iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 		}
+		ts.list_no_longer_required (iterator_facts_of_document);
+
 	}
 	return null;
 }

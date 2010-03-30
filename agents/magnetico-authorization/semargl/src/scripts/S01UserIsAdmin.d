@@ -49,6 +49,7 @@ public bool isAdmin(char* user, TripleStorage ts)
 {
 
 	triple_list_element* iterator0 = ts.getTriples(user, IS_ADMIN.ptr, "true");
+	ts.list_no_longer_required (iterator0);
 
 	if(iterator0 != null)
 		return true;

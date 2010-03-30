@@ -12,7 +12,6 @@ private import Log;
 
 public int calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
-
 	triple_list_element* iterator = cast(triple_list_element*) ts.getTriples(null, ELEMENT_ID.ptr, elementId);
 	char* ACL_subject;
 
@@ -79,14 +78,17 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 									triple2_o++;
 								}
 							}
-
+							ts.list_no_longer_required (iterator3);
 						}
-
+						ts.list_no_longer_required (iterator2);
 					}
+					ts.list_no_longer_required (iterator1);
 				}
 			}
 			iterator = iterator.next_triple_list_element;
 		}
+
+		ts.list_no_longer_required (iterator);
 
 	}
 	if(is_in_docflow)
