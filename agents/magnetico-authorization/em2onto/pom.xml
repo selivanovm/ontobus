@@ -1,0 +1,97 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>em2onto</artifactId>
+	<groupId>ru.magnetosoft.bigarchive.server</groupId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>em2onto</name>
+	<dependencies>
+		<dependency>
+			<groupId>local.sun.java.net</groupId>
+			<artifactId>jaxws-ri</artifactId>
+			<version>2.1.5</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<artifactId>big-archive-client-web-objects</artifactId>
+			<groupId>ru.magnetosoft.bigarchive.client.web</groupId>
+			<version>0.14.30</version>
+		</dependency>
+		<dependency>
+		  <groupId>ru.magnetosoft.magnet</groupId>
+		  <artifactId>magnet-commons-client</artifactId>
+		  <version>1.5.11-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+			<version>4.4</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<path id="jwdp.classpath">
+									<path refid="maven.compile.classpath" />
+									<pathelement location="${java.home}/../lib/tools.jar" />
+								</path>
+								<taskdef name="wsimport" classname="com.sun.tools.ws.ant.WsImport">
+									<classpath refid="jwdp.classpath" />
+								</taskdef>
+								<echo message="Generate DocumentService WS artifacts..." />
+								<mkdir dir="${project.build.outputDirectory}" />
+								<wsimport debug="true" verbose="false" keep="true" sourcedestdir="${project.build.sourceDirectory}" destdir="${project.build.outputDirectory}" wsdl="${basedir}/src/main/wsdl/DocumentService.wsdl" package="ru.magnetosoft.bigarch.wsclient.bl.documentservice" />
+								<echo message="Generate SearchService WS artifacts..." />
+								<mkdir dir="${project.build.outputDirectory}" />
+								<wsimport debug="true" verbose="false" keep="true" sourcedestdir="${project.build.sourceDirectory}" destdir="${project.build.outputDirectory}" wsdl="${basedir}/src/main/wsdl/SearchService.wsdl" package="ru.magnetosoft.bigarch.wsclient.bl.searchservice" />
+								<echo message="Generate AttachmentService WS artifacts..." />
+								<mkdir dir="${project.build.outputDirectory}" />
+								<wsimport debug="true" verbose="false" keep="true" sourcedestdir="${project.build.sourceDirectory}" destdir="${project.build.outputDirectory}" wsdl="${basedir}/src/main/wsdl/AttachmentService.wsdl" package="ru.magnetosoft.bigarch.wsclient.bl.attachmentservice" />
+								<mkdir dir="${project.build.outputDirectory}" />
+								<wsimport debug="true" verbose="false" keep="true" sourcedestdir="${project.build.sourceDirectory}" destdir="${project.build.outputDirectory}" wsdl="${basedir}/src/main/wsdl/OrganizationEntityService.wsdl" package="ru.magnetosoft.bigarchive.server.kernel.organization.client.generated" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>ru.magnetosoft.em2onto.Fetcher</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

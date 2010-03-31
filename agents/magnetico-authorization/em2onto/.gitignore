@@ -1,0 +1,11 @@
+*.sql
+*.class
+*.tgz
+*.n3
+*~
+*#*
+*.onto
+target/*
+*.nt
+*wsclient
+*generated*

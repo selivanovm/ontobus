@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://organization.magnet.magnetosoft.ru/" xmlns:tns="http://organization.magnet.magnetosoft.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="OrganizationServiceException" type="tns:OrganizationServiceException"/>
+
+  <xs:element name="attribute" type="tns:AttributeType"/>
+
+  <xs:element name="cleanup" type="tns:cleanup"/>
+
+  <xs:element name="cleanupResponse" type="tns:cleanupResponse"/>
+
+  <xs:element name="createTreeAccessor" type="tns:createTreeAccessor"/>
+
+  <xs:element name="createTreeAccessorResponse" type="tns:createTreeAccessorResponse"/>
+
+  <xs:element name="entity" type="tns:EntityType"/>
+
+  <xs:element name="entityContainer" type="tns:EntityContainerType"/>
+
+  <xs:element name="getAdjacency" type="tns:getAdjacency"/>
+
+  <xs:element name="getAdjacencyResponse" type="tns:getAdjacencyResponse"/>
+
+  <xs:element name="getEntities" type="tns:getEntities"/>
+
+  <xs:element name="getEntitiesResponse" type="tns:getEntitiesResponse"/>
+
+  <xs:element name="getEntity" type="tns:getEntity"/>
+
+  <xs:element name="getEntityResponse" type="tns:getEntityResponse"/>
+
+  <xs:element name="getTAChildNodes" type="tns:getTAChildNodes"/>
+
+  <xs:element name="getTAChildNodesResponse" type="tns:getTAChildNodesResponse"/>
+
+  <xs:element name="getTACovereageSubtree" type="tns:getTACovereageSubtree"/>
+
+  <xs:element name="getTACovereageSubtreeResponse" type="tns:getTACovereageSubtreeResponse"/>
+
+  <xs:element name="getTAParentNode" type="tns:getTAParentNode"/>
+
+  <xs:element name="getTAParentNodeResponse" type="tns:getTAParentNodeResponse"/>
+
+  <xs:element name="getTAPath" type="tns:getTAPath"/>
+
+  <xs:element name="getTAPathResponse" type="tns:getTAPathResponse"/>
+
+  <xs:element name="getTARoot" type="tns:getTARoot"/>
+
+  <xs:element name="getTARootResponse" type="tns:getTARootResponse"/>
+
+  <xs:element name="getTASubtree" type="tns:getTASubtree"/>
+
+  <xs:element name="getTASubtreeResponse" type="tns:getTASubtreeResponse"/>
+
+  <xs:element name="getVersion" type="tns:getVersion"/>
+
+  <xs:element name="getVersionResponse" type="tns:getVersionResponse"/>
+
+  <xs:element name="parameter" type="tns:ParameterType"/>
+
+  <xs:element name="preparedQuery" type="tns:PreparedQueryType"/>
+
+  <xs:element name="queryEntityContainer" type="tns:queryEntityContainer"/>
+
+  <xs:element name="queryEntityContainerResponse" type="tns:queryEntityContainerResponse"/>
+
+  <xs:element name="queryUids" type="tns:queryUids"/>
+
+  <xs:element name="queryUidsResponse" type="tns:queryUidsResponse"/>
+
+  <xs:element name="relationMapping" type="tns:RelationMappingType"/>
+
+  <xs:element name="removeTreeAccessor" type="tns:removeTreeAccessor"/>
+
+  <xs:element name="removeTreeAccessorResponse" type="tns:removeTreeAccessorResponse"/>
+
+  <xs:element name="treeNode" type="tns:TreeNodeType"/>
+
+  <xs:element name="validateFields" type="tns:validateFields"/>
+
+  <xs:element name="validateFieldsResponse" type="tns:validateFieldsResponse"/>
+
+  <xs:element name="writeEntity" type="tns:writeEntity"/>
+
+  <xs:element name="writeEntityContainer" type="tns:writeEntityContainer"/>
+
+  <xs:element name="writeEntityContainerResponse" type="tns:writeEntityContainerResponse"/>
+
+  <xs:element name="writeEntityResponse" type="tns:writeEntityResponse"/>
+
+  <xs:complexType name="getAdjacency">
+    <xs:sequence>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="relationName" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="adjType" type="tns:AdjacencyTypeEnum" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAdjacencyResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OrganizationServiceException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cleanup">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="cleanupResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="writeEntityContainer">
+    <xs:sequence>
+      <xs:element name="context" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="container" type="tns:EntityContainerType" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EntityContainerType">
+    <xs:sequence>
+      <xs:element name="entities" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entityList" type="tns:EntityType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EntityType">
+    <xs:sequence>
+      <xs:element name="action" type="tns:EntityActionEnumType" minOccurs="0"/>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attributeList" type="tns:AttributeType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="uid" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="AttributeType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="writeEntityContainerResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="writeEntity">
+    <xs:sequence>
+      <xs:element name="context" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element ref="tns:entity" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="writeEntityResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="queryUids">
+    <xs:sequence>
+      <xs:element name="context" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="query" type="tns:PreparedQueryType" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PreparedQueryType">
+    <xs:sequence>
+      <xs:element name="whereClause" type="xs:string" minOccurs="0"/>
+      <xs:element name="parameters" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="parameterList" type="tns:ParameterType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="displayFields" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="displayFieldList" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ParameterType">
+    <xs:sequence>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="queryUidsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createTreeAccessor">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="rootUid" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="relationList" type="tns:RelationMappingType" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="RelationMappingType">
+    <xs:sequence>
+      <xs:element name="relationName" type="xs:string" minOccurs="0"/>
+      <xs:element name="forwardDir" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createTreeAccessorResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="queryEntityContainer">
+    <xs:sequence>
+      <xs:element name="context" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="query" type="tns:PreparedQueryType" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="queryEntityContainerResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:EntityContainerType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTARoot">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTARootResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTASubtree">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTASubtreeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:TreeNodeType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TreeNodeType">
+    <xs:sequence>
+      <xs:element name="children" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="childList" type="tns:TreeNodeType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="uid" type="xs:string"/>
+    <xs:attribute name="mark" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="getEntity">
+    <xs:sequence>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getEntityResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:EntityType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="validateFields">
+    <xs:sequence>
+      <xs:element name="fields" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="validateFieldsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTAChildNodes">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTAChildNodesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersion">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getVersionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeTreeAccessor">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeTreeAccessorResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getTAParentNode">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTAParentNodeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTAPath">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTAPathResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getEntities">
+    <xs:sequence>
+      <xs:element name="uids" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getEntitiesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:EntityType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTACovereageSubtree">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="uids" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTACovereageSubtreeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:TreeNodeType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="AdjacencyTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="FORWARD"/>
+      <xs:enumeration value="BACKWARD"/>
+      <xs:enumeration value="ANY"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EntityActionEnumType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="INSERT"/>
+      <xs:enumeration value="UPDATE"/>
+      <xs:enumeration value="DELETE"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

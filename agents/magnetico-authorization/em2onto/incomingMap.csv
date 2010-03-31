@@ -1,0 +1,19 @@
+Регистрационный номер,http://magnetosoft.ru/ontology#registrationNumber
+Дата регистрации,http://magnetosoft.ru/ontology#registrationDate
+Исходящий номер,http://magnetosoft.ru/ontology#outgoingNumber
+Исходящая дата,http://magnetosoft.ru/ontology#outgoingDate
+Корреспондент,http://magnetosoft.ru/ontology#hasCorrespondent
+Подписавший,http://magnetosoft.ru/ontology#signer
+Вид документа,http://magnetosoft.ru/ontology#documentType
+Вид доставки,http://magnetosoft.ru/ontology#deliveryType
+Краткое содержание,http://magnetosoft.ru/ontology#argument
+Адресат,http://magnetosoft.ru/ontology#addressee
+В копию,http://magnetosoft.ru/ontology#sendCopyTo
+Количество листов,http://magnetosoft.ru/ontology#pagesCount
+Срок исполнения,http://magnetosoft.ru/ontology#deadlineDate
+Служебные отметки,http://magnetosoft.ru/ontology#serviceNotes
+Ключевые слова,http://magnetosoft.ru/ontology#keywords
+Вложения,http://magnetosoft.ru/ontology#fileAttachment
+Связанные документы,http://magnetosoft.ru/ontology#relatedDocuments
+Статус,http://magnetosoft.ru/ontology#status
+Статус-история,http://magnetosoft.ru/ontology#statusHistory

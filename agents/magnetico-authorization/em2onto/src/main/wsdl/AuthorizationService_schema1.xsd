@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://authorization.bigarchive.magnetosoft.ru/" xmlns:tns="http://authorization.bigarchive.magnetosoft.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="AccessDeniedException" type="tns:AccessDeniedException"/>
+
+  <xs:element name="AuthorizationException" type="tns:AuthorizationException"/>
+
+  <xs:element name="BigArchiveServerException" type="tns:BigArchiveServerException"/>
+
+  <xs:element name="accessElement" type="tns:accessElementType"/>
+
+  <xs:element name="accessRequest" type="tns:accessRequestType"/>
+
+  <xs:element name="accessResponse" type="tns:accessResponseType"/>
+
+  <xs:element name="addAuthorizationRightRecord" type="tns:addAuthorizationRightRecord"/>
+
+  <xs:element name="addAuthorizationRightRecordResponse" type="tns:addAuthorizationRightRecordResponse"/>
+
+  <xs:element name="addDelegate" type="tns:addDelegate"/>
+
+  <xs:element name="addDelegateLink" type="tns:addDelegateLink"/>
+
+  <xs:element name="addDelegateLinkResponse" type="tns:addDelegateLinkResponse"/>
+
+  <xs:element name="addDelegateResponse" type="tns:addDelegateResponse"/>
+
+  <xs:element name="authorizationRightRecord" type="tns:authorizationRightRecordType"/>
+
+  <xs:element name="disableAuthorizationCache" type="tns:disableAuthorizationCache"/>
+
+  <xs:element name="disableAuthorizationCacheResponse" type="tns:disableAuthorizationCacheResponse"/>
+
+  <xs:element name="enableAuthorizationCache" type="tns:enableAuthorizationCache"/>
+
+  <xs:element name="enableAuthorizationCacheResponse" type="tns:enableAuthorizationCacheResponse"/>
+
+  <xs:element name="getAccess" type="tns:getAccess"/>
+
+  <xs:element name="getAccessResponse" type="tns:getAccessResponse"/>
+
+  <xs:element name="getAuthorAuthorizationRightRecords" type="tns:getAuthorAuthorizationRightRecords"/>
+
+  <xs:element name="getAuthorAuthorizationRightRecordsResponse" type="tns:getAuthorAuthorizationRightRecordsResponse"/>
+
+  <xs:element name="getAuthorToTargetAuthorizationRightRecords" type="tns:getAuthorToTargetAuthorizationRightRecords"/>
+
+  <xs:element name="getAuthorToTargetAuthorizationRightRecordsResponse" type="tns:getAuthorToTargetAuthorizationRightRecordsResponse"/>
+
+  <xs:element name="getAuthorizationRightRecords" type="tns:getAuthorizationRightRecords"/>
+
+  <xs:element name="getAuthorizationRightRecordsResponse" type="tns:getAuthorizationRightRecordsResponse"/>
+
+  <xs:element name="getDelegateAssigners" type="tns:getDelegateAssigners"/>
+
+  <xs:element name="getDelegateAssignersResponse" type="tns:getDelegateAssignersResponse"/>
+
+  <xs:element name="getDelegateAssignersTree" type="tns:getDelegateAssignersTree"/>
+
+  <xs:element name="getDelegateAssignersTreeResponse" type="tns:getDelegateAssignersTreeResponse"/>
+
+  <xs:element name="getDependendsVersions" type="tns:getDependendsVersions"/>
+
+  <xs:element name="getDependendsVersionsResponse" type="tns:getDependendsVersionsResponse"/>
+
+  <xs:element name="getTargetAuthorizationRightRecords" type="tns:getTargetAuthorizationRightRecords"/>
+
+  <xs:element name="getTargetAuthorizationRightRecordsResponse" type="tns:getTargetAuthorizationRightRecordsResponse"/>
+
+  <xs:element name="getVersion" type="tns:getVersion"/>
+
+  <xs:element name="getVersionResponse" type="tns:getVersionResponse"/>
+
+  <xs:element name="isBanned" type="tns:isBanned"/>
+
+  <xs:element name="isBannedResponse" type="tns:isBannedResponse"/>
+
+  <xs:element name="jaxbDelegate" type="tns:jaxbDelegateType"/>
+
+  <xs:element name="removeAuthorizationRightRecord" type="tns:removeAuthorizationRightRecord"/>
+
+  <xs:element name="removeAuthorizationRightRecordResponse" type="tns:removeAuthorizationRightRecordResponse"/>
+
+  <xs:element name="removeDelegate" type="tns:removeDelegate"/>
+
+  <xs:element name="removeDelegateLink" type="tns:removeDelegateLink"/>
+
+  <xs:element name="removeDelegateLinkResponse" type="tns:removeDelegateLinkResponse"/>
+
+  <xs:element name="removeDelegateResponse" type="tns:removeDelegateResponse"/>
+
+  <xs:element name="resetAuthorizationCache" type="tns:resetAuthorizationCache"/>
+
+  <xs:element name="resetAuthorizationCacheResponse" type="tns:resetAuthorizationCacheResponse"/>
+
+  <xs:element name="updateAuthorizationRightRecord" type="tns:updateAuthorizationRightRecord"/>
+
+  <xs:element name="updateAuthorizationRightRecordResponse" type="tns:updateAuthorizationRightRecordResponse"/>
+
+  <xs:complexType name="isBanned">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="isBannedResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BigArchiveServerException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resetAuthorizationCache">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="resetAuthorizationCacheResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="removeAuthorizationRightRecord">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorizationRightRecordId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeAuthorizationRightRecordResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="AccessDeniedException">
+    <xs:sequence>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="right" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorAuthorizationRightRecords">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSubsystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSubsystemElement" type="xs:string" minOccurs="0"/>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorAuthorizationRightRecordsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:authorizationRightRecordType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="authorizationRightRecordType">
+    <xs:sequence>
+      <xs:element name="authorSubsystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSubsystemElement" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="canCreate" type="xs:boolean"/>
+      <xs:element name="canDelete" type="xs:boolean"/>
+      <xs:element name="canRead" type="xs:boolean"/>
+      <xs:element name="canUpdate" type="xs:boolean"/>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="dateFrom" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="dateTo" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSubsystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSubsystemElement" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSystem" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AuthorizationException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTargetAuthorizationRightRecords">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSubsystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSubsystemElement" type="xs:string" minOccurs="0"/>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getTargetAuthorizationRightRecordsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:authorizationRightRecordType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorizationRightRecords">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorizationRightRecordsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:authorizationRightRecordType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDependendsVersions">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDependendsVersionsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDelegateAssigners">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDelegateAssignersResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:jaxbDelegateType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="jaxbDelegateType">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+      <xs:element name="withDelegatesTree" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDelegate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="delegateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDelegateResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getVersion">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDelegateAssignersTree">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDelegateAssignersTreeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAccess">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="accessRequest" type="tns:accessRequestType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="accessRequestType">
+    <xs:sequence>
+      <xs:element name="accessElements" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="accessElement" type="tns:accessElementType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="accessElementType">
+    <xs:sequence>
+      <xs:element name="method" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementsMap" type="tns:hashMapType" minOccurs="0"/>
+      <xs:element name="isSuccessful" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="hashMapType">
+    <xs:sequence>
+      <xs:element name="content" type="tns:hashMapEntryType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="hashMapEntryType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="key" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="getAccessResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:accessResponseType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="accessResponseType">
+    <xs:sequence>
+      <xs:element name="accessElements" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="accessElement" type="tns:accessElementType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="addDelegate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="delegateId" type="xs:string" minOccurs="0"/>
+      <xs:element name="withDelegatesTree" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="addDelegateResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="removeDelegateLink">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+      <xs:element name="delegateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDelegateLinkResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="disableAuthorizationCache">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="disableAuthorizationCacheResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="addDelegateLink">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+      <xs:element name="delegateId" type="xs:string" minOccurs="0"/>
+      <xs:element name="withDelegatesTree" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="addDelegateLinkResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorToTargetAuthorizationRightRecords">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSubsystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorSubsystemElement" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSubsystem" type="xs:string" minOccurs="0"/>
+      <xs:element name="targetSubsystemElement" type="xs:string" minOccurs="0"/>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAuthorToTargetAuthorizationRightRecordsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:authorizationRightRecordType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateAuthorizationRightRecord">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorizationRightRecord" type="tns:authorizationRightRecordType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateAuthorizationRightRecordResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="enableAuthorizationCache">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="enableAuthorizationCacheResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="addAuthorizationRightRecord">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorizationRightRecord" type="tns:authorizationRightRecordType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="addAuthorizationRightRecordResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

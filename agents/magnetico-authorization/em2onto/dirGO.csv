@@ -1,0 +1,12 @@
+Заголовок,http://purl.org/dc/elements/1.1/title
+Регистрационный номер,http://magnetosoft.ru/ontology#registrationNumber
+Дата регистрации,http://magnetosoft.ru/ontology#registrationDate
+Заголовок,http://www.w3.org/2001/XMLSchema#string
+Инициатор,http://magnetosoft.ru/ontology#initiator
+Подписывающий,http://magnetosoft.ru/ontology#signer
+Ключевые слова,http://magnetosoft.ru/ontology#keywords
+Содержание,http://magnetosoft.ru/ontology#content
+Вложения,http://magnetosoft.ru/ontology#fileAttachment
+Связанные документы,http://magnetosoft.ru/ontology#relatedDocuments
+Статус,http://magnetosoft.ru/ontology#status
+Статус-история,http://magnetosoft.ru/ontology#statusHistory

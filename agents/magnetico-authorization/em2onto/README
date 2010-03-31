@@ -1,0 +1,18 @@
+#!/bin/sh
+
+#build em2onto with
+mvn assembly:assembly
+
+#creates file with authorization records. user must set correct db_host value
+./sh/authorization2onto.sh
+
+#fetch organization triples
+java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher org
+
+#fetch documents creators 
+java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher all
+
+#fetch document types creators
+java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher dtp
+
+

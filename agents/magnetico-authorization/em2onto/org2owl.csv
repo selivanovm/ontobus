@@ -1,0 +1,37 @@
+
+firstName,person http://swrc.ontoware.org/ontology#firstName
+secondname,employee http://magnetosoft.ru/ontology#secondName
+surname,person http://swrc.ontoware.org/ontology#lastName
+
+domainName,employee http://magnetosoft.ru/ontology#loginName
+email,person http://swrc.ontoware.org/ontology#email
+post,employee http://magnetosoft.ru/ontology#onPosition
+
+pid,employee http://magnetosoft.ru/ontology#pid
+phone,person http://swrc.ontoware.org/ontology#phone
+id,employee http://magnetosoft.ru/ontology#id
+
+departmentId,employee http://magnetosoft.ru/ontology#memberOf
+phoneExt,person http://swrc.ontoware.org/ontology#phone
+mobile,person http://swrc.ontoware.org/ontology#phone
+active,employee http://swrc.ontoware.org/ontology#isActive
+employeeCategoryR3,employee http://magnetosoft.ru/ontology#employeeCategoryR3
+r3_ad,person http://magnetosoft.ru/ontology#r3_ad
+
+Mdispatcher,employee http://magnetosoft.ru/ontology#hasRole
+scannerCP,employee http://magnetosoft.ru/ontology#hasRole
+RVZ,employee http://magnetosoft.ru/ontology#hasRole
+scannerCP,employee http://magnetosoft.ru/ontology#hasRole
+head,employee http://magnetosoft.ru/ontology#hasRole
+contractCoordinator,employee http://magnetosoft.ru/ontology#hasRole
+contractExecutor,employee http://magnetosoft.ru/ontology#hasRole
+mainEngineer,employee http://magnetosoft.ru/ontology#hasRole
+chiefOfDrawingDepartment,employee http://magnetosoft.ru/ontology#hasRole
+SPPexecutor,employee http://magnetosoft.ru/ontology#hasRole
+archiverConstructionRequest,employee http://magnetosoft.ru/ontology#hasRole
+archiverChangeConstructionRequest,employee http://magnetosoft.ru/ontology#hasRole
+archiverSketch,employee http://magnetosoft.ru/ontology#hasRole
+archiverConstructionProject,employee http://magnetosoft.ru/ontology#hasRole
+IRSpecialist,employee http://magnetosoft.ru/ontology#hasRole
+scanner,employee http://magnetosoft.ru/ontology#hasRole
+

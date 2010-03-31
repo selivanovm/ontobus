@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://authorization.bigarchive.magnetosoft.ru/" name="AuthorizationService" xmlns:tns="http://authorization.bigarchive.magnetosoft.ru/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://authorization.bigarchive.magnetosoft.ru/" schemaLocation="AuthorizationService_schema1.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="getAccess">
+    <part name="parameters" element="tns:getAccess"/>
+  </message>
+  <message name="getAccessResponse">
+    <part name="parameters" element="tns:getAccessResponse"/>
+  </message>
+  <message name="BigArchiveServerException">
+    <part name="fault" element="tns:BigArchiveServerException"/>
+  </message>
+  <message name="AuthorizationException">
+    <part name="fault" element="tns:AuthorizationException"/>
+  </message>
+  <message name="getDependendsVersions">
+    <part name="parameters" element="tns:getDependendsVersions"/>
+  </message>
+  <message name="getDependendsVersionsResponse">
+    <part name="parameters" element="tns:getDependendsVersionsResponse"/>
+  </message>
+  <message name="enableAuthorizationCache">
+    <part name="parameters" element="tns:enableAuthorizationCache"/>
+  </message>
+  <message name="enableAuthorizationCacheResponse">
+    <part name="parameters" element="tns:enableAuthorizationCacheResponse"/>
+  </message>
+  <message name="disableAuthorizationCache">
+    <part name="parameters" element="tns:disableAuthorizationCache"/>
+  </message>
+  <message name="disableAuthorizationCacheResponse">
+    <part name="parameters" element="tns:disableAuthorizationCacheResponse"/>
+  </message>
+  <message name="resetAuthorizationCache">
+    <part name="parameters" element="tns:resetAuthorizationCache"/>
+  </message>
+  <message name="resetAuthorizationCacheResponse">
+    <part name="parameters" element="tns:resetAuthorizationCacheResponse"/>
+  </message>
+  <message name="getAuthorAuthorizationRightRecords">
+    <part name="parameters" element="tns:getAuthorAuthorizationRightRecords"/>
+  </message>
+  <message name="getAuthorAuthorizationRightRecordsResponse">
+    <part name="parameters" element="tns:getAuthorAuthorizationRightRecordsResponse"/>
+  </message>
+  <message name="getTargetAuthorizationRightRecords">
+    <part name="parameters" element="tns:getTargetAuthorizationRightRecords"/>
+  </message>
+  <message name="getTargetAuthorizationRightRecordsResponse">
+    <part name="parameters" element="tns:getTargetAuthorizationRightRecordsResponse"/>
+  </message>
+  <message name="getAuthorToTargetAuthorizationRightRecords">
+    <part name="parameters" element="tns:getAuthorToTargetAuthorizationRightRecords"/>
+  </message>
+  <message name="getAuthorToTargetAuthorizationRightRecordsResponse">
+    <part name="parameters" element="tns:getAuthorToTargetAuthorizationRightRecordsResponse"/>
+  </message>
+  <message name="getAuthorizationRightRecords">
+    <part name="parameters" element="tns:getAuthorizationRightRecords"/>
+  </message>
+  <message name="getAuthorizationRightRecordsResponse">
+    <part name="parameters" element="tns:getAuthorizationRightRecordsResponse"/>
+  </message>
+  <message name="AccessDeniedException">
+    <part name="fault" element="tns:AccessDeniedException"/>
+  </message>
+  <message name="addAuthorizationRightRecord">
+    <part name="parameters" element="tns:addAuthorizationRightRecord"/>
+  </message>
+  <message name="addAuthorizationRightRecordResponse">
+    <part name="parameters" element="tns:addAuthorizationRightRecordResponse"/>
+  </message>
+  <message name="removeAuthorizationRightRecord">
+    <part name="parameters" element="tns:removeAuthorizationRightRecord"/>
+  </message>
+  <message name="removeAuthorizationRightRecordResponse">
+    <part name="parameters" element="tns:removeAuthorizationRightRecordResponse"/>
+  </message>
+  <message name="updateAuthorizationRightRecord">
+    <part name="parameters" element="tns:updateAuthorizationRightRecord"/>
+  </message>
+  <message name="updateAuthorizationRightRecordResponse">
+    <part name="parameters" element="tns:updateAuthorizationRightRecordResponse"/>
+  </message>
+  <message name="addDelegate">
+    <part name="parameters" element="tns:addDelegate"/>
+  </message>
+  <message name="addDelegateResponse">
+    <part name="parameters" element="tns:addDelegateResponse"/>
+  </message>
+  <message name="addDelegateLink">
+    <part name="parameters" element="tns:addDelegateLink"/>
+  </message>
+  <message name="addDelegateLinkResponse">
+    <part name="parameters" element="tns:addDelegateLinkResponse"/>
+  </message>
+  <message name="removeDelegate">
+    <part name="parameters" element="tns:removeDelegate"/>
+  </message>
+  <message name="removeDelegateResponse">
+    <part name="parameters" element="tns:removeDelegateResponse"/>
+  </message>
+  <message name="removeDelegateLink">
+    <part name="parameters" element="tns:removeDelegateLink"/>
+  </message>
+  <message name="removeDelegateLinkResponse">
+    <part name="parameters" element="tns:removeDelegateLinkResponse"/>
+  </message>
+  <message name="getDelegateAssigners">
+    <part name="parameters" element="tns:getDelegateAssigners"/>
+  </message>
+  <message name="getDelegateAssignersResponse">
+    <part name="parameters" element="tns:getDelegateAssignersResponse"/>
+  </message>
+  <message name="getDelegateAssignersTree">
+    <part name="parameters" element="tns:getDelegateAssignersTree"/>
+  </message>
+  <message name="getDelegateAssignersTreeResponse">
+    <part name="parameters" element="tns:getDelegateAssignersTreeResponse"/>
+  </message>
+  <message name="isBanned">
+    <part name="parameters" element="tns:isBanned"/>
+  </message>
+  <message name="isBannedResponse">
+    <part name="parameters" element="tns:isBannedResponse"/>
+  </message>
+  <message name="getVersion">
+    <part name="parameters" element="tns:getVersion"/>
+  </message>
+  <message name="getVersionResponse">
+    <part name="parameters" element="tns:getVersionResponse"/>
+  </message>
+  <portType name="AuthorizationEndpoint">
+    <operation name="getAccess">
+      <input message="tns:getAccess"/>
+      <output message="tns:getAccessResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="getDependendsVersions">
+      <input message="tns:getDependendsVersions"/>
+      <output message="tns:getDependendsVersionsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+    </operation>
+    <operation name="enableAuthorizationCache">
+      <input message="tns:enableAuthorizationCache"/>
+      <output message="tns:enableAuthorizationCacheResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+    </operation>
+    <operation name="disableAuthorizationCache">
+      <input message="tns:disableAuthorizationCache"/>
+      <output message="tns:disableAuthorizationCacheResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+    </operation>
+    <operation name="resetAuthorizationCache">
+      <input message="tns:resetAuthorizationCache"/>
+      <output message="tns:resetAuthorizationCacheResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+    </operation>
+    <operation name="getAuthorAuthorizationRightRecords">
+      <input message="tns:getAuthorAuthorizationRightRecords"/>
+      <output message="tns:getAuthorAuthorizationRightRecordsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="getTargetAuthorizationRightRecords">
+      <input message="tns:getTargetAuthorizationRightRecords"/>
+      <output message="tns:getTargetAuthorizationRightRecordsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="getAuthorToTargetAuthorizationRightRecords">
+      <input message="tns:getAuthorToTargetAuthorizationRightRecords"/>
+      <output message="tns:getAuthorToTargetAuthorizationRightRecordsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="getAuthorizationRightRecords">
+      <input message="tns:getAuthorizationRightRecords"/>
+      <output message="tns:getAuthorizationRightRecordsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="addAuthorizationRightRecord">
+      <input message="tns:addAuthorizationRightRecord"/>
+      <output message="tns:addAuthorizationRightRecordResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="removeAuthorizationRightRecord">
+      <input message="tns:removeAuthorizationRightRecord"/>
+      <output message="tns:removeAuthorizationRightRecordResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="updateAuthorizationRightRecord">
+      <input message="tns:updateAuthorizationRightRecord"/>
+      <output message="tns:updateAuthorizationRightRecordResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="addDelegate">
+      <input message="tns:addDelegate"/>
+      <output message="tns:addDelegateResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="addDelegateLink">
+      <input message="tns:addDelegateLink"/>
+      <output message="tns:addDelegateLinkResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="removeDelegate">
+      <input message="tns:removeDelegate"/>
+      <output message="tns:removeDelegateResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="removeDelegateLink">
+      <input message="tns:removeDelegateLink"/>
+      <output message="tns:removeDelegateLinkResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="getDelegateAssigners">
+      <input message="tns:getDelegateAssigners"/>
+      <output message="tns:getDelegateAssignersResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="getDelegateAssignersTree">
+      <input message="tns:getDelegateAssignersTree"/>
+      <output message="tns:getDelegateAssignersTreeResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AuthorizationException" name="AuthorizationException"/>
+    </operation>
+    <operation name="isBanned">
+      <input message="tns:isBanned"/>
+      <output message="tns:isBannedResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+    </operation>
+    <operation name="getVersion">
+      <input message="tns:getVersion"/>
+      <output message="tns:getVersionResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+    </operation>
+  </portType>
+  <binding name="AuthorizationServiceEndpointPortBinding" type="tns:AuthorizationEndpoint">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="getAccess">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDependendsVersions">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="enableAuthorizationCache">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="disableAuthorizationCache">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="resetAuthorizationCache">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getAuthorAuthorizationRightRecords">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getTargetAuthorizationRightRecords">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getAuthorToTargetAuthorizationRightRecords">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getAuthorizationRightRecords">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="addAuthorizationRightRecord">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="removeAuthorizationRightRecord">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="updateAuthorizationRightRecord">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="addDelegate">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="addDelegateLink">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="removeDelegate">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="removeDelegateLink">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDelegateAssigners">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDelegateAssignersTree">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AuthorizationException">
+        <soap:fault name="AuthorizationException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="isBanned">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getVersion">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="AuthorizationService">
+    <port name="AuthorizationServiceEndpointPort" binding="tns:AuthorizationServiceEndpointPortBinding">
+      <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
+    </port>
+  </service>
+</definitions>
+

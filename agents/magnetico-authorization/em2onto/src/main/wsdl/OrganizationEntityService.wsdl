@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://organization.magnet.magnetosoft.ru/" name="OrganizationEntityService" xmlns:tns="http://organization.magnet.magnetosoft.ru/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://organization.magnet.magnetosoft.ru/" schemaLocation="OrganizationEntityService_schema1.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="getEntity">
+    <part name="parameters" element="tns:getEntity"/>
+  </message>
+  <message name="getEntityResponse">
+    <part name="parameters" element="tns:getEntityResponse"/>
+  </message>
+  <message name="OrganizationServiceException">
+    <part name="fault" element="tns:OrganizationServiceException"/>
+  </message>
+  <message name="queryEntityContainer">
+    <part name="parameters" element="tns:queryEntityContainer"/>
+  </message>
+  <message name="queryEntityContainerResponse">
+    <part name="parameters" element="tns:queryEntityContainerResponse"/>
+  </message>
+  <message name="writeEntityContainer">
+    <part name="parameters" element="tns:writeEntityContainer"/>
+  </message>
+  <message name="writeEntityContainerResponse">
+    <part name="parameters" element="tns:writeEntityContainerResponse"/>
+  </message>
+  <message name="writeEntity">
+    <part name="parameters" element="tns:writeEntity"/>
+  </message>
+  <message name="writeEntityResponse">
+    <part name="parameters" element="tns:writeEntityResponse"/>
+  </message>
+  <message name="queryUids">
+    <part name="parameters" element="tns:queryUids"/>
+  </message>
+  <message name="queryUidsResponse">
+    <part name="parameters" element="tns:queryUidsResponse"/>
+  </message>
+  <message name="validateFields">
+    <part name="parameters" element="tns:validateFields"/>
+  </message>
+  <message name="validateFieldsResponse">
+    <part name="parameters" element="tns:validateFieldsResponse"/>
+  </message>
+  <message name="getAdjacency">
+    <part name="parameters" element="tns:getAdjacency"/>
+  </message>
+  <message name="getAdjacencyResponse">
+    <part name="parameters" element="tns:getAdjacencyResponse"/>
+  </message>
+  <message name="createTreeAccessor">
+    <part name="parameters" element="tns:createTreeAccessor"/>
+  </message>
+  <message name="createTreeAccessorResponse">
+    <part name="parameters" element="tns:createTreeAccessorResponse"/>
+  </message>
+  <message name="removeTreeAccessor">
+    <part name="parameters" element="tns:removeTreeAccessor"/>
+  </message>
+  <message name="removeTreeAccessorResponse">
+    <part name="parameters" element="tns:removeTreeAccessorResponse"/>
+  </message>
+  <message name="getTARoot">
+    <part name="parameters" element="tns:getTARoot"/>
+  </message>
+  <message name="getTARootResponse">
+    <part name="parameters" element="tns:getTARootResponse"/>
+  </message>
+  <message name="getTAParentNode">
+    <part name="parameters" element="tns:getTAParentNode"/>
+  </message>
+  <message name="getTAParentNodeResponse">
+    <part name="parameters" element="tns:getTAParentNodeResponse"/>
+  </message>
+  <message name="getTAChildNodes">
+    <part name="parameters" element="tns:getTAChildNodes"/>
+  </message>
+  <message name="getTAChildNodesResponse">
+    <part name="parameters" element="tns:getTAChildNodesResponse"/>
+  </message>
+  <message name="getTAPath">
+    <part name="parameters" element="tns:getTAPath"/>
+  </message>
+  <message name="getTAPathResponse">
+    <part name="parameters" element="tns:getTAPathResponse"/>
+  </message>
+  <message name="getTASubtree">
+    <part name="parameters" element="tns:getTASubtree"/>
+  </message>
+  <message name="getTASubtreeResponse">
+    <part name="parameters" element="tns:getTASubtreeResponse"/>
+  </message>
+  <message name="getTACovereageSubtree">
+    <part name="parameters" element="tns:getTACovereageSubtree"/>
+  </message>
+  <message name="getTACovereageSubtreeResponse">
+    <part name="parameters" element="tns:getTACovereageSubtreeResponse"/>
+  </message>
+  <message name="cleanup">
+    <part name="parameters" element="tns:cleanup"/>
+  </message>
+  <message name="cleanupResponse">
+    <part name="parameters" element="tns:cleanupResponse"/>
+  </message>
+  <message name="getVersion">
+    <part name="parameters" element="tns:getVersion"/>
+  </message>
+  <message name="getVersionResponse">
+    <part name="parameters" element="tns:getVersionResponse"/>
+  </message>
+  <message name="getEntities">
+    <part name="parameters" element="tns:getEntities"/>
+  </message>
+  <message name="getEntitiesResponse">
+    <part name="parameters" element="tns:getEntitiesResponse"/>
+  </message>
+  <portType name="OrganizationEntityEndpoint">
+    <operation name="getEntity">
+      <input message="tns:getEntity"/>
+      <output message="tns:getEntityResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="queryEntityContainer">
+      <input message="tns:queryEntityContainer"/>
+      <output message="tns:queryEntityContainerResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="writeEntityContainer">
+      <input message="tns:writeEntityContainer"/>
+      <output message="tns:writeEntityContainerResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="writeEntity">
+      <input message="tns:writeEntity"/>
+      <output message="tns:writeEntityResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="queryUids">
+      <input message="tns:queryUids"/>
+      <output message="tns:queryUidsResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="validateFields">
+      <input message="tns:validateFields"/>
+      <output message="tns:validateFieldsResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getAdjacency">
+      <input message="tns:getAdjacency"/>
+      <output message="tns:getAdjacencyResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="createTreeAccessor">
+      <input message="tns:createTreeAccessor"/>
+      <output message="tns:createTreeAccessorResponse"/>
+    </operation>
+    <operation name="removeTreeAccessor">
+      <input message="tns:removeTreeAccessor"/>
+      <output message="tns:removeTreeAccessorResponse"/>
+    </operation>
+    <operation name="getTARoot">
+      <input message="tns:getTARoot"/>
+      <output message="tns:getTARootResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getTAParentNode">
+      <input message="tns:getTAParentNode"/>
+      <output message="tns:getTAParentNodeResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getTAChildNodes">
+      <input message="tns:getTAChildNodes"/>
+      <output message="tns:getTAChildNodesResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getTAPath">
+      <input message="tns:getTAPath"/>
+      <output message="tns:getTAPathResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getTASubtree">
+      <input message="tns:getTASubtree"/>
+      <output message="tns:getTASubtreeResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getTACovereageSubtree">
+      <input message="tns:getTACovereageSubtree"/>
+      <output message="tns:getTACovereageSubtreeResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="cleanup">
+      <input message="tns:cleanup"/>
+      <output message="tns:cleanupResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+    <operation name="getVersion">
+      <input message="tns:getVersion"/>
+      <output message="tns:getVersionResponse"/>
+    </operation>
+    <operation name="getEntities">
+      <input message="tns:getEntities"/>
+      <output message="tns:getEntitiesResponse"/>
+      <fault message="tns:OrganizationServiceException" name="OrganizationServiceException"/>
+    </operation>
+  </portType>
+  <binding name="OrganizationEntityServiceEndpointPortBinding" type="tns:OrganizationEntityEndpoint">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="getEntity">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="queryEntityContainer">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="writeEntityContainer">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="writeEntity">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="queryUids">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="validateFields">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getAdjacency">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="createTreeAccessor">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="removeTreeAccessor">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getTARoot">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getTAParentNode">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getTAChildNodes">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getTAPath">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getTASubtree">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getTACovereageSubtree">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="cleanup">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getVersion">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="getEntities">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="OrganizationServiceException">
+        <soap:fault name="OrganizationServiceException" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="OrganizationEntityService">
+    <port name="OrganizationEntityServiceEndpointPort" binding="tns:OrganizationEntityServiceEndpointPortBinding">
+      <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
+    </port>
+  </service>
+</definitions>
+

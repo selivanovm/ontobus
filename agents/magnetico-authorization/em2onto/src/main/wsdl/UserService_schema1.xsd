@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://organization.bigarchive.magnetosoft.ru/" xmlns:tns="http://organization.bigarchive.magnetosoft.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="AccessDeniedException" type="tns:AccessDeniedException"/>
+
+  <xs:element name="BigArchiveServerException" type="tns:BigArchiveServerException"/>
+
+  <xs:element name="department" type="tns:departmentType"/>
+
+  <xs:element name="departmentTree" type="tns:departmentTreeType"/>
+
+  <xs:element name="getChildDepartments" type="tns:getChildDepartments"/>
+
+  <xs:element name="getChildDepartmentsResponse" type="tns:getChildDepartmentsResponse"/>
+
+  <xs:element name="getDepartmentById" type="tns:getDepartmentById"/>
+
+  <xs:element name="getDepartmentByIdResponse" type="tns:getDepartmentByIdResponse"/>
+
+  <xs:element name="getDepartmentTree" type="tns:getDepartmentTree"/>
+
+  <xs:element name="getDepartmentTreePath" type="tns:getDepartmentTreePath"/>
+
+  <xs:element name="getDepartmentTreePathResponse" type="tns:getDepartmentTreePathResponse"/>
+
+  <xs:element name="getDepartmentTreeResponse" type="tns:getDepartmentTreeResponse"/>
+
+  <xs:element name="getDepartmentsById" type="tns:getDepartmentsById"/>
+
+  <xs:element name="getDepartmentsByIdResponse" type="tns:getDepartmentsByIdResponse"/>
+
+  <xs:element name="getDepartmentsByName" type="tns:getDepartmentsByName"/>
+
+  <xs:element name="getDepartmentsByNameResponse" type="tns:getDepartmentsByNameResponse"/>
+
+  <xs:element name="getDependenciesVersions" type="tns:getDependenciesVersions"/>
+
+  <xs:element name="getDependenciesVersionsResponse" type="tns:getDependenciesVersionsResponse"/>
+
+  <xs:element name="getRootDepartment" type="tns:getRootDepartment"/>
+
+  <xs:element name="getRootDepartmentResponse" type="tns:getRootDepartmentResponse"/>
+
+  <xs:element name="getUserByLogin" type="tns:getUserByLogin"/>
+
+  <xs:element name="getUserByLoginResponse" type="tns:getUserByLoginResponse"/>
+
+  <xs:element name="getUserByUid" type="tns:getUserByUid"/>
+
+  <xs:element name="getUserByUidResponse" type="tns:getUserByUidResponse"/>
+
+  <xs:element name="getUsersByDepartmentId" type="tns:getUsersByDepartmentId"/>
+
+  <xs:element name="getUsersByDepartmentIdResponse" type="tns:getUsersByDepartmentIdResponse"/>
+
+  <xs:element name="getUsersByName" type="tns:getUsersByName"/>
+
+  <xs:element name="getUsersByNameResponse" type="tns:getUsersByNameResponse"/>
+
+  <xs:element name="getUsersByPost" type="tns:getUsersByPost"/>
+
+  <xs:element name="getUsersByPostResponse" type="tns:getUsersByPostResponse"/>
+
+  <xs:element name="getVersion" type="tns:getVersion"/>
+
+  <xs:element name="getVersionResponse" type="tns:getVersionResponse"/>
+
+  <xs:element name="selectAllUsers" type="tns:selectAllUsers"/>
+
+  <xs:element name="selectAllUsersResponse" type="tns:selectAllUsersResponse"/>
+
+  <xs:element name="selectUsersByUid" type="tns:selectUsersByUid"/>
+
+  <xs:element name="selectUsersByUidResponse" type="tns:selectUsersByUidResponse"/>
+
+  <xs:element name="user" type="tns:userType"/>
+
+  <xs:complexType name="getUserByUid">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByUidResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="userType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="active" type="xs:boolean"/>
+      <xs:element name="domainName" type="xs:string" minOccurs="0"/>
+      <xs:element name="firstName" type="xs:string" minOccurs="0"/>
+      <xs:element name="lastName" type="xs:string" minOccurs="0"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="post" type="xs:string" minOccurs="0"/>
+      <xs:element name="departmentUid" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BigArchiveServerException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AccessDeniedException">
+    <xs:sequence>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="right" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentsByName">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="tokens" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentsByNameResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="departmentType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentById">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentByIdResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentsById">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="ids" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentsByIdResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByName">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="params" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByNameResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getChildDepartments">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getChildDepartmentsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentTree">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="input" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentTreeResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentTreeType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="departmentTreeType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="chosen" type="xs:boolean"/>
+      <xs:element name="children" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="child" type="tns:departmentTreeType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByPost">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="params" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByPostResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByLogin">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="login" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserByLoginResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="selectAllUsers">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="selectAllUsersResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDependenciesVersions">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDependenciesVersionsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByDepartmentId">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="ids" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUsersByDepartmentIdResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRootDepartment">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getRootDepartmentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentTreePath">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="uid" type="xs:string" form="qualified" minOccurs="0"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDepartmentTreePathResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:departmentType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="selectUsersByUid">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="input" type="xs:string" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="locale" type="xs:string" form="qualified" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="selectUsersByUidResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:userType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersion">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://search.bigarchive.magnetosoft.ru/" xmlns:tns="http://search.bigarchive.magnetosoft.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="AccessDeniedException" type="tns:AccessDeniedException"/>
+
+  <xs:element name="BigArchiveServerException" type="tns:BigArchiveServerException"/>
+
+  <xs:element name="getSearchResults" type="tns:getSearchResults"/>
+
+  <xs:element name="getSearchResultsResponse" type="tns:getSearchResultsResponse"/>
+
+  <xs:element name="isSearchReady" type="tns:isSearchReady"/>
+
+  <xs:element name="isSearchReadyResponse" type="tns:isSearchReadyResponse"/>
+
+  <xs:element name="mapData" type="tns:mapDataType"/>
+
+  <xs:element name="searchAsync" type="tns:searchAsync"/>
+
+  <xs:element name="searchAsyncResponse" type="tns:searchAsyncResponse"/>
+
+  <xs:element name="searchRequest" type="tns:searchRequestType"/>
+
+  <xs:element name="searchResponse" type="tns:searchResponseType"/>
+
+  <xs:element name="searchResultResponse" type="tns:searchResultResponseType"/>
+
+  <xs:element name="searchResultsRequest" type="tns:searchResultsRequestType"/>
+
+  <xs:element name="searchResultsResponse" type="tns:searchResultsResponseType"/>
+
+  <xs:element name="searchSync" type="tns:searchSync"/>
+
+  <xs:element name="searchSyncResponse" type="tns:searchSyncResponse"/>
+
+  <xs:complexType name="searchAsync">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="searchRequest" type="tns:searchRequestType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchRequestType">
+    <xs:sequence>
+      <xs:element name="requestData" type="tns:mapDataType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mapDataType">
+    <xs:sequence>
+      <xs:element name="map" type="tns:hashMapType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="hashMapType">
+    <xs:sequence>
+      <xs:element name="content" type="tns:hashMapEntryType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="hashMapEntryType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="key" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="searchAsyncResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:searchResponseType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchResponseType">
+    <xs:sequence>
+      <xs:element name="contextName" type="xs:string" minOccurs="0"/>
+      <xs:element name="errorOccurred" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BigArchiveServerException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AccessDeniedException">
+    <xs:sequence>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="right" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSearchResults">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="searchResultsRequest" type="tns:searchResultsRequestType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchResultsRequestType">
+    <xs:sequence>
+      <xs:element name="contextName" type="xs:string" minOccurs="0"/>
+      <xs:element name="expectedQuantity" type="xs:int"/>
+      <xs:element name="fromPosition" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSearchResultsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:searchResultsResponseType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchResultsResponseType">
+    <xs:sequence>
+      <xs:element name="inProcess" type="xs:boolean"/>
+      <xs:element name="results" type="tns:searchResultResponseType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="totalCount" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchResultResponseType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="context" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="isSearchReady">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="isSearchReadyResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchSync">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="searchRequest" type="tns:searchRequestType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="searchSyncResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:searchResponseType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

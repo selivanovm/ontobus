@@ -1,0 +1,1867 @@
+<?xml version="1.0"?>
+<!DOCTYPE owl [
+	  <!ENTITY owl "http://www.w3.org/2002/07/owl#">
+	  <!ENTITY mag "http://magnetosoft.ru/ontology#">
+	  <!ENTITY ontology-07 "http://swrc.ontoware.org/ontology-07#">
+	  <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+	  <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+	  <!ENTITY ontology "http://swrc.ontoware.org/ontology#">
+	  <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+	  <!ENTITY dc "http://purl.org/dc/elements/1.1/">
+	  <!ENTITY swrc "http://swrc.ontoware.org/">
+	  ]>
+<rdf:RDF
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:mag="http://magnetosoft.ru/ontology#"
+   xmlns:ontology-07="http://swrc.ontoware.org/ontology-07#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:ontology="http://swrc.ontoware.org/ontology#"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:swrc="http://swrc.ontoware.org/"
+   xml:base=>"http://swrc.ontoware.org/ontology-07"
+   >
+  <owl:Ontology rdf:about="http://swrc.ontoware.org/ontology-07">
+    <rdfs:comment>Modifed version of the swrc ontology based on the updated version of the swrc ontology (v0.7.1) ontology. Bushenev Valeriy. Date: 15.08.2008.^^http://www.w3.org/2001/XMLSchema#string</rdfs:comment>
+    <owl:versionInfo>0.7.1^^http://www.w3.org/2001/XMLSchema#string</owl:versionInfo>
+  </owl:Ontology>
+
+  <!-- BusinessUnit -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#BusinessUnit">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://swrc.ontoware.org/ontology#hasParts" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#BusinessUnit">
+          </owl:Class>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Organization">
+      </owl:Class>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://purl.org/dc/elements/1.1/identifier" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label xml:lang="ru">подразделение</rdfs:label>
+  </owl:Class>
+
+  <!-- Position -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Position">
+    <rdfs:label xml:lang="ru">должность</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://purl.org/dc/elements/1.1/title" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <!-- PostOfTheStaff -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#PostOfTheStaff">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#employeeOnThePosition" />
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#staffPosition" />
+        <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://purl.org/dc/elements/1.1/identifier" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label xml:lang="ru">штатная еденица</rdfs:label>
+  </owl:Class>
+
+  <!-- File -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#File">
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://swrc.ontoware.org/ontology-07#name" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#base64Binary"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label>File</rdfs:label>
+    <rdfs:comment>File Representation</rdfs:comment>
+  </owl:Class>
+
+  <!-- Employee -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee">
+
+    <rdfs:label>Employee</rdfs:label>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Employee">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#onPosition" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Position"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#isActive" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://www.w3.org/2001/XMLSchema#boolean"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#memberOf" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Department"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#secondName" />
+        <owl:allValuesFrom>
+          <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>	
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#loginName" />
+        <owl:allValuesFrom>
+          <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>	
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#pid" />
+        <owl:allValuesFrom>
+	  <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#id" />
+        <owl:allValuesFrom>
+	  <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#employeeCategoryR3" />
+        <owl:allValuesFrom>
+	  <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#r3_ad" />
+        <owl:allValuesFrom>
+	  <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasRole" />
+        <owl:allValuesFrom>
+	  <owl:allValuesFrom rdf:resource="http://magnetosoft.ru/ontology#Role"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+
+  <!-- Department -->
+
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Department">
+
+    <rdfs:label>Department</rdfs:label>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Department">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology/"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology/entityId"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+
+  </owl:Class>
+
+  <!--DocumentsDescriptionStart-->
+
+  <!-- IncomingDocument ::: Входящий документ -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#IncomingDocument">
+
+    <rdfs:label>Incoming document</rdfs:label>
+    <rdfs:comment>Incoming document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Исходящий номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#outgoingNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Исходящая дата -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#outgoingDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Корреспондент -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasCorrespondent" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вид документа -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#documentType" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://magnetosoft.ru/ontology#IncomingDocumentType"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вид доставки -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasDeliveryType" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://magnetosoft.ru/ontology#DeliveryType"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Краткое содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#argument" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Адресат -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#addressee" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Counteragent"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- В копию -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#sendCopyTo" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Количество страниц -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#pagesCount" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#int"/>
+}        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Срок исполнения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#deadlineDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Служебные отметки -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#serviceNotes" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+	<owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+
+  <!-- Directive ::: Приказ -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Directive">
+
+    <rdfs:label>Directive</rdfs:label>
+    <rdfs:comment>Directive document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- Инициатор -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#initiator" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+
+  <!-- DirectiveGO ::: Приказ по ГО -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#DirectiveGO">
+
+    <rdfs:label>DirectiveGO</rdfs:label>
+    <rdfs:comment>DirectiveGO document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+    
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Заголовок -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Инициатор -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#initiator" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+  
+  <!-- StaffDirective ::: Приказ по кадрам -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#StaffDirective">
+
+    <rdfs:label>Staff Directive</rdfs:label>
+    <rdfs:comment>Staff Directive</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Заголовок -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Инициатор -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#initiator" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+    
+  <!-- Instruction ::: Распоряжение -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Instruction">
+
+    <rdfs:label>Instruction</rdfs:label>
+    <rdfs:comment>Instruction document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Заголовок -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Инициатор -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#initiator" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+  </owl:Class>
+
+  <!-- InstructionGO ::: Распоряжение по ГО -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Instruction">
+
+    <rdfs:label>InstructionGO</rdfs:label>
+    <rdfs:comment>InstructionGO document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Заголовок -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Инициатор -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#initiator" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+  </owl:Class>
+    
+
+  <!-- StaffInstruction ::: Распоряжение по кадрам -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Instruction">
+
+    <rdfs:label>StaffInstruction</rdfs:label>
+    <rdfs:comment>StaffInstruction document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Заголовок -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Инициатор -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#initiator" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+  </owl:Class>
+
+  <!-- Memorandum ::: Служебная записка -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Instruction">
+
+    <rdfs:label>Memorandum</rdfs:label>
+    <rdfs:comment>Memorandum document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- От кого -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#from" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Кому -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#to" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Копия -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#to" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Тема -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://purl.org/dc/elements/1.1/subject" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+    <!-- Содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#content" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    
+  </owl:Class>
+
+  <!-- RequestForDeputy ::: Запрос на назначение заместителя -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#RequestForDeputy" >
+
+    <rdfs:label>RequestForDeputy</rdfs:label>
+    <rdfs:comment>RequestForDeputy document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- Вид заявки -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasTypeOfRequest" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#RequestType"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Замещаемый -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#replacedPerson" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Заместитель -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#deputy" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Уровень делегирования -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasDelegationLevel" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#DelegationLevel"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>    
+    
+    <!-- Начало периода -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#periodStart" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>    
+
+    <!-- Конец периода -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#periodEnd" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>    
+
+    <!-- Комментарий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#comment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>    
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+    
+  <!-- OutgoingDocument ::: Исходящий документ -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#OutgoingDocument">
+
+    <rdfs:label>Outgoing document</rdfs:label>
+    <rdfs:comment>Outgoing document</rdfs:comment>
+
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document">
+      </owl:Class>
+    </rdfs:subClassOf>
+
+    <!-- Регистрационный номер -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationNumber" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Дата регистрации -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#registrationDate" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#date"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вид документа -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#documentType" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://magnetosoft.ru/ontology#IncomingDocumentType"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Краткое содержание -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#argument" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Исполнитель -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasExecutor" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Подписывающий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#signer" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Способ отправки -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasSendingType" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://magnetosoft.ru/ontology#SendingType"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Адресат -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#addressee" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- В копию -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#sendCopyTo" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Получатель -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#hasRecipient" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- В ответ на входящий -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#isResponseOn" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://magnetosoft.ru/ontology#IncomingDocument"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Ключевые слова -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#keywords" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Вложения -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#fileAttachment" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://magnetosoft.ru/ontology#File"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Связанные документы -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#relatedDocuments" />
+        <owl:allValuesFrom>
+          <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Document"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#status" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <!-- Статус-история -->
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#statusHistory" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+
+  <!--DocumentsDescriptionEnd-->
+
+  <!-- employeeOnThePosition -->
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#employeeOnThePosition">
+    <rdfs:domain>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#PostOfTheStaff">
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee">
+      </owl:Class>
+    </rdfs:range>
+  </owl:ObjectProperty>
+
+  <!-- memberOf -->
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#memberOf">
+    <rdfs:domain>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#Employee">
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#BusinessUnit">
+      </owl:Class>
+    </rdfs:range>
+  </owl:ObjectProperty>
+
+  <!-- memberOfBusinessUnit -->
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#memberOfBusinessUnit">
+    <rdfs:domain>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#PostOfTheStaff">
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#BusinessUnit">
+      </owl:Class>
+    </rdfs:range>
+  </owl:ObjectProperty>
+
+  <!-- staffPosition -->
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#staffPosition">
+    <rdfs:domain>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#PostOfTheStaff">
+      </owl:Class>
+    </rdfs:domain>
+    <rdfs:range>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#Position">
+      </owl:Class>
+    </rdfs:range>
+  </owl:ObjectProperty>
+
+  <!-- BusinessUnit -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#BusinessUnit">
+    <owl:disjointWith rdf:resource="http://swrc.ontoware.org/ontology#Enterprise"/>
+    <rdfs:subClassOf rdf:resource="http://swrc.ontoware.org/ontology#Organization"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="http://swrc.ontoware.org/ontology#hasPart"/>
+        </owl:onProperty>
+        <owl:allValuesFrom rdf:resource="http://magnetosoft.ru/ontology#BusinessUnit"/>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/identifier"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:label xml:lang="ru">подразделение</rdfs:label>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology/entityId"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+  </owl:Class>
+
+  <!-- Position -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#Position">
+    <rdfs:label xml:lang="ru">должность</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <!-- PostOfTheStaff -->
+  <owl:Class rdf:about="http://magnetosoft.ru/ontology#PostOfTheStaff">
+    <rdfs:label xml:lang="ru">штатная еденица</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#staffPosition" />
+        <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://magnetosoft.ru/ontology#employeeOnThePosition"/>
+        <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:allValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:about="http://purl.org/dc/elements/1.1/identifier"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#staffPosition">
+    <rdfs:domain rdf:resource="http://magnetosoft.ru/ontology#PostOfTheStaff"/>
+    <rdfs:range rdf:resource="http://magnetosoft.ru/ontology#Position"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#employeeOnThePosition">
+    <rdfs:domain rdf:resource="http://magnetosoft.ru/ontology#PostOfTheStaff"/>
+    <rdfs:range rdf:resource="http://magnetosoft.ru/ontology#Employee"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#memberOfBusinessUnit">
+    <rdfs:domain rdf:resource="http://magnetosoft.ru/ontology#PostOfTheStaff"/>
+    <rdfs:range rdf:resource="http://magnetosoft.ru/ontology#BusinessUnit"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#worksIn">
+    <rdfs:domain rdf:resource="http://magnetosoft.ru/ontology#BusinessUnit"/>
+    <rdfs:range rdf:resource="http://magnetosoft.ru/ontology#Employee"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#memberOf">
+    <rdfs:domain rdf:resource="http://magnetosoft.ru/ontology#Employee"/>
+    <rdfs:range rdf:resource="http://magnetosoft.ru/ontology#BusinessUnit"/>
+  </owl:ObjectProperty>
+
+  <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Enterprise">
+    <owl:disjointWith>
+      <owl:Class rdf:about="http://magnetosoft.ru/ontology#BusinessUnit">
+      </owl:Class>
+    </owl:disjointWith>
+  </owl:Class>
+
+  <owl:Class rdf:about="http://swrc.ontoware.org/ontology#Role">
+    <rdfs:label xml:lang="ru">роль</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="http://purl.org/dc/elements/1.1/name" />
+        <owl:allValuesFrom>
+          <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+        </owl:allValuesFrom>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+
+  <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology#hasRole">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#Role"/>
+    <rdfs:label xml:lang="ru">роль</rdfs:label>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology#secondName">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="ru">отчество</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="http://swrc.ontoware.org/ontology#name"/>
+  </owl:DatatypeProperty>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#onPosition">
+    <rdfs:domain rdf:resource="http://magnetosoft.ru/ontology#Employee"/>
+    <rdfs:range rdf:resource="http://magnetosoft.ru/ontology#Position"/>
+  </owl:ObjectProperty>
+
+  <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology#entityId">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    <rdfs:label xml:lang="ru">идентификатор объекта</rdfs:label>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="http://magnetosoft.ru/ontology#isActive">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </owl:DatatypeProperty>
+
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#content">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://swrc.ontoware.org/ontology-07#email">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#fileAttachment">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://swrc.ontoware.org/ontology-07#firstName">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#initiator">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#keywords">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://swrc.ontoware.org/ontology-07#lastName">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://swrc.ontoware.org/ontology-07#name">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#registrationNumber">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#relatedDocuments">
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://magnetosoft.ru/ontology#signer">
+  </owl:ObjectProperty>
+
+</rdf:RDF>

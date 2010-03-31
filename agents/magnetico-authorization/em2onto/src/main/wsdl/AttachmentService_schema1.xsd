@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://attachments.bigarchive.magnetosoft.ru/" xmlns:tns="http://attachments.bigarchive.magnetosoft.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="AccessDeniedException" type="tns:AccessDeniedException"/>
+
+  <xs:element name="BigArchiveServerException" type="tns:BigArchiveServerException"/>
+
+  <xs:element name="attachment" type="tns:attachmentType"/>
+
+  <xs:element name="createAttachment" type="tns:createAttachment"/>
+
+  <xs:element name="createAttachmentResponse" type="tns:createAttachmentResponse"/>
+
+  <xs:element name="getAttachment" type="tns:getAttachment"/>
+
+  <xs:element name="getAttachmentResponse" type="tns:getAttachmentResponse"/>
+
+  <xs:element name="getDependenciesVersions" type="tns:getDependenciesVersions"/>
+
+  <xs:element name="getDependenciesVersionsResponse" type="tns:getDependenciesVersionsResponse"/>
+
+  <xs:element name="getVersion" type="tns:getVersion"/>
+
+  <xs:element name="getVersionResponse" type="tns:getVersionResponse"/>
+
+  <xs:element name="listAttachments" type="tns:listAttachments"/>
+
+  <xs:element name="listAttachmentsResponse" type="tns:listAttachmentsResponse"/>
+
+  <xs:complexType name="getVersion">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BigArchiveServerException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAttachment">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="contexDocumentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="withContent" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getAttachmentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:attachmentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="attachmentType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="size" type="xs:long"/>
+      <xs:element name="data" ns1:expectedContentTypes="application/octet-stream" type="xs:base64Binary" xmlns:ns1="http://www.w3.org/2005/05/xmlmime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AccessDeniedException">
+    <xs:sequence>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="right" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDependenciesVersions">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDependenciesVersionsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="listAttachments">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="contexDocumentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="attachmentIds" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="withContent" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="listAttachmentsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:attachmentType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createAttachment">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="obj" type="tns:attachmentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createAttachmentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

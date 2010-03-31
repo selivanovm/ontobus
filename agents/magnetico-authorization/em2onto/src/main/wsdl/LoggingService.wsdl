@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://logging.bigarchive.magnetosoft.ru/" name="LoggingService" xmlns:tns="http://logging.bigarchive.magnetosoft.ru/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://logging.bigarchive.magnetosoft.ru/" schemaLocation="LoggingService_schema1.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="setLoggingConfiguration">
+    <part name="parameters" element="tns:setLoggingConfiguration"/>
+  </message>
+  <portType name="LoggingEndpoint">
+    <operation name="setLoggingConfiguration">
+      <input message="tns:setLoggingConfiguration"/>
+    </operation>
+  </portType>
+  <binding name="LoggingServiceEndpointPortBinding" type="tns:LoggingEndpoint">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="setLoggingConfiguration">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+    </operation>
+  </binding>
+  <service name="LoggingService">
+    <port name="LoggingServiceEndpointPort" binding="tns:LoggingServiceEndpointPortBinding">
+      <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
+    </port>
+  </service>
+</definitions>
+

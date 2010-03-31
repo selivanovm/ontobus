@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions targetNamespace="http://organization.bigarchive.magnetosoft.ru/" name="UserService" xmlns:tns="http://organization.bigarchive.magnetosoft.ru/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://organization.bigarchive.magnetosoft.ru/" schemaLocation="UserService_schema1.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="getVersion">
+    <part name="parameters" element="tns:getVersion"/>
+  </message>
+  <message name="getVersionResponse">
+    <part name="parameters" element="tns:getVersionResponse"/>
+  </message>
+  <message name="BigArchiveServerException">
+    <part name="fault" element="tns:BigArchiveServerException"/>
+  </message>
+  <message name="AccessDeniedException">
+    <part name="fault" element="tns:AccessDeniedException"/>
+  </message>
+  <message name="getDependenciesVersions">
+    <part name="parameters" element="tns:getDependenciesVersions"/>
+  </message>
+  <message name="getDependenciesVersionsResponse">
+    <part name="parameters" element="tns:getDependenciesVersionsResponse"/>
+  </message>
+  <message name="getUsersByName">
+    <part name="parameters" element="tns:getUsersByName"/>
+  </message>
+  <message name="getUsersByNameResponse">
+    <part name="parameters" element="tns:getUsersByNameResponse"/>
+  </message>
+  <message name="getUsersByPost">
+    <part name="parameters" element="tns:getUsersByPost"/>
+  </message>
+  <message name="getUsersByPostResponse">
+    <part name="parameters" element="tns:getUsersByPostResponse"/>
+  </message>
+  <message name="getUsersByDepartmentId">
+    <part name="parameters" element="tns:getUsersByDepartmentId"/>
+  </message>
+  <message name="getUsersByDepartmentIdResponse">
+    <part name="parameters" element="tns:getUsersByDepartmentIdResponse"/>
+  </message>
+  <message name="getUserByLogin">
+    <part name="parameters" element="tns:getUserByLogin"/>
+  </message>
+  <message name="getUserByLoginResponse">
+    <part name="parameters" element="tns:getUserByLoginResponse"/>
+  </message>
+  <message name="selectUsersByUid">
+    <part name="parameters" element="tns:selectUsersByUid"/>
+  </message>
+  <message name="selectUsersByUidResponse">
+    <part name="parameters" element="tns:selectUsersByUidResponse"/>
+  </message>
+  <message name="selectAllUsers">
+    <part name="parameters" element="tns:selectAllUsers"/>
+  </message>
+  <message name="selectAllUsersResponse">
+    <part name="parameters" element="tns:selectAllUsersResponse"/>
+  </message>
+  <message name="getUserByUid">
+    <part name="parameters" element="tns:getUserByUid"/>
+  </message>
+  <message name="getUserByUidResponse">
+    <part name="parameters" element="tns:getUserByUidResponse"/>
+  </message>
+  <message name="getRootDepartment">
+    <part name="parameters" element="tns:getRootDepartment"/>
+  </message>
+  <message name="getRootDepartmentResponse">
+    <part name="parameters" element="tns:getRootDepartmentResponse"/>
+  </message>
+  <message name="getChildDepartments">
+    <part name="parameters" element="tns:getChildDepartments"/>
+  </message>
+  <message name="getChildDepartmentsResponse">
+    <part name="parameters" element="tns:getChildDepartmentsResponse"/>
+  </message>
+  <message name="getDepartmentTree">
+    <part name="parameters" element="tns:getDepartmentTree"/>
+  </message>
+  <message name="getDepartmentTreeResponse">
+    <part name="parameters" element="tns:getDepartmentTreeResponse"/>
+  </message>
+  <message name="getDepartmentById">
+    <part name="parameters" element="tns:getDepartmentById"/>
+  </message>
+  <message name="getDepartmentByIdResponse">
+    <part name="parameters" element="tns:getDepartmentByIdResponse"/>
+  </message>
+  <message name="getDepartmentsById">
+    <part name="parameters" element="tns:getDepartmentsById"/>
+  </message>
+  <message name="getDepartmentsByIdResponse">
+    <part name="parameters" element="tns:getDepartmentsByIdResponse"/>
+  </message>
+  <message name="getDepartmentsByName">
+    <part name="parameters" element="tns:getDepartmentsByName"/>
+  </message>
+  <message name="getDepartmentsByNameResponse">
+    <part name="parameters" element="tns:getDepartmentsByNameResponse"/>
+  </message>
+  <message name="getDepartmentTreePath">
+    <part name="parameters" element="tns:getDepartmentTreePath"/>
+  </message>
+  <message name="getDepartmentTreePathResponse">
+    <part name="parameters" element="tns:getDepartmentTreePathResponse"/>
+  </message>
+  <portType name="UserEndpoint">
+    <operation name="getVersion">
+      <input message="tns:getVersion"/>
+      <output message="tns:getVersionResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getDependenciesVersions">
+      <input message="tns:getDependenciesVersions"/>
+      <output message="tns:getDependenciesVersionsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getUsersByName">
+      <input message="tns:getUsersByName"/>
+      <output message="tns:getUsersByNameResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getUsersByPost">
+      <input message="tns:getUsersByPost"/>
+      <output message="tns:getUsersByPostResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getUsersByDepartmentId">
+      <input message="tns:getUsersByDepartmentId"/>
+      <output message="tns:getUsersByDepartmentIdResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getUserByLogin">
+      <input message="tns:getUserByLogin"/>
+      <output message="tns:getUserByLoginResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="selectUsersByUid">
+      <input message="tns:selectUsersByUid"/>
+      <output message="tns:selectUsersByUidResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="selectAllUsers">
+      <input message="tns:selectAllUsers"/>
+      <output message="tns:selectAllUsersResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getUserByUid">
+      <input message="tns:getUserByUid"/>
+      <output message="tns:getUserByUidResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getRootDepartment">
+      <input message="tns:getRootDepartment"/>
+      <output message="tns:getRootDepartmentResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getChildDepartments">
+      <input message="tns:getChildDepartments"/>
+      <output message="tns:getChildDepartmentsResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getDepartmentTree">
+      <input message="tns:getDepartmentTree"/>
+      <output message="tns:getDepartmentTreeResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getDepartmentById">
+      <input message="tns:getDepartmentById"/>
+      <output message="tns:getDepartmentByIdResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getDepartmentsById">
+      <input message="tns:getDepartmentsById"/>
+      <output message="tns:getDepartmentsByIdResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getDepartmentsByName">
+      <input message="tns:getDepartmentsByName"/>
+      <output message="tns:getDepartmentsByNameResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+    <operation name="getDepartmentTreePath">
+      <input message="tns:getDepartmentTreePath"/>
+      <output message="tns:getDepartmentTreePathResponse"/>
+      <fault message="tns:BigArchiveServerException" name="BigArchiveServerException"/>
+      <fault message="tns:AccessDeniedException" name="AccessDeniedException"/>
+    </operation>
+  </portType>
+  <binding name="UserServiceEndpointPortBinding" type="tns:UserEndpoint">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <operation name="getVersion">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDependenciesVersions">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getUsersByName">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getUsersByPost">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getUsersByDepartmentId">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getUserByLogin">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="selectUsersByUid">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="selectAllUsers">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getUserByUid">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getRootDepartment">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getChildDepartments">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDepartmentTree">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDepartmentById">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDepartmentsById">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDepartmentsByName">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="getDepartmentTreePath">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BigArchiveServerException">
+        <soap:fault name="BigArchiveServerException" use="literal"/>
+      </fault>
+      <fault name="AccessDeniedException">
+        <soap:fault name="AccessDeniedException" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="UserService">
+    <port name="UserServiceEndpointPort" binding="tns:UserServiceEndpointPortBinding">
+      <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
+    </port>
+  </service>
+</definitions>
+

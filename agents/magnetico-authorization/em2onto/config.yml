@@ -1,0 +1,199 @@
+#
+# $Id: config.yml 10464 2008-10-03 08:02:11Z simakova $
+#
+# Конфигурационный файл
+#
+
+---
+
+# Вариант 1: Если адрес контактного справочника не указан,
+# то берется адрес по умолчанию их сгенерированных
+# артефактов (см. bar/lib/ws)
+#endpoint:
+
+# Вариант 2: Адрес справочника указан явно
+#endpoint: http://<HOST_NAME_OR_IP_ADDRESS>:<PORT>/organization/OrganizationEntitySvc
+
+# Вариант 3: Указано несколько доступных контактных
+# справочников. По умолчанию будет выбран первый. При
+# необходимости можно переключиться на другой.
+endpoint:
+  - http://syk-sv40:8088/organization/OrganizationEntitySvc
+  - http://syk-sv47:8088/organization/OrganizationEntitySvc
+  - http://localhost:80/organization/OrganizationEntitySvc
+  - http://localhost:81/organization/OrganizationEntitySvc
+  - http://localhost:8780/organization/OrganizationEntitySvc
+  - http://localhost:9875/organization/OrganizationEntitySvc
+
+#
+# Настройки валидации и отображения атрибутов для
+# узлов орг. структуры различного типа
+#
+
+attributes:
+  # Атрибуты для сотрудников
+  employee:
+    - name: pid
+      regexp: ^.*$
+#      regexp: ^\d+$
+      translation: Табельный номер
+      is_relation?: false
+    - name: surnameRu
+      regexp: ^.+$
+      translation: Фамилия
+      is_relation?: false
+    - name: firstNameRu
+      regexp: ^.+$
+      translation: Имя
+      is_relation?: false
+    - name: secondNameRu
+      regexp: ^.+$
+      translation: Отчество
+      is_relation?: false
+    - name: postRu
+      regexp: ^.+$
+      translation: Должность
+      is_relation?: false
+    - name: departmentId
+      regexp: ^\d+$
+      translation: Идентификатор подразделения
+      is_relation?: false
+    - name: surnameEn
+      regexp: ^.+$
+      translation: Фамилия (англ.)
+      is_relation?: false
+    - name: firstNameEn
+      regexp: ^.+$
+      translation: Имя (англ.)
+      is_relation?: false
+    - name: postEn
+      regexp: ^.+$
+      translation: Должность (англ.)
+      is_relation?: false
+    - name: phone
+      regexp: ^(\d{2}-\d{2})?$
+      translation: Номер телефона (внутр.)
+      is_relation?: false
+    - name: phoneExt
+      regexp: ^(\d{2}-\d{2}-\d{2})?$
+      translation: Номер телефона (внешн.)
+      is_relation?: false
+    - name: mobile
+      regexp: ^((\d{2}-\d{2}-\d{2})|(79\d{9}))?$
+      translation: Номер телефона (моб.)
+      is_relation?: false
+    - name: email
+      regexp: ^[A-Za-z0-9_\+-]+(\.[A-Za-z0-9_\+-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.([A-Za-z]{2,4})$
+      translation: Электронная почта
+      is_relation?: false
+    - name: active
+      regexp: ^(true|false)$
+      translation: Активность
+      is_relation?: false
+    - name: employeeCategoryR3
+      regexp: ^R[1-6]$
+      translation: Категория в R3
+      is_relation?: false
+    - name: r3_ad
+      regexp: ^[01]$
+      translation: Признак R3 - ActiveDirectory
+      is_relation?: false
+    - name: domainName
+      regexp: ^.+$
+      translation: Доменное имя
+      is_relation?: false
+    - name: Mdispatcher
+      regexp: ^[01]$
+      translation: Mdispatcher
+      is_relation?: false
+    - name: photo
+      regexp: ^(.*?\.(jpg|jpeg))?$
+      translation: Файл с фотографией
+      is_relation?: false
+    - name: photoUID
+      regexp: ^([0-9a-f-]{36})?$
+      translation: Идентификатор фотографии
+      is_relation?: false
+    - name: RVZ
+      regexp: ^1?$
+      translation: Руководитель высшего звена
+      is_relation?: false
+    - name: head
+      regexp: ^([0-9a-f-]{36})?$
+      translation: Руководитель подразделения
+      is_relation?: true
+    - name: contractCoordinator
+      regexp: ^.*$
+      translation: Обязательный согласующий по контрактам
+      is_relation?: true
+    - name: contractExecutor
+      regexp: ^.*$
+      translation: Исполнитель по контрактам
+      is_relation?: true
+    - name: mainEngineer
+      regexp: ^.*$
+      translation: Главный инженер
+      is_relation?: false
+    - name: chiefOfDrawingDepartment
+      regexp: ^.*$
+      translation: Начальник ПКБ/ПКО
+      is_relation?: false
+    - name: SPPexecutor
+      regexp: ^[01]$
+      translation: SPPexecutor
+      is_relation?: false
+    - name: archiverConstructionRequest
+      regexp: ^.*$
+      translation: archiverConstructionRequest
+      is_relation?: false
+    - name: archiverChangeConstructionRequest
+      regexp: ^.*$
+      translation: archiverChangeConstructionRequest
+      is_relation?: false
+    - name: archiverSketch
+      regexp: ^.*$
+      translation: archiverSketch
+      is_relation?: false
+    - name: archiverConstructionProject
+      regexp: ^.*$
+      translation: archiverConstructionProject
+      is_relation?: false
+    - name: scannerCP
+      regexp: ^.*$
+      translation: scannerCP
+      is_relation?: false
+    - name: IRSpecialist
+      regexp: ^.*$
+      translation: IRSpecialist
+      is_relation?: false
+    - name: scanner
+      regexp: ^[01]$
+      translation: Сканирующий
+      is_relation?: false
+
+  # Атрибуты для подразделений
+  department:
+    - name: nameRu
+      regexp: ^.+$
+      translation: Название
+      is_relation?: false
+    - name: nameEn
+      regexp: ^.+$
+      translation: Название (англ.)
+      is_relation?: false
+    - name: id
+      regexp: ^\d+$
+      translation: Идентификатор подразделения
+      is_relation?: false
+    - name: parentId
+      regexp: ^\d+$
+      translation: Идентификатор родительского подразделения
+      is_relation?: false
+    - name: r3_ad
+      regexp: ^[01]$
+      translation: Признак R3 - ActiveDirectory
+      is_relation?: false
+    - name: partner
+      regexp: ^([0-9a-f-]{36})?$
+      translation:  Партнер
+      is_relation?: true

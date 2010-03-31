@@ -1,0 +1,910 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://documents.bigarchive.magnetosoft.ru/" xmlns:tns="http://documents.bigarchive.magnetosoft.ru/" xmlns:ns1="http://validation.bigarchive.magnetosoft.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://validation.bigarchive.magnetosoft.ru/" schemaLocation="DocumentService_schema1.xsd"/>
+
+  <xs:element name="AccessDeniedException" type="tns:AccessDeniedException"/>
+
+  <xs:element name="BigArchiveServerException" type="tns:BigArchiveServerException"/>
+
+  <xs:element name="attribute" type="tns:attributeType"/>
+
+  <xs:element name="attributeBoolean" type="tns:attributeBooleanType"/>
+
+  <xs:element name="attributeDate" type="tns:attributeDateType"/>
+
+  <xs:element name="attributeDateInterval" type="tns:attributeDateIntervalType"/>
+
+  <xs:element name="attributeDictionary" type="tns:attributeDictionaryType"/>
+
+  <xs:element name="attributeFile" type="tns:attributeFileType"/>
+
+  <xs:element name="attributeLink" type="tns:attributeLinkType"/>
+
+  <xs:element name="attributeNumber" type="tns:attributeNumberType"/>
+
+  <xs:element name="attributeOrganization" type="tns:attributeOrganizationType"/>
+
+  <xs:element name="attributeText" type="tns:attributeTextType"/>
+
+  <xs:element name="commitDocument" type="tns:commitDocument"/>
+
+  <xs:element name="commitDocumentResponse" type="tns:commitDocumentResponse"/>
+
+  <xs:element name="commitDocumentTemplate" type="tns:commitDocumentTemplate"/>
+
+  <xs:element name="commitDocumentTemplateResponse" type="tns:commitDocumentTemplateResponse"/>
+
+  <xs:element name="countDocumentTemplates" type="tns:countDocumentTemplates"/>
+
+  <xs:element name="countDocumentTemplatesResponse" type="tns:countDocumentTemplatesResponse"/>
+
+  <xs:element name="countDocuments" type="tns:countDocuments"/>
+
+  <xs:element name="countDocumentsByTemplateId" type="tns:countDocumentsByTemplateId"/>
+
+  <xs:element name="countDocumentsByTemplateIdResponse" type="tns:countDocumentsByTemplateIdResponse"/>
+
+  <xs:element name="countDocumentsResponse" type="tns:countDocumentsResponse"/>
+
+  <xs:element name="createDocument" type="tns:createDocument"/>
+
+  <xs:element name="createDocumentBatch" type="tns:createDocumentBatch"/>
+
+  <xs:element name="createDocumentBatchResponse" type="tns:createDocumentBatchResponse"/>
+
+  <xs:element name="createDocumentDraft" type="tns:createDocumentDraft"/>
+
+  <xs:element name="createDocumentDraftResponse" type="tns:createDocumentDraftResponse"/>
+
+  <xs:element name="createDocumentResponse" type="tns:createDocumentResponse"/>
+
+  <xs:element name="createDocumentTemplate" type="tns:createDocumentTemplate"/>
+
+  <xs:element name="createDocumentTemplateDraft" type="tns:createDocumentTemplateDraft"/>
+
+  <xs:element name="createDocumentTemplateDraftResponse" type="tns:createDocumentTemplateDraftResponse"/>
+
+  <xs:element name="createDocumentTemplateResponse" type="tns:createDocumentTemplateResponse"/>
+
+  <xs:element name="createDocumentTemplateWithDraft" type="tns:createDocumentTemplateWithDraft"/>
+
+  <xs:element name="createDocumentTemplateWithDraftResponse" type="tns:createDocumentTemplateWithDraftResponse"/>
+
+  <xs:element name="createDocumentWithDraft" type="tns:createDocumentWithDraft"/>
+
+  <xs:element name="createDocumentWithDraftResponse" type="tns:createDocumentWithDraftResponse"/>
+
+  <xs:element name="document" type="tns:documentType"/>
+
+  <xs:element name="documentDraft" type="tns:documentDraftType"/>
+
+  <xs:element name="documentTemplate" type="tns:documentTemplateType"/>
+
+  <xs:element name="documentTemplateDraft" type="tns:documentTemplateDraftType"/>
+
+  <xs:element name="fault" type="ns1:faultType"/>
+
+  <xs:element name="getComputationalAttributes" type="tns:getComputationalAttributes"/>
+
+  <xs:element name="getComputationalAttributesResponse" type="tns:getComputationalAttributesResponse"/>
+
+  <xs:element name="getDocument" type="tns:getDocument"/>
+
+  <xs:element name="getDocumentByDate" type="tns:getDocumentByDate"/>
+
+  <xs:element name="getDocumentByDateResponse" type="tns:getDocumentByDateResponse"/>
+
+  <xs:element name="getDocumentDraft" type="tns:getDocumentDraft"/>
+
+  <xs:element name="getDocumentDraftResponse" type="tns:getDocumentDraftResponse"/>
+
+  <xs:element name="getDocumentResponse" type="tns:getDocumentResponse"/>
+
+  <xs:element name="getDocumentTemplate" type="tns:getDocumentTemplate"/>
+
+  <xs:element name="getDocumentTemplateByDate" type="tns:getDocumentTemplateByDate"/>
+
+  <xs:element name="getDocumentTemplateByDateResponse" type="tns:getDocumentTemplateByDateResponse"/>
+
+  <xs:element name="getDocumentTemplateDraft" type="tns:getDocumentTemplateDraft"/>
+
+  <xs:element name="getDocumentTemplateDraftResponse" type="tns:getDocumentTemplateDraftResponse"/>
+
+  <xs:element name="getDocumentTemplateResponse" type="tns:getDocumentTemplateResponse"/>
+
+  <xs:element name="getDocumentTemplateXml" type="tns:getDocumentTemplateXml"/>
+
+  <xs:element name="getDocumentTemplateXmlResponse" type="tns:getDocumentTemplateXmlResponse"/>
+
+  <xs:element name="getDocumentTemplates" type="tns:getDocumentTemplates"/>
+
+  <xs:element name="getDocumentTemplatesResponse" type="tns:getDocumentTemplatesResponse"/>
+
+  <xs:element name="getDocumentWithTemplate" type="tns:getDocumentWithTemplate"/>
+
+  <xs:element name="getDocumentWithTemplateByDate" type="tns:getDocumentWithTemplateByDate"/>
+
+  <xs:element name="getDocumentWithTemplateByDateResponse" type="tns:getDocumentWithTemplateByDateResponse"/>
+
+  <xs:element name="getDocumentWithTemplateResponse" type="tns:getDocumentWithTemplateResponse"/>
+
+  <xs:element name="getDocumentXml" type="tns:getDocumentXml"/>
+
+  <xs:element name="getDocumentXmlResponse" type="tns:getDocumentXmlResponse"/>
+
+  <xs:element name="getUserDocumentDrafts" type="tns:getUserDocumentDrafts"/>
+
+  <xs:element name="getUserDocumentDraftsResponse" type="tns:getUserDocumentDraftsResponse"/>
+
+  <xs:element name="getVersion" type="tns:getVersion"/>
+
+  <xs:element name="getVersionResponse" type="tns:getVersionResponse"/>
+
+  <xs:element name="isInDocflow" type="tns:isInDocflow"/>
+
+  <xs:element name="isInDocflowResponse" type="tns:isInDocflowResponse"/>
+
+  <xs:element name="pageDocumentTemplates" type="tns:pageDocumentTemplates"/>
+
+  <xs:element name="pageDocumentTemplatesResponse" type="tns:pageDocumentTemplatesResponse"/>
+
+  <xs:element name="pageDocuments" type="tns:pageDocuments"/>
+
+  <xs:element name="pageDocumentsResponse" type="tns:pageDocumentsResponse"/>
+
+  <xs:element name="removeDocument" type="tns:removeDocument"/>
+
+  <xs:element name="removeDocumentDraft" type="tns:removeDocumentDraft"/>
+
+  <xs:element name="removeDocumentDraftResponse" type="tns:removeDocumentDraftResponse"/>
+
+  <xs:element name="removeDocumentResponse" type="tns:removeDocumentResponse"/>
+
+  <xs:element name="removeDocumentTemplate" type="tns:removeDocumentTemplate"/>
+
+  <xs:element name="removeDocumentTemplateResponse" type="tns:removeDocumentTemplateResponse"/>
+
+  <xs:element name="typeAttribute" type="tns:typeAttributeType"/>
+
+  <xs:element name="updateDocument" type="tns:updateDocument"/>
+
+  <xs:element name="updateDocumentDraft" type="tns:updateDocumentDraft"/>
+
+  <xs:element name="updateDocumentDraftResponse" type="tns:updateDocumentDraftResponse"/>
+
+  <xs:element name="updateDocumentResponse" type="tns:updateDocumentResponse"/>
+
+  <xs:element name="updateDocumentTemplate" type="tns:updateDocumentTemplate"/>
+
+  <xs:element name="updateDocumentTemplateDraft" type="tns:updateDocumentTemplateDraft"/>
+
+  <xs:element name="updateDocumentTemplateDraftResponse" type="tns:updateDocumentTemplateDraftResponse"/>
+
+  <xs:element name="updateDocumentTemplateResponse" type="tns:updateDocumentTemplateResponse"/>
+
+  <xs:complexType name="isInDocflow">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="isInDocflowResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BigArchiveServerException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AccessDeniedException">
+    <xs:sequence>
+      <xs:element name="category" type="xs:string" minOccurs="0"/>
+      <xs:element name="elementId" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="right" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pageDocumentTemplates">
+    <xs:sequence>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="from" type="xs:int"/>
+      <xs:element name="quantity" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pageDocumentTemplatesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersion">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVersionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocument">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="document" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="documentType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="active" type="xs:boolean"/>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="inDraftState" type="xs:boolean"/>
+      <xs:element name="documentDraftId" type="xs:string" minOccurs="0"/>
+      <xs:element name="lastEditorId" type="xs:string" minOccurs="0"/>
+      <xs:element name="systemInformation" type="xs:string" minOccurs="0"/>
+      <xs:element name="templateId" type="xs:string" minOccurs="0"/>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attributes" type="tns:attributeType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="authorId" type="xs:string" minOccurs="0"/>
+      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="dateLastModified" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="documentTemplate" type="tns:documentTemplateType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="attributeType" abstract="true">
+    <xs:sequence>
+      <xs:element name="type" type="tns:typeAttributeType" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="obligatory" type="xs:boolean"/>
+      <xs:element name="multiSelect" type="xs:boolean"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="systemInformation" type="xs:string" minOccurs="0"/>
+      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="code" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="attributeDateType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="date" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="restrictionFromDate" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="restrictionToDate" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeDateIntervalType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="dateFrom" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="dateTo" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="restrictionFromDate" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="restrictionToDate" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeDictionaryType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="recordId" type="xs:string" minOccurs="0"/>
+          <xs:element name="recordName" type="xs:string" minOccurs="0"/>
+          <xs:element name="dictionaryId" type="xs:string" minOccurs="0"/>
+          <xs:element name="dictionaryName" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeFileType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="fileId" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeNumberType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="value" type="xs:string" minOccurs="0"/>
+          <xs:element name="restrictionFromValue" type="xs:string" minOccurs="0"/>
+          <xs:element name="restrictionToValue" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeTextType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="value" type="xs:string" minOccurs="0"/>
+          <xs:element name="searchWithMorphology" type="xs:boolean"/>
+          <xs:element name="ruleName" type="xs:string" minOccurs="0"/>
+          <xs:element name="readonly" type="xs:boolean"/>
+          <xs:element name="status" type="tns:confirmStates" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeOrganizationType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="tag" type="xs:string" minOccurs="0"/>
+          <xs:element name="value" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeLinkType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="link" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeBooleanType">
+    <xs:complexContent>
+      <xs:extension base="tns:attributeType">
+        <xs:sequence>
+          <xs:element name="flag" type="xs:boolean" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="documentTemplateType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="active" type="xs:boolean"/>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="inDraftState" type="xs:boolean"/>
+      <xs:element name="documentTemplateDraftId" type="xs:string" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorId" type="xs:string" minOccurs="0"/>
+      <xs:element name="systemInformation" type="xs:string" minOccurs="0"/>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attributes" type="tns:attributeType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="lastModifiedTime" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="removeDocumentDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="draftId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDocumentDraftResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="countDocumentTemplates">
+    <xs:sequence>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="countDocumentTemplatesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentWithDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="document" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentWithDraftResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDocumentTemplate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDocumentTemplateResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="commitDocument">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="commitDocumentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:jaxbDocumentValidationResult" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="jaxbDocumentValidationResult">
+    <xs:sequence>
+      <xs:element name="successful" type="xs:boolean"/>
+      <xs:element name="objectId" type="xs:string" minOccurs="0"/>
+      <xs:element name="faults" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="faults" type="ns1:faultType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="createDocumentDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentDraftResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentTemplateDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="draft" type="tns:documentTemplateDraftType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="documentTemplateDraftType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="systemInformation" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorId" type="xs:string" minOccurs="0"/>
+      <xs:element name="owner" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplateId" type="xs:string" minOccurs="0"/>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attributes" type="tns:attributeType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentTemplateDraftResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="draft" type="tns:documentDraftType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="documentDraftType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="authorId" type="xs:string" minOccurs="0"/>
+      <xs:element name="owner" type="xs:string" minOccurs="0"/>
+      <xs:element name="systemInformation" type="xs:string" minOccurs="0"/>
+      <xs:element name="templateId" type="xs:string" minOccurs="0"/>
+      <xs:element name="attributes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="attributes" type="tns:attributeType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="dateCreated" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentDraftResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="countDocuments">
+    <xs:sequence>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="countDocumentsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDocument">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removeDocumentResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="createDocument">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="document" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="countDocumentsByTemplateId">
+    <xs:sequence>
+      <xs:element name="templateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="countDocumentsByTemplateIdResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentWithTemplate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentWithTemplateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplates">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="withAttributes" type="xs:boolean"/>
+      <xs:element name="forDocumentCreating" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplatesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentTemplateType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentTemplate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplate" type="tns:documentTemplateType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateDocumentTemplateResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getComputationalAttributes">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="draftId" type="xs:string" minOccurs="0"/>
+      <xs:element name="computationals" type="tns:attributeType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getComputationalAttributesResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:attributeType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pageDocuments">
+    <xs:sequence>
+      <xs:element name="objectType" type="tns:jaxbObjectType" minOccurs="0"/>
+      <xs:element name="from" type="xs:int"/>
+      <xs:element name="quantity" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pageDocumentsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocument">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateByDate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="contexDocumentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplateId" type="xs:string" minOccurs="0"/>
+      <xs:element name="date" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateByDateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentTemplateType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="draftId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentDraftResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentDraftType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="commitDocumentTemplate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplate" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="commitDocumentTemplateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="draftId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateDraftResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentTemplateDraftType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentBatch">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="document" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentBatchResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserDocumentDrafts">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="userId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getUserDocumentDraftsResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentDraftType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentXml">
+    <xs:sequence>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentXmlResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentWithTemplateByDate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="date" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentWithTemplateByDateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateXml">
+    <xs:sequence>
+      <xs:element name="documentTemplateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateXmlResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentTemplateDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentTemplateDraftResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentTemplate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="newDocumentTemplate" type="tns:documentTemplateType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentTemplateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="contexDocumentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentTemplateId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentTemplateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentTemplateType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentTemplateWithDraft">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="newDocumentTemplate" type="tns:documentTemplateType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="createDocumentTemplateWithDraftResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentByDate">
+    <xs:sequence>
+      <xs:element name="sessionTicketId" type="xs:string" minOccurs="0"/>
+      <xs:element name="documentId" type="xs:string" minOccurs="0"/>
+      <xs:element name="date" type="xs:dateTime" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getDocumentByDateResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:documentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="jaxbObjectType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DICTIONARY"/>
+      <xs:enumeration value="DOCUMENT"/>
+      <xs:enumeration value="ORGANIZATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="typeAttributeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DATE"/>
+      <xs:enumeration value="DICTIONARY"/>
+      <xs:enumeration value="NUMBER"/>
+      <xs:enumeration value="TEXT"/>
+      <xs:enumeration value="FILE"/>
+      <xs:enumeration value="LINK"/>
+      <xs:enumeration value="DATEINTERVAL"/>
+      <xs:enumeration value="ORGANIZATION"/>
+      <xs:enumeration value="BOOLEAN"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="confirmStates">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="OK"/>
+      <xs:enumeration value="FAIL"/>
+      <xs:enumeration value="SKIPPED"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
