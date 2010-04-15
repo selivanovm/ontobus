@@ -36,6 +36,14 @@ private
 {
     import IndexException;
 }
+private
+{
+    import TripleStorage;
+}
+private
+{
+    import tango.core.Thread;
+}
 bool f_trace_qqq = false;
 triple_list_header* header_tmp = null;
 struct Triple
@@ -143,7 +151,7 @@ return hashName;
 }
     public
 {
-    void remove_triple_from_list(Triple* removed_triple, char[] s, char[] p, char[] o);
+    void remove_triple_from_list(Triple* removed_triple, char[] s, char[] p, char[] o, TripleStorage ts);
 }
     public
 {
