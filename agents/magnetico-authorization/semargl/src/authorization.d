@@ -28,6 +28,7 @@ private import tango.io.FileScan;
 private import tango.text.locale.Locale;
 private import tango.text.convert.TimeStamp;
 private import tango.text.convert.Layout;
+private import tango.core.Thread;
 
 private import scripts.S05InDocFlow;
 private import scripts.S01AllLoggedUsersCanCreateDocuments;
@@ -46,6 +47,7 @@ private import Log;
 
 private import HashMap;
 private import TripleStorage;
+private import IndexException;
 
 private import Category;
 
@@ -102,6 +104,7 @@ class Authorization
 
 		// ORGANIZATION
 		i_know_predicates[d++] = HAS_PART;
+		
 		i_know_predicates[d++] = MEMBER_OF;
 		i_know_predicates[d++] = IS_ADMIN;
 
@@ -139,6 +142,9 @@ class Authorization
 
 			ts.setPredicatesToS1PPOO(TARGET_SUBSYSTEM_ELEMENT, ELEMENT_ID, RIGHTS);
 
+			ts.define_predicate_as_multiple (HAS_PART);
+			ts.log_query = false;
+			
 			//		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 			//				"magnet-ontology/authorization/acl#rights");
 
@@ -198,6 +204,7 @@ class Authorization
 			log.trace("authorization init ... ok");
 			Stdout.format("authorization init.. ok").newline;
 
+//			ts.log_query = true;
 			ts.print_stat();
 		}
 		catch(IndexException ex)
@@ -311,15 +318,19 @@ class Authorization
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
 			char*[] hierarhical_departments, mom_client from_client)
 	{
-		//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", 
-		//getString(authorizedElementCategory), getString(authorizedElementId), getString(User));
+		//@@@@
+//		Thread.sleep(0.001);
+//		log.trace(""); 
+//		log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", 
+//		getString(authorizedElementCategory), getString(authorizedElementId), getString(User));
+				
 		bool calculatedRight;
 
 		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 
 		if(f_authorization_trace)
 		{
-			// 			log.trace("autorize:S01UserIsAdmin res={}", isAdmin);
+			 			log.trace("autorize:S01UserIsAdmin res={}", isAdmin);
 		}
 		bool result;
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
@@ -330,12 +341,12 @@ class Authorization
 
 			if(f_authorization_trace)
 			{
-				//log.trace("autorize: isAdmin || calculatedRight res={}", result);				
+				log.trace("end autorize: isAdmin || calculatedRight = {}", result);				
 			}
 
 			return result;
 		}
-
+		
 		int is_in_docflow = -1;
 		if((targetRightType == RightType.UPDATE || targetRightType == RightType.DELETE || targetRightType == RightType.WRITE) && strcmp(
 				authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
@@ -345,11 +356,13 @@ class Authorization
 			if(is_in_docflow == 1)
 			{
 				//counters[1]++;
+//				log.trace("end autorize: S05InDocFlow = {}", 1);				
 				return true;
 			}
 			else if(is_in_docflow == 0)
 			{
 				//counters[2]++;
+//				log.trace("end autorize: S05InDocFlow = {}", 0);				
 				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments);
 			}
 		}
@@ -361,55 +374,72 @@ class Authorization
 			if(scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts))
 			{
 				//counters[3]++;
+//				log.trace("end autorize: S01AllLoggedUsersCanCreateDocuments = {}", true);				
 				return true;
 			}
 			////log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
+		//@@@@
+//		Thread.sleep(0.001);
+//		log.trace("#2", result);
+
 		result = strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && scripts.S09DocumentOfTemplate.calculate(User, authorizedElementId,
 				targetRightType, ts, hierarhical_departments, pp);
-		//		log.trace("S09DocumentOfTemplate result = {}", result);
 		if(result)
 		{
 			//counters[4]++;
+//			log.trace("end autorize: S09DocumentOfTemplate result = {}", result);
 			return true;
 		}
+		
+		//@@@@
+//		Thread.sleep(0.001);
+//		log.trace("#3", result);
 
 		triple_list_element* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 		if(strcmp("null", authorizedElementId) != 0 && iterator_facts_of_document is null && strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
 		{
 			//			log.trace("iterator_facts_of_document [s={}] is null", getString(subject_document));
-			//log.trace("autorize end#2, return:[false]");
+//			log.trace("end autorize: end#2, return:[false]");
 			//counters[5]++;
 			ts.list_no_longer_required (iterator_facts_of_document);
 			return false;
 		}
+
+		//@@@@
+//		Thread.sleep(0.001);
+//		log.trace("#4", result);
 
 		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp,
 				authorizedElementCategory))
 		{
 			//counters[6]++;
 			ts.list_no_longer_required (iterator_facts_of_document);
+//			log.trace("end autorize: S11ACLRightsHierarhical = {}", true);
 			return true;
-			//log.trace("authorize:S09DocumentOfTemplate res={}", calculatedRight);
 		}
-		//log.trace("authorize:S11ACLRightsHierarhical res={}", calculatedRight);
 
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			//counters[7]++;
 			ts.list_no_longer_required (iterator_facts_of_document);
+//			log.trace("end autorize: S10UserIsAuthorOfDocument = {}", true);
 			return true;
 		}
-		//log.trace("authorize:S10UserIsAuthorOfDocument res={}", calculatedRight);
+		
+		//@@@@
+//		Thread.sleep(0.001);
+//		log.trace("#6", result);
 
 		if(isAdmin)
 		{
 			ts.list_no_longer_required (iterator_facts_of_document);
+//			log.trace("end autorize: isAdmin = {}", true);
 			return true;
 		}
 
-		//		log.trace("Access Denied");
+//		log.trace("end autorize: Access Denied");
 
 		ts.list_no_longer_required (iterator_facts_of_document);
 		return false;
@@ -422,12 +452,14 @@ class Authorization
 
 	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer,
 			mom_client from_client)
-	//, mom_client client)
 	{
-
+		//@@@@@ 
+//		ts.log_query = true;
+		
 		log.trace("запрос на выборку записей прав");
 
 		auto elapsed = new StopWatch();
+		elapsed.start;
 
 		char* queue_name = cast(char*) (new char[40]);
 
@@ -453,8 +485,9 @@ class Authorization
 		{
 			if(strlen(fact_o[i]) > 0)
 			{
-				/*				log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", 
-				 getString(fact_p[i]), getString(fact_o[i]), strlen(fact_o[i]));*/
+//				log.trace("pattern predicate = '{}'. pattern object = '{}' with length = {}", 
+//				 getString(fact_p[i]), getString(fact_o[i]), strlen(fact_o[i]));
+								
 				if(strcmp(fact_p[i], SET_FROM.ptr) == 0)
 				{
 					from_id = i;
@@ -508,55 +541,59 @@ class Authorization
 
 		//		uint* SET = ts.getTriples("6fcb52fc46889ba8", null, null);
 		//		fact_tools.print_list_triple(SET);
-
+		
 		triple_list_element* start_facts_set = null;
 		byte start_set_marker = 0;
 		if(elements_id > 0)
 		{
-			log.trace("object = {}", getString(fact_o[elements_id]));
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, ELEMENT_ID.ptr, fact_o[elements_id]);
+//			log.trace("object = {}", getString(fact_o[elements_id]));
+			start_facts_set = ts.getTriples(null, ELEMENT_ID.ptr, fact_o[elements_id]);
 		}
 		else if(author_subsystem_element_id > 0)
 		{
 			start_set_marker = 1;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[author_subsystem_element_id]);
+			
+//			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_element_id]);
+			start_facts_set = ts.getTriples(null, AUTHOR_SUBSYSTEM_ELEMENT.ptr, fact_o[author_subsystem_element_id]);
 		}
 		else if(target_subsystem_element_id > 0)
 		{
 			start_set_marker = 2;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[target_subsystem_element_id]);
+			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_element_id]);
 		}
 		else if(category_id > 0)
 		{
 			start_set_marker = 3;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[category_id]);
+			start_facts_set = ts.getTriples(null, null, fact_o[category_id]);
 		}
 		else if(author_subsystem_id > 0)
 		{
 			start_set_marker = 4;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[author_subsystem_id]);
+			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_id]);
 		}
 		else if(target_subsystem_id > 0)
 		{
 			start_set_marker = 5;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[target_subsystem_id]);
+			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_id]);
 		}
 		else if(author_system_id > 0)
 		{
 			start_set_marker = 6;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[author_system_id]);
+			start_facts_set = ts.getTriples(null, null, fact_o[author_system_id]);
 		}
 		else if(target_system_id > 0)
 		{
 			start_set_marker = 7;
-			start_facts_set = cast(triple_list_element*) ts.getTriples(null, null, fact_o[target_system_id]);
+			start_facts_set = ts.getTriples(null, null, fact_o[target_system_id]);
 		}
 
-		log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id, author_subsystem_element_id,
-				target_subsystem_element_id);
-		log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}", category_id,
-				author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
-		log.trace("start_set_marker = {}", start_set_marker);
+//		print_list_triple (start_facts_set);
+		
+//		log.trace("elements_id = {}, author_subsystem_element_id = {}, target_subsystem_element_id = {}", elements_id, author_subsystem_element_id,
+//				target_subsystem_element_id);
+//		log.trace("category_id = {}, author_subsystem_id = {}, target_subsystem_id = {}, author_system_id = {}, target_system_id = {}", category_id,
+//				author_subsystem_id, target_subsystem_id, author_system_id, target_system_id);
+//		log.trace("start_set_marker = {}", start_set_marker);
 
 		strcpy(queue_name, fact_o[reply_to_id]);
 
@@ -709,10 +746,13 @@ class Authorization
 		send_result_and_logging_messages(queue_name, result_buffer, from_client);
 
 		//		client.send(queue_name, result_buffer);
+		
+		//@@@@@ 
+//		ts.log_query = false;
 
 		double time = elapsed.stop;
 		log.trace("get authorization rights records time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-		log.trace("result:{}\n sent to: {}", getString(result_buffer), getString(queue_name));
+//		log.trace("result:{}\n sent to: {}", getString(result_buffer), getString(queue_name));
 
 	}
 
@@ -774,7 +814,7 @@ class Authorization
 
 		double time = elapsed.stop;
 		log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
-		log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
+//		log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
 
 	}
 

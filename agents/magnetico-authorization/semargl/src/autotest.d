@@ -5,6 +5,8 @@ private import tango.io.Stdout;
 private import Predicates;
 private import mom_client;
 private import Log;
+private import fact_tools;
+
 //private import tango.io.File;
 private import tango.io.device.File;
 
@@ -48,46 +50,133 @@ class autotest: mom_client
 	int send(char* routingkey, char* messagebody)
 	{
 
-		if(nocompare == false && strcmp(messagebody, output_data) != 0)
+		if(nocompare == false)
 		{
 			//			printf("\nCOMPARE OUTPUT message from file: %s\n", output_data);
 			//			printf("\nCOMPARE OUTPUT message accepted : %s\n", messagebody);
-			stop_on_next_command = true;
 
-			int Q = 0;
-			while(*(messagebody + Q) != 0)
+			// сравним оба ответа по тексту 
+			if(strcmp(messagebody, output_data) == 0)
 			{
-				if(*(messagebody + Q) != *(output_data + Q))
-				{
-					log.trace("not compare with original, {} != {}, pos={}", *(messagebody + Q), *(output_data + Q), Q);
-					break;
-				}
-				Q++;
+				return 0;
 			}
 
-			auto style = File.ReadWriteOpen;
-			style.share = File.Share.Read;
-			style.open = File.Open.Create;
-			File file = new File("recieved_message", style);
-			file.output.write(fromStringz(messagebody));
-			file.close();
+			char* messagebody_copy = cast(char*) new byte[strlen(messagebody) + 1];
+			strcpy(messagebody_copy, messagebody);
 
-			File file2 = new File("original_message", style);
-			file2.output.write(fromStringz(output_data));
-			file2.close();
+			char* output_data_copy = cast(char*) new byte[strlen(output_data) + 1];
+			strcpy(output_data_copy, output_data);
 
-			File file3 = new File("original_recieved_message", style);
-			file3.output.write(fromStringz(output_data));
-			file3.output.write("\r\n");
-			file3.output.write(fromStringz(messagebody));
-			file3.close();
-			//			log.trace("out messages {} \r\n[{}]", strlen (messagebody), fromStringz(messagebody));
-			//			log.trace("not compare with original {} \r\n[{}]", strlen (output_data), fromStringz(output_data));
-			//			throw new Exception("out messages not compare with original");
+			log.trace("autotest:messages text not compare");
+
+			// тексты сообщений не совпадают, но пофактно они могут совпадать, просто порядок разный
+			// а значит, сравним оба ответа предварительно разобрав их на факты
+
+			log.trace("autotest:parse recieved message");
+
+			char* recieved_fact_s[];
+			char* recieved_fact_p[];
+			char* recieved_fact_o[];
+			uint recieved_is_fact_in_object[];
+
+			Counts count_elements = calculate_count_facts(messagebody_copy, strlen(messagebody_copy));
+			recieved_fact_s = new char*[count_elements.facts];
+			recieved_fact_p = new char*[count_elements.facts];
+			recieved_fact_o = new char*[count_elements.facts];
+			recieved_is_fact_in_object = new uint[count_elements.facts];
+
+			log.trace("autotest:parse original message");
+
+			uint count_recieved_facts = extract_facts_from_message(messagebody_copy, strlen(messagebody_copy),
+					count_elements, recieved_fact_s, recieved_fact_p, recieved_fact_o, recieved_is_fact_in_object);
+
+			char* original_fact_s[];
+			char* original_fact_p[];
+			char* original_fact_o[];
+			uint original_is_fact_in_object[];
+
+			count_elements = calculate_count_facts(output_data_copy, strlen(output_data_copy));
+			original_fact_s = new char*[count_elements.facts];
+			original_fact_p = new char*[count_elements.facts];
+			original_fact_o = new char*[count_elements.facts];
+			original_is_fact_in_object = new uint[count_elements.facts];
+			int count_original_fact_ok = 0;
+
+			uint count_original_facts = extract_facts_from_message(output_data_copy, strlen(output_data_copy),
+					count_elements, original_fact_s, original_fact_p, original_fact_o, original_is_fact_in_object);
+
+			bool compare_is_ok;
+
+			log.trace("autotest:compare facts count_recieved_facts={}, count_original_facts={}", count_recieved_facts,
+					count_original_facts);
+
+			if(count_recieved_facts == count_original_facts)
+			{
+
+				for(int i = 0; i < count_original_facts; i++)
+				{
+					compare_is_ok = false;
+					for(int j = 0; j < count_original_facts; j++)
+					{
+						//						log.trace("autotest:compare facts i={}, j={}", i, j);
+						if(strcmp(original_fact_p[i], RESULT_DATA.ptr) == 0)
+						{
+							if(strcmp(original_fact_s[i], recieved_fact_s[j]) == 0 && strcmp(original_fact_p[i],
+									recieved_fact_p[j]) == 0)
+							{
+								count_original_fact_ok++;
+								compare_is_ok = true;
+								break;
+							}
+
+						} else
+						{
+							if(strcmp(original_fact_s[i], recieved_fact_s[j]) == 0 && strcmp(original_fact_p[i],
+									recieved_fact_p[j]) == 0 && strcmp(original_fact_o[i], recieved_fact_o[j]) == 0)
+							{
+								count_original_fact_ok++;
+								compare_is_ok = true;
+								break;
+							}
+						}
+
+					}
+					if(compare_is_ok == false)
+					{
+						log.trace("facts <{}><{}>\"{}\" not found in recieved message",
+								fromStringz(original_fact_s[i]), fromStringz(original_fact_p[i]), fromStringz(
+										original_fact_o[i]));
+						break;
+					}
+				}
+			}
+
+			if(count_original_fact_ok != count_original_facts)
+			{
+				stop_on_next_command = true;
+
+				auto style = File.ReadWriteOpen;
+				style.share = File.Share.Read;
+				style.open = File.Open.Create;
+				File file = new File("recieved_message", style);
+				file.output.write(fromStringz(messagebody));
+				file.close();
+
+				File file2 = new File("original_message", style);
+				file2.output.write(fromStringz(output_data));
+				file2.close();
+
+				File file3 = new File("original_recieved_message", style);
+				file3.output.write(fromStringz(output_data));
+				file3.output.write("\r\n");
+				file3.output.write(fromStringz(messagebody));
+				file3.close();
+				//			log.trace("out messages {} \r\n[{}]", strlen (messagebody), fromStringz(messagebody));
+				//			log.trace("not compare with original {} \r\n[{}]", strlen (output_data), fromStringz(output_data));
+				//			throw new Exception("out messages not compare with original");
+			}
 
 		}
-
-		//		log.trace("prepare block #6");
 		return 0;
 	}
 
@@ -203,6 +292,7 @@ void prepare_block(char* line, ulong line_length)
 	if(stop_on_next_command == true)
 		throw new Exception("out messages not compare with original");
 
+	log.trace("message:{}", count_commands);
 	message_acceptor(cast(byte*) input_data, size, im);
 	count_commands++;
 }
