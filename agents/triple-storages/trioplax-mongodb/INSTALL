@@ -1,0 +1,12 @@
+Installation Instructions
+*************************
+
+compiling on ubuntu 9.10
+
+download dmd+tango
+
+http://code.google.com/p/ontobus/source/browse/trunk/d/dmd_1.043_i386.deb
+http://code.google.com/p/ontobus/source/browse/trunk/d/tango-dmd_0.99.8_i386.deb
+
+dmd_1.043_i386.deb
+tango-dmd_0.99.8_i386.deb

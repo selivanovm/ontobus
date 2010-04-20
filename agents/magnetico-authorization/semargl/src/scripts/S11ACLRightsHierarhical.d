@@ -3,6 +3,7 @@ module scripts.S11ACLRightsHierarhical;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import tango.stdc.stdio;
+private import tango.core.Thread;
 
 private import Predicates;
 private import RightTypeDef;
@@ -17,6 +18,9 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 {
 	bool result = false;
 
+	//@@@@
+//	Thread.sleep(0.001);
+//	log.trace("#1.1", result);
 	//	log.trace("S11ACLRightsHierarhical document = {:X4}", elementId);
 
 	// если документ в документообороте и мы хотим модифицировать
@@ -42,12 +46,16 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments, char[] pp,
 		char* authorizedElementCategory)
 {
-	//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
+//	log.trace("S11ACLRightsHierarhical.checkRight #0 hierarhical_departments.length = {}", iterator_on_targets_of_hierarhical_departments.length);
+
+	//@@@@
+//	Thread.sleep(0.001);
+//	log.trace("#1.2");
 
 	// найдем все ACL записи для заданных user и elementId 
 	triple_list_element* iterator1 = cast (triple_list_element*)ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
 
-	//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
+//	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
 
 	bool res = lookRightOfIterator(iterator1, rt_symbols + rightType, ts, authorizedElementCategory);
@@ -100,7 +108,11 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 					if(category_triple !is null)
 					{
 						char*	category = cast(char*) category_triple.o;
-						//log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
+
+						//@@@@
+//						Thread.sleep(0.001);
+//						log.trace("#2.1");
+//						log.trace("# {} ?= {}", getString(authorizedElementCategory), getString(category));
 
 						if(strcmp(authorizedElementCategory, category) == 0)
 						{
@@ -114,7 +126,7 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 				{
 					// проверим, есть ли тут требуемуе нами право
 					char*	triple2_o = cast(char*) triple3.o;
-					//		log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
+//							log.trace ("#5 lookRightInACLRecord o={}", getString (triple2_o));
 
 					bool is_actual = false;
 					while(*triple2_o != 0)
@@ -126,7 +138,9 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 								is_actual = is_right_actual(s, ts);
 							if(is_actual)
 							{
-								//log.trace("# subject = {} ", getString(s));
+								//@@@@
+//								Thread.sleep(0.001);
+//								log.trace("# subject = {} ", getString(s));
 
 								return true;
 							}

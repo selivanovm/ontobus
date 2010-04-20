@@ -10,6 +10,7 @@ private import Text = tango.text.Util;
 private import TripleStorage;
 private import fact_tools;
 private import Log;
+private import HashMap;
 
 public void load_from_file(FilePath file_path, char[][] i_know_predicates, TripleStorage ts)
 {
@@ -19,6 +20,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 	auto elapsed = new StopWatch();
 	double time;
 	log.trace("load triples from file {}", file_path);
+	Stdout.format("load triples from file {}", file_path).newline;
 
 	log.trace("open file");
 	auto file = new File(file_path.path ~ file_path.name ~ file_path.suffix);
@@ -117,10 +119,14 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 					}
 					else
 					{
-						log.trace("!!! triple [{}] <{}><{}><{}> not added. result = {}", count_add_triple, s, p, o, result);
+						log.trace("!!! triple [{}] <{}><{}>\"{}\" not added. result = {}", count_add_triple, s, p, o, result);
 
 						count_ignored_triple++;
 					}
+					
+//					triple_list_element* list = ts.getTriples (s.ptr, p.ptr, o);
+//					if (list is null)
+//						throw new Exception ("triple <" ~ s ~ "><" ~ p ~ ">\"" ~ o ~ "\", not added");
 
 				}
 				if(command == 'D')

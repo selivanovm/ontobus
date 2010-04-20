@@ -67,11 +67,11 @@ class TripleStorage
 }
     public
 {
-    bool INFO_stat_get_triples = false;
+    bool log_query = false;
 }
     private
 {
-    bool log_stat_info = false;
+    bool log_stat_info = true;
 }
     public
 {
@@ -149,6 +149,10 @@ class TripleStorage
 {
     int dummy;
 }
+    private
+{
+    bool[char[]] predicate_as_multiple;
+}
     this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 {
 layout = new Locale;
@@ -160,6 +164,14 @@ log.trace("create idx_spo...");
 idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_length_order);
 if (f_init_debug)
 log.trace("ok");
+}
+    public
+{
+    void define_predicate_as_multiple(char[] predicate)
+{
+predicate_as_multiple[predicate] = true;
+log.trace("define predicate [{}] as multiple",predicate);
+}
 }
     public
 {
@@ -196,6 +208,32 @@ count_look_predicate_on_idx_s1ppoo++;
     public
 {
     triple_list_element* getTriples(char* s, char* p, char* o);
+}
+    private
+{
+    void logging_query(char[] op, char* s, char* p, char* o, triple_list_element* list)
+{
+char[] a_s = "";
+char[] a_p = "";
+char[] a_o = "";
+if (s !is null)
+a_s = "S";
+if (p !is null)
+a_p = "P";
+if (o !is null)
+a_o = "O";
+int count = get_count_form_list_triple(list);
+auto style = File.ReadWriteOpen;
+style.share = File.Share.Read;
+style.open = File.Open.Append;
+File log_file = new File("triple-storage-io",style);
+auto tm = WallClock.now;
+auto dt = Clock.toDate(tm);
+log_file.output.write(layout("{:yyyy-MM-dd HH:mm:ss},{} ",tm,dt.time.millis));
+log_file.output.write("\x0a" ~ op ~ " FROM INDEX " ~ a_s ~ a_p ~ a_o ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(buff,count) ~ "\x0a");
+print_list_triple_to_file(log_file,list);
+log_file.close();
+}
 }
     public
 {

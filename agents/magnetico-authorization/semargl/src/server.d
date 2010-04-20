@@ -526,7 +526,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				strcpy(result_ptr, result_state_ok_header.ptr);
 				result_ptr += result_state_ok_header.length;
 				*(result_ptr - 1) = 0;
-
+				
 				strcpy(queue_name, fact_o[reply_to_id]);
 
 				send_result_and_logging_messages(queue_name, result_buffer, from_client);
@@ -622,7 +622,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 					if(element_id >= 0)
 					{
-						log.trace("check for elementId = {}", getString(fact_o[element_id]));
+//						log.trace("check for elementId = {}", getString(fact_o[element_id]));
 						triple_list_element* founded_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr,
 								fact_o[element_id]);
 						{
@@ -634,7 +634,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								{
 									is_exists_not_null = true;
 									char* s = cast(char*) triple.s;
-									log.trace("check right record with subject = {}", getString(s));
+//									log.trace("check right record with subject = {}", getString(s));
 									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
 									{
@@ -643,7 +643,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 												RIGHTS.ptr) == 0)
 
 										{
-											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), getString(fact_o[i]));
+//											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), getString(fact_o[i]));
 											triple_list_element* founded_facts2 = cast(triple_list_element*) az.getTripleStorage.getTriples(s,
 													fact_p[i], fact_o[i]);
 											if(founded_facts2 is null)
@@ -721,8 +721,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 						try
 						{
-							log.trace("add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-									cast(char*) fact_o[i]));
+//							log.trace("add triple <{}><{}>\"{}\"", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
+//									cast(char*) fact_o[i]));
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							try
 							{
@@ -735,7 +735,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						}
 						catch(Exception ex)
 						{
-							log.trace("failed command add triple <{}><{}><{}>", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
+							log.trace("failed command add triple <{}><{}>\"{}\"", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]),
 									getString(cast(char*) fact_o[i]));
 						}
 					}
@@ -883,7 +883,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				char*[] hierarhical_departments = null;
 				hierarhical_departments = getDepartmentTreePathOfUser(user, az.getTripleStorage());
-				log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
+//				log.trace("function authorize: calculate department tree for this target, count={}", hierarhical_departments.length);
 
 				uint count_prepared_elements = 0;
 				uint count_authorized_doc = 0;
@@ -900,7 +900,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 				time_calculate_right.start;
 
-				log.trace("function authorize: repair all elementIds");
+//				log.trace("function authorize: repair all elementIds");
 
 				for(uint i = 0; true; i++)
 				{
@@ -1027,7 +1027,6 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 void remove_subject(char* s)
 {
-
 	triple_list_element* removed_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(s, null, null);
 
 	if(removed_facts !is null)
@@ -1065,7 +1064,8 @@ void remove_subject(char* s)
 
 		for(int k = 0; k < cnt; k++)
 		{
-			log.trace("remove triple2 <{}><{}><{}>", s_a[k], p_a[k], o_a[k]);
+//			log.trace("remove triple2 <{}><{}>\"{}\"", s_a[k], p_a[k], o_a[k]);
+			
 			az.getTripleStorage.removeTriple(s_a[k], p_a[k], o_a[k]);
 			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
 		}

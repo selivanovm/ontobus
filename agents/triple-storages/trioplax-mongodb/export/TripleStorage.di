@@ -14,11 +14,11 @@ private
 }
 private
 {
-    import HashMap;
+    import tango.stdc.stdlib;
 }
 private
 {
-    import IndexException;
+    import HashMap;
 }
 private
 {
@@ -48,6 +48,14 @@ private
 {
     Locale layout;
 }
+private
+{
+    import libmongoc_headers;
+}
+private
+{
+    import tango.stdc.stdlib;
+}
 enum idx_name 
 {
 S = 1 << 0,
@@ -65,106 +73,24 @@ class TripleStorage
 {
     char[] buff = null;
 }
-    public
+    const 
 {
-    bool log_query = false;
+    char* col = "az1";
 }
-    private
+    const 
 {
-    bool log_stat_info = true;
-}
-    public
-{
-    bool INFO_remove_triple_from_list = false;
-}
-    private
-{
-    bool f_init_debug = false;
-}
-    private
-{
-    HashMap idx_s = null;
-}
-    private
-{
-    HashMap idx_p = null;
-}
-    private
-{
-    HashMap idx_o = null;
-}
-    private
-{
-    HashMap idx_sp = null;
-}
-    private
-{
-    HashMap idx_po = null;
-}
-    private
-{
-    HashMap idx_so = null;
-}
-    private
-{
-    HashMap idx_spo = null;
-}
-    private
-{
-    HashMap idx_s1ppoo = null;
-}
-    private
-{
-    char[][16] look_predicate_p1_on_idx_s1ppoo;
-}
-    private
-{
-    char[][16] look_predicate_p2_on_idx_s1ppoo;
-}
-    private
-{
-    char[][16] look_predicate_pp_on_idx_s1ppoo;
-}
-    private
-{
-    char[][16] store_predicate_in_list_on_idx_s1ppoo;
-}
-    private
-{
-    uint count_look_predicate_on_idx_s1ppoo = 0;
-}
-    private
-{
-    char* idx;
-}
-    private
-{
-    char[] cat_buff1;
-}
-    private
-{
-    char[] cat_buff2;
-}
-    private
-{
-    int dummy;
+    char* ns = "az1.simple";
 }
     private
 {
     bool[char[]] predicate_as_multiple;
 }
-    this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+    public
 {
-layout = new Locale;
-cat_buff1 = new char[](64 * 1024);
-cat_buff2 = new char[](64 * 1024);
-buff = new char[](32);
-if (f_init_debug)
-log.trace("create idx_spo...");
-idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_length_order);
-if (f_init_debug)
-log.trace("ok");
+    bool log_query = false;
 }
+    mongo_connection conn;
+    this(uint max_count_element, uint max_length_order, uint inital_triple_area_length);
     public
 {
     void define_predicate_as_multiple(char[] predicate)
@@ -181,24 +107,20 @@ log.trace("define predicate [{}] as multiple",predicate);
 }
     public
 {
-    void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length);
+    void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+{
+}
 }
     public
 {
     void set_stat_info_logging(bool flag)
 {
-log_stat_info = flag;
 }
 }
     public
 {
     void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 {
-look_predicate_p1_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1;
-look_predicate_p2_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P2;
-look_predicate_pp_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = P1 ~ P2;
-store_predicate_in_list_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = _store_predicate_in_list_on_idx_s1ppoo;
-count_look_predicate_on_idx_s1ppoo++;
 }
 }
     public
@@ -248,22 +170,6 @@ log_file.close();
 {
     void print_stat()
 {
-if (idx_s !is null)
-log.trace("index {}, counts={} ",idx_s.getName(),idx_s.get_count_elements());
-if (idx_p !is null)
-log.trace("index {}, counts={} ",idx_p.getName(),idx_p.get_count_elements());
-if (idx_o !is null)
-log.trace("index {}, counts={} ",idx_o.getName(),idx_o.get_count_elements());
-if (idx_sp !is null)
-log.trace("index {}, counts={} ",idx_sp.getName(),idx_sp.get_count_elements());
-if (idx_po !is null)
-log.trace("index {}, counts={} ",idx_po.getName(),idx_po.get_count_elements());
-if (idx_so !is null)
-log.trace("index {}, counts={} ",idx_so.getName(),idx_so.get_count_elements());
-if (idx_spo !is null)
-log.trace("index {}, counts={} ",idx_spo.getName(),idx_spo.get_count_elements());
-if (idx_s1ppoo !is null)
-log.trace("index {}, counts={} ",idx_s1ppoo.getName(),idx_s1ppoo.get_count_elements());
 }
 }
     public
