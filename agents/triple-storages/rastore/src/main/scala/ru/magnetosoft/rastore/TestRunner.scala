@@ -7,6 +7,7 @@ import ru.magnetosoft.rastore.tests._
 import ru.magnetosoft.rastore.core.Store
 import ru.magnetosoft.rastore.core.Triplet
 import ru.magnetosoft.rastore.core.Logger
+import java.io.File
 
 object TestRunner {
 
@@ -39,7 +40,7 @@ object TestRunner {
 
           var i = 0
           var a = Set[Triplet]()
-          Source.fromFile(args(0)).getLines.foreach { line =>
+          Source.fromFile(new File(args(0))).getLines().foreach { line =>
             if (i < 1000) {
               a += Common.tripletFromLine(line)
               i = i + 1

@@ -377,8 +377,7 @@ public class Fetcher {
                     writeTriplet(department.getId(), Predicates.HAS_PART,
                             newToInternalIdMap.get(child), true, out);
                 }
-                writeTriplet(department.getId(), Predicates.MEMBER_OF,
-                        childToParent.get(department.getId()), true, out);
+                writeTriplet(department.getId(), Predicates.MEMBER_OF, childToParent.get(department.getId()), true, out);
             }
 
             long end = System.currentTimeMillis();
@@ -490,9 +489,10 @@ public class Fetcher {
                                 "http://swrc.ontoware.org/ontology#photo", a.getValue(), true, out);
                     } else if (a.getName().equalsIgnoreCase("photoUID")) {
                         writeTriplet(prefix, "magnet-ontology#photoUID", a.getValue(), true, out);
+                    } else if (a.getName().equalsIgnoreCase("administrator")) {
+                        writeTriplet(prefix, Predicates.IS_ADMIN, a.getValue(), true, out);
                     } else if (!writeRole(prefix, a, out)) {
-                        writeTriplet(prefix, "magnet-ontology#unknown"
-                                + a.getName(), a.getValue(), true, out);
+                        writeTriplet(prefix, "magnet-ontology#unknown" + a.getName(), a.getValue(), true, out);
                     }
                 }
             }
@@ -598,34 +598,37 @@ public class Fetcher {
     private static void writeTriplet(String subject, String predicate,
             String object, boolean isObjectLiteral, BufferedWriter bw)
             throws IOException {
+        if (object != null) {
+            StringBuilder builder = new StringBuilder("<");
 
-        StringBuilder builder = new StringBuilder("<");
+            builder.append(subject.trim());
+            builder.append("> <");
+            builder.append(predicate.trim());
+            builder.append("> ");
 
-        builder.append(subject.trim());
-        builder.append("> <");
-        builder.append(predicate.trim());
-        builder.append("> ");
+            if (isObjectLiteral) {
+                builder.append("\"");
+            } else {
+                builder.append("<");
+            }
 
-        if (isObjectLiteral) {
-            builder.append("\"");
+            builder.append(escape(object.trim()));
+
+            if (isObjectLiteral) {
+                builder.append("\"");
+            } else {
+                builder.append(">");
+            }
+
+            builder.append(" .\n");
+
+            if (fake) {
+                System.out.println(builder.toString());
+            } else {
+                bw.write(builder.toString());
+            }
         } else {
-            builder.append("<");
-        }
-
-        builder.append(escape(object.trim()));
-
-        if (isObjectLiteral) {
-            builder.append("\"");
-        } else {
-            builder.append(">");
-        }
-
-        builder.append(" .\n");
-
-        if (fake) {
-            System.out.println(builder.toString());
-        } else {
-            bw.write(builder.toString());
+            System.out.println("Error! object = null. subject = " + subject + "; predicate = " + predicate);
         }
     }
 
