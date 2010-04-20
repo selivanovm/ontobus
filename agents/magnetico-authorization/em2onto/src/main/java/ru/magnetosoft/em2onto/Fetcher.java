@@ -45,6 +45,7 @@ public class Fetcher {
     private static String dbUser;
     private static String dbPassword;
     private static String dbUrl;
+    private static String dbSuffix;
 
     public static void main(String[] args) {
 
@@ -533,6 +534,7 @@ public class Fetcher {
             dbUser = properties.getProperty("dbUser", "ba");
             dbPassword = properties.getProperty("dbPassword", "123456");
             dbUrl = properties.getProperty("dbUrl", "localhost:3306");
+            dbSuffix = properties.getProperty("dbSuffix", "");
         } catch (IOException e) {
             writeDefaultProperties();
         }
@@ -555,6 +557,8 @@ public class Fetcher {
         properties.setProperty("dictionaryUrl", "http://localhost:9874/ba-server/DictionaryServices?wsdl");
         properties.setProperty("dbUser", "ba");
         properties.setProperty("dbPassword", "123456");
+        properties.setProperty("dbUrl", "localhost:3306");
+        properties.setProperty("dbSuffix", "");
 
         try {
             properties.store(new FileOutputStream("em2onto.properties"), null);
@@ -597,9 +601,9 @@ public class Fetcher {
 
         StringBuilder builder = new StringBuilder("<");
 
-        builder.append(subject);
+        builder.append(subject.trim());
         builder.append("> <");
-        builder.append(predicate);
+        builder.append(predicate.trim());
         builder.append("> ");
 
         if (isObjectLiteral) {
@@ -608,7 +612,7 @@ public class Fetcher {
             builder.append("<");
         }
 
-        builder.append(escape(object));
+        builder.append(escape(object.trim()));
 
         if (isObjectLiteral) {
             builder.append("\"");
@@ -757,10 +761,13 @@ public class Fetcher {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             connection = DriverManager.getConnection("jdbc:mysql://" + dbUrl, dbUser, dbPassword);
+
+            System.out.println("fetching authorization right records...");
+
             String authDataQuery = "select authorSystem, authorSubsystem, authorSubsystemElement, "
                     + "targetSystem, targetSubsystem, targetSubsystemElement, category, elementId, dateFrom, dateTo, "
-                    + "_create, _read, _update, _delete from authorization_db.authorizationrightrecords";
-            ResultSet authData = connection.createStatement().executeQuery(authDataQuery);
+                    + "_create, _read, _update, _delete from authorization_db" + dbSuffix + ".authorizationrightrecords";
+            ResultSet authRecordsRs = connection.createStatement().executeQuery(authDataQuery);
 
             BufferedWriter out = null;
             if (!fake) {
@@ -768,71 +775,94 @@ public class Fetcher {
             }
             String ns = "mo/at/acl#";
 
-            int i = 0;
-            while (authData.next()) {
-                String authorSystem = authData.getString(1);
-                String authorSubsystem = authData.getString(2);
-                String authorSubsystemElement = authData.getString(3);
-                String targetSystem = authData.getString(4);
-                String targetSubsystem = authData.getString(5);
-                String targetSubsystemElement = authData.getString(6);
-                String category = authData.getString(7);
-                String elementId = authData.getString(8);
-                String dateFrom = authData.getString(9);
-                String dateTo = authData.getString(10);
-                String _create = authData.getString(11);
-                String _read = authData.getString(12);
-                String _update = authData.getString(13);
-                String _delete = authData.getString(14);
+            int i = 1;
+            while (authRecordsRs.next()) {
+                String authorSystem = authRecordsRs.getString(1);
+                String authorSubsystem = authRecordsRs.getString(2);
+                String authorSubsystemElement = authRecordsRs.getString(3);
+                String targetSystem = authRecordsRs.getString(4);
+                String targetSubsystem = authRecordsRs.getString(5);
+                String targetSubsystemElement = authRecordsRs.getString(6);
+                String category = authRecordsRs.getString(7);
+                String elementId = authRecordsRs.getString(8);
+                String dateFrom = authRecordsRs.getString(9);
+                String dateTo = authRecordsRs.getString(10);
+                String _create = authRecordsRs.getString(11);
+                String _read = authRecordsRs.getString(12);
+                String _update = authRecordsRs.getString(13);
+                String _delete = authRecordsRs.getString(14);
 
-                String recordId = ns + "RR" + i;
+                String recordId = ns + "RR" + i++;
 
-                if (!isEmpty(authorSystem)) {
-                    writeTriplet(recordId, Predicates.AUTHOR_SYSTEM, authorSystem, true, out);
-                }
-                if (!isEmpty(authorSubsystem)) {
-                    writeTriplet(recordId, Predicates.AUTHOR_SUBSYSTEM, authorSubsystem, true, out);
-                }
-                if (!isEmpty(authorSubsystemElement)) {
-                    writeTriplet(recordId, Predicates.AUTHOR_SUBSYSTEM_ELEMENT, authorSubsystemElement, true, out);
-                }
-                if (!isEmpty(targetSystem)) {
-                    writeTriplet(recordId, Predicates.TARGET_SYSTEM, targetSystem, true, out);
-                }
-                if (!isEmpty(targetSubsystem)) {
-                    writeTriplet(recordId, Predicates.TARGET_SUBSYSTEM, targetSubsystem, true, out);
-                }
-                if (!isEmpty(targetSubsystemElement)) {
-                    writeTriplet(recordId, Predicates.TARGET_SUBSYSTEM_ELEMENT, targetSubsystemElement, true, out);
-                }
-                if (!isEmpty(category)) {
-                    writeTriplet(recordId, Predicates.CATEGORY, category, true, out);
-                }
                 if (!isEmpty(elementId)) {
+                    if (!isEmpty(dateTo) && !dateTo.equals("0")) {
+                        writeTriplet(recordId, Predicates.DATE_TO, dateTo, true, out);
+                    }
+                    if (!isEmpty(authorSystem)) {
+                        writeTriplet(recordId, Predicates.AUTHOR_SYSTEM, authorSystem, true, out);
+                    }
+                    if (!isEmpty(authorSubsystem)) {
+                        writeTriplet(recordId, Predicates.AUTHOR_SUBSYSTEM, authorSubsystem, true, out);
+                    }
+                    if (!isEmpty(authorSubsystemElement)) {
+                        writeTriplet(recordId, Predicates.AUTHOR_SUBSYSTEM_ELEMENT, authorSubsystemElement, true, out);
+                    }
+                    if (!isEmpty(targetSystem)) {
+                        writeTriplet(recordId, Predicates.TARGET_SYSTEM, targetSystem, true, out);
+                    }
+                    if (!isEmpty(targetSubsystem)) {
+                        writeTriplet(recordId, Predicates.TARGET_SUBSYSTEM, targetSubsystem, true, out);
+                    }
+                    if (!isEmpty(targetSubsystemElement)) {
+                        writeTriplet(recordId, Predicates.TARGET_SUBSYSTEM_ELEMENT, targetSubsystemElement, true, out);
+                    }
+                    if (!isEmpty(category)) {
+                        writeTriplet(recordId, Predicates.CATEGORY, category, true, out);
+                    }
                     writeTriplet(recordId, Predicates.ELEMENT_ID, elementId, true, out);
-                }
-                if (!isEmpty(dateFrom)) {
-                    writeTriplet(recordId, Predicates.DATE_FROM, dateFrom, true, out);
-                }
-                if (!isEmpty(dateTo)) {
-                    writeTriplet(recordId, Predicates.DATE_TO, dateTo, true, out);
-                }
+                    if (!isEmpty(dateFrom) && !dateFrom.equals("0")) {
+                        writeTriplet(recordId, Predicates.DATE_FROM, dateFrom, true, out);
+                    }
 
-                String rights = "";
-                if (!isEmpty(_create)) {
-                    rights += 'c';
+                    String rights = "";
+                    if (!isEmpty(_create) && _create.equals("1")) {
+                        rights += 'c';
+                    }
+                    if (!isEmpty(_read) && _read.equals("1")) {
+                        rights += 'r';
+                    }
+                    if (!isEmpty(_update) && _update.equals("1")) {
+                        rights += 'u';
+                    }
+                    if (!isEmpty(_delete) && _delete.equals("1")) {
+                        rights += 'd';
+                    }
+                    writeTriplet(recordId, Predicates.RIGHTS, rights, true, out);
                 }
-                if (!isEmpty(_read)) {
-                    rights += 'r';
-                }
-                if (!isEmpty(_update)) {
-                    rights += 'u';
-                }
-                if (!isEmpty(_delete)) {
-                    rights += 'd';
-                }
-                writeTriplet(recordId, Predicates.RIGHTS, rights, true, out);
             }
+            authRecordsRs.close();
+            System.out.println("fetching from authorization right records...done");
+
+            System.out.println("fetching from delegates...");
+            String delegatesQuery = "select * from authorization_db" + dbSuffix + ".delegates";
+            ResultSet delegatesRs = connection.createStatement().executeQuery(delegatesQuery);
+            i = 1;
+            while (delegatesRs.next()) {
+                String fromUserId = delegatesRs.getString(2);
+                String toUserId = delegatesRs.getString(3);
+                String id = ns + "DR" + i++;
+                if (!(isEmpty(fromUserId) || isEmpty(toUserId))) {
+                    writeTriplet(id, Predicates.DELEGATION_OWNER, fromUserId, true, out);
+                    writeTriplet(id, Predicates.DELEGATION_DELEGATE, toUserId, true, out);
+
+                    String withDelegatesTree = delegatesRs.getString(4);
+                    if (!isEmpty(withDelegatesTree) && !withDelegatesTree.equals("0")) {
+                        writeTriplet(id, Predicates.DELEGATION_WITH_TREE, withDelegatesTree, true, out);
+                    }
+                }
+            }
+            System.out.println("fetching from delegates...done");
+
             if (!fake) {
                 out.close();
             }
@@ -852,7 +882,7 @@ public class Fetcher {
     }
 
     private static boolean isEmpty(String str) {
-        if (str == null && str.trim().length() == 0) {
+        if (str == null || str.trim().length() == 0) {
             return true;
         } else {
             return false;
