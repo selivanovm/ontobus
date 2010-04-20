@@ -490,6 +490,11 @@ public class Fetcher {
                     } else if (a.getName().equalsIgnoreCase("photoUID")) {
                         writeTriplet(prefix, "magnet-ontology#photoUID", a.getValue(), true, out);
                     } else if (a.getName().equalsIgnoreCase("administrator")) {
+                        if(a.getValue().equals("1")) {
+                            a.setValue("true");
+                        } else if(!(a.getValue().equals("true") || a.getValue().equals("false"))) {
+                            a.setValue("false");
+                        }
                         writeTriplet(prefix, Predicates.IS_ADMIN, a.getValue(), true, out);
                     } else if (!writeRole(prefix, a, out)) {
                         writeTriplet(prefix, "magnet-ontology#unknown" + a.getName(), a.getValue(), true, out);
