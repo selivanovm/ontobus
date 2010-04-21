@@ -79,6 +79,10 @@ class MessageParserTest {
 
     val functions = MessageParser.functionsFromMessage(message)
 
+    println("!!!!!!!!!!!!!!!!!!!")
+    println(functions)
+    println(of1)
+    println(functions.contains(of1))
     assertTrue(functions.contains(of1))
     assertTrue(functions.contains(of2))
     assertTrue(functions.contains(of3))

@@ -44,10 +44,10 @@ object FileStore {
     count
   }
 
-  def lineIterator(): Iterator[String] = Source.fromFile(DATA_FILE_NAME).getLines
+  def lineIterator(): Iterator[String] = Source.fromFile(new File(DATA_FILE_NAME)).getLines()
 
   def tripletsAsString(fromIndex: Int, toIndex: Int): String =
     (for(i <- fromIndex to toIndex)
-      yield Source.fromFile(DATA_FILE_NAME).getLine(i)).mkString("")
+      yield Source.fromFile(new File(DATA_FILE_NAME)).getLine(i)).mkString("")
   
 }

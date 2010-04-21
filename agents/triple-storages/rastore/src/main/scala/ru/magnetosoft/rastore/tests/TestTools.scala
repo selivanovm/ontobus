@@ -9,7 +9,7 @@ package ru.magnetosoft.rastore.tests
 
 object TestTools {
 
-    def getPaddedString(in: String, padString: String, paddingLength: int): String = {
+    def getPaddedString(in: String, padString: String, paddingLength: Int): String = {
         var result = in
         for (i <- 0 to paddingLength) {
             result += padString

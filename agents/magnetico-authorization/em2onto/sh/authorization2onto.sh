@@ -36,7 +36,7 @@ cat $tmpSqlFile | while read line; do
 		    if [ ! -z "$authorSubsystemElement" ]; then echo "<${ns}RR$i> <${ns}atSsE> \"$authorSubsystemElement\" ." >> $resultFile; fi
 
 		    if [ ! -z "$targetSystem" ]; then echo "<${ns}RR$i> <${ns}tgS> \"$targetSystem\" ." >> $resultFile; fi
-		    if [ ! -z "$targetSubSystem" ]; then echo "<${ns}RR$i> <${ns}tgSs> \"$targetSubsystem\" ." >> $resultFile; fi
+		    if [ ! -z "$targetSubsystem" ]; then echo "<${ns}RR$i> <${ns}tgSs> \"$targetSubsystem\" ." >> $resultFile; fi
 		    if [ ! -z "$targetSubsystemElement" ]; then echo "<${ns}RR$i> <${ns}tgSsE> \"$targetSubsystemElement\" ." >> $resultFile; fi
 		    if [ ! -z "$category" ]; then echo "<${ns}RR$i> <${ns}cat> \"$category\" ." >> $resultFile; fi
 

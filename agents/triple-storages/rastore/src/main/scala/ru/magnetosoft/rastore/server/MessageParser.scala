@@ -8,7 +8,7 @@ import ru.magnetosoft.rastore.core.Triplet
 import ru.magnetosoft.rastore.core.TripletModifier
 import ru.magnetosoft.rastore.core.Logger
 
-import scala.collection.jcl.ArrayList
+import scala.collection.mutable.ArrayBuffer
 
 object MessageParser {
 
@@ -63,7 +63,7 @@ object MessageParser {
   def split(tripletsLine: String): Set[String] = {
 
     val result = Set[String]()
-    val indexes = new ArrayList[Int]()
+    var indexes = new ArrayBuffer[Int](0)
 
     var isBeetweenTokens = false
     var delim_number = 1
