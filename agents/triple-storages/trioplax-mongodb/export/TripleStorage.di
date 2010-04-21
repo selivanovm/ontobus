@@ -73,13 +73,43 @@ class TripleStorage
 {
     char[] buff = null;
 }
+    private
+{
     const 
 {
     char* col = "az1";
 }
+}
+    private
+{
     const 
 {
     char* ns = "az1.simple";
+}
+}
+    private
+{
+    int max_length_pull = 1024;
+}
+    private
+{
+    char[][triple_list_element*] used_lists_pull;
+}
+    private
+{
+    int count_used_lists = 0;
+}
+    private
+{
+    int count_all_allocated_lists = 0;
+}
+    private
+{
+    int max_length_list = 0;
+}
+    private
+{
+    int max_use_pull = 0;
 }
     private
 {
@@ -89,7 +119,10 @@ class TripleStorage
 {
     bool log_query = false;
 }
+    private
+{
     mongo_connection conn;
+}
     this(uint max_count_element, uint max_length_order, uint inital_triple_area_length);
     public
 {
@@ -101,9 +134,11 @@ log.trace("define predicate [{}] as multiple",predicate);
 }
     public
 {
-    void list_no_longer_required(triple_list_element* first_element_of_list)
-{
+    bool f_trace_list_pull = true;
 }
+    public
+{
+    void list_no_longer_required(triple_list_element* first_element_of_list);
 }
     public
 {
@@ -127,6 +162,7 @@ log.trace("define predicate [{}] as multiple",predicate);
 {
     triple_list_element* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
 }
+    int ballanse = 0;
     public
 {
     triple_list_element* getTriples(char* s, char* p, char* o);
@@ -168,9 +204,7 @@ log_file.close();
 }
     public
 {
-    void print_stat()
-{
-}
+    void print_stat();
 }
     public
 {

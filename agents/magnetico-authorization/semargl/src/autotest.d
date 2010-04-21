@@ -55,8 +55,9 @@ class autotest: mom_client
 			//			printf("\nCOMPARE OUTPUT message from file: %s\n", output_data);
 			//			printf("\nCOMPARE OUTPUT message accepted : %s\n", messagebody);
 
+			log.trace("autotest:messages comparing");
 			// сравним оба ответа по тексту 
-			if(strcmp(messagebody, output_data) == 0)
+			if(strcmp(output_data, messagebody) == 0)
 			{
 				return 0;
 			}
@@ -69,6 +70,14 @@ class autotest: mom_client
 
 			log.trace("autotest:messages text not compare");
 
+			// тексты сообщений не совпадают, но размер как минимум должен совпадать, даже если факты идут в другом порядке
+			if (strlen(messagebody) != strlen(output_data))
+			{
+				log_info_and_set_exit_flag (messagebody, output_data);
+				return 0;
+			}
+
+			
 			// тексты сообщений не совпадают, но пофактно они могут совпадать, просто порядок разный
 			// а значит, сравним оба ответа предварительно разобрав их на факты
 
@@ -153,33 +162,35 @@ class autotest: mom_client
 
 			if(count_original_fact_ok != count_original_facts)
 			{
-				stop_on_next_command = true;
-
-				auto style = File.ReadWriteOpen;
-				style.share = File.Share.Read;
-				style.open = File.Open.Create;
-				File file = new File("recieved_message", style);
-				file.output.write(fromStringz(messagebody));
-				file.close();
-
-				File file2 = new File("original_message", style);
-				file2.output.write(fromStringz(output_data));
-				file2.close();
-
-				File file3 = new File("original_recieved_message", style);
-				file3.output.write(fromStringz(output_data));
-				file3.output.write("\r\n");
-				file3.output.write(fromStringz(messagebody));
-				file3.close();
-				//			log.trace("out messages {} \r\n[{}]", strlen (messagebody), fromStringz(messagebody));
-				//			log.trace("not compare with original {} \r\n[{}]", strlen (output_data), fromStringz(output_data));
-				//			throw new Exception("out messages not compare with original");
+				log_info_and_set_exit_flag (messagebody, output_data);
 			}
 
 		}
 		return 0;
 	}
 
+	private void log_info_and_set_exit_flag (char *messagebody, char* output_data)
+	{
+		stop_on_next_command = true;
+
+		auto style = File.ReadWriteOpen;
+		style.share = File.Share.Read;
+		style.open = File.Open.Create;
+		File file = new File("recieved_message", style);
+		file.output.write(fromStringz(messagebody));
+		file.close();
+
+		File file2 = new File("original_message", style);
+		file2.output.write(fromStringz(output_data));
+		file2.close();
+
+		File file3 = new File("original_recieved_message", style);
+		file3.output.write(fromStringz(output_data));
+		file3.output.write("\r\n");
+		file3.output.write(fromStringz(messagebody));
+		file3.close();
+	}
+	
 	char* get_message()
 	{
 		throw new Exception("not implemented");
@@ -287,7 +298,9 @@ void prepare_block(char* line, ulong line_length)
 	}
 
 	if(count_commands % 100 == 0)
+	{
 		Stdout.format("\r\nautotest: count messages {}", count_commands).newline;
+	}
 
 	if(stop_on_next_command == true)
 		throw new Exception("out messages not compare with original");

@@ -156,4 +156,5 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 	time = elapsed.stop;
 
 	log.trace("end read triples, total time = {}, count add triples = {}, ignored = {}", time, count_add_triple, count_ignored_triple);
+	Stdout.format("end read triples, total time = {}, count add triples = {}, ignored = {}", time, count_add_triple, count_ignored_triple).newline;	
 }

@@ -12,7 +12,8 @@ private import Log;
 
 public int calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {
-	triple_list_element* iterator = cast(triple_list_element*) ts.getTriples(null, ELEMENT_ID.ptr, elementId);
+	triple_list_element* iterator = ts.getTriples(null, ELEMENT_ID.ptr, elementId);
+	triple_list_element* iterator_FE = iterator;
 	char* ACL_subject;
 
 	bool is_in_docflow = false;
@@ -24,26 +25,31 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 			if(triple !is null)
 			{
 				ACL_subject = cast(char*) triple.s;
-				triple_list_element* iterator1 = cast(triple_list_element*) ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
+				triple_list_element* iterator1 = ts.getTriples(ACL_subject, AUTHOR_SYSTEM.ptr, "DOCFLOW");
+				triple_list_element* iterator1_FE = iterator1;
 
 				if(iterator1 !is null)
 				{
-				// если не null, значит право с найденным субъектом создал документооборот
-				
+					// если не null, значит право с найденным субъектом создал документооборот
+
 					//log.trace("isInDocFlow : subject = {} | s1", fromStringz(ACL_subject), fromStringz(subject1));
 
 					is_in_docflow = true;
 
-					triple_list_element* iterator2 = cast(triple_list_element*) ts.getTriples(ACL_subject, TARGET_SUBSYSTEM_ELEMENT.ptr, user);
+					triple_list_element* iterator2 = ts.getTriples(ACL_subject, TARGET_SUBSYSTEM_ELEMENT.ptr, user);
+					triple_list_element* iterator2_FE = iterator2;
+
 					if(iterator2 !is null)
 					{
-					// если не null, значит target для права это наш user
+						// если не null, значит target для права это наш user
 
 						//			subject1 = cast(char*) triple + 6;
 
 						//log.trace("isInDocFlow #2 {}", fromStringz(subject1));
 
-						triple_list_element* iterator3 = cast(triple_list_element*) ts.getTriples(ACL_subject, RIGHTS.ptr, null);
+						triple_list_element* iterator3 = ts.getTriples(ACL_subject, RIGHTS.ptr, null);
+						triple_list_element* iterator3_FE = iterator3;
+
 						if(iterator3 !is null)
 						{
 
@@ -58,8 +64,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 								//log.trace("isInDocFlow #4 | {}", subject1);
 
 								// проверим, есть ли тут требуемуе нами право
-								char*
-										triple2_o = cast(char*) triple.o;
+								char* triple2_o = cast(char*) triple.o;
 
 								bool is_actual = false;
 								while(*triple2_o != 0)
@@ -71,24 +76,30 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 											is_actual = is_right_actual(ACL_subject, ts);
 
 										if(is_actual)
+										{
+											ts.list_no_longer_required(iterator3_FE);
+											ts.list_no_longer_required(iterator2_FE);
+											ts.list_no_longer_required(iterator1_FE);
+											ts.list_no_longer_required(iterator_FE);
+
 											return 1;
-										else
+										} else
 											break;
 									}
 									triple2_o++;
 								}
 							}
-							ts.list_no_longer_required (iterator3);
+							ts.list_no_longer_required(iterator3_FE);
 						}
-						ts.list_no_longer_required (iterator2);
+						ts.list_no_longer_required(iterator2_FE);
 					}
-					ts.list_no_longer_required (iterator1);
+					ts.list_no_longer_required(iterator1_FE);
 				}
 			}
 			iterator = iterator.next_triple_list_element;
 		}
 
-		ts.list_no_longer_required (iterator);
+		ts.list_no_longer_required(iterator_FE);
 
 	}
 	if(is_in_docflow)
