@@ -53,7 +53,8 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 private char* getObjectAuthor(char* elementId, TripleStorage ts)
 {
 	//log.trace("getObjectAuthor #START elementId = {}", fromStringz(elementId));
-	triple_list_element* iterator_facts_of_document = cast(triple_list_element*) ts.getTriples(elementId, null, null);
+	triple_list_element* iterator_facts_of_document = ts.getTriples(elementId, null, null);
+	triple_list_element* iterator_facts_of_document_FE = iterator_facts_of_document;
 	//log.trace("getObjectAuthor #1");
 	{
 		while(iterator_facts_of_document !is null)
@@ -71,12 +72,13 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 					//log.trace("getObjectAuthor #6");
 					char*	result = cast(char*) triple0.o;
 					//log.trace("getObjectAuthor #1 {}", fromStringz(result));
+					ts.list_no_longer_required (iterator_facts_of_document_FE);
 					return result;
 				}
 			}
 			iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 		}
-		ts.list_no_longer_required (iterator_facts_of_document);
+		ts.list_no_longer_required (iterator_facts_of_document_FE);
 
 	}
 	return null;
@@ -85,8 +87,9 @@ private char* getObjectAuthor(char* elementId, TripleStorage ts)
 private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 {
 	//	log.trace("getRightRecordAuthor #START");
-	triple_list_element* iterator_facts_of_document = cast(triple_list_element*) ts.getTriples(elementId, null, null);
-	//	log.trace("getRightRecordAuthor #1");
+	triple_list_element* iterator_facts_of_document = ts.getTriples(elementId, null, null);
+	triple_list_element* iterator_facts_of_document_FE = iterator_facts_of_document; 
+	 //	log.trace("getRightRecordAuthor #1");
 	{
 		while(iterator_facts_of_document !is null)
 		{
@@ -102,12 +105,13 @@ private char* getRightRecordAuthor(char* elementId, TripleStorage ts)
 				{
 					char*	result = cast(char*) triple0.o;
 					//					log.trace("getRightRecordAuthor #RESULT {}", fromStringz(result));
+					ts.list_no_longer_required (iterator_facts_of_document_FE);
 					return result;
 				}
 			}
 			iterator_facts_of_document = iterator_facts_of_document.next_triple_list_element;
 		}
-		ts.list_no_longer_required (iterator_facts_of_document);
+		ts.list_no_longer_required (iterator_facts_of_document_FE);
 
 	}
 	return null;

@@ -310,7 +310,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					}
 					else if(put_id < 0 && strcmp(fact_o[i], CREATE.ptr) == 0)
 					{
-						log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+						log.trace("found tag {}, id ={} ", getString(fact_o[i]), i);
 						create_id = i;
 						put_id = i;
 					}
@@ -319,19 +319,25 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				else if(arg_id < 0 && strcmp(fact_p[i], FUNCTION_ARGUMENT.ptr) == 0)
 				{
 					arg_id = i;
-					log.trace("found comand {}, id ={} ", getString(fact_p[i]), i);
+					log.trace("found tag {}, id ={} ", getString(fact_p[i]), i);
 				}
 
 			}
 
 			log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
 
+			//@@@@
+			if (strcmp (fact_s[0], "c662535e-28da-4179-a95b-76825ded05c5\0") == 0)
+				az.f_authorization_trace = true;
+			else
+				az.f_authorization_trace = false;
+			
 			bool
 					isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 || get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 || agent_function_id > -1 || create_id > -1 || authorization_id > -1;
 
 			if(!isCommandRecognized)
 			{
-				log.trace("# unrecognized command");
+				log.trace("# unrecognized tag");
 
 				int reply_to_id = 0;
 				for(int i = 0; i < count_facts; i++)
@@ -430,14 +436,14 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					if(is_fact_in_object[i] == arg_id)
 						break;
 				}
-				log.trace("query s = {} , p = {} , o = {}", getString(fact_p[i]));
-				//getString(fact_p[i]), getString(fact_o[i]));
+				log.trace("query s = {}, p = {}, o = {}", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 
 				char* ss = strlen(fact_s[i]) == 0 ? null : fact_s[i];
 				char* pp = strlen(fact_p[i]) == 0 ? null : fact_p[i];
 				char* oo = strlen(fact_o[i]) == 0 ? null : fact_o[i];
 
-				triple_list_element* list_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(ss, pp, oo);
+				triple_list_element* list_facts = az.getTripleStorage.getTriples(ss, pp, oo);
+				triple_list_element* list_facts_FE = list_facts;
 				//				uint* list_facts = az.getTripleStorage.getTriples(fact_s[i], fact_p[i], fact_o[i], false);
 
 				char* result_ptr = cast(char*) result_buffer;
@@ -480,7 +486,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						}
 						list_facts = list_facts.next_triple_list_element;
 					}
-					az.getTripleStorage.list_no_longer_required (list_facts);
+					az.getTripleStorage.list_no_longer_required (list_facts_FE);
 				}
 
 				time = elapsed.stop;
@@ -622,9 +628,11 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 					if(element_id >= 0)
 					{
-//						log.trace("check for elementId = {}", getString(fact_o[element_id]));
-						triple_list_element* founded_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr,
+						log.trace("check for elementId = {}", getString(fact_o[element_id])); //@@@@
+						
+						triple_list_element* founded_facts = az.getTripleStorage.getTriples(null, ELEMENT_ID.ptr,
 								fact_o[element_id]);
+						triple_list_element* founded_facts_FE = founded_facts;
 						{
 							bool is_exists_not_null = false;
 							while(founded_facts !is null)
@@ -634,7 +642,9 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								{
 									is_exists_not_null = true;
 									char* s = cast(char*) triple.s;
-//									log.trace("check right record with subject = {}", getString(s));
+									
+									log.trace("check right record with subject = {}", getString(s)); //@@@@
+									
 									bool is_exists = true;
 									for(int i = 0; i < count_facts; i++)
 									{
@@ -643,13 +653,15 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 												RIGHTS.ptr) == 0)
 
 										{
-//											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), getString(fact_o[i]));
-											triple_list_element* founded_facts2 = cast(triple_list_element*) az.getTripleStorage.getTriples(s,
+											log.trace("check for existance <{}> <{}> <{}>", getString(s), getString(fact_p[i]), getString(fact_o[i])); //@@@@
+											triple_list_element* founded_facts2 = az.getTripleStorage.getTriples(s,
 													fact_p[i], fact_o[i]);
+											triple_list_element* founded_facts2_FE = founded_facts2;
 											if(founded_facts2 is null)
 											{
 												//log.trace("#444");
 												is_exists = false;
+												az.getTripleStorage.list_no_longer_required (founded_facts2_FE);
 												break;
 											}
 											else
@@ -672,7 +684,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 													}
 													founded_facts2 = founded_facts2.next_triple_list_element;
 												}
-												az.getTripleStorage.list_no_longer_required (founded_facts2);
+												az.getTripleStorage.list_no_longer_required (founded_facts2_FE);
 												//log.trace("#666 {} {}", is_exists, is_exists2);
 												is_exists = is_exists2 && is_exists;
 											}
@@ -687,7 +699,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 								}
 								founded_facts = founded_facts.next_triple_list_element;
 							}
-							az.getTripleStorage.list_no_longer_required (founded_facts);
+							az.getTripleStorage.list_no_longer_required (founded_facts_FE);
 						}
 					}
 				}
@@ -721,8 +733,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 						try
 						{
-//							log.trace("add triple <{}><{}>\"{}\"", getString(cast(char*) fact_s[i]), getString(cast(char*) fact_p[i]), getString(
-//									cast(char*) fact_o[i]));
+							log.trace("add triple <{}><{}>\"{}\"", getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
+							
 							az.logginTriple('A', getString(fact_s[i]), getString(fact_p[i]), getString(fact_o[i]));
 							try
 							{
@@ -1027,8 +1039,9 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 void remove_subject(char* s)
 {
-	triple_list_element* removed_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(s, null, null);
-
+	triple_list_element* removed_facts = az.getTripleStorage.getTriples(s, null, null);
+	triple_list_element* removed_facts_FE = removed_facts;
+	
 	if(removed_facts !is null)
 	{
 
@@ -1044,7 +1057,6 @@ void remove_subject(char* s)
 
 			if(triple2 !is null)
 			{
-
 				char* ss = cast(char*) triple2.s;
 
 				char* pp = cast(char*) triple2.p;
@@ -1060,7 +1072,6 @@ void remove_subject(char* s)
 			cnt++;
 			removed_facts = removed_facts.next_triple_list_element;
 		}
-		az.getTripleStorage.list_no_longer_required (removed_facts);
 
 		for(int k = 0; k < cnt; k++)
 		{
@@ -1070,13 +1081,16 @@ void remove_subject(char* s)
 			az.logginTriple('D', s_a[k], p_a[k], o_a[k]);
 		}
 
+		az.getTripleStorage.list_no_longer_required (removed_facts_FE);
+
 	}
 }
 
 void remove_subjects_by_predicate(char* p, char* o)
 {
 
-	triple_list_element* removed_facts = cast(triple_list_element*) az.getTripleStorage.getTriples(null, p, o);
+	triple_list_element* removed_facts = az.getTripleStorage.getTriples(null, p, o);
+	triple_list_element* removed_facts_FE = removed_facts;
 
 	if(removed_facts !is null)
 	{
@@ -1097,12 +1111,13 @@ void remove_subjects_by_predicate(char* p, char* o)
 			cnt++;
 			removed_facts = removed_facts.next_triple_list_element;
 		}
-		az.getTripleStorage.list_no_longer_required (removed_facts);
 
 		for(int k = 0; k < cnt; k++)
 		{
 			remove_subject(s_a[k].ptr);
 		}
+
+		az.getTripleStorage.list_no_longer_required (removed_facts_FE);
 
 	}
 }

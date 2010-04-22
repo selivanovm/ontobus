@@ -245,7 +245,7 @@ class TripleStorage
 
 		if(log_query == true)
 			logging_query("GET", s, p, o, list);
-		
+
 		return list;
 	}
 
@@ -301,8 +301,8 @@ class TripleStorage
 			return false;
 		}
 
-//		log.trace("");
-//		log.trace("remove triple <{}><{}>\"{}\"", s, p, o);
+		//		log.trace("");
+		//		log.trace("remove triple <{}><{}>\"{}\"", s, p, o);
 
 		Triple* removed_triple;
 
@@ -385,8 +385,7 @@ class TripleStorage
 								{
 									if(strcmp(s.ptr, triple1.s) == 0)
 									{
-										log.trace("found: <{}><{}>\"{}\"", fromStringz(triple1.s), fromStringz(
-												triple1.p), fromStringz(triple1.o));
+//										log.trace("found: <{}><{}>\"{}\"", fromStringz(triple1.s), fromStringz(triple1.p), fromStringz(triple1.o));
 										break;
 									}
 								}
@@ -401,7 +400,8 @@ class TripleStorage
 							//							print_list_triple(listS);
 
 							idx_s1ppoo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-							idx_s1ppoo.remove_triple_from_list(triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2, null);
+							idx_s1ppoo.remove_triple_from_list(triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2,
+									null);
 
 							//							log.trace("#! list after remove:");
 							//							listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, dummy);
@@ -421,10 +421,11 @@ class TripleStorage
 					{
 						char[] o1 = fromStringz(listS.triple.o);
 
-						log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
+//						log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
 						idx_s1ppoo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2, null);
+						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2,
+								null);
 					}
 
 				} else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
@@ -454,7 +455,7 @@ class TripleStorage
 				}
 
 			}
-			
+
 			if(idx_sp !is null)
 			{
 				idx_sp.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
@@ -474,7 +475,7 @@ class TripleStorage
 
 		INFO_remove_triple_from_list = false;
 		//do_things(o);
-		log.trace("");
+//		log.trace("");
 
 		if(log_query == true)
 			logging_query("REMOVE", s.ptr, p.ptr, o.ptr, null);
@@ -537,11 +538,14 @@ class TripleStorage
 
 					if(list !is null)
 					{
-						log.trace("addTriple: add triple <{}><{}>\"{}\"", s, p, o);
-						log.trace("addTriple: exist triples:");
-						print_list_triple(list);
+						if(f_trace_addTriple)
+						{
+							log.trace("addTriple: add triple <{}><{}>\"{}\"", s, p, o);
+							log.trace("addTriple: exist triples:");
+							print_list_triple(list);
 
-						log.trace("addTriple: remove triple <{}><{}>\"{}\"", s, p, fromStringz(list.triple.o));
+							log.trace("addTriple: remove triple <{}><{}>\"{}\"", s, p, fromStringz(list.triple.o));
+						}
 						removeTriple(s, p, fromStringz(list.triple.o));
 						//						throw new Exception("addTriple: for that predicate already has data ");
 

@@ -27,8 +27,9 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 	//	log.trace("getDepartmentTreePath #1 for user={}", getString(user));
 
-	iterator0 = cast(triple_list_element*) ts.getTriples(user, MEMBER_OF.ptr, null);
-
+	iterator0 = ts.getTriples(user, MEMBER_OF.ptr, null);
+	triple_list_element* iterator0_FE = iterator0;  
+	
 	//print_list_triple(iterator0);
 
 	if(iterator0 !is null)
@@ -45,7 +46,8 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 
 		while(next_branch !is null)
 		{
-			triple_list_element* iterator1 = cast(triple_list_element*) ts.getTriples(null, HAS_PART.ptr, next_branch);
+			triple_list_element* iterator1 = ts.getTriples(null, HAS_PART.ptr, next_branch);
+			triple_list_element* iterator1_FE = iterator1;
 			next_branch = null;
 			if(iterator1 !is null)
 			{
@@ -55,12 +57,11 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 				result[count_result] = s;
 				count_result++;
 				next_branch = s;
-				ts.list_no_longer_required (iterator1);
-
+				ts.list_no_longer_required (iterator1_FE);
 			}
 
 		}
-		ts.list_no_longer_required (iterator0);
+		ts.list_no_longer_required (iterator0_FE);
 
 	}
 
@@ -94,8 +95,9 @@ public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts
 
 public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
 {
-	triple_list_element* delegates_facts = cast(triple_list_element*) ts.getTriples(null, DELEGATION_DELEGATE.ptr, delegate_id);
-
+	triple_list_element* delegates_facts = ts.getTriples(null, DELEGATION_DELEGATE.ptr, delegate_id);
+	triple_list_element* delegates_facts_FE = delegates_facts;
+	
 	if(delegates_facts !is null)
 	{
 		//log.trace("#2 gda");
@@ -106,8 +108,9 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 			if(de_legate !is null)
 			{
 				char* subject = cast(char*) de_legate.s;
-				triple_list_element* owners_facts = cast(triple_list_element*) ts.getTriples(subject, DELEGATION_OWNER.ptr, null);
-
+				triple_list_element* owners_facts = ts.getTriples(subject, DELEGATION_OWNER.ptr, null);
+				triple_list_element* owners_facts_FE = owners_facts;
+				
 				if(owners_facts !is null)
 				{
 					while(owners_facts !is null)
@@ -126,7 +129,8 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							 result_ptr += strlen(object);*/
 							process_delegate(object);
 
-							triple_list_element* with_tree_facts = cast(triple_list_element*) ts.getTriples(subject, DELEGATION_WITH_TREE.ptr, null);
+							triple_list_element* with_tree_facts = ts.getTriples(subject, DELEGATION_WITH_TREE.ptr, null);
+							triple_list_element* with_tree_facts_FE = with_tree_facts;
 							{
 								while(with_tree_facts !is null)
 								{
@@ -143,7 +147,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 									}
 								}
 							}
-							ts.list_no_longer_required (with_tree_facts);
+							ts.list_no_longer_required (with_tree_facts_FE);
 							owners_facts = null;
 						}
 						else
@@ -153,12 +157,12 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							//?cast(uint*) next_owner;
 						}
 					}
-					ts.list_no_longer_required (owners_facts);
+					ts.list_no_longer_required (owners_facts_FE);
 				}
 			}
 			delegates_facts = delegates_facts.next_triple_list_element;
 		}
-		ts.list_no_longer_required (delegates_facts);		
+		ts.list_no_longer_required (delegates_facts_FE);		
 	}
 }
 
@@ -167,7 +171,8 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 	char* from;
 	char* to;
 
-	triple_list_element* from_iter = cast(triple_list_element*) ts.getTriples(subject, DATE_FROM.ptr, null);
+	triple_list_element* from_iter = ts.getTriples(subject, DATE_FROM.ptr, null);
+	triple_list_element* from_iter_FE = from_iter;
 
 	// log.trace("#1");
 
@@ -185,12 +190,13 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 			}
 			from_iter = from_iter.next_triple_list_element;
 		}
-		ts.list_no_longer_required (from_iter);
+		ts.list_no_longer_required (from_iter_FE);
 	}
 
 	//	log.trace("#10");
 
-	triple_list_element* to_iter = cast(triple_list_element*) ts.getTriples(subject, DATE_TO.ptr, null);
+	triple_list_element* to_iter = ts.getTriples(subject, DATE_TO.ptr, null);
+	triple_list_element* to_iter_FE = to_iter;
 	{
 		while(to_iter !is null)
 		{
@@ -205,7 +211,7 @@ public bool is_right_actual(char* subject, TripleStorage ts)
 			}
 			to_iter = to_iter.next_triple_list_element;
 		}
-		ts.list_no_longer_required (to_iter);
+		ts.list_no_longer_required (to_iter_FE);
 	}
 
 	//	log.trace("#20");	

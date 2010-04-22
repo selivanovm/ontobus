@@ -22,7 +22,7 @@ public bool calculate(char* user, char* elementId, uint rightType, TripleStorage
 	}
 
 	Triple* template_triple;
-	triple_list_element* facts = cast(triple_list_element*) ts.getTriples(elementId, DOCUMENT_TEMPLATE_ID.ptr, null);
+	triple_list_element* facts = ts.getTriples(elementId, DOCUMENT_TEMPLATE_ID.ptr, null);
 	if(facts !is null)
 	{
 		template_triple = facts.triple;

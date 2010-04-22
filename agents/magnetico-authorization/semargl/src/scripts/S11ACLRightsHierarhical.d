@@ -54,6 +54,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 
 	// найдем все ACL записи для заданных user и elementId 
 	triple_list_element* iterator1 = cast (triple_list_element*)ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
+	
 
 //	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
 	//	print_list_triple(iterator1);
@@ -102,6 +103,8 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 				char* p = cast(char*) triple3.p;
 
 				triple_list_element* category_triples = ts.getTriples(s, CATEGORY.ptr, null);
+				triple_list_element* category_triples_FE = category_triples;
+				
 				if(category_triples !is null)
 				{
 					Triple* category_triple = category_triples.triple;
@@ -119,7 +122,7 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 							category_match = true;
 						}
 					}
-					ts.list_no_longer_required (category_triples);
+					ts.list_no_longer_required (category_triples_FE);
 				}
 
 				if(category_match && strcmp(p, RIGHTS.ptr) == 0)
