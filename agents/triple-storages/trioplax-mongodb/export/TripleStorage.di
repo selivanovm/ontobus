@@ -71,6 +71,38 @@ class TripleStorage
 {
     private
 {
+    int max_length_pull = 1024 * 10;
+}
+    private
+{
+    int average_list_size = 3;
+}
+    private
+{
+    char* strings = null;
+}
+    private
+{
+    Triple* triples = null;
+}
+    private
+{
+    triple_list_element* elements_in_list = null;
+}
+    private
+{
+    triple_list_element*[] used_list = null;
+}
+    private
+{
+    int last_used_element_in_pull = 0;
+}
+    private
+{
+    int last_used_element_in_strings = 0;
+}
+    private
+{
     char[] buff = null;
 }
     private
@@ -86,18 +118,6 @@ class TripleStorage
 {
     char* ns = "az1.simple";
 }
-}
-    private
-{
-    int max_length_pull = 1024;
-}
-    private
-{
-    char[][triple_list_element*] used_lists_pull;
-}
-    private
-{
-    int count_used_lists = 0;
 }
     private
 {
@@ -126,6 +146,14 @@ class TripleStorage
     this(uint max_count_element, uint max_length_order, uint inital_triple_area_length);
     public
 {
+    void release_all_lists()
+{
+last_used_element_in_pull = 0;
+last_used_element_in_strings = 0;
+}
+}
+    public
+{
     void define_predicate_as_multiple(char[] predicate)
 {
 predicate_as_multiple[predicate] = true;
@@ -138,7 +166,9 @@ log.trace("define predicate [{}] as multiple",predicate);
 }
     public
 {
-    void list_no_longer_required(triple_list_element* first_element_of_list);
+    void list_no_longer_required(triple_list_element* first_element_of_list)
+{
+}
 }
     public
 {
@@ -158,11 +188,14 @@ log.trace("define predicate [{}] as multiple",predicate);
 {
 }
 }
+    private
+{
+    char[] p_rt = "mo/at/acl#rt\x00";
+}
     public
 {
     triple_list_element* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
 }
-    int ballanse = 0;
     public
 {
     triple_list_element* getTriples(char* s, char* p, char* o);
@@ -204,7 +237,10 @@ log_file.close();
 }
     public
 {
-    void print_stat();
+    void print_stat()
+{
+log.trace("TripleStorage:stat: max used pull={}, max length list={}",max_use_pull,max_length_list);
+}
 }
     public
 {
