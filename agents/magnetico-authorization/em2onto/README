@@ -1,18 +1,21 @@
 #!/bin/sh
 
+Во первых, отредактируйте em2onto.properties.
+Во вторых, выгружайте...
+
 #build em2onto with
 mvn assembly:assembly
 
-#creates file with authorization records. user must set correct db_host value
-./sh/authorization2onto.sh
-
-#fetch organization triples
+# fetch organization triples
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher org
 
-#fetch documents creators 
+# fetch documents creators 
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher all
 
-#fetch document types creators
+# fetch document types creators
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher dtp
+
+# fetch document types creators
+java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher auth
 
 
