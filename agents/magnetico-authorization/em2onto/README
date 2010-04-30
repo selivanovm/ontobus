@@ -15,7 +15,7 @@ java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.
 # fetch document types creators
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher dtp
 
-# fetch document types creators
+# fetch authorization records and delegates
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher auth
 
 
