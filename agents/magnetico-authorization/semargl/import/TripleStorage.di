@@ -153,7 +153,7 @@ class TripleStorage
 {
     bool[char[]] predicate_as_multiple;
 }
-    this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+    this(int max_count_element, uint max_length_order, uint inital_triple_area_length)
 {
 layout = new Locale;
 cat_buff1 = new char[](64 * 1024);
@@ -176,6 +176,12 @@ log.trace("define predicate [{}] as multiple",predicate);
     public
 {
     void list_no_longer_required(triple_list_element* first_element_of_list)
+{
+}
+}
+    public
+{
+    void release_all_lists()
 {
 }
 }

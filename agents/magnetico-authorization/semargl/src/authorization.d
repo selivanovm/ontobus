@@ -120,6 +120,13 @@ class Authorization
 
 	private char[] pp = null;
 
+	private int str2int (char[] str)
+	{
+		char[] value = props[str];
+		value[length] = 0;
+		return atoi (value.ptr);
+	}
+	
 	private void init(char[][char[]] props)
 	{
 		try
@@ -127,23 +134,18 @@ class Authorization
 			log.trace("authorization init..");
 			Stdout.format("authorization init..").newline;
 
-			ts = new TripleStorage(atoi(props["index_SPO_count"].ptr), atoi(props["index_SPO_short_order"].ptr), atoi(
-					props["index_SPO_key_area"].ptr));
-			ts.set_new_index(idx_name.S, atoi(props["index_S_count"].ptr), atoi(props["index_S_short_order"].ptr),
-					atoi(props["index_S_key_area"].ptr));
-			ts.set_new_index(idx_name.O, atoi(props["index_O_count"].ptr), atoi(props["index_O_short_order"].ptr),
-					atoi(props["index_O_key_area"].ptr));
-			ts.set_new_index(idx_name.PO, atoi(props["index_PO_count"].ptr), atoi(props["index_PO_short_order"].ptr),
-					atoi(props["index_PO_key_area"].ptr));
-			ts.set_new_index(idx_name.SP, atoi(props["index_SP_count"].ptr), atoi(props["index_SP_short_order"].ptr),
-					atoi(props["index_SP_key_area"].ptr));
-			ts.set_new_index(idx_name.S1PPOO, atoi(props["index_S1PPOO_count"].ptr), atoi(
-					props["index_S1PPOO_short_order"].ptr), atoi(props["index_S1PPOO_key_area"].ptr));
+			ts = new TripleStorage(str2int("index_SPO_count"), str2int("index_SPO_short_order"), str2int("index_SPO_key_area"));
+			ts.set_new_index(idx_name.S, str2int("index_S_count"), str2int("index_S_short_order"), str2int("index_S_key_area"));
+			ts.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
+			ts.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
+			ts.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
+			ts.set_new_index(idx_name.S1PPOO, str2int("index_S1PPOO_count"), str2int("index_S1PPOO_short_order"), str2int("index_S1PPOO_key_area"));
 
 			ts.setPredicatesToS1PPOO(TARGET_SUBSYSTEM_ELEMENT, ELEMENT_ID, RIGHTS);
 
 			ts.define_predicate_as_multiple(HAS_PART);
 			ts.log_query = false;
+//			ts.f_trace_addTriple = true;
 
 			//		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 			//				"magnet-ontology/authorization/acl#rights");

@@ -4,7 +4,7 @@ rem dmd socketserver.d ListStrings.d HashMap.d TripleStorage.d Triple.d ListTrip
 rem dmd test_triple_storage_in_file.d Hash.d HashNeighbour.d -O -oftest_triple_storage_in_file
 rem rm *.test
 rem rm *.run
-rem rm *.a
+del *.lib
 rem dmd src/testHashMap.d src/Log.d src/HashMap.d src/Hash.d -debug -ofhashMapDebug.test
 rem dmd src/testHashMap.d src/Log.d src/HashMap.d src/Hash.d -O -release -ofhashMapRelease.test
 rem date

@@ -36,16 +36,6 @@ private
 {
     import IndexException;
 }
-private
-{
-    import TripleStorage;
-}
-private
-{
-    import tango.core.Thread;
-}
-bool f_trace_qqq = false;
-triple_list_header* header_tmp = null;
 struct Triple
 {
     short s_length = 0;
@@ -110,9 +100,25 @@ class HashMap
 }
     private
 {
-    uint max_size_reducer = 0;
+    int max_size_reducer = 0;
 }
-    this(char[] _hashName, uint _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
+    private
+{
+    ubyte[] keyz_area;
+}
+    private
+{
+    int keyz_area__last = 0;
+}
+    private
+{
+    Triple[] triples_area = null;
+}
+    private
+{
+    int triples_area__last = 0;
+}
+    this(char[] _hashName, int _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 {
 hashName = _hashName;
 max_size_short_order = _max_size_short_order;
@@ -121,6 +127,11 @@ log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_ord
 max_size_reducer = max_count_elements * max_size_short_order + max_size_short_order;
 reducer = new triple_list_header*[](max_size_reducer);
 log.trace("*** HashMap[name={}, reducer.length={}",hashName,reducer.length);
+keyz_area = new ubyte[](_triple_area_length);
+keyz_area__last = 0;
+log.trace("*** HashMap[name={}, keyz_area.length={}",hashName,keyz_area.length);
+triples_area = new Triple[](_max_count_elements);
+triples_area__last = 0;
 log.trace("*** create object HashMap... ok");
 }
     public
@@ -151,7 +162,7 @@ return hashName;
 }
     public
 {
-    void remove_triple_from_list(Triple* removed_triple, char[] s, char[] p, char[] o, TripleStorage ts);
+    void remove_triple_from_list(Triple* removed_triple, char[] s, char[] p, char[] o);
 }
     public
 {

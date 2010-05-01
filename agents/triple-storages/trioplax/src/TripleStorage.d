@@ -63,7 +63,7 @@ class TripleStorage
 
 	private bool[char[]] predicate_as_multiple;
 
-	this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+	this(int max_count_element, uint max_length_order, uint inital_triple_area_length)
 	{
 		layout = new Locale;
 
@@ -88,6 +88,10 @@ class TripleStorage
 
 	public void list_no_longer_required(triple_list_element* first_element_of_list)
 	{
+	}
+	
+	public void release_all_lists()
+	{		
 	}
 
 	public void set_new_index(ubyte index, uint max_count_element, uint max_length_order,
@@ -322,31 +326,31 @@ class TripleStorage
 		if(idx_s !is null)
 		{
 			idx_s.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-			idx_s.remove_triple_from_list(removed_triple, s, null, null, null);
+			idx_s.remove_triple_from_list(removed_triple, s, null, null);
 		}
 
 		if(idx_p !is null)
 		{
 			idx_p.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-			idx_p.remove_triple_from_list(removed_triple, p, null, null, null);
+			idx_p.remove_triple_from_list(removed_triple, p, null, null);
 		}
 
 		if(idx_o !is null)
 		{
 			idx_o.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-			idx_o.remove_triple_from_list(removed_triple, o, null, null, null);
+			idx_o.remove_triple_from_list(removed_triple, o, null, null);
 		}
 
 		if(idx_po !is null)
 		{
 			idx_po.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-			idx_po.remove_triple_from_list(removed_triple, p, o, null, null);
+			idx_po.remove_triple_from_list(removed_triple, p, o, null);
 		}
 
 		if(idx_so !is null)
 		{
 			idx_so.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-			idx_so.remove_triple_from_list(removed_triple, s, o, null, null);
+			idx_so.remove_triple_from_list(removed_triple, s, o, null);
 		}
 
 		if(idx_s1ppoo !is null)
@@ -400,8 +404,7 @@ class TripleStorage
 							//							print_list_triple(listS);
 
 							idx_s1ppoo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-							idx_s1ppoo.remove_triple_from_list(triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2,
-									null);
+							idx_s1ppoo.remove_triple_from_list(triple1, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 
 							//							log.trace("#! list after remove:");
 							//							listS = idx_s1ppoo.get(look_predicate_pp_on_idx_s1ppoo[i].ptr, o1.ptr, o2.ptr, dummy);
@@ -424,8 +427,7 @@ class TripleStorage
 //						log.trace("remove from index sppoo B: p1 = {}, p2 = {}", p1, p2);
 						// вторая часть p2 для этого субьекта успешно была найдена, переходим к удалению из индекса
 						idx_s1ppoo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2,
-								null);
+						idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 					}
 
 				} else if(p == store_predicate_in_list_on_idx_s1ppoo[i])
@@ -450,7 +452,7 @@ class TripleStorage
 
 					//					log.trace ("o1={}, o2={}", o1, o2);
 
-					idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2, null);
+					idx_s1ppoo.remove_triple_from_list(removed_triple, look_predicate_pp_on_idx_s1ppoo[i], o1, o2);
 
 				}
 
@@ -459,12 +461,12 @@ class TripleStorage
 			if(idx_sp !is null)
 			{
 				idx_sp.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-				idx_sp.remove_triple_from_list(removed_triple, s, p, null, this);
+				idx_sp.remove_triple_from_list(removed_triple, s, p, null);
 			}
 
 		}
 		idx_spo.INFO_remove_triple_from_list = INFO_remove_triple_from_list;
-		idx_spo.remove_triple_from_list(removed_triple, s, p, o, null);
+		idx_spo.remove_triple_from_list(removed_triple, s, p, o);
 
 		removed_triple.s = null;
 		removed_triple.p = null;
@@ -567,6 +569,7 @@ class TripleStorage
 				if(f_trace_addTriple)
 					log.trace("addTriple:add index spo");
 
+//				idx_spo.f_trace_put = true; //@@@@@
 				idx_spo.put(s, p, o, null);
 
 				if(f_trace_addTriple)
@@ -600,48 +603,51 @@ class TripleStorage
 				//		log.trace("addTriple:4 addr={:X4} s={} p={} o={}", triple, fromStringz(cast(char*) (triple + 6)));
 
 				//				idx_s.f_check_add_to_index = true;
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to S index");
 
 				if(idx_s !is null)
+				{
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to S index");
 					idx_s.put(s, null, null, triple);
+				}
 
 				//				idx_s.f_check_add_to_index = false;
 
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to P index");
-
 				if(idx_p !is null)
+				{
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to P index");
 					idx_p.put(p, null, null, triple);
-
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to O index");
+				}
 
 				if(idx_o !is null)
+				{
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to O index");
 					idx_o.put(o, null, null, triple);
-
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to SP index");
+				}
 
 				if(idx_sp !is null)
+				{
+//					idx_sp.f_trace_put = true; //@@@@@
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to SP index");
 					idx_sp.put(s, p, null, triple);
-
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to PO index");
+				}
 
 				if(idx_po !is null)
 				{
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to PO index");
 					idx_po.put(p, o, null, triple);
 				}
 
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to SO index");
-
 				if(idx_so !is null)
+				{
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to SO index");
 					idx_so.put(s, o, null, triple);
-
-				if(f_trace_addTriple)
-					log.trace("addTriple: add to index s1ppoo");
+				}
 
 				/* 
 				 * для s1ppoo следует проверять на полноту пары PP, так как хранить данные неполного индекса будет накладно
@@ -649,6 +655,8 @@ class TripleStorage
 
 				if(idx_s1ppoo !is null)
 				{
+					if(f_trace_addTriple)
+						log.trace("addTriple: add to index s1ppoo");
 
 					char[] p1;
 					char[] p2;
