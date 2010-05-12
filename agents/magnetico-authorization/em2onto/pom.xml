@@ -19,7 +19,7 @@
         <dependency>
             <groupId>ru.magnetosoft.magnet</groupId>
             <artifactId>magnet-commons-client</artifactId>
-            <version>1.5.11-SNAPSHOT</version>
+            <version>1.5.14</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

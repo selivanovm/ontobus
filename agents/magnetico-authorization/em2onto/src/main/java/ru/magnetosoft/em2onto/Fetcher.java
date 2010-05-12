@@ -54,17 +54,17 @@ public class Fetcher {
         if (args.length == 1) {
 
             if (args[0].equals("dir")) {
-                fetchDirectives();
+                fetchDirectives(args[0] + ".n3");
             } else if (args[0].equals("org")) {
-                fetchOrganization();
-            } else if (args[0].equals("all")) {
-                fetchAllDocuments();
+                fetchOrganization(args[0] + ".n3");
+            } else if (args[0].equals("doc")) {
+                fetchAllDocuments(args[0] + ".n3");
             } else if (args[0].equals("dtp")) {
-                fetchDocumentTypes();
+                fetchDocumentTypes(args[0] + ".n3");
             } else if (args[0].equals("att")) {
                 //fetchAttachments();
             } else if (args[0].equals("auth")) {
-                fetchAuthorizationData();
+                fetchAuthorizationData(args[0] + ".n3");
             }
 
         }
@@ -75,7 +75,7 @@ public class Fetcher {
      * Выгружает все типы документов
      * в виде триплетов
      */
-    private static void fetchDocumentTypes() {
+    private static void fetchDocumentTypes(String name_file) {
 
         try {
 
@@ -83,7 +83,7 @@ public class Fetcher {
 
             BufferedWriter out = null;
             if (!fake) {
-                out = new BufferedWriter(new FileWriter(pathToDump));
+                out = new BufferedWriter(new FileWriter(pathToDump + java.io.File.separatorChar + name_file));
             }
 
             List<DocumentTemplateType> types = DocumentUtil.getInstance().listDocumentTypes(DOCUMENT_URL, ticketId);
@@ -116,7 +116,7 @@ public class Fetcher {
     /**
      * Выгружает все документы в виде триплетов
      */
-    private static void fetchAllDocuments() {
+    private static void fetchAllDocuments(String name_file) {
 
         try {
 
@@ -125,7 +125,7 @@ public class Fetcher {
 
             BufferedWriter out = null;
             if (!fake) {
-                out = new BufferedWriter(new FileWriter(pathToDump));
+                out = new BufferedWriter(new FileWriter(pathToDump + java.io.File.separatorChar + name_file));
             }
 
             // берем все типы
@@ -187,7 +187,7 @@ public class Fetcher {
 
     }
 
-    private static void fetchDirectives() {
+    private static void fetchDirectives(String name_file) {
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("search-type", "attributive");
@@ -203,7 +203,7 @@ public class Fetcher {
 
             BufferedWriter out = null;
             if (!fake) {
-                out = new BufferedWriter(new FileWriter(pathToDump));
+                out = new BufferedWriter(new FileWriter(pathToDump + java.io.File.separatorChar + name_file));
             }
 
             long blankNumber = 0;
@@ -324,7 +324,7 @@ public class Fetcher {
     /**
      * Выгружает данные орг. структуры в виде триплетов
      */
-    private static void fetchOrganization() {
+    private static void fetchOrganization(String name_file) {
 
         try {
 
@@ -335,7 +335,7 @@ public class Fetcher {
 
             BufferedWriter out = null;
             if (!fake) {
-                out = new BufferedWriter(new FileWriter(pathToDump));
+                out = new BufferedWriter(new FileWriter(pathToDump + java.io.File.separatorChar + name_file));
             }
 
             OrganizationUtil organizationUtil = new OrganizationUtil(properties.getProperty("organizationUrl"), properties.getProperty("organizationNameSpace"), properties.getProperty("organizationName"));
@@ -763,7 +763,7 @@ public class Fetcher {
         admins.add("syk-portalms");
     }
 
-    private static void fetchAuthorizationData() {
+    private static void fetchAuthorizationData(String name_file) {
         System.out.println("Fetching authorization data...");
         Connection connection = null;
         try {
@@ -779,7 +779,7 @@ public class Fetcher {
 
             BufferedWriter out = null;
             if (!fake) {
-                out = new BufferedWriter(new FileWriter(pathToDump));
+                out = new BufferedWriter(new FileWriter(pathToDump + java.io.File.separatorChar + name_file));
             }
             String ns = "mo/at/acl#";
 
