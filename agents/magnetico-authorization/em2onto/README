@@ -10,7 +10,7 @@ mvn assembly:assembly
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher org
 
 # fetch documents creators 
-java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher all
+java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher doc
 
 # fetch document types creators
 java -cp target/em2onto-0.0.1-SNAPSHOT-jar-with-dependencies.jar ru.magnetosoft.em2onto.Fetcher dtp
