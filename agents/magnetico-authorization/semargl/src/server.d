@@ -23,7 +23,7 @@ private import tango.time.StopWatch;
 private import tango.time.WallClock;
 private import tango.time.Clock;
 
-private import HashMap;
+private import triple;
 private import TripleStorage;
 private import authorization;
 
@@ -1166,6 +1166,28 @@ private char[][char[]] load_props()
 		result["amqp_server_vhost"] = "magnetico";
 		result["dbus_semargl_service_name"] = "";
 		result["dbus_semargl_listen_from"] = "";
+		result["index_PO_key_area"] = "10000";
+		result["index_S1PPOO_count"] = "1000";
+		result["index_SP_key_area"] = "10000";
+		result["index_S_key_area"] = "1000";
+		result["index_SPO_count"] = "1000";
+		result["index_O_short_order"] = "4";
+		result["index_SPO_key_area"] = "10000";
+		result["dbus_semargl_service_name"] = "";
+		result["index_SP_count"] = "1000";
+		result["index_O_key_area"] = "10000";
+		result["index_S1PPOO_short_order"] = "4";
+		result["index_S1PPOO_key_area"] = "10000";
+		result["index_SPO_short_order"] = "4";
+		result["dbus_semargl_listen_from"] = "";
+		result["index_PO_short_order"] = "4";
+		result["index_PO_count"] = "1000";
+		result["index_O_count"] = "1000";
+		result["index_S_short_order"] = "4";
+		result["index_SP_short_order"] = "4";
+		result["index_S_count"] = "1000";
+		result["amqp_server_routingkey"] = "";				
+		
 
 		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);

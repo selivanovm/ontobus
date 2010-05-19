@@ -5,7 +5,7 @@ private import tango.stdc.stringz;
 
 private import Predicates;
 private import TripleStorage;
-private import HashMap;
+private import triple;
 private import Log;
 
 static private bool[char*] cache;

@@ -10,7 +10,7 @@ private import RightTypeDef;
 private import TripleStorage;
 private import script_util;
 private import fact_tools;
-private import HashMap;
+private import triple;
 private import Log;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,

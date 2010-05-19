@@ -6,7 +6,7 @@ private import tango.io.Stdout;
 
 private import Predicates;
 private import TripleStorage;
-private import HashMap;
+private import triple;
 private import Log;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)

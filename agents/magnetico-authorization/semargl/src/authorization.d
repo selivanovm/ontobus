@@ -45,7 +45,7 @@ private import persistent_triple_storage;
 private import fact_tools;
 private import Log;
 
-private import HashMap;
+private import triple;
 private import TripleStorage;
 private import IndexException;
 

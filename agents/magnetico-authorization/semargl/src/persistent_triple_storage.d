@@ -10,7 +10,7 @@ private import Text = tango.text.Util;
 private import TripleStorage;
 private import fact_tools;
 private import Log;
-private import HashMap;
+private import triple;
 private import tango.stdc.stdio;
 private import tango.stdc.string;
 private import tango.stdc.errno;

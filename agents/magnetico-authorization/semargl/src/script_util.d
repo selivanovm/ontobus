@@ -11,7 +11,7 @@ private import RightTypeDef;
 private import TripleStorage;
 private import fact_tools;
 private import Log;
-private import HashMap;
+private import triple;
 
 /*
  * возвращает массив субьектов (s) вышестоящих подразделений по отношению к user   

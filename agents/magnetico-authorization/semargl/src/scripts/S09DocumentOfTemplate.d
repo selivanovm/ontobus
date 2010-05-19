@@ -7,7 +7,7 @@ private import Category;
 private import TripleStorage;
 private import RightTypeDef;
 private import Log;
-private import HashMap;
+private import triple;
 private import scripts.S11ACLRightsHierarhical;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
