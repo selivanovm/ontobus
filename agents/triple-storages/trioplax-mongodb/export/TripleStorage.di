@@ -18,7 +18,7 @@ private
 }
 private
 {
-    import HashMap;
+    import triple;
 }
 private
 {

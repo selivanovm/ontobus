@@ -46,6 +46,10 @@ private
 }
 private
 {
+    import triple;
+}
+private
+{
     Locale layout;
 }
 enum idx_name 

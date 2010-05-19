@@ -5,7 +5,7 @@ private import tango.stdc.string;
 private import tango.stdc.stringz;
 private import tango.stdc.stdlib: calloc;
 
-private import HashMap;
+private import triple;
 private import Log;
 
 private import Integer = tango.text.convert.Integer;

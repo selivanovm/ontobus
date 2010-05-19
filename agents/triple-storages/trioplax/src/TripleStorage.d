@@ -14,6 +14,8 @@ private import tango.time.WallClock;
 private import tango.time.Clock;
 private import tango.text.locale.Locale;
 
+private import triple;
+
 private Locale layout;
 
 enum idx_name

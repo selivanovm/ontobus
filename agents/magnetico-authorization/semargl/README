@@ -4,3 +4,5 @@ compile:
 +linux ubuntu
 +dmd 1.43
 +tango 0.99.8
+
+doc: http://docs.google.com/View?id=dcb9gbgg_37f4wqndfk
