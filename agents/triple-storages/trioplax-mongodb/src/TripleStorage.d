@@ -16,7 +16,12 @@ private import tango.text.locale.Locale;
 
 private Locale layout;
 
-private import libmongoc_headers;
+//private import libmongoc_headers;
+
+private import bson;
+private import md5;
+private import mongo;
+
 private import tango.stdc.stdlib: calloc, free;
 
 enum idx_name
