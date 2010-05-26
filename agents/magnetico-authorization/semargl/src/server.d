@@ -161,9 +161,9 @@ void main(char[][] args)
 		(new Thread(&client.listener)).start;
 		Thread.sleep(0.250);
 	}
-	
+
 	//@@@
-//	Thread.sleep(25);
+	//	Thread.sleep(25);
 }
 
 void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom_client from_client)
@@ -909,7 +909,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 					time_calculate_right.start;
 
-					//				log.trace("function authorize: repair all elementIds");
+					//	вычислим, админ ли user
+					bool isAdmin = scripts.S01UserIsAdmin.calculate(user, az.getTripleStorage(),
+							hierarhical_departments);
+
+					//	вычислим, админ ли каждый из иерархии делегатов
+					bool is_admin_of_hierarhical_delegates[] = new bool[hierarhical_delegates.length];
+					for(int ii = 0; ii < hierarhical_delegates.length; ii++)
+					{
+						is_admin_of_hierarhical_delegates[ii] = scripts.S01UserIsAdmin.calculate(
+								hierarhical_delegates[ii], az.getTripleStorage(), hierarhical_departments);
+					}
 
 					for(uint i = 0; true; i++)
 					{
@@ -921,40 +931,33 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 						if(*(autz_elements + i) == ',' || *(autz_elements + i) == 0)
 						{
-
-							//log.trace("#2");
-
 							*(autz_elements + i) = 0;
 
-							//log.trace("#21");
-
 							docId = cast(char*) (autz_elements + doc_pos);
-
-							//log.trace("#22");
 
 							count_prepared_elements++;
 							bool calculatedRight;
 							calculatedRight = az.authorize(fact_o[category_id], docId, user, targetRightType,
-									hierarhical_departments, from_client);
+									hierarhical_departments, from_client, isAdmin);
 
 							//log.trace("right = {}", calculatedRight);
-
-							//log.trace("#23");
 
 							if(calculatedRight == false)
 							{
 								for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 								{
+									//									bool delegat_isAdmin = scripts.S01UserIsAdmin.calculate(hierarhical_delegates[ii],
+									//											az.getTripleStorage(), hierarhical_departments);
 									//log.trace("#3");
 									calculatedRight = az.authorize(fact_o[category_id], docId,
 											hierarhical_delegates[ii], targetRightType,
-											hierarhical_departments_of_delegate[ii], from_client);
+											hierarhical_departments_of_delegate[ii], from_client,
+											is_admin_of_hierarhical_delegates[ii]);
+
 									if(calculatedRight == true)
 										break;
 								}
 							}
-
-							//log.trace("#4");
 
 							if(calculatedRight == false)
 							{
@@ -1040,7 +1043,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 	{
 		az.getTripleStorage().print_stat();
 		az.getTripleStorage().release_all_lists();
-		
+
 		log.trace("message successfully prepared\r\n");
 	}
 }
@@ -1186,8 +1189,7 @@ private char[][char[]] load_props()
 		result["index_S_short_order"] = "4";
 		result["index_SP_short_order"] = "4";
 		result["index_S_count"] = "1000";
-		result["amqp_server_routingkey"] = "";				
-		
+		result["amqp_server_routingkey"] = "";
 
 		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);

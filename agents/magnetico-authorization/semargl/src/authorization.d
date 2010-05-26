@@ -14,11 +14,6 @@ version(tango_99_8)
 	private import tango.io.device.File;
 }
 
-version(tango_99_7)
-{
-	private import tango.io.File;
-}
-
 private import Text = tango.text.Util;
 private import tango.time.StopWatch;
 private import tango.time.WallClock;
@@ -320,7 +315,7 @@ class Authorization
 
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для заданного пользователя
 	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
-			char*[] hierarhical_departments, mom_client from_client)
+			char*[] hierarhical_departments, mom_client from_client, bool isAdmin)
 	{
 		if(f_authorization_trace)
 		{
@@ -330,9 +325,6 @@ class Authorization
 		}
 
 		bool calculatedRight;
-
-		bool isAdmin = scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts,
-				hierarhical_departments);
 
 		if(f_authorization_trace)
 		{
@@ -378,8 +370,7 @@ class Authorization
 				{
 					log.trace("end autorize: S05InDocFlow = {}", 0);
 				}
-				return scripts.S01UserIsAdmin.calculate(User, authorizedElementId, targetRightType, ts,
-						hierarhical_departments);
+				return isAdmin;
 			}
 		}
 

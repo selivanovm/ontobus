@@ -40,7 +40,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 	char* line = null;
 
 	do
-	{		
+	{
 		line = n3file.read_next_line();
 		if(line is null)
 			break;
@@ -74,10 +74,10 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 						{
 							e_pos = i;
 							int length = e_pos - b_pos - 1;
-							
-//							if (length > 100)
-//							log.trace ("length={}", length);
-							
+
+							//							if (length > 100)
+							//							log.trace ("length={}", length);
+
 							idx++;
 							if(idx == 1)
 							{
@@ -135,7 +135,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 				if(command == 'A')
 				{
 
-//					log.trace("persistent_triple_storage: add triple [{}] <{}><{}>\"{}\"", count_add_triple, s, p, o);
+					//					log.trace("persistent_triple_storage: add triple [{}] <{}><{}>\"{}\"", count_add_triple, s, p, o);
 
 					//						log.trace("#1");
 					int result = ts.addTriple(s, p, o);
@@ -162,7 +162,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates, Tripl
 				}
 				if(command == 'D')
 				{
-//					log.trace("persistent_triple_storage: remove triple [{}] <{}><{}>\"{}\"", count_add_triple, s, p, o);
+					//					log.trace("persistent_triple_storage: remove triple [{}] <{}><{}>\"{}\"", count_add_triple, s, p, o);
 					ts.removeTriple(s, p, o);
 				}
 
@@ -219,13 +219,13 @@ class FileLineRead
 
 	private char* read_next_line()
 	{
-//				log.trace("");
-//				log.trace("#pos_end_line_in_buff = {}", pos_end_line_in_buff);
+		//				log.trace("");
+		//				log.trace("#pos_end_line_in_buff = {}", pos_end_line_in_buff);
 
 		if(content_size - pos_end_line_in_buff <= 0)
 		{
 			content_size = file.read(cast(byte*) buff.ptr, buff_size);
-//			log.trace("# content_size = {}", content_size);
+			//			log.trace("# content_size = {}", content_size);
 
 			if(content_size <= 0)
 			{
@@ -244,17 +244,17 @@ class FileLineRead
 			char* buff_ptr = cast(char*) buff.ptr + pos_end_line_in_buff;
 			for(int i = pos_end_line_in_buff; i < content_size; i++)
 			{
-//				log.trace("#i={}", i);
+				//				log.trace("#i={}", i);
 				if(*(buff.ptr + i) == '\n')
 				{
 					*(buff.ptr + i) = 0;
 					pos_end_line_in_buff = i + 1;
-//										log.trace("end line in pos = {}", pos_end_line_in_buff);
+					//										log.trace("end line in pos = {}", pos_end_line_in_buff);
 					return buff_ptr;
 				}
 
 			}
-//			log.trace("#2");
+			//			log.trace("#2");
 
 			// признак конца строки не найден, а буффер еще не пуст
 			// скопируем первую часть этой строки в начало буффера, при этом 
@@ -270,11 +270,11 @@ class FileLineRead
 			content_size = file.read(cast(byte*) buff.ptr + size_first_half_line, buff_size - size_first_half_line) + size_first_half_line;
 			pos_end_line_in_buff = 0;
 
-//			log.trace("#3 size_first_half_line={}, content_size={}", size_first_half_line, content_size);
+			//			log.trace("#3 size_first_half_line={}, content_size={}", size_first_half_line, content_size);
 			char* line = read_next_line();
-//			log.trace("#4");
-			return line;	
-					
+			//			log.trace("#4");
+			return line;
+
 		}
 
 	}

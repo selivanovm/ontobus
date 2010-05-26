@@ -10,7 +10,7 @@ private import Log;
 
 static private bool[char*] cache;
 
-public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
+public bool calculate(char* user, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
 {
 
 	//log.trace("!!! l={}", iterator_on_targets_of_hierarhical_departments.length);
