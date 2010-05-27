@@ -6,7 +6,7 @@
  Description:    some logging stuff
  Date:                   09.12.2008 by Digited
  **/
-module trioplax.memory.Log;
+module trioplax.Log;
 
 private import tango.util.log.Log;
 

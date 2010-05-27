@@ -1,5 +1,5 @@
-// D import file generated from 'src/triple.d'
-module triple;
+// D import file generated from 'src/trioplax/triple.d'
+module trioplax.triple;
 struct Triple
 {
     short s_length = 0;

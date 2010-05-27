@@ -7,11 +7,11 @@ private import tango.stdc.stringz;
 private import tango.io.Stdout;
 private import Integer = tango.text.convert.Integer;
 
-private import trioplax.memory.Hash;
-
-private import trioplax.memory.Log;
-private import trioplax.memory.IndexException;
+private import trioplax.Log;
 private import trioplax.triple;
+
+private import trioplax.memory.Hash;
+private import trioplax.memory.IndexException;
 
 struct triple_list_header
 {

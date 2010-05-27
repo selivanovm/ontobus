@@ -3,8 +3,8 @@ module scripts.S10UserIsAuthorOfDocument;
 private import tango.stdc.string;
 private import tango.io.Stdout;
 
-private import TripleStorage;
-private import triple;
+private import trioplax.TripleStorage;
+private import trioplax.triple;
 private import fact_tools;
 private import Predicates;
 

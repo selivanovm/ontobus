@@ -4,19 +4,18 @@ private import tango.io.Stdout;
 private import tango.stdc.string;
 private import tango.stdc.stringz;
 
-private import trioplax.memory.HashMap;
-private import trioplax.memory.IndexException;
-private import trioplax.memory.Log;
-
 private import Integer = tango.text.convert.Integer;
 private import tango.io.FileConduit;
 private import tango.time.WallClock;
 private import tango.time.Clock;
 private import tango.text.locale.Locale;
 
+private import trioplax.Log;
 private import trioplax.triple;
 private import trioplax.TripleStorage;
 
+private import trioplax.memory.HashMap;
+private import trioplax.memory.IndexException;
 
 private Locale layout;
 
@@ -36,7 +35,7 @@ class TripleStorageMemory: TripleStorage
 {
 	private char[] buff = null;
 
-	public bool log_query = false;
+	private bool log_query = false;
 	//	public bool INFO_stat_get_triples = true;
 	private bool log_stat_info = true;
 
@@ -81,6 +80,11 @@ class TripleStorageMemory: TripleStorage
 		idx_spo = new HashMap("SPO", max_count_element, inital_triple_area_length, max_length_order);
 		if(f_init_debug)
 			log.trace("ok");
+	}
+
+	public void set_log_query_mode (bool on_off)
+	{
+	   log_query = on_off;
 	}
 
 	public void define_predicate_as_multiple(char[] predicate)
@@ -171,18 +175,14 @@ class TripleStorageMemory: TripleStorage
 		count_look_predicate_on_idx_s1ppoo++;
 	}
 
-	public triple_list_element* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex)
+	public triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o)
 	{
-		//log.trace("### getTriples1");
-		if(useindex & idx_name.S1PPOO)
-		{
 			triple_list_element* list = idx_s1ppoo.get(s, p, o, dummy);
 
 			if(log_query == true)
 				logging_query("GET USE INDEX", s, p, o, list);
 
 			return list;
-		}
 	}
 
 	public triple_list_element* getTriples(char* s, char* p, char* o)

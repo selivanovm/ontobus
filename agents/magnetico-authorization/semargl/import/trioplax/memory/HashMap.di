@@ -1,5 +1,5 @@
-// D import file generated from 'src/HashMap.d'
-module HashMap;
+// D import file generated from 'src/trioplax/memory/HashMap.d'
+module trioplax.memory.HashMap;
 private
 {
     import tango.stdc.stdlib;
@@ -26,19 +26,19 @@ private
 }
 private
 {
-    import Hash;
+    import trioplax.Log;
 }
 private
 {
-    import Log;
+    import trioplax.triple;
 }
 private
 {
-    import IndexException;
+    import trioplax.memory.Hash;
 }
 private
 {
-    import triple;
+    import trioplax.memory.IndexException;
 }
 struct triple_list_header
 {

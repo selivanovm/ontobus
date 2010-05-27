@@ -4,8 +4,8 @@ private import tango.io.Stdout;
 private import tango.stdc.stringz;
 
 private import Predicates;
-private import TripleStorage;
-private import triple;
+private import trioplax.TripleStorage;
+private import trioplax.triple;
 private import Log;
 
 static private bool[char*] cache;

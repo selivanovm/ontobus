@@ -22,9 +22,14 @@ private import Text = tango.text.Util;
 private import tango.time.StopWatch;
 private import tango.time.WallClock;
 private import tango.time.Clock;
+private import tango.text.locale.Locale;
 
-private import triple;
-private import TripleStorage;
+private import trioplax.triple;
+private import trioplax.TripleStorage;
+private import trioplax.memory.TripleStorageMemory;
+private import trioplax.memory.IndexException;
+private import trioplax.mongodb.TripleStorageMongoDB;
+
 private import authorization;
 
 private import mom_client;
@@ -35,7 +40,6 @@ private import autotest;
 private import script_util;
 private import RightTypeDef;
 private import fact_tools;
-private import tango.text.locale.Locale;
 
 private Authorization az = null;
 public char[][char[]] props;
@@ -55,6 +59,7 @@ void main(char[][] args)
 	long count_repeat = 1;
 	bool nocompare = false;
 	bool log_query = false;
+	bool in_memory_mode = false;
 
 	if(args.length > 0)
 	{
@@ -81,6 +86,11 @@ void main(char[][] args)
 				log_query = true;
 				log.trace("log query mode");
 			}
+			if(args[i] == "-in_memory" || args[i] == "-m")
+			{
+				in_memory_mode = true;
+				log.trace("trioplax in memory mode");
+			}
 		}
 	}
 
@@ -92,10 +102,10 @@ void main(char[][] args)
 
 	props = load_props();
 
-	az = new Authorization(props);
+	az = new Authorization(props, in_memory_mode);
 
 	if(log_query)
-		az.getTripleStorage().log_query = true;
+		az.getTripleStorage().set_log_query_mode (true);
 
 	if(autotest_file is null)
 	{

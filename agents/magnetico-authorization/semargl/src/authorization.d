@@ -40,9 +40,11 @@ private import persistent_triple_storage;
 private import fact_tools;
 private import Log;
 
-private import triple;
-private import TripleStorage;
-private import IndexException;
+private import trioplax.triple;
+private import trioplax.TripleStorage;
+private import trioplax.memory.TripleStorageMemory;
+private import trioplax.mongodb.TripleStorageMongoDB;
+private import trioplax.memory.IndexException;
 
 private import Category;
 
@@ -52,16 +54,22 @@ private import server;
 
 class Authorization
 {
+	private bool triples_in_memory = false;
+
 	private char[][] i_know_predicates;
 	private TripleStorage ts = null;
+	private TripleStorageMemory ts_mem = null;
+	private TripleStorageMongoDB ts_mongo = null;	
 
 	int[] counters;
 
 	private char[] log_path = "";
 	private File log_file;
 
-	this(char[][char[]] props)
+	this(char[][char[]] props, bool _triples_in_memory)	
 	{
+		triples_in_memory = _triples_in_memory;
+		
 		counters = new int[10];
 
 		i_know_predicates = new char[][20];
@@ -128,18 +136,31 @@ class Authorization
 		{
 			log.trace("authorization init..");
 			Stdout.format("authorization init..").newline;
-
-			ts = new TripleStorage(str2int("index_SPO_count"), str2int("index_SPO_short_order"), str2int("index_SPO_key_area"));
-			ts.set_new_index(idx_name.S, str2int("index_S_count"), str2int("index_S_short_order"), str2int("index_S_key_area"));
-			ts.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
-			ts.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
-			ts.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
-			ts.set_new_index(idx_name.S1PPOO, str2int("index_S1PPOO_count"), str2int("index_S1PPOO_short_order"), str2int("index_S1PPOO_key_area"));
-
+	
+    			if (triples_in_memory)
+    			{
+			ts_mem = new TripleStorageMemory(str2int("index_SPO_count"), str2int("index_SPO_short_order"), str2int("index_SPO_key_area"));
+			
+			ts_mem.set_new_index(idx_name.S, str2int("index_S_count"), str2int("index_S_short_order"), str2int("index_S_key_area"));
+			ts_mem.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
+			ts_mem.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
+			ts_mem.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
+			ts_mem.set_new_index(idx_name.S1PPOO, str2int("index_S1PPOO_count"), str2int("index_S1PPOO_short_order"), str2int("index_S1PPOO_key_area"));
+			
+			ts = ts_mem;
+                        }
+                        else
+                        {
+			ts_mongo = new TripleStorageMongoDB();
+			
+			ts = cast (TripleStorage)ts_mongo;
+                        }
+                        
+                        
 			ts.setPredicatesToS1PPOO(TARGET_SUBSYSTEM_ELEMENT, ELEMENT_ID, RIGHTS);
 
 			ts.define_predicate_as_multiple(HAS_PART);
-			ts.log_query = false;
+			ts.set_log_query_mode (false);
 //			ts.f_trace_addTriple = true;
 
 			//		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
@@ -160,7 +181,7 @@ class Authorization
 			foreach(file; scan.files)
 			{
 				log.trace("{}\n", file);
-				load_from_file(file, i_know_predicates, ts);
+				load_from_file(file, i_know_predicates, ts_mem);
 			}
 			log.trace("\n{} Errors", scan.errors.length);
 			foreach(error; scan.errors)
@@ -205,7 +226,7 @@ class Authorization
 			ts.print_stat();
 		} catch(IndexException ex)
 		{
-			if(ex.errCode == IndexException.errorCode.short_order_is_full)
+			if(ex.errCode == errorCode.short_order_is_full)
 			{
 				char[] prop_name = "index_" ~ ex.idxName ~ "_short_order";
 				int short_order_param = atoi(props[prop_name].ptr);
@@ -217,7 +238,7 @@ class Authorization
 				Stdout.format("prev short order param = {}", short_order_param).newline;
 				props[prop_name] = Integer.toString(short_order_param);
 			}
-			if(ex.errCode == IndexException.errorCode.block_triple_area_is_full)
+			if(ex.errCode == errorCode.block_triple_area_is_full)
 			{
 				char[] prop_name = "index_" ~ ex.idxName ~ "_key_area";
 				int param = atoi(props[prop_name].ptr);

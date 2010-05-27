@@ -17,7 +17,7 @@ private Locale layout;
 
 private import trioplax.triple;
 private import trioplax.TripleStorage;
-private import trioplax.mongodb.Log;
+private import trioplax.Log;
 
 private import bson;
 private import md5;
@@ -51,11 +51,11 @@ class TripleStorageMongoDB : TripleStorage
 
 	private bool[char[]] predicate_as_multiple;
 
-	public bool log_query = false;
+	private bool log_query = false;
 
 	private mongo_connection conn;
 
-	this(uint max_count_element, uint max_length_order, uint inital_triple_area_length)
+	this()
 	{
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
@@ -82,7 +82,13 @@ class TripleStorageMongoDB : TripleStorage
 		log.trace("connect tomongodb sucessful");
 	}
 
-	public void release_all_lists()
+        public void set_log_query_mode (bool on_off)
+        {
+           log_query = on_off;
+        }
+        
+                                   
+       	public void release_all_lists()
 	{
 		last_used_element_in_pull = 0;
 		last_used_element_in_strings = 0;
@@ -172,7 +178,7 @@ class TripleStorageMongoDB : TripleStorage
 	
 	private char[] p_rt = "mo/at/acl#rt\0";
 	
-	public triple_list_element* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex)
+	public triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o)
 	{
 		//		log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
 

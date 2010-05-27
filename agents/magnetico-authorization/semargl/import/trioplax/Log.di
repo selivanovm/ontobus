@@ -1,5 +1,5 @@
-// D import file generated from 'src/Log.d'
-module Log;
+// D import file generated from 'src/trioplax/Log.d'
+module trioplax.Log;
 private
 {
     import tango.util.log.Log;

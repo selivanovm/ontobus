@@ -7,10 +7,10 @@ private import tango.time.StopWatch;
 private import tango.io.Stdout;
 private import Text = tango.text.Util;
 
-private import TripleStorage;
+private import trioplax.TripleStorage;
 private import fact_tools;
 private import Log;
-private import triple;
+private import trioplax.triple;
 private import tango.stdc.stdio;
 private import tango.stdc.string;
 private import tango.stdc.errno;

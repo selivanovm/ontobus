@@ -8,10 +8,10 @@ private import tango.stdc.time;
 
 private import Predicates;
 private import RightTypeDef;
-private import TripleStorage;
+private import trioplax.TripleStorage;
 private import fact_tools;
 private import Log;
-private import triple;
+private import trioplax.triple;
 
 /*
  * возвращает массив субьектов (s) вышестоящих подразделений по отношению к user   

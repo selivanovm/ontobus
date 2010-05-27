@@ -5,8 +5,8 @@ private import tango.io.Stdout;
 
 private import Predicates;
 private import RightTypeDef;
-private import TripleStorage;
-private import triple;
+private import trioplax.TripleStorage;
+private import trioplax.triple;
 private import script_util;
 private import Log;
 

@@ -5,8 +5,8 @@ private import tango.stdc.stringz;
 private import tango.io.Stdout;
 
 private import Predicates;
-private import TripleStorage;
-private import triple;
+private import trioplax.TripleStorage;
+private import trioplax.triple;
 private import Log;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)

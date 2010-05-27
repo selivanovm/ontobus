@@ -4,7 +4,7 @@ private import tango.io.Stdout;
 
 private import RightTypeDef;
 private import Predicates;
-private import TripleStorage;
+private import trioplax.TripleStorage;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
 {

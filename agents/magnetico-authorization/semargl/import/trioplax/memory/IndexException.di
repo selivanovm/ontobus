@@ -1,5 +1,5 @@
-// D import file generated from 'src/IndexException.d'
-module IndexException;
+// D import file generated from 'src/trioplax/memory/IndexException.d'
+module trioplax.memory.IndexException;
 enum errorCode 
 {
 short_order_is_full = -1,

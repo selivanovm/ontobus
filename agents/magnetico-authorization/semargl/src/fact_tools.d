@@ -6,7 +6,7 @@ private import tango.stdc.stdio;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import Log;
-private import triple;
+private import trioplax.triple;
 
 struct Counts
 {

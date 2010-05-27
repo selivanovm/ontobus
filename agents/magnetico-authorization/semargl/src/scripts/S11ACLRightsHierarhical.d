@@ -7,10 +7,10 @@ private import tango.core.Thread;
 
 private import Predicates;
 private import RightTypeDef;
-private import TripleStorage;
+private import trioplax.TripleStorage;
 private import script_util;
 private import fact_tools;
-private import triple;
+private import trioplax.triple;
 private import Log;
 
 public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments,
@@ -53,7 +53,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 //	log.trace("#1.2");
 
 	// найдем все ACL записи для заданных user и elementId 
-	triple_list_element* iterator1 = cast (triple_list_element*)ts.getTriplesUseIndex(cast(char*) pp, user, elementId, idx_name.S1PPOO);
+	triple_list_element* iterator1 = cast (triple_list_element*)ts.getTriplesUseIndexS1PPOO(cast(char*) pp, user, elementId);
 	
 
 //	log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(user), getString(elementId));
@@ -68,7 +68,7 @@ bool checkRight(char* user, char* elementId, uint rightType, TripleStorage ts, c
 	// проверим на вхождение elementId в вышестоящих узлах орг структуры
 	for(int i = iterator_on_targets_of_hierarhical_departments.length - 1; i >= 0; i--)
 	{
-		triple_list_element* iterator2 = cast (triple_list_element*)ts.getTriplesUseIndex(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId, idx_name.S1PPOO);
+		triple_list_element* iterator2 = cast (triple_list_element*)ts.getTriplesUseIndexS1PPOO(cast(char*) pp, iterator_on_targets_of_hierarhical_departments[i], elementId);
 
 		//		log.trace("checkRight query: pp={}, o1={}, o2={}", pp, getString(iterator_on_targets_of_hierarhical_departments[i]), getString(elementId));
 		//		print_list_triple(iterator2);

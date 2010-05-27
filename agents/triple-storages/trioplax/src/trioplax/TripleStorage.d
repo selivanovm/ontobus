@@ -18,7 +18,7 @@ interface TripleStorage
 
 	public void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo);
 	
-	public triple_list_element* getTriplesUseIndex(char* s, char* p, char* o, ubyte useindex);
+	public triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o);
 
 	public triple_list_element* getTriples(char* s, char* p, char* o);
 
@@ -35,4 +35,6 @@ interface TripleStorage
 	public void print_list_triple(triple_list_element* list_iterator);
 
 	public int get_count_form_list_triple(triple_list_element* list_iterator);
+	
+	public void set_log_query_mode (bool on_off);
 }
