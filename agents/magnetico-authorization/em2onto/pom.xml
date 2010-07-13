@@ -14,12 +14,12 @@
         <dependency>
             <artifactId>big-archive-client-web-objects</artifactId>
             <groupId>ru.magnetosoft.bigarchive.client.web</groupId>
-            <version>0.14.30</version>
+            <version>0.14.75-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ru.magnetosoft.magnet</groupId>
             <artifactId>magnet-commons-client</artifactId>
-            <version>1.5.14</version>
+            <version>1.5.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>ru.magnetosoft.magnet</groupId>
             <artifactId>magnet-messaging</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
