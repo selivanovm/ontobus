@@ -73,7 +73,7 @@ public int calculate(char* user, char* elementId, uint rightType, TripleStorage 
 									if(*triple2_o == *(rt_symbols + rightType) || *(triple2_o + 1) == *(rt_symbols + rightType))
 									{
 										if(!is_actual)
-											is_actual = is_right_actual(ACL_subject, ts);
+											is_actual = is_subject_actual(ACL_subject, ts);
 
 										if(is_actual)
 										{

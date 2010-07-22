@@ -141,7 +141,8 @@ class Authorization
     			{
 			ts_mem = new TripleStorageMemory(str2int("index_SPO_count"), str2int("index_SPO_short_order"), str2int("index_SPO_key_area"));
 			
-			ts_mem.set_new_index(idx_name.S, str2int("index_S_count"), str2int("index_S_short_order"), str2int("index_S_key_area"));
+			ts_mem.set_new_index(idx_name.S, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
+//			ts_mem.set_new_index(idx_name.P, str2int("index_P_count"), str2int("index_P_short_order"), str2int("index_P_key_area"));
 			ts_mem.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
 			ts_mem.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
 			ts_mem.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
@@ -801,12 +802,13 @@ class Authorization
 		strcpy(result_ptr, result_data_header.ptr);
 		result_ptr += result_data_header.length;
 
-		void put_in_result(char* founded_delegate)
+		void put_in_result(Triple* founded_delegate)
 		{
 			strcpy(result_ptr++, ",");
-			strcpy(result_ptr, founded_delegate);
-			result_ptr += strlen(founded_delegate);
+			strcpy(result_ptr, founded_delegate.o);
+			result_ptr += strlen(founded_delegate.o);
 		}
+
 
 		getDelegateAssignersForDelegate(fact_o[arg_id], ts, &put_in_result);
 
@@ -823,6 +825,108 @@ class Authorization
 
 		double time = elapsed.stop;
 		log.trace("get delegate assigners time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+		//		log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
+
+	}
+
+	public void getDelegators(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
+			mom_client from_client)
+	{
+
+		log.trace("команда на выборку списка лиц делегировавших свои права");
+
+		auto elapsed = new StopWatch();
+		elapsed.start;
+
+		int reply_to_id = 0;
+		for(int i = 0; i < count_facts; i++)
+		{
+			if(strlen(fact_o[i]) > 0)
+			{
+				if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
+				{
+					reply_to_id = i;
+				}
+			}
+		}
+
+		char* queue_name = cast(char*) (new char[40]);
+		strcpy(queue_name, fact_o[reply_to_id]);
+
+		//log.trace("#1 gda");
+
+		char* result_ptr = cast(char*) result_buffer;
+		char* command_uid = fact_s[0];
+		strcpy(queue_name, fact_o[reply_to_id]);
+
+		*result_ptr = '<';
+		strcpy(result_ptr + 1, command_uid);
+		result_ptr += strlen(command_uid) + 1;
+		strcpy(result_ptr, result_data_header_with_bracets.ptr);
+		result_ptr += result_data_header_with_bracets.length;
+
+//		log.trace("getDelegators:arg = s={}", getString(fact_s[arg_id]));
+//		log.trace("getDelegators:arg = p={}", getString(fact_p[arg_id]));
+//		log.trace("getDelegators:arg = o={}", getString(fact_o[arg_id]));
+
+		triple_list_element* delegators_facts = ts.getTriples(null, DELEGATION_DELEGATE.ptr, fact_o[arg_id]);
+				
+		//		triple_list_element* delegates_facts_FE = delegates_facts;
+		while(delegators_facts !is null)
+		{
+			Triple* delegator = delegators_facts.triple;
+			if(delegator !is null)
+			{
+				char* subject = cast(char*) delegator.s;
+//				log.trace("delegator = {}", getString(subject));
+
+				triple_list_element* delegate_records = ts.getTriples(subject, null, null);
+
+				while(delegate_records !is null)
+				{
+					Triple* fact_of_record = delegate_records.triple;
+					
+//					log.trace("		facts = <{}><{}><{}>", getString(fact_of_record.s), getString(fact_of_record.p), getString(fact_of_record.o));
+					*result_ptr = '<';
+					strcpy(result_ptr + 1, fact_of_record.s);
+					result_ptr += strlen(fact_of_record.s) + 1;
+					*result_ptr = '>';
+					result_ptr++;					
+					*result_ptr = '<';
+					strcpy(result_ptr + 1, fact_of_record.p);
+					result_ptr += strlen(fact_of_record.p) + 1;
+					*result_ptr = '>';
+					result_ptr++;					
+					*result_ptr = '"';
+					strcpy(result_ptr + 1, fact_of_record.o);
+					result_ptr += strlen(fact_of_record.o) + 1;
+					*result_ptr = '"';
+					result_ptr++;					
+					*result_ptr = '.';
+					result_ptr++;					
+					
+					
+					delegate_records = delegate_records.next_triple_list_element;
+				}
+
+			}
+
+			delegators_facts = delegators_facts.next_triple_list_element;
+		}
+
+		strcpy(result_ptr, "}\".<");
+		result_ptr += 3;
+		strcpy(result_ptr, command_uid);
+		result_ptr += strlen(command_uid);
+		strcpy(result_ptr, result_state_ok_header.ptr);
+		result_ptr += result_state_ok_header.length;
+		*(result_ptr - 1) = 0;
+
+		//		client.send(queue_name, result_buffer);
+		send_result_and_logging_messages(queue_name, result_buffer, from_client);
+
+		double time = elapsed.stop;
+		log.trace("get delegators time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 		//		log.trace("result:{} \nsent to:{}", getString(result_buffer), getString(queue_name));
 
 	}

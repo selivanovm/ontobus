@@ -53,6 +53,10 @@ private Locale layout;
 
 File file;
 
+char[] set_text_color_green = "\x1B[32m"; 
+char[] set_text_color_blue = "\x1B[34m"; 
+char[] all_attribute_off = "\x1B[0m"; 
+
 void main(char[][] args)
 {
 	char[] autotest_file = null;
@@ -178,9 +182,13 @@ void main(char[][] args)
 
 void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom_client from_client)
 {
+	if(logging_io_messages)
+	{
+	}
+	
 	auto elapsed = new StopWatch();
 	double time;
-
+	
 	log.trace("send to queue {}", fromStringz(queue_name));
 	elapsed.start;
 	from_client.send(queue_name, result_buffer);
@@ -192,19 +200,26 @@ void send_result_and_logging_messages(char* queue_name, char* result_buffer, mom
 	{
 		elapsed.start;
 
+		char[] str1 = fromStringz(result_buffer);
+		
 		auto tm = WallClock.now;
 		auto dt = Clock.toDate(tm);
 		writeToLog(layout("{:yyyy-MM-dd HH:mm:ss},{} OUTPUT\r\n", tm, dt.time.millis));
-		writeToLog(fromStringz(result_buffer));
+		writeToLog(str1);
 
 		time = elapsed.stop;
 		log.trace("logging output message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
+
+//		str1[str1.length] = 0;
+		
+		printf((set_text_color_green ~ layout("\nout message {:yyyy-MM-dd HH:mm:ss},{}", tm, dt.time.millis) ~ all_attribute_off ~ "\n[%s]\n\0").ptr, result_buffer);
 	}
 }
 
+int all_count_messages = 0;
+
 void get_message(byte* message, ulong message_size, mom_client from_client)
 {
-	char* msg = cast(char*) message;
 	//		log.trace("get message {}", msg[0 .. message_size]);
 	//		printf ("\nget message !%s!\n", message);
 
@@ -212,14 +227,14 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 	{
 		synchronized
 		{
-			if(*(message + message_size - 1) != '.')
-			{
-				log.trace("invalid message");
-				return;
-			}
-
+			all_count_messages ++;
+			
+			char* msg = cast(char*) message;
+			
 			*(message + message_size) = 0;
 
+			//		log.trace("get message {}", msg[0 .. message_size]);
+			
 			auto elapsed = new StopWatch();
 			auto time_calculate_right = new StopWatch();
 			double time;
@@ -231,12 +246,22 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				auto tm = WallClock.now;
 				auto dt = Clock.toDate(tm);
 
+				printf((set_text_color_blue ~ layout("\nget message {:yyyy-MM-dd HH:mm:ss},{}, size message={}, total count messages={} ", tm, dt.time.millis, message_size, all_count_messages) ~ all_attribute_off ~ "\n[%s]\n\0").ptr, message);
+				
 				writeToLog(layout("{:yyyy-MM-dd HH:mm:ss},{} INPUT\r\n", tm, dt.time.millis));
 				writeToLog(message_buffer);
 				writeToLog("\r\n\r\n");
 				time = elapsed.stop;
 				log.trace("logging input message, time = {:d6} ms. ( {:d6} sec.)", time * 1000, time);
 			}
+
+			if(*(message + message_size - 1) != '.')
+			{
+				log.trace("invalid message");
+				return;
+			}
+
+			*(message + message_size) = 0;
 
 			elapsed.start;
 
@@ -277,6 +302,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				int arg_id = -1;
 				int get_authorization_rights_records_id = -1;
 				int add_delegates_id = -1;
+				int get_delegators_records_id = -1;
 				int get_delegate_assigners_tree_id = -1;
 				int agent_function_id = -1;
 				int create_id = -1;
@@ -317,7 +343,13 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						{
 							get_delegate_assigners_tree_id = i;
 							log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
-						} else if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0)
+						} 
+						else if(get_delegators_records_id < 0 && strcmp(fact_o[i], GET_DELEGATORS_RECORDS.ptr) == 0)
+						{
+							get_delegators_records_id = i;
+							log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
+						}
+						else if(get_id < 0 && strcmp(fact_o[i], GET_AUTHORIZATION_RIGHT_RECORDS.ptr) == 0)
 						{
 							get_authorization_rights_records_id = i;
 							log.trace("found comand {}, id ={} ", getString(fact_o[i]), i);
@@ -342,11 +374,12 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				log.trace("разбор сообщения закончен : uid = {}", getString(fact_s[0]));
 
 				bool
-						isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 || get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 || agent_function_id > -1 || create_id > -1 || authorization_id > -1;
+						isCommandRecognized = delete_subjects_id > -1 || get_id > -1 || put_id > -1 || delete_subjects_by_predicate_id > -1 || get_authorization_rights_records_id > -1 || add_delegates_id > -1 || get_delegate_assigners_tree_id > -1 || get_delegators_records_id > -1 || agent_function_id > -1 || create_id > -1 || authorization_id > -1;
+
 
 				if(!isCommandRecognized)
 				{
-					log.trace("# unrecognized tag");
+					log.trace("#!!! unrecognized tag");
 
 					int reply_to_id = 0;
 					for(int i = 0; i < count_facts; i++)
@@ -608,6 +641,12 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 				if(get_authorization_rights_records_id >= 0 && arg_id > 0)
 				{
 					az.getAuthorizationRightRecords(fact_s, fact_p, fact_o, count_facts, result_buffer, from_client);
+				}
+
+				// GET_DELEGATORS RECORD
+				if(get_delegators_records_id >= 0 && arg_id > 0)
+				{
+					az.getDelegators(fact_s, fact_p, fact_o, arg_id, count_facts, result_buffer, from_client);
 				}
 
 				// PUT
@@ -890,14 +929,24 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							targetRightType = RightType.DELETE;
 					}
 
-					char*[] hierarhical_delegates = null;
+					Triple*[] hierarhical_delegates = null;
 					hierarhical_delegates = getDelegateAssignersTreeArray(user, az.getTripleStorage());
+
+					char*[] hierarhical_delegates_document_id = new char*[hierarhical_delegates.length];
 
 					char*[][] hierarhical_departments_of_delegate = new char*[][hierarhical_delegates.length];
 					for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 					{
-						hierarhical_departments_of_delegate[ii] = getDepartmentTreePathOfUser(
-								hierarhical_delegates[ii], az.getTripleStorage());
+					{
+						hierarhical_departments_of_delegate[ii] = getDepartmentTreePathOfUser(hierarhical_delegates[ii].o,
+								az.getTripleStorage());
+						triple_list_element* delegates_facts = az.getTripleStorage().getTriples(hierarhical_delegates[ii].s,
+								DELEGATION_DOCUMENT_ID.ptr, null);
+						if(delegates_facts !is null)
+						{
+							hierarhical_delegates_document_id[ii] = delegates_facts.triple.o;
+						}
+					}
 					}
 
 					char*[] hierarhical_departments = null;
@@ -928,7 +977,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 					{
 						is_admin_of_hierarhical_delegates[ii] = scripts.S01UserIsAdmin.calculate(
-								hierarhical_delegates[ii], az.getTripleStorage(), hierarhical_departments);
+								hierarhical_delegates[ii].o, az.getTripleStorage(), hierarhical_departments);
 					}
 
 					for(uint i = 0; true; i++)
@@ -956,23 +1005,34 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 							{
 								for(int ii = 0; ii < hierarhical_delegates.length; ii++)
 								{
-									//									bool delegat_isAdmin = scripts.S01UserIsAdmin.calculate(hierarhical_delegates[ii],
-									//											az.getTripleStorage(), hierarhical_departments);
-									//log.trace("#3");
-									calculatedRight = az.authorize(fact_o[category_id], docId,
-											hierarhical_delegates[ii], targetRightType,
-											hierarhical_departments_of_delegate[ii], from_client,
-											is_admin_of_hierarhical_delegates[ii]);
+									// !! здесь нужно вставить фильтр по делегированию документов
+									if(hierarhical_delegates_document_id[ii] !is null)
+									{
+										if(strcmp(docId, hierarhical_delegates_document_id[ii]) == 0)
+										{
+											calculatedRight = az.authorize(fact_o[category_id], docId,
+													hierarhical_delegates[ii].o, targetRightType,
+													hierarhical_departments_of_delegate[ii], from_client, isAdmin);
+										}
+									}
+									else
+									{
+										calculatedRight = az.authorize(fact_o[category_id], docId, hierarhical_delegates[ii].o,
+												targetRightType, hierarhical_departments_of_delegate[ii], from_client, isAdmin);
+
+									}
 
 									if(calculatedRight == true)
 										break;
+
 								}
 							}
 
-							if(calculatedRight == false)
-							{
-								// вычислим права для найденных делегатов
-							}
+//
+//							if(calculatedRight == false)
+//							{
+//								// вычислим права для найденных делегатов
+//							}
 
 							if(calculatedRight == true)
 							{

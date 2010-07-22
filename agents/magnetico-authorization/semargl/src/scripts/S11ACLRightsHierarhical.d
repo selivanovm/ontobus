@@ -138,7 +138,7 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 						if(*triple2_o == *rightType || *(triple2_o + 1) == *rightType)
 						{
 							if(!is_actual)
-								is_actual = is_right_actual(s, ts);
+								is_actual = is_subject_actual(s, ts);
 							if(is_actual)
 							{
 								//@@@@

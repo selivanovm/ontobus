@@ -72,28 +72,27 @@ public char*[] getDepartmentTreePathOfUser(char* user, TripleStorage ts)
 }
 
 /*
- * возвращает массив субьектов (s) вышестоящих подразделений по отношению к delegate_id   
+ * возвращает массив фактов (s) вышестоящих подразделений по отношению к delegate_id   
  */
-public char*[] getDelegateAssignersTreeArray(char* delegate_id, TripleStorage ts)
+public Triple*[] getDelegateAssignersTreeArray(char* person_id, TripleStorage ts)
 {
 
-	char*[] result = new char*[20];
+	Triple*[] delegates = new Triple*[20];
 	uint result_cnt = 0;
 
-	void put_in_result(char* founded_delegate)
+	void put_in_result(Triple* founded_delegate)
 	{
-		result[result_cnt++] = founded_delegate;
+		delegates[result_cnt++] = founded_delegate;
 	}
 
-	getDelegateAssignersForDelegate(delegate_id, ts, &put_in_result);
+	getDelegateAssignersForDelegate(person_id, ts, &put_in_result);
 
-	result.length = result_cnt;
+	delegates.length = result_cnt;
 
-	return result;
-
+	return delegates;
 }
 
-public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(char* founed_delegate) process_delegate)
+public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts, void delegate(Triple* founed_delegate) process_delegate)
 {
 	triple_list_element* delegates_facts = ts.getTriples(null, DELEGATION_DELEGATE.ptr, delegate_id);
 	triple_list_element* delegates_facts_FE = delegates_facts;
@@ -127,7 +126,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 							/*			  strcpy(result_ptr++, ",");
 							 strcpy(result_ptr, object);
 							 result_ptr += strlen(object);*/
-							process_delegate(object);
+							process_delegate(owner);
 
 							triple_list_element* with_tree_facts = ts.getTriples(subject, DELEGATION_WITH_TREE.ptr, null);
 							triple_list_element* with_tree_facts_FE = with_tree_facts;
@@ -166,7 +165,7 @@ public void getDelegateAssignersForDelegate(char* delegate_id, TripleStorage ts,
 	}
 }
 
-public bool is_right_actual(char* subject, TripleStorage ts)
+public bool is_subject_actual(char* subject, TripleStorage ts)
 {
 	char* from;
 	char* to;
