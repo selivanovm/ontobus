@@ -59,20 +59,20 @@ class Authorization
 	private char[][] i_know_predicates;
 	private TripleStorage ts = null;
 	private TripleStorageMemory ts_mem = null;
-	private TripleStorageMongoDB ts_mongo = null;	
+	private TripleStorageMongoDB ts_mongo = null;
 
 	int[] counters;
 
 	private char[] log_path = "";
 	private File log_file;
 
-	this(char[][char[]] props, bool _triples_in_memory)	
+	this(char[][char[]] props, bool _triples_in_memory)
 	{
 		triples_in_memory = _triples_in_memory;
-		
+
 		counters = new int[10];
 
-		i_know_predicates = new char[][20];
+		i_know_predicates = new char[][21];
 
 		uint d = 0;
 
@@ -112,6 +112,7 @@ class Authorization
 		i_know_predicates[d++] = IS_ADMIN;
 
 		i_know_predicates[d++] = DOCUMENT_TEMPLATE_ID;
+		i_know_predicates[d++] = DELEGATION_DOCUMENT_ID;		
 
 		init(props);
 	}
@@ -123,46 +124,47 @@ class Authorization
 
 	private char[] pp = null;
 
-	private int str2int (char[] str)
+	private int str2int(char[] str)
 	{
 		char[] value = props[str];
 		value[length] = 0;
-		return atoi (value.ptr);
+		return atoi(value.ptr);
 	}
-	
+
 	private void init(char[][char[]] props)
 	{
 		try
 		{
 			log.trace("authorization init..");
 			Stdout.format("authorization init..").newline;
-	
-    			if (triples_in_memory)
-    			{
-			ts_mem = new TripleStorageMemory(str2int("index_SPO_count"), str2int("index_SPO_short_order"), str2int("index_SPO_key_area"));
-			
-			ts_mem.set_new_index(idx_name.S, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
-//			ts_mem.set_new_index(idx_name.P, str2int("index_P_count"), str2int("index_P_short_order"), str2int("index_P_key_area"));
-			ts_mem.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
-			ts_mem.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
-			ts_mem.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
-			ts_mem.set_new_index(idx_name.S1PPOO, str2int("index_S1PPOO_count"), str2int("index_S1PPOO_short_order"), str2int("index_S1PPOO_key_area"));
-			
-			ts = ts_mem;
-                        }
-                        else
-                        {
-			ts_mongo = new TripleStorageMongoDB();
-			
-			ts = cast (TripleStorage)ts_mongo;
-                        }
-                        
-                        
+
+			if(triples_in_memory)
+			{
+				ts_mem = new TripleStorageMemory(str2int("index_SPO_count"), str2int("index_SPO_short_order"),
+						str2int("index_SPO_key_area"));
+
+				ts_mem.set_new_index(idx_name.S, str2int("index_S_count"), str2int("index_S_short_order"), str2int("index_S_key_area"));
+				//			ts_mem.set_new_index(idx_name.P, str2int("index_P_count"), str2int("index_P_short_order"), str2int("index_P_key_area"));
+				ts_mem.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
+				ts_mem.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
+				ts_mem.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
+				ts_mem.set_new_index(idx_name.S1PPOO, str2int("index_S1PPOO_count"), str2int("index_S1PPOO_short_order"), str2int(
+						"index_S1PPOO_key_area"));
+
+				ts = ts_mem;
+			}
+			else
+			{
+				ts_mongo = new TripleStorageMongoDB();
+
+				ts = cast(TripleStorage) ts_mongo;
+			}
+
 			ts.setPredicatesToS1PPOO(TARGET_SUBSYSTEM_ELEMENT, ELEMENT_ID, RIGHTS);
 
 			ts.define_predicate_as_multiple(HAS_PART);
-			ts.set_log_query_mode (false);
-//			ts.f_trace_addTriple = true;
+			ts.set_log_query_mode(false);
+			//			ts.f_trace_addTriple = true;
 
 			//		ts.setPredicatesToS1PPOO("magnet-ontology/authorization/acl#targetSubsystemElement", "magnet-ontology/authorization/acl#elementId",
 			//				"magnet-ontology/authorization/acl#rights");
@@ -300,29 +302,28 @@ class Authorization
 		// так сделано из невозможности задать параметр из двух цифр в Util.layout
 		if(command == 'A')
 		{
-			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 A <%7><%8>\"%9\" .\n",
-					convert(tmp[0 .. 4], dt.date.year), convert(tmp[6 .. 8], dt.date.month), convert(tmp[4 .. 6],
-							dt.date.day), convert(tmp[8 .. 10], dt.time.hours),
-					convert(tmp[10 .. 12], dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(
-							tmp[14 .. 17], dt.time.millis), s, p, o);
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 A <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(
+					tmp[6 .. 8], dt.date.month), convert(tmp[4 .. 6], dt.date.day), convert(tmp[8 .. 10], dt.time.hours), convert(
+					tmp[10 .. 12], dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p,
+					o);
 
 			log_file.output.write(now);
-		} else if(command == 'U')
+		}
+		else if(command == 'U')
 		{
-			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 U <%7><%8>\"%9\" .\n",
-					convert(tmp[0 .. 4], dt.date.year), convert(tmp[6 .. 8], dt.date.month), convert(tmp[4 .. 6],
-							dt.date.day), convert(tmp[8 .. 10], dt.time.hours),
-					convert(tmp[10 .. 12], dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(
-							tmp[14 .. 17], dt.time.millis), s, p, o);
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 U <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(
+					tmp[6 .. 8], dt.date.month), convert(tmp[4 .. 6], dt.date.day), convert(tmp[8 .. 10], dt.time.hours), convert(
+					tmp[10 .. 12], dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p,
+					o);
 
 			log_file.output.write(now);
-		} else if(command == 'D')
+		}
+		else if(command == 'D')
 		{
-			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 D <%7><%8>\"%9\" .\n",
-					convert(tmp[0 .. 4], dt.date.year), convert(tmp[6 .. 8], dt.date.month), convert(tmp[4 .. 6],
-							dt.date.day), convert(tmp[8 .. 10], dt.time.hours),
-					convert(tmp[10 .. 12], dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(
-							tmp[14 .. 17], dt.time.millis), s, p, o);
+			auto now = Util.layout(tmp1, "%0-%1-%2 %3:%4:%5,%6 D <%7><%8>\"%9\" .\n", convert(tmp[0 .. 4], dt.date.year), convert(
+					tmp[6 .. 8], dt.date.month), convert(tmp[4 .. 6], dt.date.day), convert(tmp[8 .. 10], dt.time.hours), convert(
+					tmp[10 .. 12], dt.time.minutes), convert(tmp[12 .. 14], dt.time.seconds), convert(tmp[14 .. 17], dt.time.millis), s, p,
+					o);
 
 			log_file.output.write(now);
 		}
@@ -342,8 +343,8 @@ class Authorization
 		if(f_authorization_trace)
 		{
 			log.trace("");
-			log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}", getString(
-					authorizedElementCategory), getString(authorizedElementId), getString(User));
+			log.trace("autorize start, authorizedElementCategory={}, authorizedElementId={}, User={}",
+					getString(authorizedElementCategory), getString(authorizedElementId), getString(User));
 		}
 
 		bool calculatedRight;
@@ -355,8 +356,7 @@ class Authorization
 		bool result;
 		if(strcmp(authorizedElementCategory, Category.PERMISSION.ptr) == 0)
 		{
-			calculatedRight = scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId,
-					targetRightType, ts);
+			calculatedRight = scripts.S10UserIsPermissionTargetAuthor.calculate(User, authorizedElementId, targetRightType, ts);
 
 			result = isAdmin || calculatedRight;
 
@@ -385,7 +385,8 @@ class Authorization
 					log.trace("end autorize: S05InDocFlow = {}", 1);
 				}
 				return true;
-			} else if(is_in_docflow == 0)
+			}
+			else if(is_in_docflow == 0)
 			{
 				//counters[2]++;
 				if(f_authorization_trace)
@@ -411,8 +412,8 @@ class Authorization
 			////log.trace("autorize end#0, return:[{}]", calculatedRight);
 		}
 
-		result = strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && scripts.S09DocumentOfTemplate.calculate(
-				User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
+		result = strcmp(authorizedElementCategory, Category.DOCUMENT.ptr) == 0 && scripts.S09DocumentOfTemplate.calculate(User,
+				authorizedElementId, targetRightType, ts, hierarhical_departments, pp);
 		if(result)
 		{
 			if(f_authorization_trace)
@@ -424,8 +425,8 @@ class Authorization
 
 		triple_list_element* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
 
-		if(strcmp("null", authorizedElementId) != 0 && iterator_facts_of_document is null && strcmp(
-				authorizedElementCategory, Category.DOCUMENT.ptr) == 0)
+		if(strcmp("null", authorizedElementId) != 0 && iterator_facts_of_document is null && strcmp(authorizedElementCategory,
+				Category.DOCUMENT.ptr) == 0)
 		{
 			if(f_authorization_trace)
 			{
@@ -437,15 +438,14 @@ class Authorization
 			return false;
 		}
 
-		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts,
-				hierarhical_departments, pp, authorizedElementCategory))
+		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp,
+				authorizedElementCategory))
 		{
 			ts.list_no_longer_required(iterator_facts_of_document);
 			return true;
 		}
 
-		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts,
-				iterator_facts_of_document))
+		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
 			ts.list_no_longer_required(iterator_facts_of_document);
 			return true;
@@ -470,8 +470,8 @@ class Authorization
 		return false;
 	}
 
-	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts,
-			char* result_buffer, mom_client from_client)
+	public void getAuthorizationRightRecords(char*[] fact_s, char*[] fact_p, char*[] fact_o, uint count_facts, char* result_buffer,
+			mom_client from_client)
 	{
 		//@@@@@ 
 		//		ts.log_query = true;
@@ -511,39 +511,48 @@ class Authorization
 				if(strcmp(fact_p[i], SET_FROM.ptr) == 0)
 				{
 					from_id = i;
-				} else if(strcmp(fact_p[i], AUTHOR_SYSTEM.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], AUTHOR_SYSTEM.ptr) == 0)
 				{
 					patterns_cnt++;
 					author_system_id = i;
-				} else if(strcmp(fact_p[i], AUTHOR_SUBSYSTEM.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], AUTHOR_SUBSYSTEM.ptr) == 0)
 				{
 					patterns_cnt++;
 					author_subsystem_id = i;
-				} else if(strcmp(fact_p[i], AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
 				{
 					patterns_cnt++;
 					author_subsystem_element_id = i;
-				} else if(strcmp(fact_p[i], TARGET_SYSTEM.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], TARGET_SYSTEM.ptr) == 0)
 				{
 					patterns_cnt++;
 					target_system_id = i;
-				} else if(strcmp(fact_p[i], TARGET_SUBSYSTEM.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], TARGET_SUBSYSTEM.ptr) == 0)
 				{
 					patterns_cnt++;
 					target_subsystem_id = i;
-				} else if(strcmp(fact_p[i], TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
 				{
 					patterns_cnt++;
 					target_subsystem_element_id = i;
-				} else if(strcmp(fact_p[i], CATEGORY.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], CATEGORY.ptr) == 0)
 				{
 					patterns_cnt++;
 					category_id = i;
-				} else if(strcmp(fact_p[i], ELEMENT_ID.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], ELEMENT_ID.ptr) == 0)
 				{
 					patterns_cnt++;
 					elements_id = i;
-				} else if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
+				}
+				else if(strcmp(fact_p[i], REPLY_TO.ptr) == 0)
 				{
 					reply_to_id = i;
 				}
@@ -559,33 +568,40 @@ class Authorization
 		{
 			//			log.trace("object = {}", getString(fact_o[elements_id]));
 			start_facts_set = ts.getTriples(null, ELEMENT_ID.ptr, fact_o[elements_id]);
-		} else if(author_subsystem_element_id > 0)
+		}
+		else if(author_subsystem_element_id > 0)
 		{
 			start_set_marker = 1;
 
 			//			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_element_id]);
 			start_facts_set = ts.getTriples(null, AUTHOR_SUBSYSTEM_ELEMENT.ptr, fact_o[author_subsystem_element_id]);
-		} else if(target_subsystem_element_id > 0)
+		}
+		else if(target_subsystem_element_id > 0)
 		{
 			start_set_marker = 2;
 			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_element_id]);
-		} else if(category_id > 0)
+		}
+		else if(category_id > 0)
 		{
 			start_set_marker = 3;
 			start_facts_set = ts.getTriples(null, null, fact_o[category_id]);
-		} else if(author_subsystem_id > 0)
+		}
+		else if(author_subsystem_id > 0)
 		{
 			start_set_marker = 4;
 			start_facts_set = ts.getTriples(null, null, fact_o[author_subsystem_id]);
-		} else if(target_subsystem_id > 0)
+		}
+		else if(target_subsystem_id > 0)
 		{
 			start_set_marker = 5;
 			start_facts_set = ts.getTriples(null, null, fact_o[target_subsystem_id]);
-		} else if(author_system_id > 0)
+		}
+		else if(author_system_id > 0)
 		{
 			start_set_marker = 6;
 			start_facts_set = ts.getTriples(null, null, fact_o[author_system_id]);
-		} else if(target_system_id > 0)
+		}
+		else if(target_system_id > 0)
 		{
 			start_set_marker = 7;
 			start_facts_set = ts.getTriples(null, null, fact_o[target_system_id]);
@@ -637,14 +653,12 @@ class Authorization
 								char* p1 = cast(char*) triple1.p;
 								char* o1 = cast(char*) triple1.o;
 
-								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1,
-										AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
+								if(start_set_marker < 1 && author_subsystem_element_id > 0 && strcmp(p1, AUTHOR_SUBSYSTEM_ELEMENT.ptr) == 0)
 								{
 									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[author_subsystem_element_id]) == 0;
 								}
-								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1,
-										TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
+								if(start_set_marker < 2 && target_subsystem_element_id > 0 && strcmp(p1, TARGET_SUBSYSTEM_ELEMENT.ptr) == 0)
 								{
 									checked_patterns_cnt++;
 									is_match = is_match & strcmp(o1, fact_o[target_subsystem_element_id]) == 0;
@@ -766,8 +780,8 @@ class Authorization
 
 	}
 
-	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts,
-			char* result_buffer, mom_client from_client)
+	public void getDelegateAssignersTree(char*[] fact_s, char*[] fact_p, char*[] fact_o, int arg_id, uint count_facts, char* result_buffer,
+			mom_client from_client)
 	{
 
 		log.trace("команда на выборку делегировавших");
@@ -808,7 +822,6 @@ class Authorization
 			strcpy(result_ptr, founded_delegate.o);
 			result_ptr += strlen(founded_delegate.o);
 		}
-
 
 		getDelegateAssignersForDelegate(fact_o[arg_id], ts, &put_in_result);
 
@@ -865,12 +878,12 @@ class Authorization
 		strcpy(result_ptr, result_data_header_with_bracets.ptr);
 		result_ptr += result_data_header_with_bracets.length;
 
-//		log.trace("getDelegators:arg = s={}", getString(fact_s[arg_id]));
-//		log.trace("getDelegators:arg = p={}", getString(fact_p[arg_id]));
-//		log.trace("getDelegators:arg = o={}", getString(fact_o[arg_id]));
+		//		log.trace("getDelegators:arg = s={}", getString(fact_s[arg_id]));
+		//		log.trace("getDelegators:arg = p={}", getString(fact_p[arg_id]));
+		//		log.trace("getDelegators:arg = o={}", getString(fact_o[arg_id]));
 
 		triple_list_element* delegators_facts = ts.getTriples(null, DELEGATION_DELEGATE.ptr, fact_o[arg_id]);
-				
+
 		//		triple_list_element* delegates_facts_FE = delegates_facts;
 		while(delegators_facts !is null)
 		{
@@ -878,34 +891,33 @@ class Authorization
 			if(delegator !is null)
 			{
 				char* subject = cast(char*) delegator.s;
-//				log.trace("delegator = {}", getString(subject));
+				//				log.trace("delegator = {}", getString(subject));
 
 				triple_list_element* delegate_records = ts.getTriples(subject, null, null);
 
 				while(delegate_records !is null)
 				{
 					Triple* fact_of_record = delegate_records.triple;
-					
-//					log.trace("		facts = <{}><{}><{}>", getString(fact_of_record.s), getString(fact_of_record.p), getString(fact_of_record.o));
+
+					//					log.trace("		facts = <{}><{}><{}>", getString(fact_of_record.s), getString(fact_of_record.p), getString(fact_of_record.o));
 					*result_ptr = '<';
 					strcpy(result_ptr + 1, fact_of_record.s);
 					result_ptr += strlen(fact_of_record.s) + 1;
 					*result_ptr = '>';
-					result_ptr++;					
+					result_ptr++;
 					*result_ptr = '<';
 					strcpy(result_ptr + 1, fact_of_record.p);
 					result_ptr += strlen(fact_of_record.p) + 1;
 					*result_ptr = '>';
-					result_ptr++;					
+					result_ptr++;
 					*result_ptr = '"';
 					strcpy(result_ptr + 1, fact_of_record.o);
 					result_ptr += strlen(fact_of_record.o) + 1;
 					*result_ptr = '"';
-					result_ptr++;					
+					result_ptr++;
 					*result_ptr = '.';
-					result_ptr++;					
-					
-					
+					result_ptr++;
+
 					delegate_records = delegate_records.next_triple_list_element;
 				}
 
@@ -914,7 +926,7 @@ class Authorization
 			delegators_facts = delegators_facts.next_triple_list_element;
 		}
 
-		strcpy(result_ptr, "}\".<");
+		strcpy(result_ptr, "}.<");
 		result_ptr += 3;
 		strcpy(result_ptr, command_uid);
 		result_ptr += strlen(command_uid);
