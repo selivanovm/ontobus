@@ -89,11 +89,11 @@ class Authorization
 		i_know_predicates[d++] = TARGET_SUBSYSTEM; //       - "user"/"department".
 		i_know_predicates[d++] = TARGET_SUBSYSTEM_ELEMENT; // - user id or department id.
 
-		i_know_predicates[d++] = CATEGORY; //                                 - категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
-		i_know_predicates[d++] = DATE_FROM; //                                 - период действия прав (до (с возможностью указания открытых интервалов значение null)).
-		i_know_predicates[d++] = DATE_TO; //                                 - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
-		i_know_predicates[d++] = ELEMENT_ID; //                                 - идентификатор элемента, на который выдаются права.
-		i_know_predicates[d++] = RIGHTS; //                                 - "c|r|u|d"
+		i_know_predicates[d++] = CATEGORY; // - категория элемента, на который выдаются права (DOCUMENT, DOCUMENTTYPE, DICTIONARY и т. д.).
+		i_know_predicates[d++] = DATE_FROM; // - период действия прав (до (с возможностью указания открытых интервалов значение null)).
+		i_know_predicates[d++] = DATE_TO; // - период действия прав (от (с возможностью указания открытых интервалов- значение null)).
+		i_know_predicates[d++] = ELEMENT_ID; // - идентификатор элемента, на который выдаются права.
+		i_know_predicates[d++] = RIGHTS; // - "c|r|u|d"
 
 		//		 запись о делегировании
 		i_know_predicates[d++] = DELEGATION_DELEGATE; // - кому делегируют
@@ -112,7 +112,7 @@ class Authorization
 		i_know_predicates[d++] = IS_ADMIN;
 
 		i_know_predicates[d++] = DOCUMENT_TEMPLATE_ID;
-		i_know_predicates[d++] = DELEGATION_DOCUMENT_ID;		
+		i_know_predicates[d++] = DELEGATION_DOCUMENT_ID;
 
 		init(props);
 	}
@@ -124,11 +124,18 @@ class Authorization
 
 	private char[] pp = null;
 
-	private int str2int(char[] str)
+	private int getIntProps(char[] str)
 	{
 		char[] value = props[str];
 		value[length] = 0;
 		return atoi(value.ptr);
+	}
+
+	private char[] getStrProps(char[] str)
+	{
+		char[] value = props[str];
+		value[length] = 0;
+		return value;
 	}
 
 	private void init(char[][char[]] props)
@@ -140,22 +147,26 @@ class Authorization
 
 			if(triples_in_memory)
 			{
-				ts_mem = new TripleStorageMemory(str2int("index_SPO_count"), str2int("index_SPO_short_order"),
-						str2int("index_SPO_key_area"));
+				ts_mem = new TripleStorageMemory(getIntProps("index_SPO_count"), getIntProps("index_SPO_short_order"), getIntProps(
+						"index_SPO_key_area"));
 
-				ts_mem.set_new_index(idx_name.S, str2int("index_S_count"), str2int("index_S_short_order"), str2int("index_S_key_area"));
+				ts_mem.set_new_index(idx_name.S, getIntProps("index_S_count"), getIntProps("index_S_short_order"), getIntProps(
+						"index_S_key_area"));
 				//			ts_mem.set_new_index(idx_name.P, str2int("index_P_count"), str2int("index_P_short_order"), str2int("index_P_key_area"));
-				ts_mem.set_new_index(idx_name.O, str2int("index_O_count"), str2int("index_O_short_order"), str2int("index_O_key_area"));
-				ts_mem.set_new_index(idx_name.PO, str2int("index_PO_count"), str2int("index_PO_short_order"), str2int("index_PO_key_area"));
-				ts_mem.set_new_index(idx_name.SP, str2int("index_SP_count"), str2int("index_SP_short_order"), str2int("index_SP_key_area"));
-				ts_mem.set_new_index(idx_name.S1PPOO, str2int("index_S1PPOO_count"), str2int("index_S1PPOO_short_order"), str2int(
-						"index_S1PPOO_key_area"));
+				ts_mem.set_new_index(idx_name.O, getIntProps("index_O_count"), getIntProps("index_O_short_order"), getIntProps(
+						"index_O_key_area"));
+				ts_mem.set_new_index(idx_name.PO, getIntProps("index_PO_count"), getIntProps("index_PO_short_order"), getIntProps(
+						"index_PO_key_area"));
+				ts_mem.set_new_index(idx_name.SP, getIntProps("index_SP_count"), getIntProps("index_SP_short_order"), getIntProps(
+						"index_SP_key_area"));
+				ts_mem.set_new_index(idx_name.S1PPOO, getIntProps("index_S1PPOO_count"), getIntProps("index_S1PPOO_short_order"),
+						getIntProps("index_S1PPOO_key_area"));
 
 				ts = ts_mem;
 			}
 			else
 			{
-				ts_mongo = new TripleStorageMongoDB();
+				ts_mongo = new TripleStorageMongoDB(getStrProps("mongodb_server"), getIntProps("mongodb_port"));
 
 				ts = cast(TripleStorage) ts_mongo;
 			}
@@ -172,50 +183,52 @@ class Authorization
 			pp = TARGET_SUBSYSTEM_ELEMENT ~ ELEMENT_ID;
 			//
 
-			char[] root = ".";
-			log.trace("Scanning '{}'", root);
-
-			auto scan = (new FileScan)(root, ".n3");
-			log.trace("\n{} Folders\n", scan.folders.length);
-			foreach(folder; scan.folders)
-				log.trace("{}\n", folder);
-			log.trace("\n{0} Files\n", scan.files.length);
-
-			foreach(file; scan.files)
+			if(triples_in_memory)
 			{
-				log.trace("{}\n", file);
-				load_from_file(file, i_know_predicates, ts_mem);
+				char[] root = ".";
+				log.trace("Scanning '{}'", root);
+
+				auto scan = (new FileScan)(root, ".n3");
+				log.trace("\n{} Folders\n", scan.folders.length);
+				foreach(folder; scan.folders)
+					log.trace("{}\n", folder);
+				log.trace("\n{0} Files\n", scan.files.length);
+
+				foreach(file; scan.files)
+				{
+					log.trace("{}\n", file);
+					load_from_file(file, i_know_predicates, ts_mem);
+				}
+				log.trace("\n{} Errors", scan.errors.length);
+				foreach(error; scan.errors)
+					log.trace(error);
+
+				scan = (new FileScan)(root, ".n3log");
+				log.trace("\n{} Folders\n", scan.folders.length);
+				foreach(folder; scan.folders)
+					log.trace("{}\n", folder);
+				log.trace("\n{0} Files\n", scan.files.length);
+
+				FilePath[] fp = scan.files;
+
+				char[][] fp_str = new char[][fp.length];
+
+				for(int i = 0; i < fp.length; i++)
+				{
+					fp_str[i] = fp[i].toString();
+				}
+				fp_str = fp_str.sort;
+
+				for(int i = 0; i < fp_str.length; i++)
+				{
+					log.trace("{}\n", fp_str[i]);
+					load_from_file(new FilePath(fp_str[i]), i_know_predicates, ts);
+				}
+
+				log.trace("\n{} Errors", scan.errors.length);
+				foreach(error; scan.errors)
+					log.trace(error);
 			}
-			log.trace("\n{} Errors", scan.errors.length);
-			foreach(error; scan.errors)
-				log.trace(error);
-
-			scan = (new FileScan)(root, ".n3log");
-			log.trace("\n{} Folders\n", scan.folders.length);
-			foreach(folder; scan.folders)
-				log.trace("{}\n", folder);
-			log.trace("\n{0} Files\n", scan.files.length);
-
-			FilePath[] fp = scan.files;
-
-			char[][] fp_str = new char[][fp.length];
-
-			for(int i = 0; i < fp.length; i++)
-			{
-				fp_str[i] = fp[i].toString();
-			}
-			fp_str = fp_str.sort;
-
-			for(int i = 0; i < fp_str.length; i++)
-			{
-				log.trace("{}\n", fp_str[i]);
-				load_from_file(new FilePath(fp_str[i]), i_know_predicates, ts);
-			}
-
-			log.trace("\n{} Errors", scan.errors.length);
-			foreach(error; scan.errors)
-				log.trace(error);
-
 			//		print_list_triple(ts.getTriples("record", null, null, false));
 
 			//		ts.removeTriple("record", "magnet-ontology#target", "92e57b6d-83e3-485f-8885-0bade363f759");

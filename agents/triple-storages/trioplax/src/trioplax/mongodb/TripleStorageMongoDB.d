@@ -55,7 +55,7 @@ class TripleStorageMongoDB : TripleStorage
 
 	private mongo_connection conn;
 
-	this()
+	this(char[] host, int port)
 	{
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
@@ -70,16 +70,16 @@ class TripleStorageMongoDB : TripleStorage
 
 		mongo_connection_options opts;
 
-		strncpy(cast(char*) opts.host, "127.0.0.1", 255);
+		strncpy(cast(char*) opts.host, host.ptr, 255);
 		opts.host[254] = '\0';
-		opts.port = 27017;
+		opts.port = port;
 
 		if(mongo_connect(&conn, &opts))
 		{
-			log.trace("failed to connect tomongodb");
+			log.trace("failed to connect to mongodb");
 			throw new Exception("failed to connect to mongodb");
 		}
-		log.trace("connect tomongodb sucessful");
+		log.trace("connect to mongodb sucessful");
 	}
 
         public void set_log_query_mode (bool on_off)
@@ -180,7 +180,7 @@ class TripleStorageMongoDB : TripleStorage
 	
 	public triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o)
 	{
-		//		log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
+				log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
 
 		bson_buffer bb;
 		bson b;
@@ -339,7 +339,7 @@ class TripleStorageMongoDB : TripleStorage
 
 	public triple_list_element* getTriples(char* s, char* p, char* o)
 	{
-/*
+
 		char ss[];
 		char pp[];
 		char oo[];
@@ -361,8 +361,8 @@ class TripleStorageMongoDB : TripleStorage
 			oo = fromStringz(o);
 			//			log.trace("GET TRIPLES #0, len(o)={}", strlen(o));
 		}
-*/
-		//		log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
+
+				log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
 		
 		bson_buffer bb, bb2;
 		bson query;
@@ -376,13 +376,13 @@ class TripleStorageMongoDB : TripleStorage
 			if(s !is null)
 			{
 				bson_append_string(&bb, "ss", s);
-				//			bson_append_int(&bb2, "ss", 1);
+//							bson_append_int(&bb2, "ss", 1);
 			}
 
 			if(p !is null && o !is null)
 			{
 				bson_append_string(&bb, p, o);
-				//			bson_append_int(&bb2, p, 1);
+//							bson_append_int(&bb2, "pp", 1);
 			}
 
 			//		log.trace("GET TRIPLES #4");
@@ -398,11 +398,11 @@ class TripleStorageMongoDB : TripleStorage
 
 		int length_list = 0;
 
-		//		log.trace("GET TRIPLES #6");
+				log.trace("GET TRIPLES #6");
 		mongo_cursor* cursor = null;
 		 cursor = mongo_find(&conn, ns, &query, &fields, 0, 0, 0);
 
-		//		log.trace("GET TRIPLES #7");
+				log.trace("GET TRIPLES #7");
 		while(mongo_cursor_next(cursor))
 		{
 			bson_iterator it;
@@ -412,7 +412,7 @@ class TripleStorageMongoDB : TripleStorage
 			char* tp = null;
 			char* to = null;
 
-			//			log.trace("GET TRIPLES #8");
+						log.trace("GET TRIPLES #8");
 
 			while(bson_iterator_next(&it))
 			{

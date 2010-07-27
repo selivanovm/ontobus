@@ -945,6 +945,8 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 						if(delegates_facts !is null)
 						{
 							hierarhical_delegates_document_id[ii] = delegates_facts.triple.o;
+							log.trace("hierarhical_delegates_document_id[{}] = ", ii, getString (delegates_facts.triple.o));
+
 						}
 					}
 					}
@@ -1237,30 +1239,37 @@ private char[][char[]] load_props()
 		result["amqp_server_routingkey"] = "";
 		result["amqp_server_queue"] = "semargl";
 		result["amqp_server_vhost"] = "magnetico";
+
 		result["dbus_semargl_service_name"] = "";
 		result["dbus_semargl_listen_from"] = "";
+
 		result["index_PO_key_area"] = "10000";
-		result["index_S1PPOO_count"] = "1000";
-		result["index_SP_key_area"] = "10000";
-		result["index_S_key_area"] = "1000";
-		result["index_SPO_count"] = "1000";
-		result["index_O_short_order"] = "4";
-		result["index_SPO_key_area"] = "10000";
-		result["dbus_semargl_service_name"] = "";
-		result["index_SP_count"] = "1000";
-		result["index_O_key_area"] = "10000";
-		result["index_S1PPOO_short_order"] = "4";
-		result["index_S1PPOO_key_area"] = "10000";
-		result["index_SPO_short_order"] = "4";
-		result["dbus_semargl_listen_from"] = "";
 		result["index_PO_short_order"] = "4";
 		result["index_PO_count"] = "1000";
-		result["index_O_count"] = "1000";
-		result["index_S_short_order"] = "4";
-		result["index_SP_short_order"] = "4";
-		result["index_S_count"] = "1000";
-		result["amqp_server_routingkey"] = "";
 
+		result["index_S1PPOO_count"] = "1000";
+		result["index_S1PPOO_short_order"] = "4";
+		result["index_S1PPOO_key_area"] = "10000";
+
+		result["index_SP_key_area"] = "10000";
+		result["index_SP_count"] = "1000";
+		result["index_SP_short_order"] = "4";
+
+		result["index_S_key_area"] = "1000";
+		result["index_S_short_order"] = "4";
+		result["index_S_count"] = "1000";
+
+		result["index_SPO_count"] = "1000";
+		result["index_SPO_key_area"] = "10000";
+		result["index_SPO_short_order"] = "4";
+
+		result["index_O_short_order"] = "4";
+		result["index_O_key_area"] = "10000";
+		result["index_O_count"] = "1000";
+
+		result["mongodb_server"] = "127.0.0.1";
+		result["mongodb_port"] = "27017";
+		
 		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);
 

@@ -144,7 +144,7 @@ class TripleStorageMongoDB : TripleStorage
 {
     mongo_connection conn;
 }
-    this();
+    this(char[] host, int port);
     public
 {
     void set_log_query_mode(bool on_off)
