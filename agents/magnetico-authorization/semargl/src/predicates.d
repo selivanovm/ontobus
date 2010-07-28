@@ -75,6 +75,7 @@ public static const String IS_BANNED = NAMESPACE ~ "ib";
 // документ
 public static const String DOCUMENT_TYPE_NAME = DOCUMENT_STORAGE_NAMESPACE ~ "tpnm";
 public static const String DOCUMENT_TEMPLATE_ID = DOCUMENT_STORAGE_NAMESPACE ~ "tmplid";
+public static const String INHERIT = DOCUMENT_STORAGE_NAMESPACE ~ "inherit_rights";
 
 // запись о праве
 public static const String AUTHOR_SYSTEM = AUTHORIZATION_ACL_NAMESPACE ~ "atS";
@@ -93,4 +94,3 @@ public static const String CREATOR = "pcr";
 public static const String IDENTIFIER = "pid";
 public static const String HAS_PART = NAMESPACE ~ "hsPt";
 public static const String MEMBER_OF = NAMESPACE ~ "mmbOf";
-

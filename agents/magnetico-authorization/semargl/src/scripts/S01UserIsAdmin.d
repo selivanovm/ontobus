@@ -10,7 +10,7 @@ private import Log;
 
 static private bool[char*] cache;
 
-public bool calculate(char* user, TripleStorage ts, char*[] iterator_on_targets_of_hierarhical_departments)
+public bool calculate(char* user, TripleStorage ts, char*[] array_of_targets_of_hierarhical_departments)
 {
 
 	//log.trace("!!! l={}", iterator_on_targets_of_hierarhical_departments.length);
@@ -26,10 +26,10 @@ public bool calculate(char* user, TripleStorage ts, char*[] iterator_on_targets_
 		}
 		else
 		{
-			for(int i = 0; i < iterator_on_targets_of_hierarhical_departments.length; i++)
+			for(int i = 0; i < array_of_targets_of_hierarhical_departments.length; i++)
 			{
 				//log.trace("!!! {}", fromStringz(iterator_on_targets_of_hierarhical_departments[i]));
-				if(isAdmin(iterator_on_targets_of_hierarhical_departments[i], ts))
+				if(isAdmin(array_of_targets_of_hierarhical_departments[i], ts))
 				{
 					cache[user] = true;
 					//log.trace("User is admin? {}", false);

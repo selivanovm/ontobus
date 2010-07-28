@@ -350,8 +350,8 @@ class Authorization
 	bool f_authorization_trace = false;
 
 	// необходимые данные загружены, сделаем пробное выполнение скриптов для заданного пользователя
-	public bool authorize(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
-			char*[] hierarhical_departments, mom_client from_client, bool isAdmin)
+	public bool calculateRightOfAuthorizedElement(char* authorizedElementCategory, char* authorizedElementId, char* User, uint targetRightType,
+			char*[] hierarhical_departments, bool isAdmin, triple_list_element* iterator_facts_of_document)
 	{
 		if(f_authorization_trace)
 		{
@@ -414,7 +414,7 @@ class Authorization
 				authorizedElementCategory, Category.DOCUMENT_TEMPLATE.ptr) == 0)))
 
 		{
-			if(scripts.S01AllLoggedUsersCanCreateDocuments.calculate(User, authorizedElementId, targetRightType, ts))
+			if(scripts.S01AllLoggedUsersCanCreateDocuments.calculate(targetRightType))
 			{
 				if(f_authorization_trace)
 				{
@@ -436,8 +436,6 @@ class Authorization
 			return true;
 		}
 
-		triple_list_element* iterator_facts_of_document = ts.getTriples(authorizedElementId, null, null);
-
 		if(strcmp("null", authorizedElementId) != 0 && iterator_facts_of_document is null && strcmp(authorizedElementCategory,
 				Category.DOCUMENT.ptr) == 0)
 		{
@@ -447,26 +445,22 @@ class Authorization
 				log.trace("end autorize: end#2, return:[false]");
 			}
 
-			ts.list_no_longer_required(iterator_facts_of_document);
 			return false;
 		}
 
 		if(scripts.S11ACLRightsHierarhical.calculate(User, authorizedElementId, targetRightType, ts, hierarhical_departments, pp,
 				authorizedElementCategory))
 		{
-			ts.list_no_longer_required(iterator_facts_of_document);
 			return true;
 		}
 
 		if(scripts.S10UserIsAuthorOfDocument.calculate(User, authorizedElementId, targetRightType, ts, iterator_facts_of_document))
 		{
-			ts.list_no_longer_required(iterator_facts_of_document);
 			return true;
 		}
 
 		if(isAdmin)
 		{
-			ts.list_no_longer_required(iterator_facts_of_document);
 			if(f_authorization_trace)
 			{
 				log.trace("end autorize: isAdmin = {}", true);
@@ -479,7 +473,6 @@ class Authorization
 			log.trace("end autorize: Access Denied");
 		}
 
-		ts.list_no_longer_required(iterator_facts_of_document);
 		return false;
 	}
 

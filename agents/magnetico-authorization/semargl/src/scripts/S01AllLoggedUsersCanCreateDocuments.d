@@ -6,7 +6,7 @@ private import RightTypeDef;
 private import Predicates;
 private import trioplax.TripleStorage;
 
-public bool calculate(char* user, char* elementId, uint rightType, TripleStorage ts)
+public bool calculate(uint rightType)
 {
 	//	Stdout.format("S01AllLoggedUsersCanCreateDocuments is run... rightType={}", rightType).newline;
 
