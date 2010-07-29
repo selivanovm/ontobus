@@ -717,7 +717,7 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 					{
 						if(strcmp(fact_p[i], INHERIT.ptr) == 0)
 						{
-							remove_facts_of_subject_by_predicate (fact_s[i], fact_p[i]);
+							remove_facts_of_subject_by_predicate(fact_s[i], fact_p[i]);
 						}
 
 						if(strcmp(fact_p[i], NEW_UID.ptr) == 0)
@@ -893,7 +893,7 @@ private void remove_facts_of_subject_by_predicate(char* s, char* p)
 	if(removed_facts !is null)
 	{
 
-		char[][100] s_a;
+		Triple*[100] t_a;
 
 		int cnt = 0;
 
@@ -903,8 +903,7 @@ private void remove_facts_of_subject_by_predicate(char* s, char* p)
 
 			if(triple2 !is null)
 			{
-				char* ss = cast(char*) triple2.s;
-				s_a[cnt] = getString(ss);
+				t_a[cnt] = triple2;
 			}
 			cnt++;
 			removed_facts = removed_facts.next_triple_list_element;
@@ -912,11 +911,11 @@ private void remove_facts_of_subject_by_predicate(char* s, char* p)
 
 		for(int k = 0; k < cnt; k++)
 		{
-			remove_subject(s_a[k].ptr);
+			az.getTripleStorage.removeTriple(getString (t_a[k].s), getString (t_a[k].p), getString (t_a[k].o));
 		}
 
 		az.getTripleStorage.list_no_longer_required(removed_facts_FE);
-	}	
+	}
 }
 
 //!!! ограничен 100 удаляемыми фактами
@@ -1304,7 +1303,8 @@ private bool calculate_right_according_to_delegation(char* categoryId, char* gua
 				}
 			}
 			else
-			{uint is_fact_in_object[];
+			{
+				uint is_fact_in_object[];
 				//				log.trace("calculate_right_according_to_delegation #5", calculatedRight);	 
 				calculatedRight = az.calculateRightOfAuthorizedElement(categoryId, guardedElementId, hierarhical_delegates[ii].o,
 						targetRightType, hierarhical_departments_of_delegate[ii], isAdmin, iterator_facts_of_document);
@@ -1334,7 +1334,8 @@ private bool calculate_right_according_to_delegation(char* categoryId, char* gua
 				char* triple0_p = cast(char*) triple0.p;
 
 				if(strcmp(triple0_p, INHERIT.ptr) == 0)
-				{uint is_fact_in_object[];
+				{
+					uint is_fact_in_object[];
 					//					log.trace("calculate_right_according_to_delegation #8", calculatedRight);
 					char* inherit_rights_of = triple0.o;
 
@@ -1358,7 +1359,8 @@ private bool calculate_right_according_to_delegation(char* categoryId, char* gua
 	return calculatedRight;
 }
 
-private void delete_subjects_by_predicate(char* fact_s[], char* fact_p[], char* fact_o[], uint is_fact_in_object[], int count_facts, int arg_id, StopWatch* elapsed, mom_client from_client)
+private void delete_subjects_by_predicate(char* fact_s[], char* fact_p[], char* fact_o[], uint is_fact_in_object[], int count_facts,
+		int arg_id, StopWatch* elapsed, mom_client from_client)
 {
 	double time;
 	char* arg_p;
