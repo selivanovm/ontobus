@@ -25,7 +25,7 @@ private import mongo;
 
 private import tango.stdc.stdlib: calloc, free;
 
-class TripleStorageMongoDB : TripleStorage
+class TripleStorageMongoDB: TripleStorage
 {
 	private int max_length_pull = 1024 * 10;
 	private int average_list_size = 3;
@@ -42,8 +42,8 @@ class TripleStorageMongoDB : TripleStorage
 	private const char* ns = "az1.simple";
 
 	//	private char[][1024] query_of_used_lists;
-//	private char[][triple_list_element*] used_lists_pull;
-//	private int count_used_lists = 0;
+	//	private char[][triple_list_element*] used_lists_pull;
+	//	private int count_used_lists = 0;
 
 	private int count_all_allocated_lists = 0;
 	private int max_length_list = 0;
@@ -59,8 +59,7 @@ class TripleStorageMongoDB : TripleStorage
 	{
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
-		elements_in_list = cast(triple_list_element*) calloc(triple_list_element.sizeof,
-				max_length_pull * average_list_size);
+		elements_in_list = cast(triple_list_element*) calloc(triple_list_element.sizeof, max_length_pull * average_list_size);
 
 		used_list = new triple_list_element*[max_length_pull];
 		last_used_element_in_pull = 0;
@@ -82,28 +81,25 @@ class TripleStorageMongoDB : TripleStorage
 		log.trace("connect to mongodb sucessful");
 	}
 
-        public void set_log_query_mode (bool on_off)
-        {
-           log_query = on_off;
-        }
-        
-                                   
-       	public void release_all_lists()
+	public void set_log_query_mode(bool on_off)
+	{
+		log_query = on_off;
+	}
+
+	public void release_all_lists()
 	{
 		last_used_element_in_pull = 0;
 		last_used_element_in_strings = 0;
-		
-		
-		
-//		used_lists_pull = null;
+
+		//		used_lists_pull = null;
 		//count_used_lists = 0;
 
-//		char[][] values = used_lists_pull.values;
+		//		char[][] values = used_lists_pull.values;
 
-//		for(int i = 0; i < values.length; i++)
-//		{
-			//			log.trace("used list of query {}", values[i]);
-//		}
+		//		for(int i = 0; i < values.length; i++)
+		//		{
+		//			log.trace("used list of query {}", values[i]);
+		//		}
 
 	}
 
@@ -163,8 +159,7 @@ class TripleStorageMongoDB : TripleStorage
 		 */
 	}
 
-	public void set_new_index(ubyte index, uint max_count_element, uint max_length_order,
-			uint inital_triple_area_length)
+	public void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 	{
 	}
 
@@ -175,12 +170,12 @@ class TripleStorageMongoDB : TripleStorage
 	public void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 	{
 	}
-	
+
 	private char[] p_rt = "mo/at/acl#rt\0";
-	
+
 	public triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o)
 	{
-				log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
+		log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
 
 		bson_buffer bb;
 		bson b;
@@ -214,7 +209,7 @@ class TripleStorageMongoDB : TripleStorage
 			char* ts = null;
 			char* tp = strings + last_used_element_in_strings;
 			last_used_element_in_strings += p_rt.length;
-//			char* tp = cast(char*) calloc(byte.sizeof, "mo/at/acl#rt".length + 1);
+			//			char* tp = cast(char*) calloc(byte.sizeof, "mo/at/acl#rt".length + 1);
 			strncpy(tp, p_rt.ptr, p_rt.length);
 			char* to = null;
 
@@ -240,12 +235,13 @@ class TripleStorageMongoDB : TripleStorage
 
 							//								ts = cast(char*) calloc(byte.sizeof, len + 1);
 							strcpy(ts, value);
-						} else if(strcmp(name_key, "mo/at/acl#rt".ptr) == 0)
+						}
+						else if(strcmp(name_key, "mo/at/acl#rt".ptr) == 0)
 						{
 							to = strings + last_used_element_in_strings;
 							last_used_element_in_strings += len + 1;
 
-//							to = cast(char*) calloc(byte.sizeof, len + 1);
+							//							to = cast(char*) calloc(byte.sizeof, len + 1);
 							strcpy(to, value);
 						}
 						break;
@@ -260,9 +256,9 @@ class TripleStorageMongoDB : TripleStorage
 
 			next_element = elements_in_list + last_used_element_in_pull;
 			next_element.next_triple_list_element = null;
-			
+
 			Triple* triple = triples + last_used_element_in_pull;
-			
+
 			last_used_element_in_pull++;
 
 			length_list++;
@@ -278,7 +274,7 @@ class TripleStorageMongoDB : TripleStorage
 				list = next_element;
 			}
 
-//			Triple* triple = cast(Triple*) calloc(Triple.sizeof, 1);
+			//			Triple* triple = cast(Triple*) calloc(Triple.sizeof, 1);
 			triple.s = ts;
 			triple.p = tp;
 			triple.o = to;
@@ -299,36 +295,36 @@ class TripleStorageMongoDB : TripleStorage
 		{
 
 			//@@@@@
-/*			
-			char ss[];
-			char pp[];
-			char oo[];
+			/*			
+			 char ss[];
+			 char pp[];
+			 char oo[];
 
-			if(s !is null)
-				ss = fromStringz(s);
+			 if(s !is null)
+			 ss = fromStringz(s);
 
-			if(p !is null)
-				pp = fromStringz(p);
+			 if(p !is null)
+			 pp = fromStringz(p);
 
-			if(o !is null)
-				oo = fromStringz(o);
+			 if(o !is null)
+			 oo = fromStringz(o);
 
-			if(count_used_lists < max_length_pull)
-			{
-				used_lists_pull[list] = "GET USE INDEX S=" ~ ss ~ ", P=" ~ pp ~ ", O=" ~ oo;
-				//				log.trace("get ({:X4}), length={}", list, used_lists_pull.length);
+			 if(count_used_lists < max_length_pull)
+			 {
+			 used_lists_pull[list] = "GET USE INDEX S=" ~ ss ~ ", P=" ~ pp ~ ", O=" ~ oo;
+			 //				log.trace("get ({:X4}), length={}", list, used_lists_pull.length);
 
-				//				query_of_used_lists[count_used_lists] = "GET USE INDEX S=" ~ ss ~ ", P=" ~ pp ~ ", O= " ~ oo;
-				//				used_lists_pull[count_used_lists] = list;
-			}
+			 //				query_of_used_lists[count_used_lists] = "GET USE INDEX S=" ~ ss ~ ", P=" ~ pp ~ ", O= " ~ oo;
+			 //				used_lists_pull[count_used_lists] = list;
+			 }
 
-			if(length_list > max_length_list)
-				max_length_list = length_list;
+			 if(length_list > max_length_list)
+			 max_length_list = length_list;
 
-			if(used_lists_pull.length > max_use_pull)
-				max_use_pull = used_lists_pull.length;
-*/
-	//		count_used_lists++;
+			 if(used_lists_pull.length > max_use_pull)
+			 max_use_pull = used_lists_pull.length;
+			 */
+			//		count_used_lists++;
 			count_all_allocated_lists++;
 			//			if(count_all_allocated_lists % 1000 == 0)
 			//				print_stat();
@@ -362,12 +358,11 @@ class TripleStorageMongoDB : TripleStorage
 			//			log.trace("GET TRIPLES #0, len(o)={}", strlen(o));
 		}
 
-				log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
-		
+		log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
+
 		bson_buffer bb, bb2;
 		bson query;
 		bson fields;
-
 
 		{
 			bson_buffer_init(&bb2);
@@ -376,19 +371,19 @@ class TripleStorageMongoDB : TripleStorage
 			if(s !is null)
 			{
 				bson_append_string(&bb, "ss", s);
-//							bson_append_int(&bb2, "ss", 1);
+				//							bson_append_int(&bb2, "ss", 1);
 			}
 
 			if(p !is null && o !is null)
 			{
 				bson_append_string(&bb, p, o);
-//							bson_append_int(&bb2, "pp", 1);
+				//							bson_append_int(&bb2, "pp", 1);
 			}
 
 			//		log.trace("GET TRIPLES #4");
 			bson_from_buffer(&query, &bb);
 			bson_from_buffer(&fields, &bb2);
-			
+
 		}
 
 		//		log.trace("GET TRIPLES #5");
@@ -398,11 +393,11 @@ class TripleStorageMongoDB : TripleStorage
 
 		int length_list = 0;
 
-				log.trace("GET TRIPLES #6");
+		log.trace("GET TRIPLES #6");
 		mongo_cursor* cursor = null;
-		 cursor = mongo_find(&conn, ns, &query, &fields, 0, 0, 0);
+		cursor = mongo_find(&conn, ns, &query, &fields, 0, 0, 0);
 
-				log.trace("GET TRIPLES #7");
+		log.trace("GET TRIPLES #7");
 		while(mongo_cursor_next(cursor))
 		{
 			bson_iterator it;
@@ -412,7 +407,7 @@ class TripleStorageMongoDB : TripleStorage
 			char* tp = null;
 			char* to = null;
 
-						log.trace("GET TRIPLES #8");
+			log.trace("GET TRIPLES #8");
 
 			while(bson_iterator_next(&it))
 			{
@@ -428,51 +423,52 @@ class TripleStorageMongoDB : TripleStorage
 
 						//						if(len > 0)
 						{
-							//							log.trace("name_key=[{}], value=[{}], len={}", fromStringz(name_key), fromStringz(value),
-							//									len);
+							log.trace("name_key=[{}], value=[{}], len={}", fromStringz(name_key), fromStringz(value), len);
 
 							if(strcmp(name_key, "ss".ptr) == 0)
 							{
-//								ts = cast(char*) calloc(byte.sizeof, len + 1);
+								//								ts = cast(char*) calloc(byte.sizeof, len + 1);
 								ts = strings + last_used_element_in_strings;
 								last_used_element_in_strings += len + 1;
 
 								strcpy(ts, value);
-							} else if(p !is null && strcmp(name_key, p) == 0)
+							}
+							else if(p !is null && strcmp(name_key, p) == 0)
 							{
-//								to = cast(char*) calloc(byte.sizeof, len + 1);
+								//								to = cast(char*) calloc(byte.sizeof, len + 1);
 								to = strings + last_used_element_in_strings;
 								last_used_element_in_strings += len + 1;
 
 								strcpy(to, value);
-							} else if(p is null)
+							}
+							else if(p is null)
 							{
-//								ts = cast(char*) calloc(byte.sizeof, strlen(s) + 1);
+								//								ts = cast(char*) calloc(byte.sizeof, strlen(s) + 1);
 								ts = strings + last_used_element_in_strings;
 								last_used_element_in_strings += strlen(s) + 1;
 
 								strcpy(ts, s);
 
-//								tp = cast(char*) calloc(byte.sizeof, strlen(name_key) + 1);
+								//								tp = cast(char*) calloc(byte.sizeof, strlen(name_key) + 1);
 								tp = strings + last_used_element_in_strings;
 								last_used_element_in_strings += strlen(name_key) + 1;
 
 								strcpy(tp, name_key);
 
-//								to = cast(char*) calloc(byte.sizeof, len + 1);
+								//								to = cast(char*) calloc(byte.sizeof, len + 1);
 								to = strings + last_used_element_in_strings;
 								last_used_element_in_strings += len + 1;
-								
+
 								strcpy(to, value);
 
 								if(ts !is null && tp !is null && to !is null)
 								{
-//									next_element = cast(triple_list_element*) calloc(triple_list_element.sizeof, 1);
+									//									next_element = cast(triple_list_element*) calloc(triple_list_element.sizeof, 1);
 									next_element = elements_in_list + last_used_element_in_pull;
 									next_element.next_triple_list_element = null;
-									
+
 									Triple* triple = triples + last_used_element_in_pull;
-									
+
 									last_used_element_in_pull++;
 
 									if(prev_element !is null)
@@ -488,7 +484,7 @@ class TripleStorageMongoDB : TripleStorage
 
 									//			log.trace("GET TRIPLES #10");
 
-//									Triple* triple = cast(Triple*) calloc(Triple.sizeof, 1);
+									//									Triple* triple = cast(Triple*) calloc(Triple.sizeof, 1);
 									//									log.trace ("new triple, ballance={}", ballanse);
 
 									triple.s = ts;
@@ -505,37 +501,37 @@ class TripleStorageMongoDB : TripleStorage
 						}
 
 					break;
-/*
-					case bson_type.bson_array:
+					/*
+					 case bson_type.bson_array:
 
-						bson_iterator sub_it;
-						bson_iterator_subiterator(&it, &sub_it);
+					 bson_iterator sub_it;
+					 bson_iterator_subiterator(&it, &sub_it);
 
-						while(bson_iterator_next(&sub_it))
-						{
-							switch(bson_iterator_type(&sub_it))
-							{
-								case bson_type.bson_string:
+					 while(bson_iterator_next(&sub_it))
+					 {
+					 switch(bson_iterator_type(&sub_it))
+					 {
+					 case bson_type.bson_string:
 
-									char* value = bson_iterator_string(&sub_it);
-									int len = strlen(value);
+					 char* value = bson_iterator_string(&sub_it);
+					 int len = strlen(value);
 
-									if(len > 0)
-									{
-										//										log.trace("sub:name_key=[{}], value=[{}], len={}", fromStringz(name_key),
-										//												fromStringz(value), len);
-									}
+					 if(len > 0)
+					 {
+					 //										log.trace("sub:name_key=[{}], value=[{}], len={}", fromStringz(name_key),
+					 //												fromStringz(value), len);
+					 }
 
-								break;
+					 break;
 
-								default:
-								break;
-							}
+					 default:
+					 break;
+					 }
 
-						}
+					 }
 
-					break;
-*/
+					 break;
+					 */
 					default:
 					break;
 				}
@@ -543,7 +539,7 @@ class TripleStorageMongoDB : TripleStorage
 
 			if(p !is null)
 			{
-//				tp = cast(char*) calloc(byte.sizeof, strlen(p) + 1);
+				//				tp = cast(char*) calloc(byte.sizeof, strlen(p) + 1);
 				tp = strings + last_used_element_in_strings;
 				last_used_element_in_strings += strlen(p) + 1;
 
@@ -551,7 +547,7 @@ class TripleStorageMongoDB : TripleStorage
 
 				if(o !is null)
 				{
-//					to = cast(char*) calloc(byte.sizeof, strlen(o) + 1);
+					//					to = cast(char*) calloc(byte.sizeof, strlen(o) + 1);
 					to = strings + last_used_element_in_strings;
 					last_used_element_in_strings += strlen(o) + 1;
 
@@ -585,7 +581,7 @@ class TripleStorageMongoDB : TripleStorage
 
 					//			log.trace("GET TRIPLES #10");
 
-//					Triple* triple = cast(Triple*) calloc(Triple.sizeof, 1);
+					//					Triple* triple = cast(Triple*) calloc(Triple.sizeof, 1);
 					triple.s = ts;
 					triple.p = tp;
 					triple.o = to;
@@ -609,22 +605,22 @@ class TripleStorageMongoDB : TripleStorage
 
 		if(list !is null && f_trace_list_pull == true)
 		{
-/*
-			if(count_used_lists < max_length_pull)
-			{
-				used_lists_pull[list] = "GET S=" ~ ss ~ ", P=" ~ pp ~ ", O=" ~ oo;
-				//				log.trace("get ({:X4}), length={}", list, used_lists_pull.length);
-				//				query_of_used_lists[count_used_lists] = "GET S=" ~ ss ~ ", P=" ~ pp ~ ", O= " ~ oo;
-				//				used_lists_pull[count_used_lists] = list;
-			}
+			/*
+			 if(count_used_lists < max_length_pull)
+			 {
+			 used_lists_pull[list] = "GET S=" ~ ss ~ ", P=" ~ pp ~ ", O=" ~ oo;
+			 //				log.trace("get ({:X4}), length={}", list, used_lists_pull.length);
+			 //				query_of_used_lists[count_used_lists] = "GET S=" ~ ss ~ ", P=" ~ pp ~ ", O= " ~ oo;
+			 //				used_lists_pull[count_used_lists] = list;
+			 }
 
-			if(length_list > max_length_list)
-				max_length_list = length_list;
+			 if(length_list > max_length_list)
+			 max_length_list = length_list;
 
-			if(used_lists_pull.length > max_use_pull)
-				max_use_pull = used_lists_pull.length;
-*/
-	//		count_used_lists++;
+			 if(used_lists_pull.length > max_use_pull)
+			 max_use_pull = used_lists_pull.length;
+			 */
+			//		count_used_lists++;
 			count_all_allocated_lists++;
 			//			if(count_all_allocated_lists % 1000 == 0)
 			//				print_stat();
@@ -660,8 +656,8 @@ class TripleStorageMongoDB : TripleStorage
 		log_file.output.write(layout("{:yyyy-MM-dd HH:mm:ss},{} ", tm, dt.time.millis));
 
 		log_file.output.write(
-				"\n" ~ op ~ " FROM INDEX " ~ a_s ~ a_p ~ a_o ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(
-						o) ~ "] " ~ Integer.format(buff, count) ~ "\n");
+				"\n" ~ op ~ " FROM INDEX " ~ a_s ~ a_p ~ a_o ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(
+						buff, count) ~ "\n");
 
 		print_list_triple_to_file(log_file, list);
 
@@ -681,7 +677,7 @@ class TripleStorageMongoDB : TripleStorage
 		bson_buffer bb;
 		bson query;
 		bson fields;
-//		bson record;
+		//		bson record;
 
 		bson_buffer_init(&bb);
 		//		log.trace("remove! #2");
@@ -715,7 +711,8 @@ class TripleStorageMongoDB : TripleStorage
 				break;
 			}
 
-		} else
+		}
+		else
 		{
 			throw new Exception("remove triple <" ~ s ~ "><" ~ p ~ ">\"" ~ o ~ "\": triple not found");
 		}
@@ -784,7 +781,8 @@ class TripleStorageMongoDB : TripleStorage
 			bson_append_string(sub, p.ptr, o.ptr);
 			bson_append_finish_object(sub);
 			bson_from_buffer(&op, &bb);
-		} else
+		}
+		else
 		{
 			bson_buffer_init(&bb);
 			bson_buffer* sub = bson_append_start_object(&bb, "$set");
