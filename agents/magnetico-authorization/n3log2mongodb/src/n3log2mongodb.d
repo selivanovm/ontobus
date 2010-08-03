@@ -19,7 +19,7 @@ void main(char[][] args)
 {
 	char[][] i_know_predicates;
 
-	i_know_predicates = new char[][20];
+	i_know_predicates = new char[][21];
 
 	int d = 0;
 
@@ -58,6 +58,9 @@ void main(char[][] args)
 	i_know_predicates[d++] = IS_ADMIN;
 
 	i_know_predicates[d++] = DOCUMENT_TEMPLATE_ID;
+        i_know_predicates[d++] = DELEGATION_DOCUMENT_ID;
+	
+	
 
 	char[] root = ".";
 	log.trace("Scanning '{}'", root);

@@ -5,10 +5,13 @@ module Predicates;
 public static const char[] result_data_header_with_bracets = "><" ~ RESULT_DATA ~ ">{";
 public static const char[] result_data_header = "><" ~ RESULT_DATA ~ ">\"";
 public static const char[] result_state_ok_header = "><" ~ RESULT_STATE ~ ">\"ok\". ";
+public static const char[] result_state_err_header = "><" ~ RESULT_STATE ~ ">\"er\". ";
 
 alias char[] String;
 
 /////////////////////////////////////////////////////////////////////////////////////////
+
+public static const String NEW_UID = "new-uid";
 
 public static const String NAMESPACE = "mo#";
 public static const String AUTHORIZATION_FUNCTIONS_NAMESPACE = "mo/at/fn#";
@@ -46,6 +49,8 @@ public static const String CREATE = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "cr";
 public static const String UPDATE = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "up";
 //public static const String REMOVE_RECORDS_FOR_ELEMENT = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "rrfe";
 public static const String GET_AUTHORIZATION_RIGHT_RECORDS = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "garr";
+public static const String GET_DELEGATORS_RECORDS = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "getDelegatorsRecords";
+
 public static const String IS_IN_DOCFLOW = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "iid";
 public static const String IS_ADMIN = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "ia";
 public static const String GET_DELEGATE_ASSIGNERS = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "gda";
@@ -56,6 +61,7 @@ public static const String AUTHORIZE = AUTHORIZATION_FUNCTIONS_NAMESPACE ~ "a";
 public static const String DELEGATION_DELEGATE = AUTHORIZATION_ACL_NAMESPACE ~ "de";
 public static const String DELEGATION_OWNER = AUTHORIZATION_ACL_NAMESPACE ~ "ow";
 public static const String DELEGATION_WITH_TREE = AUTHORIZATION_ACL_NAMESPACE ~ "wt";
+public static const String DELEGATION_DOCUMENT_ID = AUTHORIZATION_ACL_NAMESPACE ~ "dg_doc_id";
 
 // функции модуля справочников
 public static const String GET_DICTIONARY_ID_BY_ATTRIBUTE_ID = NAMESPACE ~ "gdibai";
@@ -69,6 +75,7 @@ public static const String IS_BANNED = NAMESPACE ~ "ib";
 // документ
 public static const String DOCUMENT_TYPE_NAME = DOCUMENT_STORAGE_NAMESPACE ~ "tpnm";
 public static const String DOCUMENT_TEMPLATE_ID = DOCUMENT_STORAGE_NAMESPACE ~ "tmplid";
+public static const String INHERIT = DOCUMENT_STORAGE_NAMESPACE ~ "inherit_rights";
 
 // запись о праве
 public static const String AUTHOR_SYSTEM = AUTHORIZATION_ACL_NAMESPACE ~ "atS";
@@ -87,4 +94,3 @@ public static const String CREATOR = "pcr";
 public static const String IDENTIFIER = "pid";
 public static const String HAS_PART = NAMESPACE ~ "hsPt";
 public static const String MEMBER_OF = NAMESPACE ~ "mmbOf";
-
