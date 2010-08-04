@@ -276,7 +276,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates)
 						bson_destroy(&op);
 
 						log.trace(
-								"persistent_triple_storage: add triple [{}] <{}><{}>\"{}\"",
+								"persistent_triple_storage: add triple [{}] <{}> <{}> \"{}\" .",
 								count_add_triple, s, p, o);
 					}
 
@@ -285,7 +285,7 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates)
 					count_add_triple++;
 
 					if(count_add_triple % 12345 == 0)
-						Stdout.format("count load triples {}", count_add_triple).newline;
+						Stdout.format("count load triples {} {}", count_add_triple, file_path).newline;
 					/*
 					 else
 					 {
@@ -345,12 +345,13 @@ public void load_from_file(FilePath file_path, char[][] i_know_predicates)
 						bson_destroy(&cond);
 						bson_destroy(&op);
 						
-						Thread.sleep(0.001);
+						Thread.sleep(0.011);
 						// не всегда удаляется ? возможно если очень быстро удалять												
 					}
 
-					log.trace(
-							"persistent_triple_storage: remove triple [{}] <{}><{}><{}>",
+					Stdout.format ("\npersistent_triple_storage: remove triple [{}] <{}> <{}> \"{}\" .",
+							count_add_triple, s, p, o);
+					log.trace("persistent_triple_storage: remove triple [{}] <{}> <{}> \"{}\"",
 							count_add_triple, s, p, o);
 				}
 
