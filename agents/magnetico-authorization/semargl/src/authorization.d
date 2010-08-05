@@ -42,6 +42,7 @@ private import Log;
 
 private import trioplax.triple;
 private import trioplax.TripleStorage;
+private import trioplax.memory.HashMap;
 private import trioplax.memory.TripleStorageMemory;
 private import trioplax.mongodb.TripleStorageMongoDB;
 private import trioplax.memory.IndexException;
@@ -144,7 +145,8 @@ class Authorization
 		{
 			log.trace("authorization init..");
 			Stdout.format("authorization init..").newline;
-
+			
+			
 			if(triples_in_memory)
 			{
 				ts_mem = new TripleStorageMemory(getIntProps("index_SPO_count"), getIntProps("index_SPO_short_order"), getIntProps(

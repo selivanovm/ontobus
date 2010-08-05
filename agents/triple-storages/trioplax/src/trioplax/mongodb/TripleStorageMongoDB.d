@@ -25,6 +25,9 @@ private import mongo;
 
 private import tango.stdc.stdlib: calloc, free;
 
+private import trioplax.memory.TripleStorageMemory;
+
+
 class TripleStorageMongoDB: TripleStorage
 {
 	private int max_length_pull = 1024 * 10;
@@ -55,8 +58,12 @@ class TripleStorageMongoDB: TripleStorage
 
 	private mongo_connection conn;
 
+	private TripleStorageMemory cache_requests = null;
+
 	this(char[] host, int port)
 	{
+		cache_requests = new TripleStorageMemory(10_000, 3, 10_000);
+
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
 		elements_in_list = cast(triple_list_element*) calloc(triple_list_element.sizeof, max_length_pull * average_list_size);
@@ -175,7 +182,7 @@ class TripleStorageMongoDB: TripleStorage
 
 	public triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o)
 	{
-//		log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
+		//		log.trace("getTriplesUseIndex #1 [{}] [{}] [{}]", fromStringz(s), fromStringz(p), fromStringz(o));
 
 		bson_buffer bb;
 		bson b;
@@ -333,8 +340,24 @@ class TripleStorageMongoDB: TripleStorage
 		return list;
 	}
 
+	public triple_list_element* get_request_in_cache(char* s, char* p, char* o)
+	{
+		triple_list_element* list_iterator = cache_requests.getTriples(s, p, o);
+
+		if(list_iterator !is null)
+			log.trace("TripleStorageMongoDB.get_request_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));
+
+		return list_iterator;
+	}
+
 	public triple_list_element* getTriples(char* s, char* p, char* o)
 	{
+		triple_list_element* list_in_cache = get_request_in_cache(s, p, o);
+
+		if(list_in_cache !is null)
+		{
+			return list_in_cache;
+		}
 
 		char ss[];
 		char pp[];
@@ -358,7 +381,7 @@ class TripleStorageMongoDB: TripleStorage
 			//			log.trace("GET TRIPLES #0, len(o)={}", strlen(o));
 		}
 
-//		log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
+		//		log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
 
 		bson_buffer bb, bb2;
 		bson query;
@@ -393,11 +416,11 @@ class TripleStorageMongoDB: TripleStorage
 
 		int length_list = 0;
 
-//		log.trace("GET TRIPLES #6");
+		//		log.trace("GET TRIPLES #6");
 		mongo_cursor* cursor = null;
 		cursor = mongo_find(&conn, ns, &query, &fields, 0, 0, 0);
 
-//		log.trace("GET TRIPLES #7");
+		//		log.trace("GET TRIPLES #7");
 		while(mongo_cursor_next(cursor))
 		{
 			bson_iterator it;
@@ -407,7 +430,7 @@ class TripleStorageMongoDB: TripleStorage
 			char* tp = null;
 			char* to = null;
 
-//			log.trace("GET TRIPLES #8");
+			//			log.trace("GET TRIPLES #8");
 
 			while(bson_iterator_next(&it))
 			{
@@ -423,7 +446,7 @@ class TripleStorageMongoDB: TripleStorage
 
 						//						if(len > 0)
 						{
-//							log.trace("name_key=[{}], value=[{}], len={}", fromStringz(name_key), fromStringz(value), len);
+							//							log.trace("name_key=[{}], value=[{}], len={}", fromStringz(name_key), fromStringz(value), len);
 
 							if(strcmp(name_key, "ss".ptr) == 0)
 							{
