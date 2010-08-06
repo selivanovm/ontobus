@@ -26,6 +26,7 @@ private import mongo;
 private import tango.stdc.stdlib: calloc, free;
 
 private import trioplax.memory.TripleStorageMemory;
+private import trioplax.memory.HashMap;
 
 
 class TripleStorageMongoDB: TripleStorage
@@ -58,11 +59,13 @@ class TripleStorageMongoDB: TripleStorage
 
 	private mongo_connection conn;
 
-	private TripleStorageMemory cache_requests = null;
+	private TripleStorageMemory cache_query_result = null;
+	private HashMap list_query = null;
 
 	this(char[] host, int port)
 	{
-		cache_requests = new TripleStorageMemory(10_000, 3, 10_000);
+		cache_query_result = new TripleStorageMemory(10_000, 3, 10_000);
+//		list_query
 
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
@@ -340,9 +343,9 @@ class TripleStorageMongoDB: TripleStorage
 		return list;
 	}
 
-	public triple_list_element* get_request_in_cache(char* s, char* p, char* o)
+	public triple_list_element* get_query_result_in_cache(char* s, char* p, char* o)
 	{
-		triple_list_element* list_iterator = cache_requests.getTriples(s, p, o);
+		triple_list_element* list_iterator = cache_query_result.getTriples(s, p, o);
 
 		if(list_iterator !is null)
 			log.trace("TripleStorageMongoDB.get_request_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));
@@ -352,7 +355,7 @@ class TripleStorageMongoDB: TripleStorage
 
 	public triple_list_element* getTriples(char* s, char* p, char* o)
 	{
-		triple_list_element* list_in_cache = get_request_in_cache(s, p, o);
+		triple_list_element* list_in_cache = get_query_result_in_cache(s, p, o);
 
 		if(list_in_cache !is null)
 		{
