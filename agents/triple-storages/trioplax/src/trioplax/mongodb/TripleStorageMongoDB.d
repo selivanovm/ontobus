@@ -65,7 +65,13 @@ class TripleStorageMongoDB: TripleStorage
 	this(char[] host, int port)
 	{
 		cache_query_result = new TripleStorageMemory(10_000, 3, 10_000);
-//		list_query
+		cache_query_result.set_new_index(idx_name.S, 10_000, 3, 100_000);
+		cache_query_result.set_new_index(idx_name.O, 10_000, 3, 100_000);
+		cache_query_result.set_new_index(idx_name.PO, 10_000, 3, 100_000);
+		cache_query_result.set_new_index(idx_name.SP, 10_000, 3, 100_000);
+		cache_query_result.set_new_index(idx_name.S1PPOO, 10_000, 3, 100_000);				
+		
+		list_query = new HashMap ("list_query", 10_000, 10_000, 3);
 
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);

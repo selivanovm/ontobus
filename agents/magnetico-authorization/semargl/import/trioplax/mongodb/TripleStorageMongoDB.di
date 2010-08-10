@@ -68,6 +68,14 @@ private
 {
     import tango.stdc.stdlib;
 }
+private
+{
+    import trioplax.memory.TripleStorageMemory;
+}
+private
+{
+    import trioplax.memory.HashMap;
+}
 class TripleStorageMongoDB : TripleStorage
 {
     private
@@ -144,6 +152,14 @@ class TripleStorageMongoDB : TripleStorage
 {
     mongo_connection conn;
 }
+    private
+{
+    TripleStorageMemory cache_query_result = null;
+}
+    private
+{
+    HashMap list_query = null;
+}
     this(char[] host, int port);
     public
 {
@@ -203,6 +219,16 @@ log.trace("define predicate [{}] as multiple",predicate);
     public
 {
     triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o);
+}
+    public
+{
+    triple_list_element* get_query_result_in_cache(char* s, char* p, char* o)
+{
+triple_list_element* list_iterator = cache_query_result.getTriples(s,p,o);
+if (list_iterator !is null)
+log.trace("TripleStorageMongoDB.get_request_in_cache (s=[{}], p=[{}], o=[{}])",fromStringz(s),fromStringz(p),fromStringz(o));
+return list_iterator;
+}
 }
     public
 {
