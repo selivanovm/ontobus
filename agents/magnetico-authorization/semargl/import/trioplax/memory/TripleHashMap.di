@@ -1,4 +1,4 @@
-// D import file generated from 'src/trioplax/memory/HashMap.d'
+// D import file generated from 'src/trioplax/memory/TripleHashMap.d'
 module trioplax.memory.HashMap;
 private
 {
