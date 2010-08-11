@@ -42,7 +42,7 @@ private import Log;
 
 private import trioplax.triple;
 private import trioplax.TripleStorage;
-private import trioplax.memory.HashMap;
+private import trioplax.memory.TripleHashMap;
 private import trioplax.memory.TripleStorageMemory;
 private import trioplax.mongodb.TripleStorageMongoDB;
 private import trioplax.memory.IndexException;

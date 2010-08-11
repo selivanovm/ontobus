@@ -28,7 +28,6 @@ private import tango.stdc.stdlib: calloc, free;
 private import trioplax.memory.TripleStorageMemory;
 private import trioplax.memory.HashMap;
 
-
 class TripleStorageMongoDB: TripleStorage
 {
 	private int max_length_pull = 1024 * 10;
@@ -69,9 +68,9 @@ class TripleStorageMongoDB: TripleStorage
 		cache_query_result.set_new_index(idx_name.O, 10_000, 3, 100_000);
 		cache_query_result.set_new_index(idx_name.PO, 10_000, 3, 100_000);
 		cache_query_result.set_new_index(idx_name.SP, 10_000, 3, 100_000);
-		cache_query_result.set_new_index(idx_name.S1PPOO, 10_000, 3, 100_000);				
-		
-		list_query = new HashMap ("list_query", 10_000, 10_000, 3);
+		cache_query_result.set_new_index(idx_name.S1PPOO, 10_000, 3, 100_000);
+
+		list_query = new HashMap("list_query", 10_000, 10_000, 3);
 
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
@@ -349,23 +348,20 @@ class TripleStorageMongoDB: TripleStorage
 		return list;
 	}
 
-	public triple_list_element* get_query_result_in_cache(char* s, char* p, char* o)
-	{
-		triple_list_element* list_iterator = cache_query_result.getTriples(s, p, o);
-
-		if(list_iterator !is null)
-			log.trace("TripleStorageMongoDB.get_request_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));
-
-		return list_iterator;
-	}
-
 	public triple_list_element* getTriples(char* s, char* p, char* o)
 	{
-		triple_list_element* list_in_cache = get_query_result_in_cache(s, p, o);
+		triple_list_element* list_in_cache = null;
+		int dummy;
 
-		if(list_in_cache !is null)
+		// проверим, был ли такой запрос закешированн
+		triple_list_element* is_query_in_cache = list_query.get(s, p, o, dummy);
+		if(is_query_in_cache !is null)
 		{
-			return list_in_cache;
+			log.trace("query_is_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));
+
+			list_in_cache = cache_query_result.getTriples(s, p, o);
+
+			//			return list_in_cache;
 		}
 
 		char ss[];
@@ -388,6 +384,13 @@ class TripleStorageMongoDB: TripleStorage
 		{
 			oo = fromStringz(o);
 			//			log.trace("GET TRIPLES #0, len(o)={}", strlen(o));
+		}
+
+		if(is_query_in_cache is null)
+		{
+			log.trace("query_is_not_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));			
+
+			list_query.put(ss, pp, oo, null);
 		}
 
 		//		log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
