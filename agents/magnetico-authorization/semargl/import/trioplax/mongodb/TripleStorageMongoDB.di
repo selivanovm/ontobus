@@ -172,6 +172,10 @@ class TripleStorageMongoDB : TripleStorage
 {
     HashMap list_query = null;
 }
+    private
+{
+    HashMap S1PPOO_IDX = null;
+}
     this(char[] host, int port);
     public
 {
@@ -220,7 +224,7 @@ log.trace("define predicate [{}] as multiple",predicate);
 }
     public
 {
-    void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
+    void setPredicatesToS1PPOO(char[] _P1, char[] _P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 {
 }
 }

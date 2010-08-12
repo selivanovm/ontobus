@@ -396,6 +396,7 @@ class HashMap
 			log.trace("put:end header={:X4}, keyz={:X4}", header, header.keys);
 		}
 
+		count_element++;
 	}
 
 	//в индексе S1PPOO бывают одинаковые факты
