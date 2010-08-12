@@ -76,8 +76,20 @@ private
 {
     import trioplax.memory.HashMap;
 }
+private
+{
+    import trioplax.memory.IndexException;
+}
 class TripleStorageMongoDB : TripleStorage
 {
+    private
+{
+    long total_count_queries = 0;
+}
+    private
+{
+    long count_queries_in_cache = 0;
+}
     private
 {
     int max_length_pull = 1024 * 10;

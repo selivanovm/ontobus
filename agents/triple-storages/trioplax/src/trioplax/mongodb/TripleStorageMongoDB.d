@@ -27,9 +27,13 @@ private import tango.stdc.stdlib: calloc, free;
 
 private import trioplax.memory.TripleStorageMemory;
 private import trioplax.memory.HashMap;
+private import trioplax.memory.IndexException;
 
 class TripleStorageMongoDB: TripleStorage
 {
+	private long total_count_queries = 0;
+	private long count_queries_in_cache = 0;
+	
 	private int max_length_pull = 1024 * 10;
 	private int average_list_size = 3;
 
@@ -70,7 +74,7 @@ class TripleStorageMongoDB: TripleStorage
 		cache_query_result.set_new_index(idx_name.SP, 10_000, 3, 100_000);
 		cache_query_result.set_new_index(idx_name.S1PPOO, 10_000, 3, 100_000);
 
-		list_query = new HashMap("list_query", 10_000, 10_000, 3);
+		list_query = new HashMap("list_query", 10_000, 1_000_000, 3);
 
 		triples = cast(Triple*) calloc(Triple.sizeof, max_length_pull * average_list_size);
 		strings = cast(char*) calloc(char.sizeof, max_length_pull * average_list_size * 3 * 256);
@@ -353,45 +357,76 @@ class TripleStorageMongoDB: TripleStorage
 		triple_list_element* list_in_cache = null;
 		int dummy;
 
-		// проверим, был ли такой запрос закешированн
-		triple_list_element* is_query_in_cache = list_query.get(s, p, o, dummy);
-		if(is_query_in_cache !is null)
-		{
-			log.trace("query_is_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));
-
-			list_in_cache = cache_query_result.getTriples(s, p, o);
-
-			//			return list_in_cache;
-		}
-
 		char ss[];
 		char pp[];
 		char oo[];
 
+		char ss1[];
+		char pp1[];
+		char oo1[];
+
 		if(s !is null)
 		{
 			ss = fromStringz(s);
+			ss1 = ss;
 			//			log.trace("GET TRIPLES #0 len(s)={}", strlen(s));
+		}
+		else
+		{
+			ss1 = "#";
 		}
 
 		if(p !is null)
 		{
 			pp = fromStringz(p);
+			pp1 = pp;
 			//			log.trace("GET TRIPLES #0 len(p)={}", strlen(p));
+		}
+		else
+		{
+			pp1 = "#";
 		}
 
 		if(o !is null)
 		{
 			oo = fromStringz(o);
+			oo1 = oo;
 			//			log.trace("GET TRIPLES #0, len(o)={}", strlen(o));
+		}
+		else
+		{
+			oo1 = "#";
+		}
+
+		total_count_queries++;
+		
+		// проверим, был ли такой запрос закешированн
+//		log.trace("is_query_in_cache? (s=[{}], p=[{}], o=[{}])", ss1, pp1, oo1);
+//		list_query.f_trace_put = true;
+		triple_list_element* is_query_in_cache = list_query.get(ss1.ptr, pp1.ptr, oo1.ptr, dummy);
+		if(is_query_in_cache !is null)
+		{			
+			log.trace("query_is_in_cache (s=[{}], p=[{}], o=[{}], )", ss1, pp1, oo1);
+
+			list_in_cache = cache_query_result.getTriples(s, p, o);
 		}
 
 		if(is_query_in_cache is null)
 		{
-			log.trace("query_is_not_in_cache (s=[{}], p=[{}], o=[{}])", fromStringz(s), fromStringz(p), fromStringz(o));			
+			log.trace("query_is_not_in_cache (s=[{}], p=[{}], o=[{}])", ss1, pp1, oo1);
 
-			list_query.put(ss, pp, oo, null);
+			try
+			{
+				list_query.put(ss1, pp1, oo1, null);
+				count_queries_in_cache++;
+			} catch(IndexException ex)
+			{
+
+				log.trace("query is not add in cache [list_query]: exception: {}", ex.message);
+			}
 		}
+		
+		log.trace("total_count_queries={}, count_queries_in_cache={}", total_count_queries, count_queries_in_cache);
 
 		//		log.trace("GET TRIPLES <{}> <{}> \"{}\"", ss, pp, oo);
 

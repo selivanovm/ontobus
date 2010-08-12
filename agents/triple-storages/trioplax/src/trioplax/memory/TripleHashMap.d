@@ -45,31 +45,30 @@ class HashMap
 	private int keyz_area__last = 0;
 
 	// область хранения Triple
-	private Triple[] triples_area = null;	
+	private Triple[] triples_area = null;
 	private int triples_area__last = 0;
-	
+
 	this(char[] _hashName, int _max_count_elements, uint _triple_area_length, uint _max_size_short_order)
 	{
 		hashName = _hashName;
 		max_size_short_order = _max_size_short_order;
 		max_count_elements = _max_count_elements;
-		log.trace(
-				"*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start",
-				hashName, _max_count_elements, max_size_short_order, _triple_area_length);
+		log.trace("*** create HashMap[name={}, max_count_elements={}, max_size_short_order={}, triple_area_length={} ... start", hashName,
+				_max_count_elements, max_size_short_order, _triple_area_length);
 
 		// область маппинга ключей, 
 		// содержит короткую очередь
 		max_size_reducer = max_count_elements * max_size_short_order + max_size_short_order;
 		reducer = new triple_list_header*[max_size_reducer];
 		log.trace("*** HashMap[name={}, reducer.length={}", hashName, reducer.length);
-		
-		 keyz_area = new ubyte[_triple_area_length];
-		 keyz_area__last = 0;
-		 log.trace("*** HashMap[name={}, keyz_area.length={}", hashName, keyz_area.length);
-		 
-		 triples_area = new Triple[_max_count_elements];
-		 triples_area__last = 0;
-		 
+
+		keyz_area = new ubyte[_triple_area_length];
+		keyz_area__last = 0;
+		log.trace("*** HashMap[name={}, keyz_area.length={}", hashName, keyz_area.length);
+
+		triples_area = new Triple[_max_count_elements];
+		triples_area__last = 0;
+
 		log.trace("*** create object HashMap... ok");
 	}
 
@@ -91,6 +90,9 @@ class HashMap
 		if(key1.length == 0 && key2.length == 0 && key3.length == 0)
 			return null;
 
+		int STORE_keyz_area__last = keyz_area__last;
+		int STORE_triples_area__last = triples_area__last;		
+		
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
@@ -98,15 +100,14 @@ class HashMap
 		{
 			log.trace(
 					"Exception: {}, hash={}, short_order_conflict_keys={}, short_order_conflict_keys + max_size_short_order={}, max_size_reducer={}",
-					hashName, hash, short_order_conflict_keys, short_order_conflict_keys + max_size_short_order,
-					max_size_reducer);
-			throw new Exception(hashName ~ "put:short_order_conflict_keys + max_size_short_order >= max_size_reducer");
+					hashName, hash, short_order_conflict_keys, short_order_conflict_keys + max_size_short_order, max_size_reducer);
+			throw new Exception(hashName ~ " put:short_order_conflict_keys + max_size_short_order >= max_size_reducer");
 		}
 
 		if(f_trace_put)
 		{
 			log.trace("\r\n\r\nput{} #10 key1={}, key2={}, key3={}", hashName, key1, key2, key3);
-			log.trace("put #20 triple_ptr={:X4}, hash = {:X4}", triple_ptr, hash);
+			log.trace("put #10 triple_ptr={:X4}, hash = {:X4}", triple_ptr, hash);
 		}
 
 		triple_list_header* header;
@@ -118,8 +119,7 @@ class HashMap
 
 		if(f_trace_put)
 		{
-			log.trace("put:{}:reducer[{:X4}]={:X4}", hashName, short_order_conflict_keys,
-					reducer[short_order_conflict_keys]);
+			log.trace("put:{}:reducer[{:X4}]={:X4}", hashName, short_order_conflict_keys, reducer[short_order_conflict_keys]);
 		}
 
 		int i = 0;
@@ -160,8 +160,7 @@ class HashMap
 
 				if(f_trace_put)
 				{
-					log.trace("put #10 keyz = <{}> <{}> <{}>", fromStringz(keyz.s), fromStringz(keyz.p), fromStringz(
-							keyz.o));
+					log.trace("put:{} 20 keyz = <{}> <{}> <{}>", hashName, fromStringz(keyz.s), fromStringz(keyz.p), fromStringz(keyz.o));
 				}
 
 				if(key1 !is null)
@@ -227,9 +226,9 @@ class HashMap
 
 		//		log.trace("put #50 header={:X4}, isKeyExists={}", header, isKeyExists);
 		new_element = cast(triple_list_element*) calloc(1, triple_list_element.sizeof);
-		if (new_element is null)
-			throw new Exception ("Can not allocate memory");
-		
+		if(new_element is null)
+			throw new Exception("put: " ~ hashName ~ " Can not allocate memory");
+
 		if(!isKeyExists)
 		{
 			if(f_trace_put)
@@ -240,9 +239,9 @@ class HashMap
 			//			log.trace("put #21");
 
 			header = cast(triple_list_header*) calloc(1, triple_list_header.sizeof);
-			if (header is null)
-				throw new Exception ("Can not allocate memory");
-			
+			if(header is null)
+				throw new Exception("put: " ~ hashName ~ " Can not allocate memory");
+
 			//			header = cast(triple_list_header*) (key_2_list_triples_area.ptr + key_2_list_triples_area__last);
 			//			key_2_list_triples_area__last += triple_list_header.sizeof;
 
@@ -250,10 +249,11 @@ class HashMap
 			if(first_free_header_place != -1)
 			{
 				reducer[short_order_conflict_keys + first_free_header_place] = header;
-			} else
+			}
+			else
 			{
-				throw new IndexException("put:" ~ hashName ~ " short_order_conflict_keys > max_size_short_order",
-						hashName, errorCode.hash2short_is_out_of_range, 0);
+				throw new IndexException("put: " ~ hashName ~ " short_order_conflict_keys > max_size_short_order", hashName,
+						errorCode.hash2short_is_out_of_range, 0);
 				//				throw new Exception("short_order_conflict_keys + i > reducer.length");
 			}
 
@@ -264,24 +264,24 @@ class HashMap
 
 			//			keyz = cast(Triple*) (key_2_list_triples_area.ptr + key_2_list_triples_area__last);
 			keyz = &triples_area[triples_area__last];
-			triples_area__last ++;
-			if (triples_area__last > triples_area.length)
+			triples_area__last++;
+			if(triples_area__last > triples_area.length)
 			{
-				log.trace ("{}, triple area: increase the size of the array, new size = {}", hashName, triples_area.length + 10000);
-				triples_area.length = triples_area.length + 10000;				
+				log.trace("{}, triple area: increase the size of the array, new size = {}", hashName, triples_area.length + 10000);
+				triples_area.length = triples_area.length + 10000;
 			}
-//				throw new Exception (hashName ~ ": Can not allocate memory for Triple");
-			
-//			keyz = cast(Triple*) calloc(1, Triple.sizeof);
-//			if (keyz is null)
-//				throw new Exception ("Can not allocate memory");
+			//				throw new Exception (hashName ~ ": Can not allocate memory for Triple");
+
+			//			keyz = cast(Triple*) calloc(1, Triple.sizeof);
+			//			if (keyz is null)
+			//				throw new Exception ("Can not allocate memory");
 
 			//			log.trace("put:{} check key1_length={}, key2_length={}, key3_length={}", hashName, key1.length, key2.length, key3.length);
 
 			if(f_trace_put)
 			{
-				log.trace("put:store keys length, keyz={:X4}, key1_length={}, key2_length={}, key3_length={}", keyz,
-						key1.length, key2.length, key3.length);
+				log.trace("put:store keys length, keyz={:X4}, key1_length={}, key2_length={}, key3_length={}", keyz, key1.length,
+						key2.length, key3.length);
 			}
 
 			keyz.s_length = key1.length;
@@ -291,19 +291,30 @@ class HashMap
 			keyz.p = null;
 			keyz.o = null;
 
-
 			char* buff = null;
 			if(key1.length + key2.length + key3.length > 0)
 			{
-//				buff = cast(char*) calloc(key1.length + key2.length + key3.length + 3, byte.sizeof);
-//				if (buff is null)
-//					throw new Exception ("Can not allocate memory");
-				
+				//				buff = cast(char*) calloc(key1.length + key2.length + key3.length + 3, byte.sizeof);
+				//				if (buff is null)
+				//					throw new Exception ("Can not allocate memory");
+
 				buff = cast(char*) (keyz_area.ptr + keyz_area__last);
+
+				if(keyz_area__last + key1.length + key2.length + key3.length + 3 > keyz_area.length)
+				{
+					// перед выбросом Exception, если заполнялась новая ячейка в short order, то очистим ее
+					// восстановим глобальные переменные  
+					
+					keyz_area__last = STORE_keyz_area__last;
+					triples_area__last = STORE_triples_area__last;		
+
+					reducer[short_order_conflict_keys + first_free_header_place] = null;
+
+					throw new Exception("put: " ~ hashName ~ " Can not allocate memory for keyz_area");
+				}
+
 				keyz_area__last += key1.length + key2.length + key3.length + 3;
-				if (keyz_area__last > keyz_area.length)
-					throw new Exception ("Can not allocate memory for keyz_area");									
-				
+
 				if(f_trace_put)
 				{
 					log.trace("put:store keys values, alloc buff={:X4}", buff);
@@ -320,7 +331,7 @@ class HashMap
 				keyz.s = buff;
 				strncpy(keyz.s, key1.ptr, key1.length + 1);
 			}
-			
+
 			if(f_trace_put)
 			{
 				log.trace("put:store keys values, store key2");
@@ -331,7 +342,7 @@ class HashMap
 				keyz.p = keyz.s + key1.length + 1;
 				strncpy(keyz.p, key2.ptr, key2.length + 1);
 			}
-			
+
 			if(f_trace_put)
 			{
 				log.trace("put:store keys values, store key3");
@@ -349,7 +360,8 @@ class HashMap
 			}
 			header.keys = keyz;
 			//			log.trace("put #55 header.keys={:X4}", header.keys);
-		} else
+		}
+		else
 		{
 			// ключ уже существует, допишем триплет к last_element в найденном header
 			//						log.trace("put #61 header.last_element={:X4}", header.last_element);
@@ -373,8 +385,8 @@ class HashMap
 		{
 			if(check_triple_in_list(triple_ptr, key1.ptr, key2.ptr, key3.ptr) == false)
 			{
-				log.trace("Exception: {} check add triple {} -> [{}][{}][{}] in index, triple not added in index",
-						triple_to_string(triple_ptr), hashName, key1, key2, key3);
+				log.trace("Exception: {} check add triple {} -> [{}][{}][{}] in index, triple not added in index", triple_to_string(
+						triple_ptr), hashName, key1, key2, key3);
 				throw new Exception(hashName ~ " triple <" ~ key1 ~ "><" ~ key2 ~ ">\"" ~ key3 ~ "\" not added in index");
 			}
 		}
@@ -439,9 +451,8 @@ class HashMap
 		{
 			log.trace(
 					"Exception: {}, hash={}, short_order_conflict_keys={}, short_order_conflict_keys + max_size_short_order={}, max_size_reducer={}",
-					hashName, hash, short_order_conflict_keys, short_order_conflict_keys + max_size_short_order,
-					max_size_reducer);
-			throw new Exception(hashName ~ "get:short_order_conflict_keys + max_size_short_order >= max_size_reducer");
+					hashName, hash, short_order_conflict_keys, short_order_conflict_keys + max_size_short_order, max_size_reducer);
+			throw new Exception(hashName ~ " get:short_order_conflict_keys + max_size_short_order >= max_size_reducer");
 		}
 
 		triple_list_header* header;
@@ -449,8 +460,8 @@ class HashMap
 		if(f_trace_get)
 		{
 			log.trace("");
-			log.trace("get:{}, hash[{:X}] map key1[{}], key2[{}], key3[{}]", hashName, hash, fromStringz(key1),
-					fromStringz(key2), fromStringz(key3));
+			log.trace("get:{}, hash[{:X}] map key1[{}], key2[{}], key3[{}]", hashName, hash, fromStringz(key1), fromStringz(key2),
+					fromStringz(key3));
 		}
 
 		// @@@@ здесь бля баг
@@ -483,8 +494,8 @@ class HashMap
 				}
 
 				if(f_trace_get)
-					log.trace("get:{} header={:X4} header.keys={:X4}, i={}, short_order_conflict_keys + i={:X4}",
-							hashName, header, header.keys, i, short_order_conflict_keys + i);
+					log.trace("get:{} header={:X4} header.keys={:X4}, i={}, short_order_conflict_keys + i={:X4}", hashName, header,
+							header.keys, i, short_order_conflict_keys + i);
 
 				keyz = header.keys;
 
@@ -498,8 +509,8 @@ class HashMap
 
 				if(f_trace_get)
 				{
-					log.trace("get:{} 7 key1_length={}, key2_length={}, key3_length={}", hashName, keyz.s_length,
-							keyz.p_length, keyz.o_length);
+					log.trace("get:{} 7 key1_length={}, key2_length={}, key3_length={}", hashName, keyz.s_length, keyz.p_length,
+							keyz.o_length);
 				}
 
 				//				keyz += short.sizeof * 3;
@@ -508,8 +519,8 @@ class HashMap
 				{
 					if(f_trace_get)
 					{
-						log.trace("get:[{:X}] 7.1 сравниваем key1={} и keyz.s[{:X4}]={}", cast(void*) this,
-								fromStringz(key1), keyz.s, fromStringz(keyz.s));
+						log.trace("get:[{:X}] 7.1 сравниваем key1={} и keyz.s[{:X4}]={}", cast(void*) this, fromStringz(key1), keyz.s,
+								fromStringz(keyz.s));
 					}
 
 					if(strncmp(keyz.s, key1, keyz.s_length + 1) == 0)
@@ -534,8 +545,7 @@ class HashMap
 
 					if(f_trace_get)
 					{
-						log.trace("get:[{:X}] 7.2 сравниваем key2={} и keyz.p={}", cast(void*) this, fromStringz(key2),
-								fromStringz(keyz.p));
+						log.trace("get:[{:X}] 7.2 сравниваем key2={} и keyz.p={}", cast(void*) this, fromStringz(key2), fromStringz(keyz.p));
 					}
 
 					if(strncmp(keyz.p, key2, keyz.p_length + 1) == 0)
@@ -562,8 +572,7 @@ class HashMap
 
 					if(f_trace_get)
 					{
-						log.trace("get:[{:X}] 7.3 сравниваем key3={} и keyz={}", cast(void*) this, fromStringz(key3),
-								fromStringz(keyz.o));
+						log.trace("get:[{:X}] 7.3 сравниваем key3={} и keyz={}", cast(void*) this, fromStringz(key3), fromStringz(keyz.o));
 					}
 
 					if(strncmp(keyz.o, key3, keyz.o_length + 1) == 0)
@@ -640,7 +649,7 @@ class HashMap
 		}
 
 		if(list != reducer[idx_header].first_element)
-			throw new Exception("Exception: неведомахуйня");
+			throw new Exception("put:" ~ hashName ~ " Exception: неведомахуйня");
 
 		if(INFO_remove_triple_from_list)
 		{
@@ -679,8 +688,7 @@ class HashMap
 						if(i == 0)
 						{
 							if(INFO_remove_triple_from_list)
-								log.trace("#{} remove triple from list: это первый и последний элемент в списке",
-										hashName);
+								log.trace("#{} remove triple from list: это первый и последний элемент в списке", hashName);
 							// это первый и последний элемент в списке, и так как длинна будующего списока равна нулю, 
 							// то следует удалить запись об этом списке в короткой очереди reducer'a
 							//							log.trace("#remove_triple_from_list: это первый и последний элемент в списке");
@@ -725,7 +733,8 @@ class HashMap
 							reducer[idx_header] = null;
 
 							break;
-						} else
+						}
+						else
 						{
 							if(INFO_remove_triple_from_list)
 								log.trace(
@@ -760,22 +769,22 @@ class HashMap
 							}
 							//							break;
 						}
-					} else
+					}
+					else
 					{
 						if(INFO_remove_triple_from_list)
-							log.trace("#{} remove triple from list: после удаляемого элемента есть еще элементы",
-									hashName);
+							log.trace("#{} remove triple from list: после удаляемого элемента есть еще элементы", hashName);
 
 						//log.trace("#rtf5 {:X4} {:X4} {:X4}", list, list + 1, prev_element);
 						if(prev_element !is null)
 						{
 							if(INFO_remove_triple_from_list)
-								log.trace("#{} remove triple from list: перед удаляемым элементом есть элементы",
-										hashName);
+								log.trace("#{} remove triple from list: перед удаляемым элементом есть элементы", hashName);
 
 							prev_element.next_triple_list_element = list.next_triple_list_element;
 							break;
-						} else
+						}
+						else
 						{
 							if(INFO_remove_triple_from_list)
 								log.trace("#{} remove triple from list: удаляемый элемент первый", hashName);
@@ -854,7 +863,7 @@ class HashMap
 			{
 				log.trace("Exception: list corrupted, {} count_triples_in_list, before {} != after {} + 1", hashName,
 						count_triples_in_list, tmp_count_triples_in_list);
-				throw new Exception("list corrupted");
+				throw new Exception("put: " ~ hashName ~ " list corrupted");
 			}
 		}
 
@@ -866,8 +875,7 @@ class HashMap
 		if(triple is null)
 			return;
 
-		log.trace("{} {} triple: <{}><{}>\"{}\"", hashName, header, fromStringz(triple.s), fromStringz(triple.p),
-				fromStringz(triple.o));
+		log.trace("{} {} triple: <{}><{}>\"{}\"", hashName, header, fromStringz(triple.s), fromStringz(triple.p), fromStringz(triple.o));
 	}
 
 	public char[] triple_to_string(Triple* triple)
