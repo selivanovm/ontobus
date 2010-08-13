@@ -137,7 +137,7 @@ class TripleStorageMongoDB: TripleStorage
 
 		if(cache_query_result !is null)
 			cache_query_result.define_predicate_as_multiple(predicate);
-		
+
 		log.trace("define predicate [{}] as multiple", predicate);
 	}
 
@@ -255,7 +255,7 @@ class TripleStorageMongoDB: TripleStorage
 		}
 
 		bool f_is_query_stored = false;
-//		bool fS1 = false;
+		//		bool fS1 = false;
 
 		if(is_query_in_cache is null)
 		{
@@ -958,6 +958,9 @@ class TripleStorageMongoDB: TripleStorage
 			bson_destroy(&op);
 		}
 
+		if(cache_query_result !is null)
+			cache_query_result.removeTriple(s, p, o);
+		
 		if(log_query == true)
 			logging_query("REMOVE", s.ptr, p.ptr, o.ptr, null);
 
@@ -999,6 +1002,9 @@ class TripleStorageMongoDB: TripleStorage
 
 		bson_destroy(&cond);
 		bson_destroy(&op);
+
+		if(cache_query_result !is null)
+			cache_query_result.addTriple(s, p, o);
 
 		log.trace("TripleStorage:add Triple..ok");
 		return 0;

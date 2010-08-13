@@ -200,6 +200,8 @@ last_used_element_in_strings = 0;
     void define_predicate_as_multiple(char[] predicate)
 {
 predicate_as_multiple[predicate] = true;
+if (cache_query_result !is null)
+cache_query_result.define_predicate_as_multiple(predicate);
 log.trace("define predicate [{}] as multiple",predicate);
 }
 }
