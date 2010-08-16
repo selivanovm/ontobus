@@ -1,48 +1,48 @@
 // D import file generated from 'src/trioplax/Log.d'
 module trioplax.Log;
-private
+private 
 {
     import tango.util.log.Log;
 }
-private
+private 
 {
     import tango.time.Clock;
 }
-private
+private 
 {
     import tango.time.WallClock;
 }
-private
+private 
 {
     import tango.util.log.AppendFile;
 }
-private
+private 
 {
     import tango.util.log.AppendConsole;
 }
-private
+private 
 {
     import tango.text.convert.Layout;
 }
-package
+package 
 {
     Logger log;
     Layout!(char) _layout;
 }
-private
+private 
 {
     AppendFile _logFile;
     static this();
         class VerySimpleLayout : Appender.Layout
 {
-    private
+    private 
 {
     bool localTime;
     char[] convert(char[] tmp, long i)
 {
 return Integer.formatter(tmp,i,'u','?',8);
 }
-    public
+    public 
 {
     this(bool localTime = true)
 {

@@ -1,9 +1,9 @@
 // D import file generated from 'src/amqp_base.d'
-public
+public 
 {
     import tango.stdc.inttypes;
 }
-public
+public 
 {
     import tango.stdc.errno;
 }

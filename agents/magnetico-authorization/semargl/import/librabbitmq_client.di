@@ -1,31 +1,78 @@
 // D import file generated from 'src/librabbitmq_client.d'
-private
+private 
 {
     import tango.io.Stdout;
 }
-private
+private 
 {
     import tango.stdc.string;
 }
-private
+private 
 {
-    import tango.stdc.posix.stdio;
+    import tango.net.device.Socket;
 }
-import librabbitmq_headers;
-import mom_client;
-private
+private 
+{
+    import tango.stdc.stringz;
+}
+private 
+{
+    import tango.stdc.stdio;
+}
+private 
+{
+    import mom_client;
+}
+private 
+{
+    import amqp_base;
+}
+private 
+{
+    import amqp;
+}
+private 
+{
+    import amqp_framing;
+}
+private 
+{
+    import amqp_private;
+}
+private 
+{
+    import amqp_connection;
+}
+private 
+{
+    import amqp_socket;
+}
+private 
+{
+    import amqp_api;
+}
+private 
+{
+    import amqp_mem;
+}
+private 
+{
+    import Log;
+}
+private 
 {
     import tango.core.Thread;
 }
 class librabbitmq_client : mom_client
 {
-    amqp_connection_state_t_ conn;
+    amqp_connection_state_t* conn;
     char[] vhost;
     char[] login;
     char[] passw;
     char* bindingkey = null;
     char* exchange = cast(char*)"\x00";
     int waiting_for_login = 5;
+    Socket socket;
     char[] hostname;
     int port;
     void function(byte* txt, ulong size, mom_client from_client) message_acceptor;
@@ -42,15 +89,10 @@ vhost = _vhost;
 {
 message_acceptor = _message_acceptor;
 }
-    int send(char* routingkey, char* messagebody)
+    int send(char* routingkey, char* messagebody);
+    char* get_message()
 {
-amqp_basic_properties_t props;
-props._flags = amqp_def.AMQP_BASIC_CONTENT_TYPE_FLAG | amqp_def.AMQP_BASIC_DELIVERY_MODE_FLAG;
-props.content_type = amqp_cstring_bytes("text/plain");
-props.delivery_mode = 2;
-int result_publish = amqp_basic_publish(&conn,1,amqp_cstring_bytes(exchange),amqp_cstring_bytes(routingkey),0,0,&props,amqp_cstring_bytes(messagebody));
-return result_publish;
+return null;
 }
-    char* get_message();
     void listener();
 }

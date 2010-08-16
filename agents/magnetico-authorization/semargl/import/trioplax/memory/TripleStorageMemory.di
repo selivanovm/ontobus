@@ -1,58 +1,58 @@
 // D import file generated from 'src/trioplax/memory/TripleStorageMemory.d'
 module trioplax.memory.TripleStorageMemory;
-private
+private 
 {
     import tango.io.Stdout;
 }
-private
+private 
 {
     import tango.stdc.string;
 }
-private
+private 
 {
     import tango.stdc.stringz;
 }
-private
+private 
 {
     import Integer = tango.text.convert.Integer;
 }
-private
+private 
 {
-    import tango.io.FileConduit;
+    import tango.io.device.File;
 }
-private
+private 
 {
     import tango.time.WallClock;
 }
-private
+private 
 {
     import tango.time.Clock;
 }
-private
+private 
 {
     import tango.text.locale.Locale;
 }
-private
+private 
 {
     import trioplax.Log;
 }
-private
+private 
 {
     import trioplax.triple;
 }
-private
+private 
 {
     import trioplax.TripleStorage;
 }
-private
+private 
 {
     import trioplax.memory.HashMap;
 }
-private
+private 
 {
     import trioplax.memory.IndexException;
 }
-private
+private 
 {
     Locale layout;
 }
@@ -69,95 +69,95 @@ S1PPOO = 1 << 7,
 }
 class TripleStorageMemory : TripleStorage
 {
-    private
+    private 
 {
     char[] buff = null;
 }
-    private
+    private 
 {
     bool log_query = false;
 }
-    private
+    private 
 {
     bool log_stat_info = true;
 }
-    public
+    public 
 {
     bool INFO_remove_triple_from_list = false;
 }
-    private
+    private 
 {
     bool f_init_debug = false;
 }
-    private
+    private 
 {
     HashMap idx_s = null;
 }
-    private
+    private 
 {
     HashMap idx_p = null;
 }
-    private
+    private 
 {
     HashMap idx_o = null;
 }
-    private
+    private 
 {
     HashMap idx_sp = null;
 }
-    private
+    private 
 {
     HashMap idx_po = null;
 }
-    private
+    private 
 {
     HashMap idx_so = null;
 }
-    private
+    private 
 {
     HashMap idx_spo = null;
 }
-    private
+    private 
 {
     HashMap idx_s1ppoo = null;
 }
-    private
+    private 
 {
     char[][16] look_predicate_p1_on_idx_s1ppoo;
 }
-    private
+    private 
 {
     char[][16] look_predicate_p2_on_idx_s1ppoo;
 }
-    private
+    private 
 {
     char[][16] look_predicate_pp_on_idx_s1ppoo;
 }
-    private
+    private 
 {
     char[][16] store_predicate_in_list_on_idx_s1ppoo;
 }
-    private
+    private 
 {
     uint count_look_predicate_on_idx_s1ppoo = 0;
 }
-    private
+    private 
 {
     char* idx;
 }
-    private
+    private 
 {
     char[] cat_buff1;
 }
-    private
+    private 
 {
     char[] cat_buff2;
 }
-    private
+    private 
 {
     int dummy;
 }
-    private
+    private 
 {
     bool[char[]] predicate_as_multiple;
 }
@@ -173,14 +173,14 @@ idx_spo = new HashMap("SPO",max_count_element,inital_triple_area_length,max_leng
 if (f_init_debug)
 log.trace("ok");
 }
-    public
+    public 
 {
     void set_log_query_mode(bool on_off)
 {
 log_query = on_off;
 }
 }
-    public
+    public 
 {
     void define_predicate_as_multiple(char[] predicate)
 {
@@ -188,30 +188,30 @@ predicate_as_multiple[predicate] = true;
 log.trace("define predicate [{}] as multiple",predicate);
 }
 }
-    public
+    public 
 {
     void list_no_longer_required(triple_list_element* first_element_of_list)
 {
 }
 }
-    public
+    public 
 {
     void release_all_lists()
 {
 }
 }
-    public
+    public 
 {
     void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length);
 }
-    public
+    public 
 {
     void set_stat_info_logging(bool flag)
 {
 log_stat_info = flag;
 }
 }
-    public
+    public 
 {
     void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 {
@@ -222,7 +222,7 @@ store_predicate_in_list_on_idx_s1ppoo[count_look_predicate_on_idx_s1ppoo] = _sto
 count_look_predicate_on_idx_s1ppoo++;
 }
 }
-    public
+    public 
 {
     triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o)
 {
@@ -232,11 +232,11 @@ logging_query("GET USE INDEX",s,p,o,list);
 return list;
 }
 }
-    public
+    public 
 {
     triple_list_element* getTriples(char* s, char* p, char* o);
 }
-    private
+    private 
 {
     void logging_query(char[] op, char* s, char* p, char* o, triple_list_element* list)
 {
@@ -262,16 +262,16 @@ print_list_triple_to_file(log_file,list);
 log_file.close();
 }
 }
-    public
+    public 
 {
     bool removeTriple(char[] s, char[] p, char[] o);
 }
     bool f_trace_addTriple = false;
-    public
+    public 
 {
     int addTriple(char[] s, char[] p, char[] o);
 }
-    public
+    public 
 {
     void print_stat()
 {
@@ -293,23 +293,23 @@ if (idx_s1ppoo !is null)
 log.trace("index {}, counts={} ",idx_s1ppoo.getName(),idx_s1ppoo.get_count_elements());
 }
 }
-    public
+    public 
 {
     void print_list_triple_to_file(File log_file, triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     void print_list_triple(triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     int get_count_form_list_triple(triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     void print_triple(Triple* triple);
 }
-    public
+    public 
 {
     char[] triple_to_string(Triple* triple);
 }

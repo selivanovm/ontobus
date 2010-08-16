@@ -1,6 +1,6 @@
 // D import file generated from 'src/amqp_socket.d'
 import tango.stdc.stdarg;
-import tango.net.Socket;
+import tango.net.device.Socket;
 import tango.net.InternetAddress;
 import tango.stdc.string;
 import tango.stdc.stdlib;
@@ -14,7 +14,7 @@ import amqp_connection;
 const AF_INET = 2;
 const PF_INET = AF_INET;
 alias ushort sa_family_t;
-private
+private 
 {
     import Log;
 }
@@ -24,7 +24,7 @@ static
 }
 Socket amqp_open_socket(char[] hostname, int portnumber)
 {
-Socket socket = new Socket(AddressFamily.INET,SocketType.STREAM,ProtocolType.IP,true);
+Socket socket = new Socket(AddressFamily.INET,SocketType.STREAM,ProtocolType.IP);
 socket.connect(new InternetAddress(hostname,portnumber));
 buf_array = new void[](INITIAL_INBOUND_SOCK_BUFFER_SIZE);
 return socket;
@@ -90,6 +90,6 @@ int send_buffer_to_socket(Socket socket, void* buffer, uint length)
 {
 void[] buf_array = new void[](length);
 memcpy(buf_array.ptr,buffer,length);
-return socket.send(buf_array,SocketFlags.NONE);
+return socket.write(buf_array);
 }
 int receive_buffer_from_socket(Socket socket, void* buffer, uint length);

@@ -1,76 +1,76 @@
 // D import file generated from 'src/trioplax/TripleStorage.d'
 module trioplax.TripleStorage;
-private
+private 
 {
     import trioplax.triple;
 }
-private
+private 
 {
-    import tango.io.FileConduit;
+    import tango.io.device.File;
 }
 interface TripleStorage
 {
-    public
+    public 
 {
     void release_all_lists();
 }
-    public
+    public 
 {
     void define_predicate_as_multiple(char[] predicate);
 }
-    public
+    public 
 {
     void list_no_longer_required(triple_list_element* first_element_of_list);
 }
-    public
+    public 
 {
     void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length);
 }
-    public
+    public 
 {
     void set_stat_info_logging(bool flag);
 }
-    public
+    public 
 {
     void setPredicatesToS1PPOO(char[] P1, char[] P2, char[] _store_predicate_in_list_on_idx_s1ppoo);
 }
-    public
+    public 
 {
     triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o);
 }
-    public
+    public 
 {
     triple_list_element* getTriples(char* s, char* p, char* o);
 }
-    private
+    private 
 {
     void logging_query(char[] op, char* s, char* p, char* o, triple_list_element* list);
 }
-    public
+    public 
 {
     bool removeTriple(char[] s, char[] p, char[] o);
 }
-    public
+    public 
 {
     int addTriple(char[] s, char[] p, char[] o);
 }
-    public
+    public 
 {
     void print_stat();
 }
-    public
+    public 
 {
     void print_list_triple_to_file(File log_file, triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     void print_list_triple(triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     int get_count_form_list_triple(triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     void set_log_query_mode(bool on_off);
 }

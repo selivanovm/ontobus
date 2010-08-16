@@ -1,5 +1,5 @@
 // D import file generated from 'src/amqp_private.d'
-import tango.net.Socket;
+import tango.net.device.Socket;
 import tango.stdc.string;
 import tango.stdc.stdio;
 import tango.stdc.stdlib;
@@ -46,7 +46,7 @@ assert(o + l <= b.len);
 return v;
 }
 }
-public
+public 
 {
     static 
 {
@@ -56,7 +56,7 @@ return &(cast(uint8_t*)b.bytes)[o];
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -66,7 +66,7 @@ return CL!(uint8_t).CHECK_LIMIT(b,o,1,*cast(uint8_t*)BUF_AT(b,o));
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -74,11 +74,11 @@ public
 {
 uint16_t v;
 memcpy(&v,BUF_AT(b,o),2);
-return CL!(uint16_t).CHECK_LIMIT(b,o,2,ntohs(v));
+return CL!(uint16_t).CHECK_LIMIT(b,o,2,_htons(v));
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -86,11 +86,11 @@ public
 {
 uint32_t v;
 memcpy(&v,BUF_AT(b,o),4);
-return CL!(uint32_t).CHECK_LIMIT(b,o,4,ntohl(v));
+return CL!(uint32_t).CHECK_LIMIT(b,o,4,_htonl(v));
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -102,7 +102,7 @@ return hi << 32 | lo;
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -112,7 +112,7 @@ return CL!(uint8_t*).CHECK_LIMIT(b,o,l,BUF_AT(b,o));
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -123,31 +123,31 @@ return CL!(uint8_t).CHECK_LIMIT(b,o,1,*cast(uint8_t*)BUF_AT(b,o));
 }
 }
 }
-public
+public 
 {
     static 
 {
     uint16_t E_16(amqp_bytes_t b, int o, uint16_t v)
 {
-uint16_t vv = htons(v);
+uint16_t vv = _htons(v);
 memcpy(BUF_AT(b,o),&vv,2);
 return CL!(uint16_t).CHECK_LIMIT(b,o,2,vv);
 }
 }
 }
-public
+public 
 {
     static 
 {
     uint32_t E_32(amqp_bytes_t b, int o, uint32_t v)
 {
-uint32_t vv = htonl(v);
+uint32_t vv = _htonl(v);
 memcpy(BUF_AT(b,o),&vv,4);
 return CL!(uint32_t).CHECK_LIMIT(b,o,4,vv);
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -158,7 +158,7 @@ return E_32(b,o + 4,cast(uint32_t)(cast(uint64_t)v & -1u));
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -168,27 +168,65 @@ CL!(void*).CHECK_LIMIT(b,o,l,memcpy(BUF_AT(b,o),v,l));
 }
 }
 }
-public
+public 
 {
     static 
 {
     void amqp_assert(bool condition,...);
 }
 }
-public
+public 
 {
     static 
 {
     int AMQP_CHECK_EOF_RESULT(int expr);
 }
 }
-public
+public 
 {
     static 
 {
     void amqp_dump(void* buffer, size_t len)
 {
 return cast(void)0;
+}
+}
+}
+version (BigEndian)
+{
+    private 
+{
+    ushort _htons(ushort x)
+{
+return x;
+}
+}
+    private 
+{
+    uint _htonl(uint x)
+{
+return x;
+}
+}
+}
+else
+{
+    private 
+{
+    import tango.core.BitManip;
+}
+    private 
+{
+    ushort _htons(ushort x)
+{
+return cast(ushort)(x >> 8 | x << 8);
+}
+}
+    private 
+{
+    uint _htonl(uint x)
+{
+return bswap(x);
 }
 }
 }

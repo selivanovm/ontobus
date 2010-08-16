@@ -1,178 +1,178 @@
 // D import file generated from 'src/trioplax/mongodb/TripleStorageMongoDB.d'
 module trioplax.mongodb.TripleStorageMongoDB;
-private
+private 
 {
     import tango.io.Stdout;
 }
-private
+private 
 {
     import tango.stdc.string;
 }
-private
+private 
 {
     import tango.stdc.stringz;
 }
-private
+private 
 {
     import tango.stdc.stdlib;
 }
-private
+private 
 {
     import Integer = tango.text.convert.Integer;
 }
-private
+private 
 {
-    import tango.io.FileConduit;
+    import tango.io.device.File;
 }
-private
+private 
 {
     import tango.time.WallClock;
 }
-private
+private 
 {
     import tango.time.Clock;
 }
-private
+private 
 {
     import tango.text.locale.Locale;
 }
-private
+private 
 {
     Locale layout;
 }
-private
+private 
 {
     import trioplax.triple;
 }
-private
+private 
 {
     import trioplax.TripleStorage;
 }
-private
+private 
 {
     import trioplax.Log;
 }
-private
+private 
 {
     import bson;
 }
-private
+private 
 {
     import md5;
 }
-private
+private 
 {
     import mongo;
 }
-private
+private 
 {
     import tango.stdc.stdlib;
 }
-private
+private 
 {
     import trioplax.memory.TripleStorageMemory;
 }
-private
+private 
 {
     import trioplax.memory.HashMap;
 }
-private
+private 
 {
     import trioplax.memory.IndexException;
 }
 class TripleStorageMongoDB : TripleStorage
 {
-    private
+    private 
 {
     long total_count_queries = 0;
 }
-    private
+    private 
 {
     long count_queries_in_cache = 0;
 }
-    private
+    private 
 {
     int max_length_pull = 1024 * 10;
 }
-    private
+    private 
 {
     int average_list_size = 3;
 }
-    private
+    private 
 {
     char* strings = null;
 }
-    private
+    private 
 {
     Triple* triples = null;
 }
-    private
+    private 
 {
     triple_list_element* elements_in_list = null;
 }
-    private
+    private 
 {
     triple_list_element*[] used_list = null;
 }
-    private
+    private 
 {
     int last_used_element_in_pull = 0;
 }
-    private
+    private 
 {
     int last_used_element_in_strings = 0;
 }
-    private
+    private 
 {
     char[] buff = null;
 }
-    private
+    private 
 {
     const 
 {
     char* col = "az1";
 }
 }
-    private
+    private 
 {
     const 
 {
     char* ns = "az1.simple";
 }
 }
-    private
+    private 
 {
     int count_all_allocated_lists = 0;
 }
-    private
+    private 
 {
     int max_length_list = 0;
 }
-    private
+    private 
 {
     int max_use_pull = 0;
 }
-    private
+    private 
 {
     bool[char[]] predicate_as_multiple;
 }
-    private
+    private 
 {
     bool log_query = false;
 }
-    private
+    private 
 {
     mongo_connection conn;
 }
-    private
+    private 
 {
     TripleStorageMemory cache_query_result = null;
 }
-    private
+    private 
 {
     HashMap list_query = null;
 }
-    private
+    private 
 {
     HashMap S1PPOO_IDX = null;
 }
@@ -180,14 +180,14 @@ class TripleStorageMongoDB : TripleStorage
     char[] P2;
     char[] store_predicate_in_list_on_idx_s1ppoo;
     this(char[] host, int port);
-    public
+    public 
 {
     void set_log_query_mode(bool on_off)
 {
 log_query = on_off;
 }
 }
-    public
+    public 
 {
     void release_all_lists()
 {
@@ -195,7 +195,7 @@ last_used_element_in_pull = 0;
 last_used_element_in_strings = 0;
 }
 }
-    public
+    public 
 {
     void define_predicate_as_multiple(char[] predicate)
 {
@@ -205,29 +205,29 @@ cache_query_result.define_predicate_as_multiple(predicate);
 log.trace("define predicate [{}] as multiple",predicate);
 }
 }
-    public
+    public 
 {
     bool f_trace_list_pull = true;
 }
-    public
+    public 
 {
     void list_no_longer_required(triple_list_element* first_element_of_list)
 {
 }
 }
-    public
+    public 
 {
     void set_new_index(ubyte index, uint max_count_element, uint max_length_order, uint inital_triple_area_length)
 {
 }
 }
-    public
+    public 
 {
     void set_stat_info_logging(bool flag)
 {
 }
 }
-    public
+    public 
 {
     void setPredicatesToS1PPOO(char[] _P1, char[] _P2, char[] _store_predicate_in_list_on_idx_s1ppoo)
 {
@@ -238,19 +238,19 @@ if (cache_query_result !is null)
 cache_query_result.setPredicatesToS1PPOO(P1,P2,store_predicate_in_list_on_idx_s1ppoo);
 }
 }
-    private
+    private 
 {
     char[] p_rt = "mo/at/acl#rt\x00";
 }
-    public
+    public 
 {
     triple_list_element* getTriplesUseIndexS1PPOO(char* s, char* p, char* o);
 }
-    public
+    public 
 {
     triple_list_element* getTriples(char* s, char* p, char* o);
 }
-    private
+    private 
 {
     void logging_query(char[] op, char* s, char* p, char* o, triple_list_element* list)
 {
@@ -276,39 +276,39 @@ print_list_triple_to_file(log_file,list);
 log_file.close();
 }
 }
-    public
+    public 
 {
     bool removeTriple(char[] s, char[] p, char[] o);
 }
     bool f_trace_addTriple = false;
-    public
+    public 
 {
     int addTriple(char[] s, char[] p, char[] o);
 }
-    public
+    public 
 {
     void print_stat()
 {
 log.trace("TripleStorage:stat: max used pull={}, max length list={}",max_use_pull,max_length_list);
 }
 }
-    public
+    public 
 {
     void print_list_triple_to_file(File log_file, triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     void print_list_triple(triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     int get_count_form_list_triple(triple_list_element* list_iterator);
 }
-    public
+    public 
 {
     void print_triple(Triple* triple);
 }
-    public
+    public 
 {
     char[] triple_to_string(Triple* triple);
 }

@@ -10,7 +10,7 @@ struct amqp_decimal_t
     int decimals;
     uint32_t value;
 }
-public
+public 
 {
     static 
 {
@@ -46,7 +46,7 @@ struct amqp_table_t
     int num_entries;
     amqp_table_entry_t* entries;
 }
-public
+public 
 {
     static 
 {
@@ -60,7 +60,7 @@ return entry;
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -72,7 +72,7 @@ return _AMQP_TE_INIT(k,'S',val);
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -84,7 +84,7 @@ return _AMQP_TE_INIT(k,'I',val);
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -96,7 +96,7 @@ return _AMQP_TE_INIT(k,'D',val);
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -108,7 +108,7 @@ return _AMQP_TE_INIT(k,'T',val);
 }
 }
 }
-public
+public 
 {
     static 
 {
@@ -178,7 +178,7 @@ struct amqp_rpc_reply_t
     amqp_method_t reply;
     int library_errno;
 }
-public
+public 
 {
     enum amqp_sasl_method_enum 
 {
