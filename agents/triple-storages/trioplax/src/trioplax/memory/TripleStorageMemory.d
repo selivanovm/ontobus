@@ -5,7 +5,7 @@ private import tango.stdc.string;
 private import tango.stdc.stringz;
 
 private import Integer = tango.text.convert.Integer;
-private import tango.io.FileConduit;
+private import tango.io.device.File;
 private import tango.time.WallClock;
 private import tango.time.Clock;
 private import tango.text.locale.Locale;

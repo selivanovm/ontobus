@@ -12,8 +12,7 @@ private import Log;
 
 private import tango.io.device.File;
 private import tango.io.FileScan;
-private import tango.io.FileConduit;
-private import tango.io.stream.MapStream;
+private import tango.io.stream.Map;
 
 private import Integer = tango.text.convert.Integer;
 
@@ -40,6 +39,18 @@ private import autotest;
 private import script_util;
 private import RightTypeDef;
 private import fact_tools;
+
+private import amqp;
+private import amqp_api;
+private import amqp_base;
+private import amqp_connection;
+private import amqp_framing;
+private import amqp_framing_;
+private import amqp_mem;
+private import amqp_private;
+private import amqp_socket;
+private import amqp_table;
+
 
 private Authorization az = null;
 public char[][char[]] props;
@@ -973,7 +984,7 @@ private void writeToLog(char[] string)
 private char[][char[]] load_props()
 {
 	char[][char[]] result;
-	FileConduit props_conduit;
+	File props_conduit;
 
 	auto props_path = new FilePath("./semargl.properties");
 
@@ -1019,7 +1030,7 @@ private char[][char[]] load_props()
 		result["mongodb_server"] = "127.0.0.1";
 		result["mongodb_port"] = "27017";
 
-		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
+		props_conduit = new File(props_path.toString(), File.ReadWriteCreate);
 		auto output = new MapOutput!(char)(props_conduit.output);
 
 		output.append(result);
@@ -1028,7 +1039,7 @@ private char[][char[]] load_props()
 	}
 	else
 	{
-		props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadExisting);
+		props_conduit = new File(props_path.toString(), File.ReadExisting);
 		auto input = new MapInput!(char)(props_conduit.input);
 		result = result.init;
 		input.load(result);

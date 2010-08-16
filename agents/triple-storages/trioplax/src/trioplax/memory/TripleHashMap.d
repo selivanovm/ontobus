@@ -85,10 +85,10 @@ class HashMap
 	public void put(char[] key1, char[] key2, char[] key3, Triple* triple_ptr)
 	{
 		if(key1 is null && key2 is null && key3 is null)
-			return null;
+			return;
 
 		if(key1.length == 0 && key2.length == 0 && key3.length == 0)
-			return null;
+			return;
 
 		int STORE_keyz_area__last = keyz_area__last;
 		int STORE_triples_area__last = triples_area__last;		

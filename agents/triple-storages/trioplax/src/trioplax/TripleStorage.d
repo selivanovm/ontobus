@@ -1,7 +1,7 @@
 module trioplax.TripleStorage;
 
 private import trioplax.triple;
-private import tango.io.FileConduit;
+private import tango.io.device.File;
 
 interface TripleStorage
 {

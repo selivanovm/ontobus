@@ -285,7 +285,7 @@ void prepare_block(char* line, ulong line_length)
 		auto input_data_text = new Text!(char)(qqq);
 		//		while(strstr(input_data_text.toString().ptr, "<>") !is null)
 		//		{
-		input_data_text.select("{<>");
+		input_data_text.search("{<>").next; //???
 		input_data_text.replace("{<><" ~ NEW_UID ~ ">\"" ~ result_id_text ~ "\".<>");
 		//		}
 		//		log.trace("#i1-5");

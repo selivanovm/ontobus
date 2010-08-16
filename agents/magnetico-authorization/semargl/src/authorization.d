@@ -5,14 +5,10 @@ private import Predicates;
 private import tango.io.Stdout;
 private import tango.stdc.string;
 private import tango.stdc.stdlib;
-private import tango.io.FileConduit;
-private import tango.io.stream.MapStream;
+private import tango.io.stream.Map;
 private import Integer = tango.text.convert.Integer;
 
-version(tango_99_8)
-{
-	private import tango.io.device.File;
-}
+private import tango.io.device.File;
 
 private import Text = tango.text.Util;
 private import tango.time.StopWatch;
@@ -270,9 +266,9 @@ class Authorization
 				props[prop_name] = Integer.toString(param);
 			}
 
-			FileConduit props_conduit;
+			File props_conduit;
 			auto props_path = new FilePath("./semargl.properties");
-			props_conduit = new FileConduit(props_path.toString(), FileConduit.ReadWriteCreate);
+			props_conduit = new File(props_path.toString(), File.ReadWriteCreate);
 			auto output = new MapOutput!(char)(props_conduit.output);
 
 			output.append(props);
