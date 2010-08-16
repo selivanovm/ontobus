@@ -1,5 +1,6 @@
 authorization agent prototype for magnetico
 
+
 compile:
 +linux ubuntu 10.4
 +dmd 1.43
