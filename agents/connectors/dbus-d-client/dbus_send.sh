@@ -1,1 +1,0 @@
-dbus-send --dest='test.signal.sink' --type=signal test/signal/sink/object/name test.signal.Type int32:47 string:'hello world' double:65.32
