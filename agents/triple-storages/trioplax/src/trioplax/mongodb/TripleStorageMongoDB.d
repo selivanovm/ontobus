@@ -77,7 +77,7 @@ class TripleStorageMongoDB: TripleStorage
 			cache_query_result.set_new_index(idx_name.S, 100_000, 5, 1_000_000);
 			cache_query_result.set_new_index(idx_name.O, 100_000, 5, 1_000_000);
 			cache_query_result.set_new_index(idx_name.PO, 100_000, 5, 1_000_000);
-			cache_query_result.set_new_index(idx_name.SP, 100_000, 5, 1_000_000);
+			cache_query_result.set_new_index(idx_name.SP, 100_000, 6, 1_000_000);
 			cache_query_result.set_new_index(idx_name.S1PPOO, 100_000, 5, 1_000_000);
 
 			//			cache_query_result.f_trace_addTriple = true;

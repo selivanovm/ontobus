@@ -2,6 +2,7 @@ module scripts.S11ACLRightsHierarhical;
 
 private import tango.io.Stdout;
 private import tango.stdc.string;
+private import tango.stdc.stringz;
 private import tango.stdc.stdio;
 private import tango.core.Thread;
 
@@ -100,7 +101,15 @@ bool lookRightOfIterator(triple_list_element* iterator3, char* rightType, Triple
 			if(triple3 !is null)
 			{
 				char* s = cast(char*) triple3.s;
+				
 				char* p = cast(char*) triple3.p;
+				
+				if (s is null)
+				{
+				    log.trace ("Exception: scripts.S11ACLRightsHierarhical.lookRightOfIterator (..)  subject is null, p = " ~ fromStringz (p));
+				    throw new Exception ("scripts.S11ACLRightsHierarhical.lookRightOfIterator (..)  subject is null, p = " ~ fromStringz (p));
+				}
+				
 
 				triple_list_element* category_triples = ts.getTriples(s, CATEGORY.ptr, null);
 				triple_list_element* category_triples_FE = category_triples;
