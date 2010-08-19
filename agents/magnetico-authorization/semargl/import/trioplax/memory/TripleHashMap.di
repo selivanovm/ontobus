@@ -1,42 +1,42 @@
 // D import file generated from 'src/trioplax/memory/TripleHashMap.d'
 module trioplax.memory.HashMap;
-private
+private 
 {
     import tango.stdc.stdlib;
 }
-private
+private 
 {
     import tango.stdc.stdlib;
 }
-private
+private 
 {
     import tango.stdc.string;
 }
-private
+private 
 {
     import tango.stdc.stringz;
 }
-private
+private 
 {
     import tango.io.Stdout;
 }
-private
+private 
 {
     import Integer = tango.text.convert.Integer;
 }
-private
+private 
 {
     import trioplax.Log;
 }
-private
+private 
 {
     import trioplax.triple;
 }
-private
+private 
 {
     import trioplax.memory.Hash;
 }
-private
+private 
 {
     import trioplax.memory.IndexException;
 }
@@ -48,63 +48,63 @@ struct triple_list_header
 }
 class HashMap
 {
-    public
+    public 
 {
     bool f_check_add_to_index = false;
 }
-    public
+    public 
 {
     bool f_check_remove_from_index = false;
 }
-    public
+    public 
 {
     bool INFO_remove_triple_from_list = false;
 }
-    public
+    public 
 {
     bool f_trace_put = false;
 }
-    public
+    public 
 {
     bool f_trace_get = false;
 }
-    private
+    private 
 {
     uint count_element = 0;
 }
-    private
+    private 
 {
     char[] hashName;
 }
-    private
+    private 
 {
     uint max_count_elements = 1000;
 }
-    private
+    private 
 {
     uint max_size_short_order = 8;
 }
-    private
+    private 
 {
     triple_list_header*[] reducer;
 }
-    private
+    private 
 {
     int max_size_reducer = 0;
 }
-    private
+    private 
 {
     ubyte[] keyz_area;
 }
-    private
+    private 
 {
     int keyz_area__last = 0;
 }
-    private
+    private 
 {
     Triple[] triples_area = null;
 }
-    private
+    private 
 {
     int triples_area__last = 0;
 }
@@ -124,41 +124,41 @@ triples_area = new Triple[](_max_count_elements);
 triples_area__last = 0;
 log.trace("*** create object HashMap... ok");
 }
-    public
+    public 
 {
     uint get_count_elements()
 {
 return count_element;
 }
 }
-    public
+    public 
 {
     char[] getName()
 {
 return hashName;
 }
 }
-    public
+    public 
 {
     void put(char[] key1, char[] key2, char[] key3, Triple* triple_ptr);
 }
-    public
+    public 
 {
     bool check_triple_in_list(Triple* triple_ptr, char* key1, char* key2, char* key3);
 }
-    public
+    public 
 {
     triple_list_element* get(char* key1, char* key2, char* key3, out int pos_in_reducer);
 }
-    public
+    public 
 {
     void remove_triple_from_list(Triple* removed_triple, char[] s, char[] p, char[] o);
 }
-    public
+    public 
 {
     void print_triple(char[] header, Triple* triple);
 }
-    public
+    public 
 {
     char[] triple_to_string(Triple* triple);
 }

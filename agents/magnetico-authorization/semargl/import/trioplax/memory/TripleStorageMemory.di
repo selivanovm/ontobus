@@ -257,7 +257,7 @@ File log_file = new File("triple-storage-io",style);
 auto tm = WallClock.now;
 auto dt = Clock.toDate(tm);
 log_file.output.write(layout("{:yyyy-MM-dd HH:mm:ss},{} ",tm,dt.time.millis));
-log_file.output.write("\x0a" ~ op ~ " FROM INDEX " ~ a_s ~ a_p ~ a_o ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(buff,count) ~ "\x0a");
+log_file.output.write("\x0a" ~ op ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(buff,count) ~ "\x0a");
 print_list_triple_to_file(log_file,list);
 log_file.close();
 }

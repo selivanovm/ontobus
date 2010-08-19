@@ -91,8 +91,8 @@ class HashMap
 			return;
 
 		int STORE_keyz_area__last = keyz_area__last;
-		int STORE_triples_area__last = triples_area__last;		
-		
+		int STORE_triples_area__last = triples_area__last;
+
 		uint hash = (getHash(key1, key2, key3) & 0x7FFFFFFF) % max_count_elements;
 		uint short_order_conflict_keys = hash * max_size_short_order;
 
@@ -304,9 +304,9 @@ class HashMap
 				{
 					// перед выбросом Exception, если заполнялась новая ячейка в short order, то очистим ее
 					// восстановим глобальные переменные  
-					
+
 					keyz_area__last = STORE_keyz_area__last;
-					triples_area__last = STORE_triples_area__last;		
+					triples_area__last = STORE_triples_area__last;
 
 					reducer[short_order_conflict_keys + first_free_header_place] = null;
 
@@ -619,7 +619,7 @@ class HashMap
 	{
 		f_check_add_to_index = true;
 
-		//		INFO_remove_triple_from_list = true;
+//		INFO_remove_triple_from_list = true;
 
 		int idx_header;
 		int count_triples_in_list = 0;
@@ -669,8 +669,6 @@ class HashMap
 
 			while(list !is null)
 			{
-				//count_triples_in_list++;
-
 				if(removed_triple == list.triple)
 				{
 					found_remove_triple_in_list = true;
@@ -682,54 +680,23 @@ class HashMap
 
 					if(list.next_triple_list_element is null)
 					{
-						// *(list + 1) == 0 -> означает что далее нет элементов, список закончен.
 						if(INFO_remove_triple_from_list)
 							log.trace("#{} remove triple from list: далее нет элементов, список закончен", hashName);
 
 						if(i == 0)
 						{
-							if(INFO_remove_triple_from_list)
-								log.trace("#{} remove triple from list: это первый и последний элемент в списке", hashName);
 							// это первый и последний элемент в списке, и так как длинна будующего списока равна нулю, 
 							// то следует удалить запись об этом списке в короткой очереди reducer'a
-							//							log.trace("#remove_triple_from_list: это первый и последний элемент в списке");
-							/*
-							 short last_element_in_order;
-							 for (last_element_in_order = found_pos_in_order_conflict_keys; last_element_in_order < max_size_short_order; last_element_in_order++)
-							 {
-							 log.trace("#{} remove triple from list: #0 last_element_in_order={}", hashName, last_element_in_order);
-							 if(reducer[found_short_order_conflict_keys + last_element_in_order] is null)
-							 {
-							 last_element_in_order--;
-							 break;
-							 }
-							 }
-							 if(INFO_remove_triple_from_list)
-							 log.trace("#{} remove triple from list: #1 last_element_in_order={}", hashName, last_element_in_order);
 
-							 if(last_element_in_order > 1)
-							 {
-							 // на место удаляемого элемента поставим последний, на место последнего запишем null
-							 if(INFO_remove_triple_from_list)
-							 log.trace("#{} remove triple from list: #2", hashName);
-							 reducer[found_short_order_conflict_keys + found_pos_in_order_conflict_keys] = reducer[last_element_in_order];
-							 reducer[last_element_in_order] = null;
-							 }
-							 else
-							 {
-							 if(INFO_remove_triple_from_list)
-							 log.trace("#{} remove triple from list: #3", hashName);
-							 reducer[found_short_order_conflict_keys + found_pos_in_order_conflict_keys] = null;
-							 
-							 }
-							 */
+							if(INFO_remove_triple_from_list)
+								log.trace("#{} remove triple from list: это первый и последний элемент в списке", hashName);
+
 							list.triple = null;
-							//print_list_triple(list);
 
 							list.next_triple_list_element = null;
+
 							// в область преобразования запишем 0, так как в очереди был один единственный элемент
 							// а значит, нужно удалить все упоминания об этом триплете 
-							//!!!???							reducer[found_short_order_conflict_keys + found_pos_in_order_conflict_keys] = null;
 
 							reducer[idx_header] = null;
 
@@ -737,22 +704,17 @@ class HashMap
 						}
 						else
 						{
+							// удаляемый элемент является последним элементом в списке, но список еще не пуст,   
+							// нужно выставить указатель на последний элемент списка, 
+							// для корректной работы добавления фактов с список (put) 
+
 							if(INFO_remove_triple_from_list)
 								log.trace(
 										"#{} remove triple from list: удаляемый элемент является последним элементом в списке, но список еще не пуст",
 										hashName);
-							// удаляемый элемент является последним элементом в списке, но список еще не пуст,   
-							// нужно выставить указатель на последний элемент списка, 
-							// для корректной работы добавления фактов с список (put) 
-							//							triple_list_header* header = reducer[found_short_order_conflict_keys + found_pos_in_order_conflict_keys];
-
-							//							log.trace("#remove_triple_from_list: это последний но не единственный элемент в списке");
-							//							log.trace("#remove_triple_from_list: keys_of_hash_in_reducer={:X4}, found_short_order_conflict_keys={:X4}",
-							//									keys_of_hash_in_reducer, found_short_order_conflict_keys);
 
 							if(idx_header > 0)
 							{
-								//								if(INFO_remove_triple_from_list)
 								if(INFO_remove_triple_from_list)
 									log.trace(
 											"#{} remove triple from list: сохраним в заголовке списка, ссылку на последний элемент этого списка",
@@ -760,15 +722,11 @@ class HashMap
 
 								triple_list_header* header = reducer[idx_header];
 
-								//								log.trace("#remove_triple_from_list: prev_element={:X4}", prev_element);
 								// сохраним в заголовке списка, ссылку на последний элемент этого списка
-								//ptr_to_mem(key_area, keys_of_hash_in_reducer + _LAST_ELEMENT, cast(uint) prev_element);
 								header.last_element = prev_element;
 
-								//								*(cast(uint*) (key_area.ptr + keys_of_hash_in_reducer + _LAST_ELEMENT)) = cast(uint) prev_element;
 								prev_element.next_triple_list_element = null;
 							}
-							//							break;
 						}
 					}
 					else

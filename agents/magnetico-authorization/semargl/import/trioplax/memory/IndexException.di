@@ -8,19 +8,19 @@ block_triple_area_is_full = -3,
 }
 class IndexException : Exception
 {
-    public
+    public 
 {
     char[] idxName;
 }
-    public
+    public 
 {
     int errCode;
 }
-    public
+    public 
 {
     uint curLimitParam;
 }
-    public
+    public 
 {
     char[] message;
 }

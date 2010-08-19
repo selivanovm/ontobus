@@ -79,9 +79,11 @@ class TripleStorageMongoDB: TripleStorage
 			cache_query_result.set_new_index(idx_name.PO, 100_000, 5, 1_000_000);
 			cache_query_result.set_new_index(idx_name.SP, 100_000, 6, 1_000_000);
 			cache_query_result.set_new_index(idx_name.S1PPOO, 100_000, 5, 1_000_000);
+			
+			cache_query_result.set_log_query_mode (log_query);
 
 			//			cache_query_result.f_trace_addTriple = true;
-			list_query = new HashMap("list_query", 10_000, 1_000_000, 3);
+			list_query = new HashMap("list_query", 10_000, 1_000_000, 5);
 			//			S1PPOO_IDX = new HashMap("S1PPOO_IDX", 10_000, 1_000_000, 5);
 		}
 
@@ -860,7 +862,7 @@ class TripleStorageMongoDB: TripleStorage
 		log_file.output.write(layout("{:yyyy-MM-dd HH:mm:ss},{} ", tm, dt.time.millis));
 
 		log_file.output.write(
-				"\n" ~ op ~ " FROM INDEX " ~ a_s ~ a_p ~ a_o ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(
+				"\n" ~ op ~ " s=[" ~ fromStringz(s) ~ "] p=[" ~ fromStringz(p) ~ "] o=[" ~ fromStringz(o) ~ "] " ~ Integer.format(
 						buff, count) ~ "\n");
 
 		print_list_triple_to_file(log_file, list);
@@ -1004,9 +1006,15 @@ class TripleStorageMongoDB: TripleStorage
 		bson_destroy(&op);
 
 		if(cache_query_result !is null)
+		{
 			cache_query_result.addTriple(s, p, o);
+		}
 
-		log.trace("TripleStorage:add Triple..ok");
+//		log.trace("TripleStorage:add Triple..ok");
+		
+		if(log_query == true)
+			logging_query("ADD", s.ptr, p.ptr, o.ptr, null);
+		
 		return 0;
 	}
 

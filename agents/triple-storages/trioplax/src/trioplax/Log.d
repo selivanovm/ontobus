@@ -38,7 +38,7 @@ private
 		// trace is the lowest level, so all levels are logged
 		Log.root.level(Logger.Level.Trace);
 
-		log = Log.getLogger("trace");
+		log = Log.getLogger("trioplax_trace");
 
 		_logFile = new AppendFile("trioplax.log", new VerySimpleLayout);
 		log.add(_logFile);

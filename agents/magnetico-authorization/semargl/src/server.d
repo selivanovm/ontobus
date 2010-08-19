@@ -837,12 +837,17 @@ void get_message(byte* message, ulong message_size, mom_client from_client)
 
 		}
 
-	} finally
+  	   log.trace("status execute message : SUCCESSFULLY\r\n");
+	}
+	catch (Exception ex)  
 	{
-		az.getTripleStorage().print_stat();
+		log.trace("Exception: {}", ex.msg);		
+  	   	log.trace("status execute message : NO GOOD\r\n");
+	}	
+	finally
+	{
+//		az.getTripleStorage().print_stat();
 		az.getTripleStorage().release_all_lists();
-
-		log.trace("message successfully prepared\r\n");
 	}
 }
 
